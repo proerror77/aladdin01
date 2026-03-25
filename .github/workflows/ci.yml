@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  lint-validate:
+    name: Lint & Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: "./scripts"
+          severity: warning
+
+      - name: Validate YAML configs
+        run: |
+          pip install yamllint --quiet
+          yamllint -d relaxed config/
+
+      - name: Validate state schema
+        run: |
+          python3 -c "
+          import yaml, sys
+          files = [
+            'state/progress-schema.yaml',
+            'config/compliance/blocklist.yaml',
+            'config/compliance/policy-rules.yaml',
+          ]
+          errors = []
+          for f in files:
+            try:
+              yaml.safe_load(open(f))
+              print(f'OK: {f}')
+            except FileNotFoundError:
+              print(f'SKIP (not found): {f}')
+            except yaml.YAMLError as e:
+              errors.append(f'{f}: {e}')
+          if errors:
+            print('YAML errors:', errors, file=sys.stderr)
+            sys.exit(1)
+          "
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for leaked secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  compliance-config-test:
+    name: Compliance Config Test
+    runs-on: ubuntu-latest
+    # 仅在 push to main 时运行（PR 跳过，避免暴露 key）
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint-validate, secret-scan]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check env vars present
+        env:
+          ARK_API_KEY: ${{ secrets.ARK_API_KEY }}
+          IMAGE_GEN_API_URL: ${{ secrets.IMAGE_GEN_API_URL }}
+          IMAGE_GEN_API_KEY: ${{ secrets.IMAGE_GEN_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: ./scripts/api-caller.sh env-check
+
+      - name: Validate blocklist format
+        run: |
+          python3 -c "
+          import yaml
+          data = yaml.safe_load(open('config/compliance/blocklist.yaml'))
+          assert isinstance(data, dict), 'blocklist must be a dict'
+          print('blocklist.yaml OK')
+          "
+
+      - name: Validate policy-rules format
+        run: |
+          python3 -c "
+          import yaml
+          data = yaml.safe_load(open('config/compliance/policy-rules.yaml'))
+          assert isinstance(data, dict), 'policy-rules must be a dict'
+          print('policy-rules.yaml OK')
+          "
