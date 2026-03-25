@@ -1,0 +1,126 @@
+# 状态文件 Schema 定义
+# 所有状态文件使用 JSON 格式
+
+version: "1.0"
+
+# 主索引文件：state/progress.json
+# 仅作为索引，不直接写入，由 ~status 汇总读取
+progress_index:
+  version:
+    type: string
+    description: "Schema version"
+  batch_start:
+    type: string
+    description: "Batch start timestamp (ISO 8601)"
+  episodes:
+    type: object
+    description: "Episode index, key = episode id"
+    properties:
+      status:
+        type: string
+        enum: [pending, in_progress, awaiting_review, completed, failed, skipped]
+      current_phase:
+        type: integer
+        description: "Current phase number (1-5)"
+
+# 各阶段状态文件：state/{ep}-phase{N}.json
+# 每个 agent 完成后写入自己的阶段文件
+phase_state:
+  episode:
+    type: string
+    description: "Episode id"
+  phase:
+    type: integer
+    description: "Phase number (1-5)"
+  status:
+    type: string
+    enum: [in_progress, awaiting_review, needs_revision, completed, failed]
+  started_at:
+    type: string
+    description: "Start timestamp (ISO 8601)"
+  completed_at:
+    type: string
+    description: "Completion timestamp (ISO 8601)"
+  data:
+    type: object
+    description: "Phase-specific data"
+
+# Phase 1 (comply-agent) data
+phase1_data:
+  rewrites_count:
+    type: integer
+    description: "Number of rewrites made during compliance check"
+  compliance_passed:
+    type: boolean
+    description: "Whether compliance check passed"
+
+# Phase 2 (visual-agent) data
+phase2_data:
+  shot_count:
+    type: integer
+    description: "Total number of shots"
+  total_duration:
+    type: number
+    description: "Total duration in seconds"
+
+# Phase 3 (design-agent) data
+phase3_data:
+  new_characters:
+    type: integer
+    description: "Number of newly generated character reference images"
+  reused_characters:
+    type: integer
+    description: "Number of reused character reference images"
+  scenes:
+    type: integer
+    description: "Number of scene reference images"
+
+# Phase 4 (voice-agent) data
+phase4_data:
+  voice_count:
+    type: integer
+    description: "Number of voices configured"
+
+# 镜次状态文件：state/{ep}-shot-{N}.json
+# 每个 gen-worker 独立写入
+shot_state:
+  episode:
+    type: string
+    description: "Episode id"
+  shot_id:
+    type: string
+    description: "Full shot id (e.g., ep01-s01-shot01)"
+  shot_index:
+    type: integer
+    description: "Shot index number (1, 2, 3...)"
+  status:
+    type: string
+    enum: [pending, generating, completed, failed]
+    description: "Current shot status"
+  started_at:
+    type: string
+    description: "Start timestamp (ISO 8601)"
+  completed_at:
+    type: string
+    description: "Completion timestamp (ISO 8601)"
+  video_path:
+    type: string
+    description: "Path to generated video file (empty string if failed)"
+  original_retries:
+    type: integer
+    description: "Number of retries with original prompt"
+  rewrite_rounds:
+    type: integer
+    description: "Number of prompt rewrite rounds"
+  total_api_calls:
+    type: integer
+    description: "Total number of API calls made"
+  error_message:
+    type: string
+    description: "Human-readable error message if failed"
+  last_prompt:
+    type: string
+    description: "Last prompt used before failure (for debugging)"
+  last_rejection:
+    type: string
+    description: "Last rejection reason from API (for debugging)"

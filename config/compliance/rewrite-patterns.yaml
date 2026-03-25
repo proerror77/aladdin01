@@ -1,0 +1,60 @@
+---
+# 提示词改写模式 - 视频生成被拒后的 LLM 改写指导
+# 用于 gen-worker 在 5 次重试失败后触发的改写阶段
+
+version: "1.0"
+
+# 改写原则
+principles:
+  - "最小改写：只修改导致拒绝的部分，保留镜头意图和叙事功能"
+  - "保留主体：角色外貌、服装、场景不变"
+  - "保留镜头：镜头类型、运镜方式不变"
+  - "降级表达：将直接描述改为间接/暗示表达"
+
+# 暴力场景改写模式
+violence_rewrites:
+  - pattern: "角色A攻击角色B"
+    rewrite: "角色A做出攻击动作，镜头切到角色B的反应表情"
+  - pattern: "血腥/流血"
+    rewrite: "删除血腥描述，保留受伤后的情绪状态"
+  - pattern: "武器近景"
+    rewrite: "改为武器持握的手部特写，不展示伤害过程"
+  - pattern: "死亡场景"
+    rewrite: "改为角色倒下的背影或旁观者的震惊表情"
+
+# 性暗示场景改写模式
+sexual_rewrites:
+  - pattern: "亲密接触"
+    rewrite: "改为眼神交流或手部接触的情感特写"
+  - pattern: "暴露服装"
+    rewrite: "改为保守服装描述，保留角色气质"
+
+# 冲突场景改写模式
+conflict_rewrites:
+  - pattern: "激烈争吵+辱骂"
+    rewrite: "改为激烈争吵，角色表情愤怒，无具体辱骂词汇"
+  - pattern: "威胁性语言"
+    rewrite: "改为强硬语气的对话，删除威胁内容"
+
+# 改写提示词模板（发给 LLM 的 system prompt）
+llm_rewrite_prompt: |
+  你是一个视频提示词优化专家。以下提示词被视频生成平台拒绝了。
+
+  你的任务：
+  1. 分析可能导致拒绝的内容
+  2. 对提示词做最小改写，只修改问题部分
+  3. 保留：镜头意图、角色外貌、场景设定、运镜方式
+  4. 降级：暴力→反应镜头，性→情绪氛围，辱骂→中性冲突
+  5. 输出改写后的完整提示词，不超过 2000 字符
+
+  原始提示词：
+  {original_prompt}
+
+  拒绝原因（如有）：
+  {rejection_reason}
+
+  请直接输出改写后的提示词，不要解释。
+
+# 改写轮次限制
+max_rewrite_rounds: 3
+escalation_on_failure: "标记为 failed，记录到 generation-report.md，通知 team-lead"

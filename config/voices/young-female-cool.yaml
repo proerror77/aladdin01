@@ -1,0 +1,15 @@
+---
+id: young-female-cool
+display_name: "年轻女性·冷艳"
+gender: female
+age_range: "20-30"
+tone: cool
+language: zh-CN
+tts_platform: "pending"
+voice_id: ""
+sample_description: "声线清冷，语速偏慢，适合高冷、神秘的女性角色"
+suitable_roles:
+  - 女强人
+  - 反派
+  - 神秘角色
+  - 冷艳女主

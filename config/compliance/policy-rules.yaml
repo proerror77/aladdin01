@@ -1,0 +1,49 @@
+---
+# 合规策略规则 - 第二层 LLM 判断 + 第三层 Moderation API
+
+version: "1.0"
+
+# LLM 判断层（第二层）
+llm_check:
+  enabled: true
+  model: "claude-sonnet-4-6"
+  # 判断维度
+  dimensions:
+    - name: violence_level
+      description: "暴力程度：0=无，1=轻微冲突，2=明显暴力，3=极端暴力"
+      threshold: 2  # ≥2 触发改写
+    - name: sexual_content
+      description: "性内容：0=无，1=暗示，2=明显，3=露骨"
+      threshold: 1  # ≥1 触发改写
+    - name: hate_speech
+      description: "仇恨言论：0=无，1=轻微，2=明显，3=严重"
+      threshold: 2
+    - name: self_harm
+      description: "自我伤害：0=无，1=提及，2=描述，3=鼓励"
+      threshold: 1
+
+# OpenAI Moderation API（第三层）
+moderation_api:
+  enabled: true
+  endpoint: "https://api.openai.com/v1/moderations"
+  # 触发改写的类别阈值
+  thresholds:
+    sexual: 0.5
+    violence: 0.7
+    self-harm: 0.5
+    hate: 0.6
+    harassment: 0.6
+
+# 改写策略映射
+rewrite_strategies:
+  violence: "替换为反应镜头或情绪特写，保留叙事张力"
+  sexual: "改为情绪氛围描写，保留角色关系"
+  abuse: "改为中性冲突表达，保留戏剧冲突"
+  illegal_detail: "删除具体操作细节，保留事件结果"
+  political: "删除敏感词汇，改为中性表述"
+
+# 输出格式
+output:
+  story_script: "保留原始剧本（仅供内部记录）"
+  render_script: "合规改写后的版本，供后续所有阶段使用"
+  compliance_report: "记录所有改写点、原文、改写后内容、触发层级"

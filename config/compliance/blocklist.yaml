@@ -1,0 +1,64 @@
+---
+# 合规敏感词表 - 第一层检测（精确匹配 + 正则）
+# 命中即触发改写，不进入 LLM 判断层
+
+version: "1.0"
+
+# 暴力类
+violence:
+  keywords:
+    - 杀死
+    - 砍头
+    - 爆头
+    - 血腥
+    - 虐杀
+    - 肢解
+    - 割喉
+  patterns:
+    - "\\b(gun|knife|sword)\\s+(kill|murder|stab)\\b"
+    - "大量鲜血"
+    - "内脏.*外露"
+
+# 性相关
+sexual:
+  keywords:
+    - 裸体
+    - 色情
+    - 性爱
+    - 做爱
+    - 淫秽
+  patterns:
+    - "露出.*胸部"
+    - "脱.*衣服.*全裸"
+
+# 辱骂类
+abuse:
+  keywords:
+    - 操你
+    - 傻逼
+    - 滚蛋
+    - 废物
+    - 贱人
+  patterns: []
+
+# 违法细节
+illegal:
+  keywords:
+    - 制毒
+    - 贩毒
+    - 爆炸物
+    - 自制炸弹
+    - 非法枪支
+  patterns:
+    - "如何.*制作.*炸弹"
+    - "合成.*毒品.*步骤"
+
+# 政治敏感（中国市场）
+political:
+  keywords:
+    - 台独
+    - 藏独
+    - 法轮功
+    - 六四
+    - 天安门事件
+  patterns: []

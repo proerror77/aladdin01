@@ -1,0 +1,16 @@
+---
+# 预设音色库 - 年轻男性（温柔）
+id: young-male-gentle
+display_name: "年轻男性·温柔"
+gender: male
+age_range: "18-28"
+tone: gentle
+language: zh-CN
+tts_platform: "pending"
+voice_id: ""  # TTS 平台启用后填入
+sample_description: "声线清澈，语速适中，适合温柔、内敛的男性角色"
+suitable_roles:
+  - 学生
+  - 文艺青年
+  - 暗恋者
+  - 温柔男主

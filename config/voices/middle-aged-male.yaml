@@ -1,0 +1,15 @@
+---
+id: middle-aged-male
+display_name: "中年男性·沉稳"
+gender: male
+age_range: "35-50"
+tone: steady
+language: zh-CN
+tts_platform: "pending"
+voice_id: ""
+sample_description: "声线低沉有力，语速稳健，适合成熟、权威的男性角色"
+suitable_roles:
+  - 父亲
+  - 上司
+  - 反派头目
+  - 导师

@@ -1,0 +1,15 @@
+---
+id: young-female-sweet
+display_name: "年轻女性·甜美"
+gender: female
+age_range: "18-25"
+tone: sweet
+language: zh-CN
+tts_platform: "pending"
+voice_id: ""
+sample_description: "声线明亮甜美，语速轻快，适合活泼、可爱的女性角色"
+suitable_roles:
+  - 女主角
+  - 闺蜜
+  - 学生
+  - 邻家女孩

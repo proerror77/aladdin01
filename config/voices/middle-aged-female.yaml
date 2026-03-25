@@ -1,0 +1,15 @@
+---
+id: middle-aged-female
+display_name: "中年女性·知性"
+gender: female
+age_range: "35-50"
+tone: intellectual
+language: zh-CN
+tts_platform: "pending"
+voice_id: ""
+sample_description: "声线成熟知性，语速适中，适合职场、家庭中的成熟女性角色"
+suitable_roles:
+  - 母亲
+  - 女上司
+  - 导师
+  - 成熟女性

@@ -1,0 +1,14 @@
+.env
+.env.*
+*.env
+
+# 生成产物（视频/图片）
+outputs/**/*.mp4
+outputs/**/*.mov
+outputs/**/*.mp3
+assets/characters/images/
+assets/characters/voices/
+assets/scenes/images/
+
+# 运行时状态（不追踪具体进度）
+state/*.json

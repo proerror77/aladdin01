@@ -1,0 +1,244 @@
+ep_id: ep01
+total_shots: 22
+shots:
+  - shot_id: ep01-shot-01
+    shot_index: 1
+    scene: 木屋室内
+    duration: 5
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      昏暗木屋室内，一把锋利的剔骨刀在粗糙磨刀石上缓慢摩擦，黄色烛光摇曳，投下不稳定的阴影。极近特写，镜头微微震颤，写实电影感，高对比度，暗调。背景传来金属摩擦石头的刺耳声响。
+
+  - shot_id: ep01-shot-02
+    shot_index: 2
+    scene: 木屋室内
+    duration: 5
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      昏暗木屋室内，中年男子赛拉斯半张脸隐藏在深重阴影中，另半张脸被烛光勾勒，嘴角挂着一抹诡异僵硬的微笑。近景人物特写，镜头缓慢推进，写实电影感，高对比度暗调。远处隐约传来低沉的雷声滚动。
+
+  - shot_id: ep01-shot-03
+    shot_index: 3
+    scene: 木屋室内
+    duration: 6
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      极近特写，剔骨刀刀刃在烛光下反光，光芒划过赛拉斯浑浊阴冷的眼球，眼神中透出危险的光。镜头从刀刃缓慢上移至眼睛，写实电影感，高对比度，暗调。Silas: "A perfect night for cooking."
+
+  - shot_id: ep01-shot-04
+    shot_index: 4
+    scene: 木屋室外
+    duration: 5
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      木屋室外夜晚，狂风卷着暴雪疯狂拍打木屋破旧的木门，门板在风中剧烈颤抖，积雪堆积在门槛。仰角广角镜头，镜头随风轻微晃动，写实电影感，冷色调，暗蓝夜色。背景传来猛烈的敲门声与呼啸风声。
+
+  - shot_id: ep01-shot-05
+    shot_index: 5
+    scene: 木屋室外
+    duration: 6
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋门外，两道被大雪覆盖的身影蜷缩在门口，全身颤抖，衣物湿透结冰，呼出的白气在寒风中消散。中景，手持镜头微微抖动，写实电影感，冷蓝色调，暴风雪背景虚化。Megan: "Hello? Is anyone in there? Please!"
+
+  - shot_id: ep01-shot-06
+    shot_index: 6
+    scene: 木屋室内
+    duration: 4
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      木屋室内，赛拉斯持刀的手骤然停住，刀尖悬在半空一动不动，烛光在静止的刀刃上跳动。极近特写手部，镜头静止，写实电影感，高对比度暗调。金属摩擦声戛然而止，室内陷入死寂。
+
+  - shot_id: ep01-shot-07
+    shot_index: 7
+    scene: 木屋室内
+    duration: 6
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋室内，赛拉斯面部特写，嘴角上扬的弧度变得极其夸张扭曲，双眼死死盯向大门方向，眼神中透出疯狂的兴奋。近景人物，镜头缓慢推进，写实电影感，烛光暖黄与阴影强烈对比。Silas: "Ah dinner delivered itself."
+
+  - shot_id: ep01-shot-08
+    shot_index: 8
+    scene: 木屋门口
+    duration: 5
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      木屋门口内侧，沉重的木门随着刺耳的摩擦声被缓缓向内拉开，风雪夹杂着刺骨寒气从门缝涌入，烛光剧烈摇曳。低角度仰拍，镜头从门缝向外推，写实电影感，冷暖色调强烈对比。木门铰链发出沉重的嘎吱声。
+
+  - shot_id: ep01-shot-09
+    shot_index: 9
+    scene: 木屋门口
+    duration: 6
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋门口，赛拉斯面部瞬间切换为极其和蔼憨厚的笑容，眼睛弯成月牙，双手张开做出欢迎姿态，与刚才的阴森形成强烈反差。近景人物，镜头轻微推进，写实电影感，门口暖光映照。Silas: "Oh my goodness! You poor souls!"
+
+  - shot_id: ep01-shot-10
+    shot_index: 10
+    scene: 木屋门口
+    duration: 7
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋门口，大卫全身颤抖、牙齿打颤，双手紧紧抓住赛拉斯的手臂，眼神中充满感激与如释重负，嘴唇因寒冷而发紫。中近景，手持镜头微抖，写实电影感，门口暖光与室外冷蓝形成对比。David: "Thank you... thank God you're here! We got totally lost."
+
+  - shot_id: ep01-shot-11
+    shot_index: 11
+    scene: 木屋室内
+    duration: 6
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋室内，梅根嘴唇发紫、双臂紧抱取暖，跟在大卫身后缓缓迈入屋内，目光扫视四周，神情疲惫而警惕。中景跟拍，镜头缓慢横移，写实电影感，室内烛光暖黄，与她冻僵的状态形成对比。Megan: "It is freezing out there."
+
+  - shot_id: ep01-shot-12
+    shot_index: 12
+    scene: 木屋室内
+    duration: 5
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      木屋室内，赛拉斯侧身礼貌地让两人进屋，随即转身用力将沉重的木门猛地合上，门框震动，尘土飘落。中景，镜头跟随门的关闭动作，写实电影感，暗调。沉重的木门砰然关闭声在室内回响。
+
+  - shot_id: ep01-shot-13
+    shot_index: 13
+    scene: 木屋室内
+    duration: 5
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      木屋室内，极近特写赛拉斯的手在身后悄悄拨动门上三道暗锁，动作熟练而隐秘，每道锁扣合时金属碰撞声清晰可辨。手部特写，镜头静止，写实电影感，高对比度暗调。三声清脆的金属锁扣声依次响起。
+
+  - shot_id: ep01-shot-14
+    shot_index: 14
+    scene: 木屋客厅
+    duration: 6
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋客厅，大卫走到壁炉旁，双手伸向火焰搓揉取暖，脸上浮现出放松的笑容，火光映照在他的脸上，神情毫无戒备。中景，镜头缓慢推进，写实电影感，壁炉暖橙光，背景虚化。David: "You saved our lives mister. Truly."
+
+  - shot_id: ep01-shot-15
+    shot_index: 15
+    scene: 木屋客厅
+    duration: 7
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋客厅，赛拉斯背对着大卫，面部表情瞬间垮塌，和蔼的笑容消失殆尽，恢复阴森冷酷的本来面目，眼神空洞而危险。近景人物背面，镜头缓慢拉远，写实电影感，背光剪影，高对比度暗调。Silas: "Just doing what any good neighbor would."
+
+  - shot_id: ep01-shot-16
+    shot_index: 16
+    scene: 木屋厨房
+    duration: 5
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      木屋厨房，赛拉斯缓步走向厨房台面，目光锁定台面上那把锋利的剁骨刀，步伐沉稳而目的明确。中景跟拍，镜头缓慢推进，写实电影感，厨房昏暗，刀刃在光线下隐约反光。脚步声缓缓靠近厨房台面。
+
+  - shot_id: ep01-shot-17
+    shot_index: 17
+    scene: 木屋厨房
+    duration: 7
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋厨房，极近特写赛拉斯的手缓缓覆盖在刀柄上，指节因用力而泛白，手背青筋隐现，动作缓慢而充满压迫感。手部特写，镜头静止，写实电影感，高对比度，暗调。Silas: "Make yourselves at home. I'll get something warm."
+
+  - shot_id: ep01-shot-18
+    shot_index: 18
+    scene: 木屋客厅
+    duration: 6
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋客厅，大卫傻笑着环顾四周，眼神好奇而放松，对周围的危险毫无察觉，神情天真愉快。中景，镜头缓慢环绕，写实电影感，壁炉暖光，室内昏黄氛围。David: "Wow this place is so cozy! Very rustic!"
+
+  - shot_id: ep01-shot-19
+    shot_index: 19
+    scene: 木屋厨房
+    duration: 7
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋厨房，赛拉斯的眼睛透过厨房木栅栏缝隙窥视客厅中的两人，眼神阴冷而计算，嘴角微微上扬，手仍握着刀柄。极近特写眼部，镜头静止，写实电影感，栅栏投下条纹阴影，高对比度暗调。Silas: "Now who goes into the pot first?"
+
+  - shot_id: ep01-shot-20
+    shot_index: 20
+    scene: 木屋客厅
+    duration: 5
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      木屋客厅，大卫伸着双手靠近壁炉烤火，全身放松，神情惬意，对身后的危险浑然不觉。中景，镜头缓慢推进，写实电影感，壁炉火光跳动，暖橙色调。壁炉中木柴噼啪燃烧的声响温暖而讽刺。
+
+  - shot_id: ep01-shot-21
+    shot_index: 21
+    scene: 木屋客厅
+    duration: 5
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: false
+    prompt: |
+      木屋客厅角落，梅根独自坐在破旧的旧沙发上，身体微微蜷缩，目光游移，神情与大卫的放松截然不同，隐约透出一丝不安。中近景，镜头缓慢推进，写实电影感，角落光线昏暗，背景虚化。隐约传来低沉而有节律的心跳声。
+
+  - shot_id: ep01-shot-22
+    shot_index: 22
+    scene: 木屋客厅
+    duration: 6
+    ratio: "9:16"
+    resolution: "1080p"
+    generation_mode: text2video
+    generate_audio: true
+    prompt: |
+      木屋客厅，梅根面部特写，眼神毫无温度，冰冷如刀，目光锐利地刺向厨房方向，嘴角微微下压，表情中透出隐藏的危险与算计。极近特写，镜头静止，写实电影感，侧光勾勒轮廓，高对比度暗调。Megan: "Cozy? We will see about that."
