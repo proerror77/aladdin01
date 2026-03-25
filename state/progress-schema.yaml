@@ -124,3 +124,41 @@ shot_state:
   last_rejection:
     type: string
     description: "Last rejection reason from API (for debugging)"
+
+# ─── A/B 测试扩展 ───
+
+# A/B 镜次状态：state/{ep}-shot-{N}-a.json / state/{ep}-shot-{N}-b.json
+# 继承 shot_state 所有字段，额外增加：
+ab_shot_state:
+  extends: shot_state
+  additional_fields:
+    variant:
+      type: string
+      description: "变体标识（如 baseline, cinematic-v1）"
+    variant_prompt:
+      type: string
+      description: "变体变换后实际使用的提示词"
+
+# A/B 评分结果：state/{ep}-shot-{N}-ab-result.json
+ab_result_state:
+  episode: { type: string }
+  shot_id: { type: string }
+  shot_index: { type: integer }
+  variant_a:
+    id: { type: string }
+    video_path: { type: string }
+    status: { type: string, enum: [completed, failed] }
+    prompt_used: { type: string }
+  variant_b:
+    id: { type: string }
+    video_path: { type: string }
+    status: { type: string, enum: [completed, failed] }
+    prompt_used: { type: string }
+  scoring:
+    scored: { type: boolean, default: false }
+    variant_a_scores: { type: object, description: "各维度评分" }
+    variant_b_scores: { type: object, description: "各维度评分" }
+    variant_a_weighted: { type: number }
+    variant_b_weighted: { type: number }
+    winner: { type: string, enum: [a, b, tie] }
+    notes: { type: string }
