@@ -12,3 +12,6 @@ assets/scenes/images/
 
 # 运行时状态（不追踪具体进度）
 state/*.json
+
+# Git Worktrees
+.worktrees/

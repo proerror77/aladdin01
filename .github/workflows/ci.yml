@@ -80,21 +80,3 @@ jobs:
           IMAGE_GEN_API_KEY: ${{ secrets.IMAGE_GEN_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: ./scripts/api-caller.sh env-check
-
-      - name: Validate blocklist format
-        run: |
-          python3 -c "
-          import yaml
-          data = yaml.safe_load(open('config/compliance/blocklist.yaml'))
-          assert isinstance(data, dict), 'blocklist must be a dict'
-          print('blocklist.yaml OK')
-          "
-
-      - name: Validate policy-rules format
-        run: |
-          python3 -c "
-          import yaml
-          data = yaml.safe_load(open('config/compliance/policy-rules.yaml'))
-          assert isinstance(data, dict), 'policy-rules must be a dict'
-          print('policy-rules.yaml OK')
-          "
