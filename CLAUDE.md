@@ -191,15 +191,49 @@ fix/*          # 修复
 ```
 
 **规则**：
-- `main` 禁止直接 push，所有改动走 PR
-- 分支从 `main` 切出，合并后立即删除
-- PR 需 CI 全绿才可合并，squash merge 保持 main 历史整洁
+- `main` 禁止直接 push，**唯一例外：仓库初始化的第一个 commit**
+- 分支从最新 `main` 切出，合并后立即删除
+- PR 需 CI 全绿才可合并，使用 squash merge 保持 main 历史整洁
 
 **分支命名**：
 ```
 feature/add-comply-agent
 feature/voice-config-yaml
 fix/gen-worker-retry-logic
+```
+
+### 完整开发流程
+
+**1. 开始新工作**
+```bash
+git checkout main && git pull origin main
+git checkout -b feature/your-feature
+```
+
+**2. 开发 + atomic commits**
+```bash
+# 改动后，每完成一件事就 commit
+git add <specific-files>
+git commit -m "feat(scope): 描述"
+```
+
+**3. 推送并开 PR**
+```bash
+git push origin feature/your-feature
+gh pr create --title "feat(scope): 描述" --body "## 改动内容\n\n## 测试方式"
+```
+
+**4. PR checklist（合并前确认）**
+- [ ] CI 全绿（lint、shellcheck、secret-scan）
+- [ ] commit message 符合规范，无 WIP/update
+- [ ] 不含 `.mp4`、API Key、`state/*.json`
+- [ ] CLAUDE.md 如有架构变更已同步更新
+
+**5. 合并 + 清理**
+```bash
+# GitHub 上 squash merge
+git checkout main && git pull origin main
+git branch -d feature/your-feature
 ```
 
 ### Atomic Commits
