@@ -182,17 +182,51 @@ python3 -c "import yaml; yaml.safe_load(open('config/compliance/blocklist.yaml')
 - `config/api-endpoints.yaml` 只存 URL 模板，不存 Key
 - PR diff 中出现疑似 Key 格式（`sk-`、`Bearer ` 后跟长字符串）时 CI 自动阻断
 
-### 分支策略
+### 分支策略（GitHub Flow）
 
 ```
-main          # 稳定版本，受保护，需 PR + CI 通过
-feature/*     # 功能开发
-fix/*         # 修复
+main           # 唯一长期分支，始终可部署
+feature/*      # 新功能（agent、phase、config 改动）
+fix/*          # 修复
 ```
 
-- `main` 分支禁止直接 push
-- PR 需至少 1 人 review + 所有 CI checks 通过
-- commit message 格式：`type(scope): 描述`（type: feat/fix/config/docs/refactor）
+**规则**：
+- `main` 禁止直接 push，所有改动走 PR
+- 分支从 `main` 切出，合并后立即删除
+- PR 需 CI 全绿才可合并，squash merge 保持 main 历史整洁
+
+**分支命名**：
+```
+feature/add-comply-agent
+feature/voice-config-yaml
+fix/gen-worker-retry-logic
+```
+
+### Atomic Commits
+
+每个 commit 只做一件事，能独立 revert。
+
+**粒度参考**：
+
+| 场景 | 正确拆分 |
+|------|---------|
+| 新增 agent + 更新 CLAUDE.md | 2 个 commit |
+| 修复 retry 逻辑 + 顺手改注释 | 2 个 commit |
+| 新增 phase + 对应 state schema | 2 个 commit |
+| 同一 agent 的多处 bug fix | 1 个 commit（同一关注点） |
+
+**commit message 格式**：`type(scope): 描述`
+
+| type | 用途 |
+|------|------|
+| `feat` | 新 agent、新 phase、新功能 |
+| `fix` | bug 修复 |
+| `config` | 配置文件改动（compliance、platform、voice） |
+| `docs` | CLAUDE.md、注释 |
+| `refactor` | 重构，不改行为 |
+| `ci` | GitHub Actions、脚本 |
+
+**禁止**：`fix stuff`、`WIP`、`update`、一个 commit 跨多个不相关 scope。
 
 ### CI 不覆盖的内容
 
