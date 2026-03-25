@@ -1,0 +1,8 @@
+id: baseline
+name: "基线（原始提示词）"
+description: "使用 visual-agent 生成的原始提示词，不做任何修改"
+transform_type: passthrough
+rewrite_instruction: ""
+constraints:
+  max_prompt_length: 2000
+  preserve_fields: [duration, ratio, resolution, generation_mode, generate_audio, dialogue]
