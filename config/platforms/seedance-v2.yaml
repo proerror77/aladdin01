@@ -30,8 +30,16 @@ prompt_formula:
   image_to_video: "subject+action, background+action, camera+motion"
 
 generation_duration:
-  min: 4
-  max: 12  # Seedance 1.5 pro 支持 4-12 秒
+  # 各模型时长上限（gen-worker 和 visual-agent 按 default_model 读取对应值）
+  seedance_2_0:    { min: 4, max: 15 }  # API 尚未开放
+  seedance_1_5_pro: { min: 4, max: 12 }
+  seedance_1_0_pro: { min: 2, max: 12 }
+  seedance_1_0_pro_fast: { min: 2, max: 12 }
+  seedance_1_0_lite_t2v: { min: 2, max: 12 }
+  seedance_1_0_lite_i2v: { min: 2, max: 12 }
+  # 当前默认（与 default_model 对应，切换模型时同步更新）
+  current_min: 4
+  current_max: 12
 
 # 宽高比选项
 ratio_options:

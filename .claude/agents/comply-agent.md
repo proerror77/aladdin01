@@ -45,10 +45,10 @@ tools:
 
 ### 第三层：OpenAI Moderation API
 
-将剧本文本写入临时文件，调用：
+对**改写后**的 render-script 做最终验证（确保改写结果也通过检测）：
 ```bash
-# 先将剧本写入临时文件（避免 shell 注入风险）
-cat script/{ep}.md > /tmp/moderation_input_{ep}.txt
+# 将改写后的 render-script 写入临时文件（避免 shell 注入风险）
+cat outputs/{ep}/render-script.md > /tmp/moderation_input_{ep}.txt
 ./scripts/api-caller.sh moderation check-file /tmp/moderation_input_{ep}.txt
 ```
 
