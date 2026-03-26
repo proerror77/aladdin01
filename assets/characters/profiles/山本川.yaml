@@ -1,0 +1,11 @@
+name: "山本川"
+project: "jiuba"
+age: 50
+gender: "male"
+appearance: |
+  表面温文尔雅，金丝眼镜配西装，伪装成商人；施法时面容扭曲，身着九菊派暗黑和服，周身萦绕邪雾
+personality: |
+  狂妄自大、阴险狡诈，痴迷力量，视华夏国运为囊中之物，轻视道家驱邪文化
+first_episode: "jiuba-ep01"
+voice_hint: "middle-male-sinister"
+notes: "樱花国九菊一派当代首领，精通九菊派邪术，擅长操控怨灵、布下阴毒阵法"
