@@ -127,34 +127,66 @@ payload 格式：
 请确认以上参考图是否符合剧本描述，确认后继续音色配置阶段。
 ```
 
+## 自动评分
+
+审核文档输出后，对产出进行 LLM 自评打分（0-10 分/项）：
+
+| 维度 | 评分标准 |
+|------|---------|
+| 角色一致性 character_consistency | 生成的角色描述/参考图是否与剧本档案一致 |
+| 场景完整性 scene_completeness | 所有出现场景是否都有参考图或描述 |
+| 风格统一性 style_unity | 美术风格是否全集统一，无风格跳跃 |
+
+**评分规则**：
+- 总分 ≥ 24 且各项 ≥ 7 → `auto_approved`，状态写 `completed`
+- 总分 < 24 或任一项 < 5 → `needs_review`，状态写 `awaiting_review`，填写原因
+
 ## 完成后
 
-向 team-lead 发送消息：`design-agent 完成，{N} 个角色（{M} 个新生成，{K} 个复用），{P} 个场景，等待人工确认`
+根据自动评分结果决定状态和消息：
+
+- **auto_approved**：向 team-lead 发送消息：`design-agent 完成，{N} 个角色（{M} 个新生成，{K} 个复用），{P} 个场景，自动通过（评分 {score}/30）`
+- **needs_review**：向 team-lead 发送消息：`design-agent 完成，{N} 个角色（{M} 个新生成，{K} 个复用），{P} 个场景，需人工审核（评分 {score}/30，原因：{reason}）`
 
 写入独立状态文件 `state/{ep}-phase3.json`：
 ```json
 {
   "episode": "{ep}",
   "phase": 3,
-  "status": "awaiting_review",
+  "status": "completed",
   "started_at": "{ISO8601}",
   "completed_at": "{ISO8601}",
   "data": {
     "new_characters": {M},
     "reused_characters": {K},
     "scenes": {P}
+  },
+  "auto_review": {
+    "score": {total},
+    "scores": {
+      "character_consistency": 9,
+      "scene_completeness": 8,
+      "style_unity": 9
+    },
+    "result": "auto_approved",
+    "reason": ""
   }
 }
 ```
+
+- `auto_review.result` 为 `auto_approved` 时，`status` 写 `completed`
+- `auto_review.result` 为 `needs_review` 时，`status` 写 `awaiting_review`，`reason` 填写具体原因
 
 同时更新索引文件 `state/progress.json` 中的 `{ep}` 条目：
 ```json
 {
   "episodes": {
     "{ep}": {
-      "status": "awaiting_review",
+      "status": "completed",
       "current_phase": 3
     }
   }
 }
 ```
+
+（`status` 与 `auto_review.result` 对应：`auto_approved` → `completed`，`needs_review` → `awaiting_review`）

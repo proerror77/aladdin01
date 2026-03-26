@@ -99,34 +99,34 @@ mkdir -p outputs/{ep02}/videos
 
 每个 agent 完成后写入独立状态文件，避免并发写入冲突。
 
-### 🔴 批量审核点 1 — 视觉分析
+### 🔶 批量审核点 1 — 视觉分析（条件触发）
 
-所有剧本的视觉指导完成后，一次性展示：
+所有剧本的视觉指导完成后，读取每个 `state/{ep}-phase2.json` 的 `auto_review.result` 字段：
 
+**全部 auto_approved**：
 ```
-所有剧本的视觉分析已完成，请逐一审核：
+Phase 2 视觉分析完成：全部 {N} 个剧本自动通过，继续 Phase 3...
+```
+直接进入 Phase 3，无需人工确认。
 
-━━━ ep01 ━━━
-outputs/ep01/visual-direction.yaml
-镜次数：{N}，总时长：{X}秒
+**有 needs_review 的剧本**：
+```
+Phase 2 视觉分析完成：
+✅ ep01 自动通过（38/40）
+✅ ep02 自动通过（36/40）
+⚠️  ep03 需要审核（28/40，原因：第3场镜次覆盖不足）
 
-━━━ ep02 ━━━
-outputs/ep02/visual-direction.yaml
-镜次数：{N}，总时长：{X}秒
-
-━━━ ep03 ━━━
-...
-
-全部确认后继续美术指导？(yes/no)
-如需修改某个剧本，请输入剧本名（如 ep01）进行单独调整。
+需要审核 1 个剧本，请确认后继续：
+outputs/ep03/visual-direction.yaml
+确认继续？(yes/修改)
 ```
 
-**单独调整流程**：
+**单独调整流程**（仅针对 needs_review 的剧本）：
 ```
-ep01 单独调整模式：
+{ep} 单独调整模式：
 1. 查看并批准
 2. 拒绝并修改
-3. 跳过 ep01，继续处理其他剧本
+3. 跳过 {ep}，继续处理其他剧本
 
 请选择：
 ```
@@ -148,19 +148,26 @@ ep01 单独调整模式：
 
 每个 design-agent 完成后写入 `state/{ep}-phase3.json`。
 
-### 🔴 批量审核点 2 — 参考图
+### 🔶 批量审核点 2 — 参考图（条件触发）
 
+所有剧本的参考图生成完成后，读取每个 `state/{ep}-phase3.json` 的 `auto_review.result` 字段：
+
+**全部 auto_approved**：
 ```
-所有剧本的参考图已生成，请审核：
+Phase 3 美术指导完成：全部 {N} 个剧本自动通过，继续 Phase 4...
+```
+直接进入 Phase 4，无需人工确认。
 
-━━━ ep01 ━━━
-outputs/ep01/art-direction-review.md
-新角色：{N}，复用角色：{M}，场景：{P}
+**有 needs_review 的剧本**：
+```
+Phase 3 美术指导完成：
+✅ ep01 自动通过（28/30）
+⚠️  ep02 需要审核（18/30，原因：角色风格不统一）
+✅ ep03 自动通过（26/30）
 
-━━━ ep02 ━━━
-...
-
-全部确认后继续音色配置？(yes/no)
+需要审核 1 个剧本，请确认后继续：
+outputs/ep02/art-direction-review.md
+全部确认后继续音色配置？(yes/修改)
 ```
 
 ### 6. Phase 4 串行（音色配置）⚠️

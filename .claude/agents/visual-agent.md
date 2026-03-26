@@ -105,6 +105,21 @@ subject+action, background+action, camera+motion
 - [ ] 镜次覆盖了剧本所有关键情节
 - [ ] 节奏合理（不过于密集或稀疏）
 
+### 6. 自动评分
+
+自审检查完成后，对产出进行 LLM 自评打分（0-10 分/项）：
+
+| 维度 | 评分标准 |
+|------|---------|
+| 提示词覆盖率 coverage | 所有关键情节是否都有对应镜次 |
+| 提示词质量 quality | 每个镜次描述是否具体可视化，避免抽象 |
+| 时长合理性 timing | 镜次时长是否符合叙事节奏，不过密不过疏 |
+| 格式合规性 format | 所有字段是否完整、prompt ≤ 2000 字符 |
+
+**评分规则**：
+- 总分 ≥ 32 且各项 ≥ 8 → `auto_approved`，状态写 `completed`
+- 总分 < 32 或任一项 < 6 → `needs_review`，状态写 `awaiting_review`，填写原因
+
 ### 输出格式
 
 **visual-direction.yaml**（结构化数据）：
@@ -162,31 +177,50 @@ shots:
 
 ## 完成后
 
-向 team-lead 发送消息：`visual-agent 完成，共 {N} 个镜次，等待人工确认`
+根据自动评分结果决定状态和消息：
+
+- **auto_approved**：向 team-lead 发送消息：`visual-agent 完成，共 {N} 个镜次，自动通过（评分 {score}/40）`
+- **needs_review**：向 team-lead 发送消息：`visual-agent 完成，共 {N} 个镜次，需人工审核（评分 {score}/40，原因：{reason}）`
 
 写入独立状态文件 `state/{ep}-phase2.json`：
 ```json
 {
   "episode": "{ep}",
   "phase": 2,
-  "status": "awaiting_review",
+  "status": "completed",
   "started_at": "{ISO8601}",
   "completed_at": "{ISO8601}",
   "data": {
     "shot_count": {N},
     "total_duration": {X}
+  },
+  "auto_review": {
+    "score": {total},
+    "scores": {
+      "coverage": 9,
+      "quality": 8,
+      "timing": 9,
+      "format": 10
+    },
+    "result": "auto_approved",
+    "reason": ""
   }
 }
 ```
+
+- `auto_review.result` 为 `auto_approved` 时，`status` 写 `completed`
+- `auto_review.result` 为 `needs_review` 时，`status` 写 `awaiting_review`，`reason` 填写具体原因
 
 同时更新索引文件 `state/progress.json` 中的 `{ep}` 条目：
 ```json
 {
   "episodes": {
     "{ep}": {
-      "status": "awaiting_review",
+      "status": "completed",
       "current_phase": 2
     }
   }
 }
 ```
+
+（`status` 与 `auto_review.result` 对应：`auto_approved` → `completed`，`needs_review` → `awaiting_review`）
