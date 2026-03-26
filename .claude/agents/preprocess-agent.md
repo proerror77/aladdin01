@@ -20,8 +20,7 @@ tools:
 
 由 team-lead 传入：
 - `source_file` — 原始剧本文件路径（支持 .docx、.md、.txt）
-- `project_name` — 项目名称（用于生成 ep_id 前缀，如 `jiuba` → `jiuba-ep01`）
-- `episodes_per_batch` — 每批处理集数（默认 5，避免单次 context 过大）
+- `project_name` — 项目名称（用于生成 ep_id 前缀，如 `jiuba` → `jiuba-ep01`，必须为 ASCII 字母数字和连字符）
 
 ## 输出
 
@@ -38,7 +37,14 @@ tools:
 ```bash
 cd /tmp && cp {source_file} preprocess_input.docx
 unzip -o preprocess_input.docx word/document.xml -d preprocess_unpacked 2>/dev/null
-cat preprocess_unpacked/word/document.xml | sed 's/<[^>]*>//g' | tr -s ' ' ' ' > preprocess_text.txt
+if [ ! -f preprocess_unpacked/word/document.xml ]; then
+  echo "ERROR: word/document.xml not found in docx — file may be corrupt or non-standard" >&2; exit 1
+fi
+cat preprocess_unpacked/word/document.xml \
+  | sed 's/<[^>]*>//g' \
+  | python3 -c "import html,sys; print(html.unescape(sys.stdin.read()))" \
+  | tr -s ' ' > preprocess_text.txt
+[ -s preprocess_text.txt ] || { echo "ERROR: extracted text is empty" >&2; exit 1; }
 ```
 
 **如果是 .md 或 .txt 文件**，直接读取。
@@ -103,10 +109,12 @@ notes: ""
 `script/{project_name}-ep0X.md`：
 
 ```markdown
-# {项目名} 第X集
+---
 ep_id: {project_name}-ep0X
 source: "{原始文件名}"
 ---
+
+# {项目名} 第X集
 
 ## 剧情摘要
 
@@ -162,7 +170,25 @@ source: "{原始文件名}"
 \`\`\`
 ```
 
-### 7. 向 team-lead 汇报
+### 7. 写入状态文件
+
+预处理完成后，写入 `state/preprocess-{project_name}.json`：
+
+```json
+{
+  "project": "{project_name}",
+  "source_file": "{source_file}",
+  "status": "completed",
+  "total_episodes": {N},
+  "characters": {M},
+  "scenes": {K},
+  "completed_at": "{timestamp}"
+}
+```
+
+如果处理失败，写入 `status: "failed"` 和 `error` 字段，便于 `~status` 检测。
+
+### 8. 向 team-lead 汇报
 
 ```
 预处理完成！
@@ -179,4 +205,4 @@ source: "{原始文件名}"
 - **原文不改动**：分集剧本中的原始内容原文保留，不做任何改写或摘要
 - **角色名一致性**：同一角色在不同地方可能有不同称呼（如「凌霄」「凌道长」「师兄」），统一使用正式姓名
 - **集数编号**：统一使用两位数字（ep01、ep02...ep10、ep11...）
-- **大文件处理**：如果原始文件超过 100 集，分批处理，每批 10 集
+- **大文件处理**：如果原始文件超过 100 集，分批处理，每批 10 集（Claude 单次 context 限制）
