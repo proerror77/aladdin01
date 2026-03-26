@@ -74,6 +74,28 @@ script/ 目录下没有找到剧本文件。
 3. 方形（1:1，Instagram）
 ```
 
+### 2.5 A/B 测试模式（可选）
+
+如果用户输入 `~start --ab` 或在交互中回答 yes：
+
+```
+是否启用 A/B 测试模式？(yes/no，默认 no)
+```
+
+如果启用：
+1. 扫描 `config/ab-testing/variants/` 目录，列出所有 `.yaml` 文件（读取每个文件的 `id` 和 `name` 字段）
+2. 展示可用变体列表，让用户选择变体 A 和变体 B：
+   ```
+   可用变体：
+   1. baseline — 基线（原始提示词）
+   2. cinematic-v1 — 电影感增强 v1
+
+   变体 A（默认 baseline）：
+   变体 B：
+   ```
+3. 记录 `variant_a_id` 和 `variant_b_id`，后续 Phase 5 使用
+4. 提示：A/B 模式将使 API 调用量翻倍（每镜次 2 个变体）
+
 ### 3. 初始化目录和状态
 
 ```bash
@@ -161,9 +183,9 @@ spawn voice-agent
 | prompt | shots[].prompt | 组装好的 Seedance 提示词 |
 | duration | shots[].duration | 视频时长（秒） |
 | generation_mode | shots[].generation_mode | `text2video` 或 `img2video` |
-| reference_image_path | shots[].references[0].image_path | 参考图路径（如有） |
+| reference_image_url | shots[].references[0].image_url | 参考图 URL（img2video 时必需；本地图片需先上传至 IMAGE_GEN_API 获取 URL） |
 | dialogue | shots[].audio | 对白内容（唇形同步用） |
-| voice_config_path | 根据 shots[].audio 中的角色名查找 | 音色配置路径 |
+| voice_config_path | `assets/characters/voices/{角色名}/voice-config.yaml` | 音色配置路径（TTS 预留） |
 
 3. 并行 spawn gen-workers：
 ```
@@ -173,6 +195,59 @@ spawn gen-worker (shot-2 params)
 spawn gen-worker (shot-N params)
 等待所有 worker 完成
 ```
+
+**Phase 5 — 视频生成（A/B 模式）**
+
+如果 A/B 模式未启用，执行上述原有逻辑（不变）。
+
+如果 A/B 模式启用：
+
+1. 读取变体 A（`config/ab-testing/variants/{variant_a_id}.yaml`）和变体 B 的配置
+2. 对每个镜次 shot：
+   a. 获取原始 prompt = `shot.prompt`
+   b. 生成 `variant_a_prompt`：
+      - `transform_type: passthrough` → 直接使用原始 prompt
+      - `transform_type: llm_rewrite` → 将 `rewrite_instruction`（替换 `{original_prompt}` 占位符）发给 LLM 改写
+      - 验证 `len(prompt) <= 2000`，超长则截断至 2000 字符并输出警告
+   c. 同理生成 `variant_b_prompt`
+   d. spawn gen-worker（变体 A）：
+      所有原始参数不变，额外传入：
+      `prompt=variant_a_prompt`, `output_suffix="-a"`,
+      `variant=variant_a_id`, `variant_prompt=variant_a_prompt`
+   e. spawn gen-worker（变体 B）：
+      同上，`prompt=variant_b_prompt`, `output_suffix="-b"`,
+      `variant=variant_b_id`, `variant_prompt=variant_b_prompt`
+3. 等待所有 2×N 个 gen-workers 完成
+4. 对每个镜次，读取 `state/{ep}-shot-{N}-a.json` 和 `state/{ep}-shot-{N}-b.json`，
+   创建 `state/{ep}-shot-{N}-ab-result.json`：
+   ```json
+   {
+     "episode": "{ep}",
+     "shot_id": "{shot_id}",
+     "shot_index": {N},
+     "variant_a": {
+       "id": "{variant_a_id}",
+       "video_path": "outputs/{ep}/videos/shot-{N}-a.mp4",
+       "status": "{从 -a.json 读取}",
+       "prompt_used": "{variant_a_prompt}"
+     },
+     "variant_b": {
+       "id": "{variant_b_id}",
+       "video_path": "outputs/{ep}/videos/shot-{N}-b.mp4",
+       "status": "{从 -b.json 读取}",
+       "prompt_used": "{variant_b_prompt}"
+     },
+     "scoring": { "scored": false }
+   }
+   ```
+5. 输出提示：
+   ```
+   A/B 视频生成完成！
+   共 {N} 个镜次 × 2 变体 = {2N} 个视频
+   成功：{S}，失败：{F}
+
+   运行 ~ab-review 进行人工评分
+   ```
 
 ### 5. 汇总结果
 

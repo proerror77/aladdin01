@@ -30,11 +30,14 @@ tools:
 | `generate_audio` | bool | 是否生成音频（含对白唇形同步） |
 | `dialogue` | string? | 对白内容（格式：`角色名: "台词"`） |
 | `voice_config_path` | string? | 音色配置路径（TTS 预留） |
+| `output_suffix` | string? | 输出文件后缀（A/B 测试用，如 `-a` 或 `-b`）。默认为空。 |
+| `variant` | string? | 变体标识（如 `baseline`），写入状态文件。 |
+| `variant_prompt` | string? | 变体变换后的提示词，写入状态文件。 |
 
 ## 输出
 
-- `outputs/{ep}/videos/shot-{N}.mp4` — 生成的视频文件
-- `state/{ep}-shot-{N}.json` — 镜次状态文件
+- `outputs/{ep}/videos/shot-{N}{output_suffix}.mp4` — 生成的视频文件（output_suffix 默认为空）
+- `state/{ep}-shot-{N}{output_suffix}.json` — 镜次状态文件（output_suffix 默认为空）
 
 ## 执行流程
 
@@ -47,7 +50,7 @@ tools:
 
 创建工作目录：`outputs/{ep}/videos/`
 
-写入初始状态文件 `state/{ep}-shot-{N}.json`：
+写入初始状态文件 `state/{ep}-shot-{N}{output_suffix}.json`：
 ```json
 {
   "episode": "{ep}",
@@ -199,8 +202,8 @@ PAYLOAD_EOF
 ### download_video(video_url)
 
 ```bash
-./scripts/api-caller.sh seedance download {video_url} shot-{N}.mp4
-mv shot-{N}.mp4 outputs/{ep}/videos/
+./scripts/api-caller.sh seedance download {video_url} shot-{N}{output_suffix}.mp4
+mv shot-{N}{output_suffix}.mp4 outputs/{ep}/videos/
 ```
 
 ### rewrite_prompt(prompt, rejection_reason)
@@ -213,7 +216,7 @@ mv shot-{N}.mp4 outputs/{ep}/videos/
 
 ### 成功后
 
-写入状态文件 `state/{ep}-shot-{N}.json`：
+写入状态文件 `state/{ep}-shot-{N}{output_suffix}.json`：
 ```json
 {
   "episode": "{ep}",
@@ -222,18 +225,23 @@ mv shot-{N}.mp4 outputs/{ep}/videos/
   "status": "completed",
   "started_at": "{ISO8601}",
   "completed_at": "{ISO8601}",
-  "video_path": "outputs/{ep}/videos/shot-{N}.mp4",
+  "video_path": "outputs/{ep}/videos/shot-{N}{output_suffix}.mp4",
   "original_retries": {n},
   "rewrite_rounds": {n},
   "total_api_calls": {n}
 }
 ```
 
+当 `variant` 参数存在时，额外写入：
+  "variant": "{variant}",
+  "variant_prompt": "{variant_prompt}"
+```
+
 向 team-lead 发送消息：`shot-{N} 完成，重试 {n} 次，改写 {n} 轮`
 
 ### 失败后
 
-写入状态文件 `state/{ep}-shot-{N}.json`：
+写入状态文件 `state/{ep}-shot-{N}{output_suffix}.json`：
 ```json
 {
   "episode": "{ep}",
@@ -250,6 +258,11 @@ mv shot-{N}.mp4 outputs/{ep}/videos/
   "last_prompt": "{最后一次使用的提示词}",
   "last_rejection": "{最后一次拒绝原因}"
 }
+```
+
+当 `variant` 参数存在时，额外写入：
+  "variant": "{variant}",
+  "variant_prompt": "{variant_prompt}"
 ```
 
 向 team-lead 发送消息：`shot-{N} 失败，已重试 5 次 + 改写 3 轮，需人工处理`

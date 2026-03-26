@@ -55,6 +55,5 @@ llm_rewrite_prompt: |
 
   请直接输出改写后的提示词，不要解释。
 
-# 改写轮次限制
-max_rewrite_rounds: 3
+# 改写轮次限制（以 config/platforms/seedance-v2.yaml 中的 max_rewrite_rounds 为准）
 escalation_on_failure: "标记为 failed，记录到 generation-report.md，通知 team-lead"

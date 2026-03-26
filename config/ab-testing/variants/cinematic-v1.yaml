@@ -1,0 +1,25 @@
+id: cinematic-v1
+name: "电影感增强 v1"
+description: "通过 LLM 改写增强电影感：更具体的光影描述、更专业的镜头语言、更丰富的氛围渲染"
+transform_type: llm_rewrite
+rewrite_instruction: |
+  你是一个专业的电影视觉提示词优化师。请对以下视频生成提示词进行电影感增强改写。
+
+  改写原则：
+  1. 增强光影描述：添加具体的光源方向、色温、阴影质感
+  2. 专业镜头语言：使用更精确的焦距描述（如 35mm, 85mm）、景深效果
+  3. 氛围渲染：增加环境细节（烟雾、尘埃、光斑等微粒效果）
+  4. 色彩分级：添加具体的调色描述（如 teal-orange, desaturated, high contrast）
+
+  必须保留：
+  - 原始角色描述和动作
+  - 对白内容（格式：角色名: "台词"）不得修改
+  - 场景核心设定
+
+  原始提示词：
+  {original_prompt}
+
+  请直接输出改写后的完整提示词，不超过 2000 字符，不要解释。
+constraints:
+  max_prompt_length: 2000
+  preserve_fields: [duration, ratio, resolution, generation_mode, generate_audio, dialogue]

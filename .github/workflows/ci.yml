@@ -38,7 +38,7 @@ jobs:
           errors = []
           for f in files:
             try:
-              yaml.safe_load(open(f))
+              data = yaml.safe_load(open(f))
               print(f'OK: {f}')
             except FileNotFoundError:
               print(f'SKIP (not found): {f}')
@@ -46,6 +46,29 @@ jobs:
               errors.append(f'{f}: {e}')
           if errors:
             print('YAML errors:', errors, file=sys.stderr)
+            sys.exit(1)
+          "
+
+      - name: Validate compliance config structure
+        run: |
+          python3 -c "
+          import yaml, sys
+          checks = {
+            'config/compliance/blocklist.yaml': dict,
+            'config/compliance/policy-rules.yaml': dict,
+          }
+          errors = []
+          for f, expected_type in checks.items():
+            try:
+              data = yaml.safe_load(open(f))
+              if not isinstance(data, expected_type):
+                errors.append(f'{f}: expected {expected_type.__name__}, got {type(data).__name__}')
+              else:
+                print(f'OK: {f}')
+            except FileNotFoundError:
+              print(f'SKIP (not found): {f}')
+          if errors:
+            for e in errors: print(e, file=sys.stderr)
             sys.exit(1)
           "
 
@@ -80,21 +103,3 @@ jobs:
           IMAGE_GEN_API_KEY: ${{ secrets.IMAGE_GEN_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: ./scripts/api-caller.sh env-check
-
-      - name: Validate blocklist format
-        run: |
-          python3 -c "
-          import yaml
-          data = yaml.safe_load(open('config/compliance/blocklist.yaml'))
-          assert isinstance(data, dict), 'blocklist must be a dict'
-          print('blocklist.yaml OK')
-          "
-
-      - name: Validate policy-rules format
-        run: |
-          python3 -c "
-          import yaml
-          data = yaml.safe_load(open('config/compliance/policy-rules.yaml'))
-          assert isinstance(data, dict), 'policy-rules must be a dict'
-          print('policy-rules.yaml OK')
-          "

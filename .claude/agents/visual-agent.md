@@ -31,23 +31,23 @@ tools:
 - text_to_video 提示词公式：`[subject] + [action] + [scene] + [camera] + [style] + [audio]`
 - image_to_video 提示词公式：`subject+action, background+action, camera+motion`
 - 最大长度：2000 字符
-- 时长范围：4-15 秒
+- 时长范围：读取 `generation_duration.current_min` 和 `generation_duration.current_max`（当前默认模型对应的上下限）
 - 对白格式：lip_sync
 
 ### 2. 场景拆分
 
 按剧本场景标记拆分，每个场景拆分为若干镜次（shot）。
 
-每个镜次时长 4-15 秒，根据叙事节奏决定。
+每个镜次时长在 `current_min`–`current_max` 秒之间，根据叙事节奏决定。
 
 ### 3. 结构化输出
 
 每个镜次输出以下字段：
 
 ```yaml
-- shot_id: "ep01-s01-shot01"
+- shot_id: "ep01-shot-01"
   shot_index: 1
-  duration: 8  # 秒，4-15 之间
+  duration: 8  # 秒，current_min–current_max 之间
   scene_name: "{场景名}"
   generation_mode: "text2video"  # 或 "img2video"
   subject: |
@@ -100,7 +100,7 @@ subject+action, background+action, camera+motion
 
 完成所有镜次后，自审：
 - [ ] 每个镜次提示词长度 ≤ 2000 字符
-- [ ] 时长均在 4-15 秒范围内
+- [ ] 时长均在 current_min–current_max 秒范围内（读自 config/platforms/seedance-v2.yaml）
 - [ ] 所有有对白的镜次都有 audio 字段
 - [ ] 镜次覆盖了剧本所有关键情节
 - [ ] 节奏合理（不过于密集或稀疏）
@@ -115,11 +115,11 @@ target_medium: "{medium}"
 total_shots: {N}
 total_duration: {X}
 shots:
-  - shot_id: "ep01-s01-shot01"
+  - shot_id: "ep01-shot-01"
     shot_index: 1
     duration: 8
     # ... 其他字段
-  - shot_id: "ep01-s01-shot02"
+  - shot_id: "ep01-shot-02"
     # ...
 ```
 
