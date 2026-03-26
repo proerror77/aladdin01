@@ -99,88 +99,83 @@ mkdir -p outputs/{ep02}/videos
 
 每个 agent 完成后写入独立状态文件，避免并发写入冲突。
 
-### 🔴 批量审核点 1 — 视觉分析
+Phase 2 完成后自动通过（批量模式默认 `--auto-approve`），无需人工确认。
 
-所有剧本的视觉指导完成后，一次性展示：
-
+输出日志：
 ```
-所有剧本的视觉分析已完成，请逐一审核：
-
-━━━ ep01 ━━━
-outputs/ep01/visual-direction.yaml
-镜次数：{N}，总时长：{X}秒
-
-━━━ ep02 ━━━
-outputs/ep02/visual-direction.yaml
-镜次数：{N}，总时长：{X}秒
-
-━━━ ep03 ━━━
-...
-
-全部确认后继续美术指导？(yes/no)
-如需修改某个剧本，请输入剧本名（如 ep01）进行单独调整。
+[auto-approve] 所有剧本视觉指导自动通过
 ```
 
-**单独调整流程**：
-```
-ep01 单独调整模式：
-1. 查看并批准
-2. 拒绝并修改
-3. 跳过 ep01，继续处理其他剧本
+### 4.5 角色预扫描（Phase 3 前置）
 
-请选择：
-```
-
-### 5. Phase 3 串行（美术指导）⚠️
-
-**重要：为避免角色资产竞态条件，Phase 3 采用串行执行。**
+在 Phase 3 并行执行前，先串行扫描所有剧本的 render-script，构建全局角色注册表：
 
 ```
-[ep01] spawn design-agent → 等待完成
-[ep02] spawn design-agent（自动复用 ep01 已生成的角色）→ 等待完成
-[ep03] spawn design-agent（自动复用已有角色）→ 等待完成
+1. 遍历所有 outputs/{ep}/render-script.md
+2. 提取每个剧本中出现的角色列表
+3. 去重，生成全局角色列表
+4. 检查 assets/characters/images/ 中已有角色
+5. 输出角色注册表到 state/character-registry.json
 ```
 
-串行原因：
-- design-agent 需要检查 `assets/characters/images/` 中是否有已有角色
-- 并行执行时多个 agent 可能同时检测到角色不存在，各自生成
-- 串行确保前一个剧本生成完成后，后续剧本能正确复用
+`state/character-registry.json` 格式：
+```json
+{
+  "characters": {
+    "凌霄": {"first_ep": "jiuba-ep01", "status": "pending"},
+    "徐莺莺": {"first_ep": "jiuba-ep01", "status": "pending"}
+  }
+}
+```
+
+角色注册表的作用：
+- Phase 3 并行时，每个 design-agent 读取注册表判断角色归属
+- 角色的参考图由 `first_ep` 对应的 design-agent 负责生成
+- 其他剧本的 design-agent 直接复用，不重复生成
+
+### 5. Phase 3 并行（美术指导）
+
+**有了角色注册表，Phase 3 可以安全并行。**
+
+```
+[ep01] spawn design-agent（读取 character-registry.json，生成归属本集的新角色）
+[ep02] spawn design-agent（读取 character-registry.json，复用已有角色）
+[ep03] spawn design-agent（读取 character-registry.json，复用已有角色）
+等待所有 design-agent 完成
+```
+
+并行安全保证：
+- 每个角色只由 `first_ep` 的 design-agent 生成参考图
+- 其他集的 design-agent 等待该角色的参考图就绪后复用
+- 场景参考图按集独立生成，无冲突
 
 每个 design-agent 完成后写入 `state/{ep}-phase3.json`。
 
-### 🔴 批量审核点 2 — 参考图
+Phase 3 完成后自动通过（批量模式默认 `--auto-approve`），无需人工确认。
+
+### 6. Phase 4 并行（音色配置）
+
+**批量模式默认启用 `auto_voice_match`，无交互，可安全并行。**
 
 ```
-所有剧本的参考图已生成，请审核：
-
-━━━ ep01 ━━━
-outputs/ep01/art-direction-review.md
-新角色：{N}，复用角色：{M}，场景：{P}
-
-━━━ ep02 ━━━
-...
-
-全部确认后继续音色配置？(yes/no)
+[ep01] spawn voice-agent（auto_voice_match: true）
+[ep02] spawn voice-agent（auto_voice_match: true，自动复用已有音色）
+[ep03] spawn voice-agent（auto_voice_match: true）
+等待所有 voice-agent 完成
 ```
 
-### 6. Phase 4 串行（音色配置）⚠️
-
-**重要：为避免交互式冲突，Phase 4 采用串行执行。**
-
-```
-[ep01] spawn voice-agent → 等待完成（含用户交互）
-[ep02] spawn voice-agent（自动复用 ep01 已配置的音色）→ 等待完成
-[ep03] spawn voice-agent → 等待完成
-```
-
-串行原因：
-- voice-agent 需要交互式询问用户选择音色
-- 并行时多个 agent 同时提问，用户无法区分
-- 串行确保一次只处理一个剧本的音色配置
+并行安全保证：
+- 自动匹配模式无用户交互，不会冲突
+- 每个 voice-agent 读取 `assets/characters/voices/` 检查已有音色
+- 同一角色的音色由首次遇到的 voice-agent 写入，后续复用
 
 每个 voice-agent 完成后写入 `state/{ep}-phase4.json`。
 
-### 7. Phase 5 并行（视频生成）
+### 7. Phase 5 视频生成
+
+首先读取 `config/platforms/seedance-v2.yaml` 的 `generation_backend` 字段。
+
+**backend = "api"（默认，并行）**
 
 所有剧本的所有镜次并行生成：
 
@@ -205,7 +200,21 @@ outputs/ep01/art-direction-review.md
 等待所有 worker 完成
 ```
 
-每个 gen-worker 写入独立状态文件 `state/{ep}-shot-{N}.json`，无并发冲突。
+**backend = "browser"（串行，Seedance 2.0 via 即梦 Web UI）**
+
+所有剧本的所有镜次串行生成（浏览器同时只能做一件事）：
+
+```
+for each ep in episodes:
+  for each shot in ep.shots:
+    spawn browser-gen-worker (shot params)
+    等待完成
+    等待 wait_between 秒
+```
+
+注意：browser 模式下批量处理速度远慢于 API 模式。
+
+每个 gen-worker / browser-gen-worker 写入独立状态文件 `state/{ep}-shot-{N}.json`，无并发冲突。
 
 ### 8. 批量汇总报告
 
@@ -234,8 +243,9 @@ ep03：{S3}/{T3} 成功
 |------|---------|------|
 | Phase 1 合规 | 并行 | 独立剧本，无共享资源 |
 | Phase 2 视觉 | 并行 | 独立剧本，无共享资源 |
-| Phase 3 美术 | **串行** | 跨集角色资产复用，避免竞态 |
-| Phase 4 音色 | **串行** | 交互式询问用户，避免冲突 |
+| 角色预扫描 | 串行 | 构建全局角色注册表（轻量，仅文本扫描） |
+| Phase 3 美术 | **并行** | 角色注册表保证每个角色只由一个 agent 生成 |
+| Phase 4 音色 | **并行** | 自动匹配模式无交互，无冲突 |
 | Phase 5 视频 | 并行 | 每个镜次独立状态文件 |
 
 ## 单个剧本失败处理
