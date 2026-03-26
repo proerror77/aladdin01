@@ -29,6 +29,7 @@ STEALTH="${JIMENG_STEALTH:-true}"
 WAIT_BETWEEN="${JIMENG_WAIT_BETWEEN:-30}"
 DOWNLOAD_POLL_INTERVAL="${JIMENG_DOWNLOAD_POLL_INTERVAL:-30}"
 DOWNLOAD_MAX_WAIT="${JIMENG_DOWNLOAD_MAX_WAIT:-600}"
+export WAIT_BETWEEN DOWNLOAD_POLL_INTERVAL DOWNLOAD_MAX_WAIT
 
 # Actionbook 基础参数
 AB_ARGS=(-P "$PROFILE")
@@ -164,7 +165,6 @@ cmd_submit() {
 # ============================================================
 cmd_download() {
   local output_file="${1:-video.mp4}"
-  local waited=0
 
   log "准备下载视频到: $output_file"
 
