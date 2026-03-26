@@ -31,7 +31,7 @@ prompt_formula:
 
 generation_duration:
   # 各模型时长上限（gen-worker 和 visual-agent 按 default_model 读取对应值）
-  seedance_2_0:    { min: 4, max: 15 }  # API 尚未开放
+  seedance_2_0: {min: 4, max: 15}  # API 尚未开放
   seedance_1_5_pro: { min: 4, max: 12 }
   seedance_1_0_pro: { min: 2, max: 12 }
   seedance_1_0_pro_fast: { min: 2, max: 12 }
