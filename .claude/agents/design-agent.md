@@ -31,21 +31,26 @@ tools:
 
 ### 1. 提取角色列表
 
-从 render_script 中提取所有出现的角色，检查 `assets/characters/images/` 是否已有该角色的参考图。
+从 render_script 中提取所有出现的角色，然后：
 
-**已有角色**：直接复用，跳过生图步骤，记录"复用自 {ep_source}"。
+1. 读取 `assets/characters/profiles/{角色名}.yaml`（如果存在），获取 `tier`、`appearance`、`gender`、`age` 等预处理信息
+2. 检查 `assets/characters/images/` 是否已有该角色的参考图
 
-**新角色**：进入生图流程。
+**已有参考图**：直接复用，跳过生图步骤，记录"复用自 {ep_source}"。
 
-### 2. 角色三视图提示词
+**新角色**：根据 `tier` 进入不同生图流程。
 
-为每个新角色生成三视图提示词（正面/侧面/背面）：
+### 2. 角色参考图提示词
+
+根据角色层级（tier）生成不同规格的参考图：
+
+**主角/重要配角（tier: protagonist/supporting）— 三视图**：
 
 ```markdown
 # 角色：{角色名}
 
 ## 正面视图
-{详细外貌描述：发型、面部特征、服装、体型、表情}
+{从 profile.appearance 提取外貌描述，补充：发型、面部特征、服装、体型、表情}
 风格：{与剧本一致的美术风格}
 构图：正面站立，全身，白色背景，参考图风格
 
@@ -56,7 +61,20 @@ tools:
 {同上，背面角度}
 ```
 
+**单集角色（tier: minor）— 仅正面图**：
+
+```markdown
+# 角色：{角色名}
+
+## 正面视图
+{从 profile.appearance 提取简要外貌，或从 render_script 推断}
+风格：{与剧本一致的美术风格}
+构图：正面站立，半身或全身，白色背景
+```
+
 保存到 `assets/characters/prompts/{角色名}.md`
+
+**注意**：优先使用 `assets/characters/profiles/{角色名}.yaml` 中的 `appearance` 字段作为外貌描述来源，比从 render_script 重新提取更准确和一致。
 
 ### 3. 场景参考图提示词
 
@@ -77,7 +95,7 @@ tools:
 
 读取 `config/api-endpoints.yaml` 获取 image_gen 配置。
 
-为每个角色（三视图）和场景调用：
+为每个角色和场景调用：
 ```bash
 # 生成图片
 ./scripts/api-caller.sh image_gen generate <payload.json>
@@ -97,9 +115,16 @@ payload 格式：
 ```
 
 下载生成的图片到对应目录：
+
+**主角/重要配角**（三视图）：
 - `assets/characters/images/{角色名}-front.png`
 - `assets/characters/images/{角色名}-side.png`
 - `assets/characters/images/{角色名}-back.png`
+
+**单集角色**（仅正面）：
+- `assets/characters/images/{角色名}-front.png`
+
+**场景**：
 - `assets/scenes/images/{场景名}.png`
 
 ### 5. 输出审核文档
