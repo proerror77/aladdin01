@@ -40,7 +40,12 @@ voice-agent 支持两种模式：
 
 扫描 render_script，找出所有有台词的角色（格式：`角色名: "台词"`）。
 
-同时提取每个角色的特征信息（性别、年龄段、性格关键词），用于自动匹配。
+对每个角色，读取 `assets/characters/profiles/{角色名}.yaml`（如果存在），获取：
+- `voice_hint` — preprocess 阶段推荐的音色类型（如 `young-male-gentle`）
+- `tier` — 角色层级（protagonist/supporting/minor）
+- `gender`、`age` — 性别和年龄
+
+如果 profile 不存在，从 render_script 推断角色特征（性别、年龄段、性格关键词）。
 
 ### 2. 检查已有音色
 
@@ -55,9 +60,10 @@ voice-agent 支持两种模式：
 读取 `config/voices/` 下所有预设音色 YAML，提取 `gender`、`age_range`、`tone`、`suitable_roles` 字段。
 
 对每个新角色，按以下优先级匹配：
-1. **性别匹配**（必须）：角色性别 = 预设 `gender`
-2. **年龄段匹配**：角色年龄段落入预设 `age_range`
-3. **角色类型匹配**：角色描述关键词命中预设 `suitable_roles`
+1. **voice_hint 直接匹配**（最高优先级）：如果 profile 中有 `voice_hint`，直接查找 preset_id 匹配的预设音色
+2. **性别匹配**（必须）：角色性别 = 预设 `gender`
+3. **年龄段匹配**：角色年龄段落入预设 `age_range`
+4. **角色类型匹配**：角色描述关键词命中预设 `suitable_roles`
 
 匹配规则：
 - 从剧本台词和场景描述推断角色性别（"他/她"、名字特征、描述词）
