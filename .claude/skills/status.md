@@ -33,6 +33,13 @@
 **注意**：Phase 5 没有独立的 `phase5.json`，进度通过汇总 `state/{ep}-shot-*.json` 计算：
 - 已完成镜次数 / 总镜次数（来自 phase2.json 的 data.shot_count）
 
+**A/B 模式检测**：如果存在 `state/{ep}-shot-*-ab-result.json` 文件，说明本集使用了 A/B 模式。
+此时 Phase 5 进度改为汇总 `-a.json` 和 `-b.json` 文件（各变体独立计数），并额外显示评分进度：
+```
+ep01  [████████░░] 80%  Phase 5: A/B 视频生成中 (16/22 变体完成)
+                        A/B 评分：5/11 镜次已评分
+```
+
 输出：
 
 ```

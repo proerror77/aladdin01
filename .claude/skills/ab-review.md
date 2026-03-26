@@ -14,7 +14,13 @@
 
 ### 1. 扫描待评分镜次
 
-扫描 `state/{ep}-shot-*-ab-result.json`，筛选 `scoring.scored == false` 的镜次。
+**`~ab-review report {ep}` 子命令**：如果没有任何 `state/{ep}-shot-*-ab-result.json` 文件，输出：
+```
+没有找到 {ep} 的 A/B 测试结果文件。请先运行 ~start --ab {ep}。
+```
+然后退出，不生成报告。
+
+**评分模式**：扫描 `state/{ep}-shot-*-ab-result.json`，筛选 `scoring.scored == false` 的镜次。
 
 如果没有待评分镜次：
 ```
@@ -22,7 +28,19 @@
 请先运行 ~start --ab 生成 A/B 视频。
 ```
 
-跳过任一变体 `status == failed` 的镜次，记录到报告的「失败镜次」部分。
+如果 `config/ab-testing/scoring.yaml` 不存在：
+```
+ERROR: 找不到评分配置 config/ab-testing/scoring.yaml。请检查配置文件是否存在。
+```
+然后退出。
+
+**跳过规则**：
+- 任一变体 `status == failed` → 跳过评分，记录到报告「失败镜次」部分
+- **两个变体均 `status == failed`** → 跳过评分，并在评分结束后额外输出：
+  ```
+  ⚠️  WARNING: Shot {N} 的两个变体均生成失败，该镜次将缺失于最终视频。
+      请重新运行 ~start --ab 并指定该镜次重新生成。
+  ```
 
 ### 2. 逐镜次评分
 
