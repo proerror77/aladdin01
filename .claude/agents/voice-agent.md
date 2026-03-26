@@ -19,6 +19,7 @@ tools:
 - `outputs/{ep}/visual-direction.yaml` — 从结构化 audio 字段提取对白信息（更准确）
 - `config/voices/` — 预设音色库
 - `assets/characters/voices/` — 已有角色音色（跨集复用）
+- `assets/characters/profiles/{角色名}.yaml` — 角色档案（含 `voice_hint` 字段，用于自动匹配）
 
 ## 输出
 
@@ -37,9 +38,32 @@ tools:
 
 **已有音色**：直接复用，记录"复用自 {ep_source}"。
 
-**新角色**：进入音色选择流程。
+**新角色**：进入自动匹配流程（步骤 2.5）。
 
-### 3. 音色选择（新角色）
+### 2.5 从角色档案自动匹配（新角色）
+
+对每个新角色，尝试从角色档案自动匹配音色，减少交互式询问：
+
+1. 检查 `assets/characters/profiles/{角色名}.yaml` 是否存在
+2. 如果存在，读取 `voice_hint` 字段（如 `young-male-cool`）
+3. 扫描 `config/voices/` 目录下所有音色配置，按以下优先级匹配：
+
+**匹配优先级**：
+
+| 优先级 | 匹配方式 | 示例 |
+|--------|---------|------|
+| 1 | 精确匹配 voice_hint | `young-male-cool` = `young-male-cool` |
+| 2 | 前缀匹配（同性别年龄段） | `young-male-cool` → `young-male-gentle` |
+| 3 | 性别+年龄段匹配 | `young-male-*` → 任意年轻男性音色 |
+| 4 | 无匹配 → 进入步骤 3 交互式选择 | — |
+
+**匹配成功**：自动选择该音色，在 voice-assignment.md 中记录匹配方式为"档案自动匹配"。
+
+**匹配失败**（角色档案不存在、无 voice_hint 字段、或无匹配音色）：进入步骤 3 交互式选择。
+
+### 3. 音色选择（未自动匹配的新角色）
+
+仅对步骤 2.5 未能自动匹配的角色执行交互式选择。
 
 列出 `config/voices/` 下所有预设音色，展示给用户：
 
@@ -91,16 +115,17 @@ notes: "{角色特征备注}"
 ```markdown
 # 音色分配 - {ep}
 
-| 角色 | 音色来源 | 音色ID/文件 | 状态 |
-|------|----------|-------------|------|
-| {角色名} | 预设库 | young-male-gentle | ✅ |
-| {角色名} | 用户上传 | reference.wav | ✅ |
-| {角色名} | 复用 ep01 | young-female-sweet | ✅ |
+| 角色 | 音色来源 | 音色ID/文件 | 匹配方式 | 状态 |
+|------|----------|-------------|----------|------|
+| {角色名} | 预设库 | young-male-cool | 档案自动匹配 | ✅ |
+| {角色名} | 预设库 | young-male-gentle | 用户选择 | ✅ |
+| {角色名} | 用户上传 | reference.wav | 用户选择 | ✅ |
+| {角色名} | 复用 ep01 | young-female-sweet | 跨集复用 | ✅ |
 ```
 
 ## 完成后
 
-向 team-lead 发送消息：`voice-agent 完成，{N} 个角色音色已配置`
+向 team-lead 发送消息：`voice-agent 完成，{N} 个角色音色已配置（自动匹配 {A} 个，用户选择 {U} 个）`
 
 写入独立状态文件 `state/{ep}-phase4.json`：
 ```json
@@ -111,7 +136,9 @@ notes: "{角色特征备注}"
   "started_at": "{ISO8601}",
   "completed_at": "{ISO8601}",
   "data": {
-    "voice_count": {N}
+    "voice_count": {N},
+    "auto_matched": {A},
+    "user_selected": {U}
   }
 }
 ```
