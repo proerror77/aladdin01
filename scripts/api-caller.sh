@@ -291,9 +291,43 @@ print(json.dumps(payload))
     esac
     ;;
 
+  jimeng-web)
+    # 即梦 Web UI 浏览器自动化（通过 Actionbook CLI）
+    # 用于 Seedance 2.0 API 未开放时的替代方案
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+    JIMENG_SCRIPT="${SCRIPT_DIR}/jimeng-web.sh"
+
+    if [[ ! -x "$JIMENG_SCRIPT" ]]; then
+      echo "ERROR: jimeng-web.sh not found or not executable: $JIMENG_SCRIPT" >&2
+      exit 1
+    fi
+
+    case "$ACTION" in
+      setup)
+        "$JIMENG_SCRIPT" setup
+        ;;
+      submit)
+        if [[ ! -f "$INPUT" ]]; then
+          echo "ERROR: Payload file not found: $INPUT" >&2
+          exit 1
+        fi
+        "$JIMENG_SCRIPT" submit "$INPUT"
+        ;;
+      download)
+        OUTPUT_FILE="${4:-video.mp4}"
+        "$JIMENG_SCRIPT" download "$OUTPUT_FILE"
+        ;;
+      *)
+        echo "ERROR: Unknown jimeng-web action: ${ACTION}" >&2
+        echo "Valid actions: setup, submit, download" >&2
+        exit 1
+        ;;
+    esac
+    ;;
+
   *)
     echo "ERROR: Unknown service: ${SERVICE}" >&2
-    echo "Valid services: seedance, image_gen, moderation, env-check" >&2
+    echo "Valid services: seedance, image_gen, moderation, jimeng-web, env-check" >&2
     exit 1
     ;;
 esac

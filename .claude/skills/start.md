@@ -6,9 +6,19 @@
 
 ```
 ~start
+~start --auto-approve          # 跳过人工审核点，自动通过
+~start --auto-approve --ab     # 自动通过 + A/B 测试
 ```
 
 在 `script/` 目录下放好剧本文件后运行。
+
+### 参数
+
+| 参数 | 说明 |
+|------|------|
+| `--auto-approve` | 跳过 Phase 2/3 的 🔴 人工确认点，自动通过 |
+| `--ab` | 启用 A/B 测试模式 |
+| `--auto-voice` | 音色自动匹配（不交互询问用户） |
 
 ## 执行流程
 
@@ -133,7 +143,11 @@ spawn visual-agent
   等待完成
 ```
 
-🔴 **人工确认点 1**
+🔴 **人工确认点 1**（`--auto-approve` 时跳过）
+
+如果 `--auto-approve` 启用：直接继续 Phase 3，输出日志 `[auto-approve] 视觉指导自动通过`。
+
+否则：
 ```
 视觉指导已完成，请查看：outputs/{ep}/visual-direction.yaml
 
@@ -151,7 +165,11 @@ spawn design-agent
   等待完成
 ```
 
-🔴 **人工确认点 2**
+🔴 **人工确认点 2**（`--auto-approve` 时跳过）
+
+如果 `--auto-approve` 启用：直接继续 Phase 4，输出日志 `[auto-approve] 美术指导自动通过`。
+
+否则：
 ```
 参考图已生成，请查看：outputs/{ep}/art-direction-review.md
 
@@ -167,10 +185,18 @@ spawn design-agent
 ```
 spawn voice-agent
   输入：render-script + visual-direction.yaml
-  等待完成（voice-agent 会交互式询问用户）
+  auto_voice_match: true（如果 --auto-voice 或 --auto-approve 启用）
+  等待完成
 ```
 
-**Phase 5 — 视频生成（并行）**
+如果 `--auto-voice` 或 `--auto-approve` 启用，voice-agent 使用自动匹配模式（无交互）。
+否则 voice-agent 交互式询问用户。
+
+**Phase 5 — 视频生成**
+
+首先读取 `config/platforms/seedance-v2.yaml` 的 `generation_backend` 字段。
+
+**backend = "api"（默认，并行）**
 
 1. 读取 `outputs/{ep}/visual-direction.yaml`，提取所有镜次数据
 2. 为每个镜次组装 gen-worker 参数：
@@ -195,6 +221,34 @@ spawn gen-worker (shot-2 params)
 spawn gen-worker (shot-N params)
 等待所有 worker 完成
 ```
+
+**backend = "browser"（串行，Seedance 2.0 via 即梦 Web UI）**
+
+1. 读取 `outputs/{ep}/visual-direction.yaml`，提取所有镜次数据
+2. 为每个镜次组装 browser-gen-worker 参数：
+
+| 参数 | 来源 | 说明 |
+|------|------|------|
+| ep | 用户选择 | 剧本 ID |
+| shot_id | shots[].shot_id | 镜次完整 ID |
+| shot_index | shots[].shot_index | 镜次序号 |
+| prompt | shots[].prompt | Seedance 提示词（browser-gen-worker 内部转换为 script_text） |
+| duration | shots[].duration | 视频时长（4-15 秒） |
+| ratio | 用户选择的宽高比 | 如 `9:16` |
+| reference_image_paths | shots[].references[].local_path | 参考图本地路径（assets/ 下） |
+| audio_paths | `assets/characters/voices/{角色名}/*.mp3` | 音频文件路径 |
+| generate_audio | shots[].has_dialogue | 是否生成音频 |
+| dialogue | shots[].audio | 对白内容 |
+
+3. 串行 spawn browser-gen-worker（浏览器同时只能做一件事）：
+```
+for each shot in shots:
+  spawn browser-gen-worker (shot params)
+  等待完成
+  等待 wait_between 秒
+```
+
+注意：browser 模式不支持 A/B 测试（API 调用量翻倍在浏览器模式下不现实）。
 
 **Phase 5 — 视频生成（A/B 模式）**
 

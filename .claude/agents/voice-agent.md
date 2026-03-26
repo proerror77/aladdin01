@@ -25,11 +25,27 @@ tools:
 - `assets/characters/voices/{角色名}/voice-config.yaml` — 音色配置
 - `outputs/{ep}/voice-assignment.md` — 音色分配报告
 
+## 执行模式
+
+voice-agent 支持两种模式：
+
+| 模式 | 触发条件 | 行为 |
+|------|---------|------|
+| 交互模式 | `auto_voice_match` 未设置或为 `false` | 逐角色询问用户选择音色 |
+| 自动匹配 | `auto_voice_match: true`（batch 默认） | 根据角色描述自动匹配预设音色 |
+
 ## 执行流程
 
 ### 1. 提取有对白角色
 
 扫描 render_script，找出所有有台词的角色（格式：`角色名: "台词"`）。
+
+对每个角色，读取 `assets/characters/profiles/{角色名}.yaml`（如果存在），获取：
+- `voice_hint` — preprocess 阶段推荐的音色类型（如 `young-male-gentle`）
+- `tier` — 角色层级（protagonist/supporting/minor）
+- `gender`、`age` — 性别和年龄
+
+如果 profile 不存在，从 render_script 推断角色特征（性别、年龄段、性格关键词）。
 
 ### 2. 检查已有音色
 
@@ -37,9 +53,32 @@ tools:
 
 **已有音色**：直接复用，记录"复用自 {ep_source}"。
 
-**新角色**：进入音色选择流程。
+**新角色**：根据模式进入不同流程。
 
-### 3. 音色选择（新角色）
+### 3a. 自动匹配（`auto_voice_match: true`）
+
+读取 `config/voices/` 下所有预设音色 YAML，提取 `gender`、`age_range`、`tone`、`suitable_roles` 字段。
+
+对每个新角色，按以下优先级匹配：
+1. **voice_hint 直接匹配**（最高优先级）：如果 profile 中有 `voice_hint`，直接查找 preset_id 匹配的预设音色
+2. **性别匹配**（必须）：角色性别 = 预设 `gender`
+3. **年龄段匹配**：角色年龄段落入预设 `age_range`
+4. **角色类型匹配**：角色描述关键词命中预设 `suitable_roles`
+
+匹配规则：
+- 从剧本台词和场景描述推断角色性别（"他/她"、名字特征、描述词）
+- 从描述推断年龄段（"年轻/中年/老年"、"学生/父亲"等）
+- 选择得分最高的预设音色
+- 如果多个预设得分相同，选择 `suitable_roles` 列表中匹配项最多的
+
+输出自动匹配结果（无需等待用户确认）：
+```
+🔊 音色自动匹配结果：
+  凌霄 → 年轻男性·温柔（性别✓ 年龄✓ 角色类型: 男主）
+  徐莺莺 → 年轻女性·甜美（性别✓ 年龄✓ 角色类型: 女主角）
+```
+
+### 3b. 交互模式（默认）
 
 列出 `config/voices/` 下所有预设音色，展示给用户：
 
@@ -77,8 +116,9 @@ tools:
 ```yaml
 character: "{角色名}"
 episode_first_used: "{ep}"
-voice_source: "preset"  # 或 "user_upload"
+voice_source: "preset"  # 或 "user_upload" 或 "auto_match"
 preset_id: "young-male-gentle"  # 预设时填入
+match_confidence: "high"  # 自动匹配时填入（high/medium/low）
 reference_audio: ""  # 用户上传时填入路径
 tts_platform: "pending"  # TTS 平台启用后更新
 notes: "{角色特征备注}"
@@ -93,6 +133,7 @@ notes: "{角色特征备注}"
 
 | 角色 | 音色来源 | 音色ID/文件 | 状态 |
 |------|----------|-------------|------|
+| {角色名} | 自动匹配 | young-male-gentle (high) | ✅ |
 | {角色名} | 预设库 | young-male-gentle | ✅ |
 | {角色名} | 用户上传 | reference.wav | ✅ |
 | {角色名} | 复用 ep01 | young-female-sweet | ✅ |
