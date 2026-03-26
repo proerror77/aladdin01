@@ -1,0 +1,10 @@
+name: "周瑜"
+project: "jiuba"
+tier: "minor"
+age: "unknown"
+gender: "male"
+appearance: |
+  羽扇纶巾，面如冠玉，唇若点朱，眉宇间凛然锋芒，儒将之风
+first_episode: "jiuba-ep11"
+voice_hint: "young-male-noble"
+notes: "被林昂以出马之术召唤的千古英灵（江东周郎），一挥扇子消散冰雕士兵"

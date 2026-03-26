@@ -1,0 +1,16 @@
+name: "王象"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "male"
+appearance: |
+  中年富豪，外表未详细描述
+personality: |
+  贪婪、心虚、懦弱，为还赌债不惜害人
+first_episode: "jiuba-ep02"
+episodes:
+  - "jiuba-ep02"
+  - "jiuba-ep03"
+  - "jiuba-ep04"
+voice_hint: "middle-male-coward"
+notes: "委托人，为还赌债在阴阳师蛊惑下将女友王霞活埋于墙内"

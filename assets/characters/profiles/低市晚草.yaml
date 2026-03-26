@@ -1,0 +1,25 @@
+name: "低市晚草"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "male"
+appearance: |
+  瘦削，戴眼镜，阴鸷的中年男人面孔，嘴角挂诡异笑容；
+  初次登场伪装成轮椅老者；最终浑身焦黑、面目全非而死
+personality: |
+  阴险狡诈，善于伪装，贪婪（用金钱收买），报复心强；
+  手段残忍（活葬、锁龙阵窃取国运），狂妄自大
+first_episode: "jiuba-ep51"
+episodes:
+  - "jiuba-ep51"
+  - "jiuba-ep52"
+  - "jiuba-ep53"
+  - "jiuba-ep54"
+  - "jiuba-ep58"
+  - "jiuba-ep65"
+  - "jiuba-ep77"
+  - "jiuba-ep78"
+  - "jiuba-ep79"
+  - "jiuba-ep80"
+voice_hint: "middle-male-sinister"
+notes: "日本（樱花国）阴阳师，入赘改姓，妻子为日本首相高市早草；布置炼狱炉、幻境迷宫、锁龙阵等阵法；幕后反派首领"

@@ -1,0 +1,10 @@
+name: "紫袍老道"
+project: "jiuba"
+tier: "minor"
+age: "unknown"
+gender: "male"
+appearance: |
+  紫色道袍，鹤发童颜，从天而降
+first_episode: "jiuba-ep68"
+voice_hint: "old-male-stern"
+notes: "老宗师，响应凌霄爷爷集结令前来支援"

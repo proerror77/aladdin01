@@ -1,0 +1,10 @@
+name: "丧尸"
+project: "jiuba"
+tier: "minor"
+age: "unknown"
+gender: "unknown"
+appearance: |
+  身形高大，浑身溃烂，皮肤青黑色，双眼浑浊却透着狡黠，嘴角挂诡异的笑
+first_episode: "jiuba-ep07"
+voice_hint: "monster-growl"
+notes: "阴阳师制造的变异丧尸，免疫符箓和黑驴蹄子，被凌霄用浓硫酸糯米加电击桃木剑消灭"

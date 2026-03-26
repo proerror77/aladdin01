@@ -1,0 +1,22 @@
+name: "画廊老板"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "male"
+appearance: |
+  中年男性，脸色煞白（受惊时）
+personality: |
+  胆小怕事、迷信、贪财（将怪人的画冒充明代真迹卖千万）；
+  实为非法囚禁者，将好友锁在通风管道三年
+first_episode: "jiuba-ep23"
+episodes:
+  - "jiuba-ep23"
+  - "jiuba-ep24"
+  - "jiuba-ep25"
+  - "jiuba-ep26"
+  - "jiuba-ep27"
+  - "jiuba-ep28"
+  - "jiuba-ep29"
+  - "jiuba-ep30"
+voice_hint: "middle-male-nervous"
+notes: "将好友（怪人/小青）锁在通风管道三年，冒充其画作卖千万；最终被警车带走"

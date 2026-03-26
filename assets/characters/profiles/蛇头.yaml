@@ -1,0 +1,10 @@
+name: "蛇头"
+project: "jiuba"
+tier: "minor"
+age: "unknown"
+gender: "male"
+appearance: |
+  跪在甲板上，浑身颤抖
+first_episode: "jiuba-ep36"
+voice_hint: "middle-male-coward"
+notes: "偷渡船蛇头，运送被盗灵龟福寿"

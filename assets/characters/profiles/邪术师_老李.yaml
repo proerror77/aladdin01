@@ -1,0 +1,10 @@
+name: "邪术师/老李"
+project: "jiuba"
+tier: "minor"
+age: "unknown"
+gender: "male"
+appearance: |
+  苍老憨厚的面容
+first_episode: "jiuba-ep17"
+voice_hint: "old-male-weak"
+notes: "血站库管，被寄生邪术控制偷血，被追上后发现是血肉替身（蜕壳符）非真身"

@@ -1,0 +1,19 @@
+name: "疤哥"
+project: "jiuba"
+tier: "supporting"
+age: 30
+gender: "male"
+appearance: |
+  脸上横着一道刀疤，流里流气，双手抱胸
+personality: |
+  嚣张但胆小，碰瓷耍赖；
+  关键时刻有良知（发现张丽红被害后想报警）
+first_episode: "jiuba-ep45"
+episodes:
+  - "jiuba-ep45"
+  - "jiuba-ep46"
+  - "jiuba-ep47"
+  - "jiuba-ep49"
+  - "jiuba-ep50"
+voice_hint: "young-male-rough"
+notes: "高利贷催债人，后被凌霄利用带路进入弯月赌坊，最终被押上治安车"

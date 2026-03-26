@@ -1,0 +1,24 @@
+name: "卖豆腐大妈"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "female"
+appearance: |
+  系围裙，扛拂尘；月白色道袍；随身携带瓶瓶罐罐草药
+personality: |
+  泼辣豪爽，嘴上不饶人；
+  精通药理毒术（驱毒方子传了十八代）；与老保安互怼
+first_episode: "jiuba-ep67"
+episodes:
+  - "jiuba-ep67"
+  - "jiuba-ep70"
+  - "jiuba-ep72"
+  - "jiuba-ep74"
+  - "jiuba-ep75"
+  - "jiuba-ep76"
+  - "jiuba-ep77"
+  - "jiuba-ep78"
+  - "jiuba-ep79"
+  - "jiuba-ep80"
+voice_hint: "middle-female-bold"
+notes: "东北卖豆腐大妈，卖了三十年豆腐；响应凌远山集结令而来"

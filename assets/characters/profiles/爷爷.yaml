@@ -1,0 +1,14 @@
+name: "爷爷"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "male"
+appearance: |
+  未直接出场，仅电话中出现；苍老而沉稳的声音
+personality: |
+  沉稳，一呼百应（发出集结令召集全国道门中人）
+first_episode: "jiuba-ep67"
+episodes:
+  - "jiuba-ep67"
+voice_hint: "old-male-stern"
+notes: "凌霄的爷爷，真名凌远山；与方丈慧明有旧交（五台山论道）；发出集结令召集全国道门中人"

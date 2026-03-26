@@ -1,0 +1,19 @@
+name: "方丈释安"
+project: "jiuba"
+tier: "supporting"
+age: 65
+gender: "male"
+appearance: |
+  持禅杖，周身金光涌动（伪装时）；
+  真面目为僧袍敞开露出符文刺青，双眼猩红，周身暗红邪气，阴气森森
+personality: |
+  表面正义刚烈的得道高僧，实为邪修；
+  急于灭口，邪气暴涨时凶狠；修行五十年
+first_episode: "jiuba-ep41"
+episodes:
+  - "jiuba-ep41"
+  - "jiuba-ep42"
+  - "jiuba-ep43"
+  - "jiuba-ep44"
+voice_hint: "old-male-sinister"
+notes: "静安寺方丈（ep41-42称'方丈'，ep43-44称'主持'/'释安'），表面修行实为邪修；让女巫刻阵法，下禁制灭口；最终被四人联手制服交给479局"

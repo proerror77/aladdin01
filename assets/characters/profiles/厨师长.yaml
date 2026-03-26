@@ -1,0 +1,21 @@
+name: "厨师长"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "male"
+appearance: |
+  中年男性，一脸忠厚（伪装）
+personality: |
+  表面忠厚老实，实则贪财背叛；
+  偷龟卖给樱花国人获利300万；用傀儡符操控老张栽赃王伟
+first_episode: "jiuba-ep31"
+episodes:
+  - "jiuba-ep31"
+  - "jiuba-ep32"
+  - "jiuba-ep33"
+  - "jiuba-ep34"
+  - "jiuba-ep35"
+  - "jiuba-ep36"
+  - "jiuba-ep37"
+voice_hint: "middle-male-steady"
+notes: "真名老郑，后厨干了多年的老人；被揭穿后被酒店老板开除"

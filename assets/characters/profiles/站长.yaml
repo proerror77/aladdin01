@@ -1,0 +1,23 @@
+name: "站长"
+project: "jiuba"
+tier: "supporting"
+age: 40
+gender: "male"
+appearance: |
+  国字脸，浓眉大眼，鼻梁高挺，头发一丝不苟，白大褂，胸口别三支笔，
+  站姿笔挺，手指修长有力
+personality: |
+  表面正气凛然、笑容满面，实则是真正的内鬼；
+  与吸血鬼勾结偷血浆，城府极深；
+  女儿亮亮患白血病晚期，被吸血鬼利用供奉鲜血
+first_episode: "jiuba-ep14"
+episodes:
+  - "jiuba-ep14"
+  - "jiuba-ep15"
+  - "jiuba-ep16"
+  - "jiuba-ep17"
+  - "jiuba-ep19"
+  - "jiuba-ep21"
+  - "jiuba-ep22"
+voice_hint: "middle-male-steady"
+notes: "血液储存站站长，真名张安；表面请凌霄等人调查，实际是偷血浆供给吸血鬼的幕后黑手；ep19身份暴露"

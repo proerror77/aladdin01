@@ -1,0 +1,18 @@
+name: "王伟"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "male"
+appearance: |
+  青年男性，缩在角落时脸色惨白
+personality: |
+  老实本分、胆小、容易哭、被冤枉后无助
+first_episode: "jiuba-ep31"
+episodes:
+  - "jiuba-ep31"
+  - "jiuba-ep32"
+  - "jiuba-ep33"
+  - "jiuba-ep34"
+  - "jiuba-ep37"
+voice_hint: "young-male-timid"
+notes: "张烈的发小；四季春酒店后厨员工，被冤枉杀龟；最终被提拔为厨师长"

@@ -1,0 +1,24 @@
+name: "老保安"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "male"
+appearance: |
+  穿保安制服（内藏玄色法袍），腰间铜钱剑；爱打哈欠打瞌睡
+personality: |
+  看似懒散实则勇猛，关键时刻以身挡锁链；
+  与卖豆腐大妈互怼
+first_episode: "jiuba-ep67"
+episodes:
+  - "jiuba-ep67"
+  - "jiuba-ep70"
+  - "jiuba-ep72"
+  - "jiuba-ep74"
+  - "jiuba-ep75"
+  - "jiuba-ep76"
+  - "jiuba-ep77"
+  - "jiuba-ep78"
+  - "jiuba-ep79"
+  - "jiuba-ep80"
+voice_hint: "old-male-lazy"
+notes: "深圳小区老保安；响应凌远山集结令而来；实力深厚"

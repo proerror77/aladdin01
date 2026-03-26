@@ -61,8 +61,10 @@ cat preprocess_unpacked/word/document.xml \
 
 对每个角色记录：
 - 姓名（统一使用正式姓名）
+- 别名/昵称（如有，记录所有变体：笔误、昵称、称呼等）
 - 年龄/性别（无法确定则标注"未知"）
 - 外貌描述（从人物小传或剧本中提取，单集角色可简略）
+- 形态变化（如有：人形/鬼形/兽形/神灵形态等，每种形态单独描述外貌）
 - 性格特征（单集角色可省略）
 - 首次出现集数
 - 角色层级（主角/重要配角/单集角色）
@@ -84,12 +86,24 @@ cat preprocess_unpacked/word/document.xml \
 `assets/characters/profiles/{角色名}.yaml`（完整档案 — 主角/重要配角）：
 ```yaml
 name: "{角色名}"
+aliases: ["{别名1}", "{别名2}"]  # 昵称、笔误变体、称呼等
 project: "{project_name}"
 tier: "{protagonist/supporting}"  # 主角 or 重要配角
 age: {年龄}
 gender: "{male/female}"
 appearance: |
-  {外貌描述，从人物小传提取}
+  {默认形态外貌描述，从人物小传提取}
+forms:  # 可选，仅当角色有多种视觉形态时添加
+  - form_id: "default"
+    form_label: "{形态名称，如 日常/人形}"
+    appearance: |
+      {该形态的外貌描述}
+    tags: ["{标签1}", "{标签2}"]
+  - form_id: "{form_id}"
+    form_label: "{形态名称，如 鬼形/兽形/神灵}"
+    appearance: |
+      {该形态的外貌描述}
+    tags: ["{标签}"]
 personality: |
   {性格特征}
 first_episode: "{ep_id}"
@@ -101,6 +115,7 @@ notes: "{其他备注}"
 `assets/characters/profiles/{角色名}.yaml`（简化档案 — 单集角色）：
 ```yaml
 name: "{角色名}"
+aliases: []  # 通常为空
 project: "{project_name}"
 tier: "minor"
 age: {年龄或 "unknown"}
@@ -242,6 +257,8 @@ source: "{原始文件名}"
 ## 注意事项
 
 - **原文不改动**：分集剧本中的原始内容原文保留，不做任何改写或摘要
-- **角色名一致性**：同一角色在不同地方可能有不同称呼（如「凌霄」「凌道长」「师兄」），统一使用正式姓名
+- **角色名一致性**：同一角色在不同地方可能有不同称呼（如「凌霄」「凌道长」「师兄」），统一使用正式姓名，其他称呼记录到 `aliases` 字段
+- **多形态角色**：如果角色有明显不同的视觉形态（如人形/鬼形/兽形/神灵形态），在 `forms` 字段中逐一描述。只有一种形态的角色不需要 `forms` 字段，直接用 `appearance`
+- **融合步骤**：分段扫描完成后，由 merge-agent 执行跨集角色名融合，识别同一角色的不同名字。preprocess-agent 不需要处理跨段去重
 - **集数编号**：统一使用两位数字（ep01、ep02...ep10、ep11...）
 - **大文件处理**：如果原始文件超过 100 集，分批处理，每批 10 集（Claude 单次 context 限制）

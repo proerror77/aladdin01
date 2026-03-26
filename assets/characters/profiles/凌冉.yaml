@@ -1,11 +1,22 @@
 name: "凌冉"
 project: "jiuba"
+tier: "supporting"
 age: 48
 gender: "female"
 appearance: |
-  岁月不败美人，身着简约民族风服饰，气质洒脱灵动，眉眼间与凌霄极为相似，自带慵懒随性的气场
+  背剑，戴面具；端庄秀丽的脸庞，眉眼间与凌霄七八分相似；
+  豪爽泼辣，实战经验丰富（驱蛇粉、踹门、镇魂铃）
 personality: |
-  潇洒不羁、乐观开朗，极度依赖丈夫，怕麻烦、怕带孙子，对道家掌门之位毫无兴趣
-first_episode: "jiuba-ep01"
+  潇洒不羁、乐观开朗，豪爽泼辣，不拘小节；
+  极度依赖丈夫，怕麻烦、怕带孙子，对道家掌门之位毫无兴趣；
+  道法天赋顶尖，是凌霄的隐藏后盾
+first_episode: "jiuba-ep69"
+episodes:
+  - "jiuba-ep69"
+  - "jiuba-ep71"
+  - "jiuba-ep73"
+  - "jiuba-ep75"
+  - "jiuba-ep76"
+  - "jiuba-ep79"
 voice_hint: "middle-female-elegant"
-notes: "青城派掌门之女，凌霄的母亲，道法天赋顶尖，是凌霄的隐藏后盾"
+notes: "青城派掌门之女，凌霄的母亲，自称'姐姐'；道法天赋顶尖"

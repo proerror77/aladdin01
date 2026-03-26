@@ -1,0 +1,19 @@
+name: "牧师"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "male"
+appearance: |
+  白衬衫、黑马甲、领结一丝不苟，左手托圣经，右手握银质权杖，
+  背后可展开巨大白色翅膀
+personality: |
+  傲慢，自称神的使徒，蔑视东方人（"低等种族"）；
+  实为历史学家/古罗马战争史研究者，被人利用
+first_episode: "jiuba-ep10"
+episodes:
+  - "jiuba-ep10"
+  - "jiuba-ep11"
+  - "jiuba-ep12"
+  - "jiuba-ep13"
+voice_hint: "middle-male-foreign"
+notes: "国际通缉犯，被称为'堕罪牧师'，真名阿莱克西；在冰雪大世界炼制冰阴兵，受幕后黑袍人指使；被击败后放走（凌霄暗中贴了追踪符箓）"

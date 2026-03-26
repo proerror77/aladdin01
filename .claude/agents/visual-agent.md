@@ -58,6 +58,8 @@ tools:
   shot_index: 1
   duration: 8  # 秒，current_min–current_max 之间
   scene_name: "{场景名}"
+  time_of_day: "night"  # day / night / dusk / dawn，从剧本上下文推断
+  lighting_note: "{光线补充描述，如：霓虹灯闪烁、月光透过窗帘}"
   generation_mode: "text2video"  # 或 "img2video"
   subject: |
     角色外貌完整描述（服装、发型、表情、体型）
@@ -80,14 +82,34 @@ tools:
   references:
     characters:
       - name: "{角色名}"
-        image_path: "assets/characters/images/{角色名}-front.png"
+        form_id: "default"  # 该镜次中角色的形态 ID，对应 profile 中的 forms[].form_id
+        image_path: "assets/characters/images/{角色名}-{form_id}-front.png"
     scenes:
       - name: "{场景名}"
-        image_path: "assets/scenes/images/{场景名}.png"
+        time_of_day: "night"  # 与镜次的 time_of_day 一致
+        image_path: "assets/scenes/images/{场景名}-night.png"
   # 组装好的提示词
   prompt: |
     {根据 generation_mode 按对应公式组装的完整提示词}
 ```
+
+### 角色形态引用规则
+
+每个镜次引用角色时，必须指定 `form_id`：
+
+1. 读取 `assets/characters/profiles/{角色名}.yaml`
+2. 如果角色有 `forms` 字段 → 根据剧本上下文选择对应的 `form_id`
+3. 如果角色没有 `forms` 字段 → 使用 `form_id: "default"`，`image_path` 不带 form_id 后缀（即 `{角色名}-front.png`）
+4. `subject` 字段中的外貌描述应使用对应形态的 `appearance`，而非角色的默认 `appearance`
+
+### 场景时间推断规则
+
+每个镜次必须标注 `time_of_day`：
+
+1. 从剧本上下文推断（如「夜晚」「清晨」「日落」等明确描述）
+2. 从场景特征推断（如酒吧场景通常是 night，户外景区可能是 day）
+3. 无法确定时默认为 `day`
+4. `lighting_note` 补充具体光线描述，用于提示词中的 `[scene]` 部分
 
 ### 4. 提示词组装
 

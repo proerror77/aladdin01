@@ -1,0 +1,10 @@
+name: "人偶邪灵"
+project: "jiuba"
+tier: "minor"
+age: "unknown"
+gender: "female"
+appearance: |
+  四肢伸长抽搐折叠，关节咔吧脆响，脑袋旋转180度，正面狞笑
+first_episode: "jiuba-ep01"
+voice_hint: "young-female-eerie"
+notes: "百年邪灵，在酒吧附身女客人，先装弱求饶再爆发，被凌霄用符箓驱散"

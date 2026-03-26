@@ -1,0 +1,10 @@
+name: "龙王"
+project: "jiuba"
+tier: "minor"
+age: "unknown"
+gender: "male"
+appearance: |
+  巨大金龙，龙须飘动，龙目如电
+first_episode: "jiuba-ep36"
+voice_hint: "old-male-stern"
+notes: "东海龙王，被凌霄召唤拦截偷渡船，一尾巴掀浪将船推回"

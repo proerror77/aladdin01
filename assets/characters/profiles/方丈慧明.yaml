@@ -1,0 +1,16 @@
+name: "方丈慧明"
+project: "jiuba"
+tier: "supporting"
+age: "unknown"
+gender: "male"
+appearance: |
+  白眉垂肩，手持禅杖，周身隐隐有金光流转
+personality: |
+  威严刚烈、护寺心切、重戒律；
+  但通情达理（得知凌霄身份后态度转变）
+first_episode: "jiuba-ep39"
+episodes:
+  - "jiuba-ep39"
+  - "jiuba-ep40"
+voice_hint: "old-male-stern"
+notes: "静安寺方丈，法号慧明；与凌霄爷爷凌远山有旧交（五台山论道）"
