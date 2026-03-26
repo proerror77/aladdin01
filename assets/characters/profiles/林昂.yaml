@@ -1,0 +1,11 @@
+name: "林昂"
+project: "jiuba"
+age: 24
+gender: "male"
+appearance: |
+  温文尔雅，身着简约中式服装，手持藏有符箓的折扇，自带儒雅气质
+personality: |
+  心思缜密、冷静理智，擅长谋略，对道家阵法和驱邪原理研究极深，擅长通灵之术
+first_episode: "jiuba-ep06"
+voice_hint: "young-male-gentle"
+notes: "正一派传人，职业是室内设计师，479局探员，男主的智囊担当，东北话口音"
