@@ -104,6 +104,7 @@ spawn preprocess-agent：
 详细报告：outputs/preprocess/{project_name}-report.md
 
 下一步：运行 ~design 生成参考图（角色 + 场景）
+      推荐在 ~batch 前运行；~start 模式可选（Phase 3 会提示缺失的参考图）
 ```
 
 ## 支持的文件格式

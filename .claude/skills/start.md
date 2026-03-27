@@ -12,6 +12,15 @@
 
 在 `script/` 目录下放好剧本文件后运行。
 
+## 前置条件
+
+**推荐**：在运行 `~start` 前先运行 `~design` 生成参考图（角色 + 场景）。
+
+- 如果已运行 `~design`：Phase 3 将校验参考图是否完整（纯校验，不生成图）
+- 如果未运行 `~design`：Phase 3 会提示缺失的参考图，需手动运行 `~design` 后再继续
+
+**注意**：`~design` 是可选的，但强烈推荐在批量生产前运行，以确保角色/场景一致性。
+
 ### 参数
 
 | 参数 | 说明 |
@@ -155,6 +164,7 @@ mkdir -p outputs/{ep}/videos
 ```
 spawn comply-agent
   输入：script/{ep}.md
+  输出：outputs/{ep}/render-script.md（合规后的剧本）
   等待完成
 ```
 
@@ -183,11 +193,17 @@ spawn visual-agent
 **Phase 3 — 美术校验**
 ```
 spawn design-agent
-  输入：render-script + visual-direction.yaml + state/design-lock.json
+  输入：render-script + visual-direction.yaml + state/design-lock.json（可选）
+  输出：art-direction-review.md（校验报告）
   等待完成
 ```
 
-注意：Phase 3 需要 `~design` 已运行并生成参考图。如果 design-agent 发现缺失的参考图，会提示先运行 `~design`。
+**重要**：Phase 3 是**纯校验阶段**，不生成任何参考图。design-agent 只检查 visual-direction.yaml 中引用的参考图是否存在：
+- 如果 `state/design-lock.json` 存在：读取已锁定的参考图清单，校验文件是否存在
+- 如果 `state/design-lock.json` 不存在：检查 `assets/characters/images/` 和 `assets/scenes/images/` 中是否有对应的参考图
+- 如果发现缺失的参考图：提示用户先运行 `~design` 生成参考图，然后再继续
+
+注意：推荐在运行 `~start` 前先运行 `~design` 生成参考图。如果 design-agent 发现缺失的参考图，会提示先运行 `~design`。
 
 🔴 **人工确认点 2**（`--auto-approve` 时跳过）
 
