@@ -103,7 +103,7 @@ spawn preprocess-agent：
 
 详细报告：outputs/preprocess/{project_name}-report.md
 
-下一步：运行 ~batch 开始批量生成视频
+下一步：运行 ~design 生成参考图（角色 + 场景）
 ```
 
 ## 支持的文件格式

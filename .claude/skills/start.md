@@ -180,12 +180,14 @@ spawn visual-agent
 - 输入 `yes` → 继续 Phase 3
 - 输入 `no` → 进入修改流程（~review revise {ep}）
 
-**Phase 3 — 美术指导**
+**Phase 3 — 美术校验**
 ```
 spawn design-agent
-  输入：render-script + visual-direction.yaml
+  输入：render-script + visual-direction.yaml + state/design-lock.json
   等待完成
 ```
+
+注意：Phase 3 需要 `~design` 已运行并生成参考图。如果 design-agent 发现缺失的参考图，会提示先运行 `~design`。
 
 🔴 **人工确认点 2**（`--auto-approve` 时跳过）
 

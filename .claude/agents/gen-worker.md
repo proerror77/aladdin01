@@ -21,7 +21,7 @@ tools:
 | `shot_id` | string | 镜次 ID（如 ep01-s01-shot01） |
 | `shot_index` | int | 镜次序号（如 1） |
 | `prompt` | string | 组装好的 Seedance 提示词 |
-| `duration` | int | 视频时长（4-12 秒，Seedance 1.5 pro） |
+| `duration` | int | 视频时长（范围由 `config/platforms/seedance-v2.yaml` 的 `duration_min`/`duration_max` 决定） |
 | `ratio` | string | 宽高比（`16:9` / `9:16` / `4:3` / `1:1` / `3:4` / `21:9` / `adaptive`） |
 | `resolution` | string | 分辨率（`480p` / `720p` / `1080p`，默认 `1080p`） |
 | `generation_mode` | string | 生成模式：`text2video` 或 `img2video` |
