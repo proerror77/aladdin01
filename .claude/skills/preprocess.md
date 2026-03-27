@@ -59,6 +59,31 @@ spawn preprocess-agent：
 - `project_name`: 项目名
 - 等待完成
 
+### 3.5 角色融合（大文件分段扫描时）
+
+如果预处理使用了分段扫描（多个 scan agent 并行扫描不同集数范围），在写入最终档案前执行跨集角色名融合：
+
+1. 检查 `state/char-scan-ep*.md` 是否存在多个扫描结果文件
+2. 如果只有 1 个（小剧本，未分段）→ 跳过融合，直接写档案
+3. 如果有多个 → spawn merge-agent：
+   - `scan_files`: 所有 `state/char-scan-ep*.md` 文件路径
+   - `project_name`: 项目名
+   - 等待完成
+4. 展示融合结果：
+
+```
+🔗 角色融合完成
+   合并了 {M} 组角色（涉及 {K} 个别名）
+   最终独立角色数：{N}
+   融合映射表：state/character-merge-map.json
+
+   合并示例：
+   - 凌霄 ← [凌宵, 宵凌]（笔误）
+   - 曾令辉 ← [阿白]（昵称）
+```
+
+5. 后续写档案步骤读取 `state/character-merge-map.json`，按正名写入，aliases 记录到 YAML
+
 ### 4. 展示结果
 
 预处理完成后，展示报告摘要：
