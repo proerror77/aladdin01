@@ -5,8 +5,10 @@
 ## 使用方式
 
 ```
-~status
-~status ep01        # 查看特定剧本的详细进度
+~status                    # 全局进度总览
+~status ep01              # 查看特定剧本的详细进度
+~status --mine            # 只查看分配给我的剧本进度
+~status alice             # 查看某人的剧本进度
 ```
 
 ## 状态文件结构
@@ -117,3 +119,24 @@ Phase 5 的细分进度 = 80% + (已完成镜次数 / 总镜次数) × 20%
 | {ep}-phase3.json | data.new_characters, data.reused_characters, data.scenes |
 | {ep}-phase4.json | data.voice_count |
 | {ep}-shot-{N}.json | status, original_retries, rewrite_rounds |
+
+## 多人协作模式
+
+### 按人查看（~status --mine 或 ~status alice）
+
+1. 读取 `state/task-board.json`
+2. 筛选属于指定用户的剧本
+3. 只展示这些剧本的进度
+
+输出：
+```
+━━━ alice 的进度 ━━━
+
+ep01-ep20  [████████░░] 80%  Phase 5: 视频生成中 (160/200)
+ep41-ep60  [████░░░░░░] 40%  Phase 3: 美术校验完成
+
+━━━ 摘要 ━━━
+负责：40 集
+完成：0 集
+进行中：2 组
+```

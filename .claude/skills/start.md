@@ -125,6 +125,28 @@ mkdir -p outputs/{ep}/videos
 }
 ```
 
+### 3.5 断点检测（自动 resume）
+
+在启动 Phase 1 前，检查已有状态文件：
+
+```
+检查断点状态...
+
+[resume] Phase 1-3 已完成，Phase 4: 音色配置完成
+[resume] Phase 5: 8/12 镜次已完成
+
+从 Phase 5 继续（跳过已完成的镜次）
+```
+
+检测逻辑：
+1. 读取 `state/{ep}-phase{1-4}.json`，确定已完成的阶段
+2. 统计 `state/{ep}-shot-*.json` 中 `status: completed` 的镜次
+3. 从最早未完成的阶段继续
+
+断点续传跳过规则：
+- Phase X `status: completed` → 跳过该阶段
+- 镜次 `status: completed` 且视频文件存在 → 跳过该镜次
+
 ### 4. 启动 Agent Team
 
 创建 team，按顺序执行：
@@ -158,12 +180,14 @@ spawn visual-agent
 - 输入 `yes` → 继续 Phase 3
 - 输入 `no` → 进入修改流程（~review revise {ep}）
 
-**Phase 3 — 美术指导**
+**Phase 3 — 美术校验**
 ```
 spawn design-agent
-  输入：render-script + visual-direction.yaml
+  输入：render-script + visual-direction.yaml + state/design-lock.json
   等待完成
 ```
+
+注意：Phase 3 需要 `~design` 已运行并生成参考图。如果 design-agent 发现缺失的参考图，会提示先运行 `~design`。
 
 🔴 **人工确认点 2**（`--auto-approve` 时跳过）
 
