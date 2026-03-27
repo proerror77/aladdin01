@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# jimeng-web.sh — 通过 Actionbook CLI 操作即梦 Web UI 生成视频
+# jimeng-web.sh — 通过 Actionbook CLI + CDP 操作即梦 Web UI 生成视频
 #
 # 用法：
 #   ./scripts/jimeng-web.sh setup                    # 首次登录（手动）
@@ -8,14 +8,20 @@
 #
 # Payload JSON 格式：
 # {
-#   "image_paths": ["/abs/path/to/img1.jpg", "/abs/path/to/img2.png"],
+#   "image_paths": ["/abs/path/to/img1.jpg"],
 #   "audio_paths": ["/abs/path/to/audio1.mp3"],
-#   "script_text": "镜头描述，@图片1，动作\n无字幕，无水印",
+#   "script_text": "镜头描述文本\n无字幕，无水印",
 #   "video_duration": "12s",
 #   "aspect_ratio": "9:16"
 # }
 #
-# 依赖：actionbook CLI (>= 0.6.0), jq
+# 依赖：actionbook CLI (>= 0.6.0), jq, python3, pip: websockets
+#
+# 实测验证的操作方式（2026-03-26）：
+#   - 下拉选择：eval + JS click combobox[role=combobox] → option[role=option]
+#   - 文本输入：actionbook browser type/fill + CSS 'textarea.lv-textarea'
+#   - 文件上传：CDP DOM.setFileInputFiles via Python websockets
+#   - 页面导航：actionbook browser goto（不是 open，避免多 tab）
 
 set -euo pipefail
 
@@ -23,13 +29,13 @@ set -euo pipefail
 # 配置
 # ============================================================
 PROFILE="${JIMENG_PROFILE:-jimeng}"
+CDP_PORT="${JIMENG_CDP_PORT:-9224}"
 JIMENG_VIDEO_URL="https://jimeng.jianying.com/ai-tool/home?type=video"
 JIMENG_ASSET_URL="https://jimeng.jianying.com/ai-tool/asset"
 STEALTH="${JIMENG_STEALTH:-true}"
 WAIT_BETWEEN="${JIMENG_WAIT_BETWEEN:-30}"
 DOWNLOAD_POLL_INTERVAL="${JIMENG_DOWNLOAD_POLL_INTERVAL:-30}"
 DOWNLOAD_MAX_WAIT="${JIMENG_DOWNLOAD_MAX_WAIT:-600}"
-export WAIT_BETWEEN DOWNLOAD_POLL_INTERVAL DOWNLOAD_MAX_WAIT
 
 # Actionbook 基础参数
 AB_ARGS=(-P "$PROFILE")
@@ -45,13 +51,64 @@ log() { echo "[jimeng-web] $(date '+%H:%M:%S') $*"; }
 err() { echo "[jimeng-web] ERROR: $*" >&2; }
 
 ab_browser() {
-  actionbook browser "$@" "${AB_ARGS[@]}"
+  actionbook browser "$@" "${AB_ARGS[@]}" 2>/dev/null
+}
+
+ab_eval() {
+  actionbook browser eval "$1" "${AB_ARGS[@]}" 2>/dev/null
 }
 
 wait_seconds() {
   local secs="$1"
-  log "等待 ${secs} 秒..."
+  log "等待 ${secs}s..."
   sleep "$secs"
+}
+
+# 获取即梦页面的 CDP WebSocket URL
+_get_jimeng_ws_url() {
+  actionbook browser status -P "$PROFILE" 2>/dev/null \
+    | grep -oE '[A-F0-9]{32}' | head -1 | while read -r page_id; do
+      echo "ws://127.0.0.1:${CDP_PORT}/devtools/page/${page_id}"
+    done
+}
+
+# 通过 CDP WebSocket 执行操作（Python helper）
+_cdp_run() {
+  local py_code="$1"
+  python3 -c "
+import json, asyncio, websockets, sys
+
+CDP_PORT = ${CDP_PORT}
+
+async def get_jimeng_page_ws():
+    import subprocess
+    r = subprocess.run(['actionbook', 'browser', 'status', '-P', '${PROFILE}'],
+                       capture_output=True, text=True)
+    import re
+    pages = re.findall(r'([A-F0-9]{32})', r.stdout)
+    for pid in pages:
+        ws = f'ws://127.0.0.1:{CDP_PORT}/devtools/page/{pid}'
+        try:
+            async with websockets.connect(ws, max_size=10*1024*1024, open_timeout=3) as test:
+                await test.send(json.dumps({'id':0,'method':'Runtime.evaluate','params':{'expression':'document.title'}}))
+                resp = json.loads(await test.recv())
+                title = resp.get('result',{}).get('result',{}).get('value','')
+                if '即梦' in title or 'jimeng' in title.lower():
+                    return ws
+        except:
+            continue
+    return pages[0] if pages else None
+
+async def main():
+    ws_url = await get_jimeng_page_ws()
+    if not ws_url:
+        print('ERROR: no jimeng page found', file=sys.stderr)
+        sys.exit(1)
+    async with websockets.connect(ws_url, max_size=10*1024*1024) as ws:
+${py_code}
+
+asyncio.run(main())
+" 2>&1
 }
 
 # ============================================================
@@ -59,11 +116,9 @@ wait_seconds() {
 # ============================================================
 cmd_setup() {
   log "启动浏览器，请手动登录即梦..."
-  log "登录完成后按 Ctrl+C 退出，登录状态会自动保存到 profile: $PROFILE"
-  ab_browser open "https://jimeng.jianying.com" 2>/dev/null || true
-  # 保持浏览器打开，等待用户登录
+  ab_browser open "https://jimeng.jianying.com" || true
   log "浏览器已打开。请在浏览器中完成登录。"
-  log "登录后运行: actionbook browser close -P $PROFILE"
+  log "登录完成后运行: actionbook browser close -P $PROFILE"
 }
 
 # ============================================================
@@ -82,81 +137,79 @@ cmd_submit() {
   duration=$(jq -r '.video_duration' "$payload")
   ratio=$(jq -r '.aspect_ratio' "$payload")
 
-  # 解析图片和音频路径为数组
   local -a image_paths=()
   local -a audio_paths=()
-  while IFS= read -r p; do
-    [[ -n "$p" ]] && image_paths+=("$p")
-  done < <(jq -r '.image_paths[]?' "$payload")
-  while IFS= read -r p; do
-    [[ -n "$p" ]] && audio_paths+=("$p")
-  done < <(jq -r '.audio_paths[]?' "$payload")
+  while IFS= read -r p; do [[ -n "$p" ]] && image_paths+=("$p"); done < <(jq -r '.image_paths[]?' "$payload")
+  while IFS= read -r p; do [[ -n "$p" ]] && audio_paths+=("$p"); done < <(jq -r '.audio_paths[]?' "$payload")
 
-  # 校验图片路径
+  # 校验文件
   for img in "${image_paths[@]}"; do
-    if [[ ! -f "$img" ]]; then
-      err "图片文件不存在: $img"
-      exit 1
-    fi
+    [[ ! -f "$img" ]] && { err "图片不存在: $img"; exit 1; }
+  done
+  for aud in "${audio_paths[@]}"; do
+    [[ ! -f "$aud" ]] && { err "音频不存在: $aud"; exit 1; }
   done
 
-  log "提交视频生成任务"
-  log "  图片: ${#image_paths[@]} 张"
-  log "  音频: ${#audio_paths[@]} 个"
-  log "  时长: $duration"
-  log "  比例: $ratio"
+  log "提交任务: ${#image_paths[@]} 图, ${#audio_paths[@]} 音频, 时长=$duration, 比例=$ratio"
 
-  # --- 1. 打开即梦视频生成页 ---
-  log "打开即梦视频生成页..."
-  ab_browser open "$JIMENG_VIDEO_URL"
+  # --- 1. 导航到即梦视频生成页 ---
+  log "导航到即梦..."
+  ab_browser goto "$JIMENG_VIDEO_URL"
   wait_seconds 4
 
-  # --- 2. 配置视频设置 ---
-  # 参考模式 → 全能参考
-  log "配置参考模式: 全能参考"
-  _select_dropdown "全能参考" "首尾帧" "智能多帧" "主题参考"
+  # --- 2. 配置：参考模式 → 全能参考 ---
+  log "设置参考模式: 全能参考"
+  _select_combobox 2 "全能参考"
 
-  # 模型 → Seedance 2.0
-  log "配置模型: Seedance 2.0"
-  _select_dropdown "Seedance 2.0" "Seedance 2.0 Fast" "Seedance 2.0 Pro"
+  # --- 3. 配置：模型 → Seedance 2.0 ---
+  log "设置模型: Seedance 2.0"
+  _select_combobox 1 "全能王者"
 
-  # 时长
-  log "配置时长: $duration"
-  _select_dropdown "$duration"
+  # --- 4. 配置：时长 ---
+  log "设置时长: $duration"
+  _select_combobox 3 "$duration"
 
-  # --- 3. 上传图片 ---
+  # --- 5. 上传图片 ---
   if [[ ${#image_paths[@]} -gt 0 ]]; then
     log "上传 ${#image_paths[@]} 张图片..."
-    _upload_files "${image_paths[@]}"
+    _upload_files_cdp "${image_paths[@]}"
     wait_seconds 3
   fi
 
-  # --- 4. 上传音频 ---
+  # --- 6. 上传音频 ---
   if [[ ${#audio_paths[@]} -gt 0 ]]; then
     log "上传 ${#audio_paths[@]} 个音频..."
-    _upload_files "${audio_paths[@]}"
+    _upload_files_cdp "${audio_paths[@]}"
     wait_seconds 3
   fi
 
-  # --- 5. 配置比例（上传后，因为上传会改变比例） ---
-  log "配置比例: $ratio"
-  _select_dropdown "$ratio" "21:9" "16:9" "4:3" "1:1" "3:4" "9:16" "自动匹配"
+  # --- 7. 配置比例（上传后，因为上传可能改变比例） ---
+  log "设置比例: $ratio"
+  _select_ratio "$ratio"
 
-  # --- 6. 输入脚本 ---
+  # --- 8. 输入脚本 ---
+  # 全能参考模式用 ProseMirror (.tiptap)，首尾帧模式用 textarea
   log "输入脚本..."
-  _input_script "$script_text"
+  ab_browser fill '.tiptap.ProseMirror' "$script_text" 2>/dev/null || \
+    ab_browser fill 'textarea.lv-textarea' "$script_text" 2>/dev/null || \
+    { err "找不到输入框"; exit 1; }
+  wait_seconds 1
 
-  # --- 7. 提交 ---
+  # --- 9. 提交（Enter + 确认弹窗） ---
   log "提交生成..."
   ab_browser press "Enter"
   wait_seconds 2
-
   # 点击确认弹窗
-  ab_browser click 'button:has-text("确认")' --wait 5000 2>/dev/null || \
-    ab_browser click '.lv-btn--primary' --wait 3000 2>/dev/null || \
-    log "未检测到确认弹窗，可能已自动提交"
+  ab_eval '(() => {
+    const btns = document.querySelectorAll("button");
+    for (const b of btns) {
+      if (b.textContent.trim() === "确认") { b.click(); return "confirmed"; }
+    }
+    return "no-confirm-dialog";
+  })()'
+  wait_seconds 1
 
-  log "视频生成任务已提交"
+  log "任务已提交"
   echo '{"status":"submitted"}'
 }
 
@@ -165,190 +218,168 @@ cmd_submit() {
 # ============================================================
 cmd_download() {
   local output_file="${1:-video.mp4}"
+  log "下载视频到: $output_file"
 
-  log "准备下载视频到: $output_file"
-
-  # 打开资产页
+  # 导航到资产页
   ab_browser goto "$JIMENG_ASSET_URL"
   wait_seconds 3
 
   # 切换到视频标签
   log "切换到视频标签..."
-  ab_browser click 'text=视频' --wait 3000 2>/dev/null || \
-    ab_browser click '[data-key="video"]' --wait 3000 2>/dev/null || \
-    log "可能已在视频标签"
-  wait_seconds 2
+  ab_eval '(() => {
+    const items = document.querySelectorAll("[role=menuitem], [role=tab], span");
+    for (const el of items) {
+      if (el.textContent.trim() === "视频") { el.click(); return "clicked-video-tab"; }
+    }
+    return "video-tab-not-found";
+  })()'
+  wait_seconds 3
 
-  # 等待视频列表加载
-  ab_browser wait 'video' --wait 10000 2>/dev/null || true
-
-  # 开启批量操作
+  # 点击批量操作
   log "开启批量操作..."
-  ab_browser click 'text=批量操作' --wait 3000 2>/dev/null || true
+  ab_eval '(() => {
+    const spans = document.querySelectorAll("span, div");
+    for (const el of spans) {
+      if (el.textContent.trim() === "批量操作" && el.offsetParent) { el.click(); return "batch-mode"; }
+    }
+    return "no-batch-btn";
+  })()'
   wait_seconds 1
 
-  # 选择第一个视频（最新的）
+  # 选择第一个视频
   log "选择最新视频..."
-  ab_browser click 'video' --wait 3000 2>/dev/null || true
+  ab_eval '(() => {
+    const videos = document.querySelectorAll("video");
+    if (videos.length > 0) { videos[0].click(); return "selected-" + videos.length; }
+    return "no-videos";
+  })()'
   wait_seconds 1
 
   # 点击下载
   log "点击下载..."
-  ab_browser click 'button:has-text("下载")' --wait 5000 2>/dev/null || \
-    ab_browser click '[data-testid="download-btn"]' --wait 3000 2>/dev/null
-
-  # 等待下载完成
-  # 注意：Actionbook 的下载行为取决于浏览器配置
-  # 下载的文件通常在浏览器默认下载目录
+  ab_eval '(() => {
+    const btns = document.querySelectorAll("button");
+    for (const b of btns) {
+      if (b.textContent.includes("下载")) { b.click(); return "downloading"; }
+    }
+    return "no-download-btn";
+  })()'
   wait_seconds 10
 
-  log "下载请求已发送"
-  log "请检查浏览器下载目录，将视频移动到: $output_file"
-  echo "{\"status\":\"downloaded\",\"output\":\"$output_file\"}"
+  log "下载请求已发送，检查浏览器下载目录"
+  echo "{\"status\":\"download_requested\",\"output\":\"$output_file\"}"
 }
 
 # ============================================================
-# 内部函数：选择下拉选项
+# 内部函数：通过 JS 选择 combobox 选项
+# combobox_index: 0=功能, 1=模型, 2=参考模式, 3=时长
+# match_text: 选项中包含的文本（用 includes 匹配）
 # ============================================================
-_select_dropdown() {
+_select_combobox() {
+  local idx="$1"
+  local match_text="$2"
+
+  # 点击 combobox 打开下拉
+  ab_eval "(()=>{
+    const cb = document.querySelectorAll('[role=combobox]')[${idx}];
+    if (!cb) return 'combobox-${idx}-not-found';
+    cb.click();
+    return 'opened-combobox-${idx}: ' + cb.textContent.trim().substring(0,30);
+  })()"
+  sleep 1
+
+  # 从下拉中选择匹配的选项
+  ab_eval "(()=>{
+    const opts = document.querySelectorAll('[role=option]');
+    for (const o of opts) {
+      if (o.textContent.includes('${match_text}')) { o.click(); return 'selected: ${match_text}'; }
+    }
+    return 'option-not-found: ${match_text}';
+  })()"
+  sleep 1
+
+  # 验证
+  local current
+  current=$(ab_eval "(()=>{ return document.querySelectorAll('[role=combobox]')[${idx}]?.textContent?.trim()?.substring(0,30) || 'N/A'; })()" 2>/dev/null || echo "N/A")
+  log "  当前值: $current"
+}
+
+# ============================================================
+# 内部函数：选择比例（比例是 button 不是 combobox）
+# ============================================================
+_select_ratio() {
   local target="$1"
-  shift
-  local -a others=("$@")
-
-  # 尝试点击当前显示的非目标选项来打开下拉
-  for label in "${others[@]}"; do
-    if ab_browser click "text=$label" --wait 1500 2>/dev/null; then
-      wait_seconds 1
-      if ab_browser click "text=$target" --wait 3000 2>/dev/null; then
-        log "  已选择: $target"
-        wait_seconds 1
-        return 0
-      fi
-    fi
-  done
-
-  # 如果上面都没成功，直接尝试点击目标（可能已经是当前选项）
-  ab_browser click "text=$target" --wait 2000 2>/dev/null || \
-    log "  $target: 可能已是当前选项或未找到"
-  wait_seconds 1
+  ab_eval "(()=>{
+    const btns = document.querySelectorAll('button');
+    for (const b of btns) {
+      const t = b.textContent.trim();
+      if (['21:9','16:9','4:3','1:1','3:4','9:16'].includes(t) && t !== '${target}') {
+        b.click(); return 'opened-ratio-from: ' + t;
+      }
+    }
+    return 'ratio-btn-not-found';
+  })()"
+  sleep 1
+  ab_eval "(()=>{
+    const items = document.querySelectorAll('[role=option], [role=menuitem], li, span');
+    for (const el of items) {
+      if (el.textContent.trim() === '${target}') { el.click(); return 'selected-ratio: ${target}'; }
+    }
+    return 'ratio-option-not-found';
+  })()"
+  sleep 1
 }
 
 # ============================================================
-# 内部函数：上传文件（通过 CDP setFileInputFiles）
+# 内部函数：通过 CDP WebSocket 上传文件
 # ============================================================
-_upload_files() {
+_upload_files_cdp() {
   local -a files=("$@")
 
-  # 构建 JS 文件路径数组
-  local js_paths=""
+  # 构建 Python 文件路径列表
+  local py_files=""
   for f in "${files[@]}"; do
     local abs_path
-    abs_path=$(cd "$(dirname "$f")" && pwd)/$(basename "$f")
-    if [[ -n "$js_paths" ]]; then
-      js_paths="$js_paths, \"$abs_path\""
-    else
-      js_paths="\"$abs_path\""
-    fi
+    abs_path="$(cd "$(dirname "$f")" && pwd)/$(basename "$f")"
+    [[ -n "$py_files" ]] && py_files="$py_files, "
+    py_files="${py_files}\"${abs_path}\""
   done
 
-  # 通过 eval 获取 input[type=file] 的 DOM 节点，然后用 CDP 设置文件
-  # Actionbook 的 eval 在页面上下文执行 JS
-  ab_browser eval "
-    (async () => {
-      const input = document.querySelector('input[type=\"file\"]');
-      if (!input) { return 'no-file-input'; }
-      // 触发 input 的 change 事件需要通过 CDP
-      // 这里先让 input 可见
-      input.style.display = 'block';
-      input.style.opacity = '1';
-      return 'file-input-ready';
-    })()
-  " 2>/dev/null || true
-
-  # 注意：纯 JS 无法设置 input[type=file] 的值（安全限制）
-  # 需要通过 Actionbook 的底层 CDP 能力
-  # 如果 actionbook browser eval 不支持 CDP file upload，
-  # 回退方案：用 actionbook browser click 点击上传区域触发文件选择器
-  log "  文件上传通过 CDP（如失败请检查 Actionbook 版本）"
-}
-
-# ============================================================
-# 内部函数：输入脚本（处理 @图片N/@音频M 引用）
-# ============================================================
-_input_script() {
-  local script_text="$1"
-
-  # 定位输入框
-  ab_browser click 'textarea' --wait 5000 2>/dev/null || \
-    ab_browser click '[contenteditable]' --wait 5000 2>/dev/null || \
-    ab_browser click '[placeholder*="输入"]' --wait 5000 2>/dev/null || \
-    ab_browser click '[placeholder*="描述"]' --wait 5000 2>/dev/null
-  wait_seconds 1
-
-  # 检查脚本中是否有 @引用
-  if echo "$script_text" | grep -qE '@(图片|音频)[0-9]+'; then
-    # 有 @引用，需要逐段输入
-    _input_script_with_refs "$script_text"
-  else
-    # 无 @引用，直接填入
-    ab_browser fill 'textarea, [contenteditable], [placeholder*="输入"], [placeholder*="描述"]' "$script_text"
-  fi
-}
-
-# 逐段输入脚本，在 @引用处触发下拉选择
-_input_script_with_refs() {
-  local script_text="$1"
-  local remaining="$script_text"
-
-  while [[ -n "$remaining" ]]; do
-    # 找到下一个 @引用的位置
-    local before_ref ref_label after_ref
-    if [[ "$remaining" =~ ^([^@]*)@(图片[0-9]+|音频[0-9]+)(.*) ]]; then
-      before_ref="${BASH_REMATCH[1]}"
-      ref_label="${BASH_REMATCH[2]}"
-      after_ref="${BASH_REMATCH[3]}"
-
-      # 输入 @引用前的文本
-      if [[ -n "$before_ref" ]]; then
-        ab_browser type 'textarea, [contenteditable], [placeholder*="输入"], [placeholder*="描述"]' "$before_ref"
-        wait_seconds 0.5
-      fi
-
-      # 输入 @ 触发下拉
-      ab_browser type 'textarea, [contenteditable], [placeholder*="输入"], [placeholder*="描述"]' "@"
-      wait_seconds 1
-
-      # 从下拉中选择引用
-      ab_browser click "text=$ref_label" --wait 3000 2>/dev/null || \
-        log "  未找到下拉选项: $ref_label"
-      wait_seconds 0.5
-
-      remaining="$after_ref"
-    else
-      # 没有更多 @引用，输入剩余文本
-      ab_browser type 'textarea, [contenteditable], [placeholder*="输入"], [placeholder*="描述"]' "$remaining"
-      remaining=""
-    fi
-  done
+  _cdp_run "
+        files = [${py_files}]
+        # Enable DOM
+        await ws.send(json.dumps({'id':1,'method':'DOM.enable'}))
+        await ws.recv()
+        # Get document
+        await ws.send(json.dumps({'id':2,'method':'DOM.getDocument','params':{'depth':-1}}))
+        r = json.loads(await ws.recv())
+        root = r['result']['root']['nodeId']
+        # Find file input
+        await ws.send(json.dumps({'id':3,'method':'DOM.querySelector','params':{'nodeId':root,'selector':'input[type=file]'}}))
+        r = json.loads(await ws.recv())
+        node_id = r['result']['nodeId']
+        if node_id == 0:
+            print('ERROR: no file input found')
+            sys.exit(1)
+        # Set files
+        await ws.send(json.dumps({'id':4,'method':'DOM.setFileInputFiles','params':{'nodeId':node_id,'files':files}}))
+        r = json.loads(await ws.recv())
+        if 'error' in r:
+            print(f'ERROR: {r[\"error\"]}')
+            sys.exit(1)
+        print(f'uploaded {len(files)} file(s)')
+"
 }
 
 # ============================================================
 # 主入口
 # ============================================================
 case "$COMMAND" in
-  setup)
-    cmd_setup
-    ;;
-  submit)
-    cmd_submit "$@"
-    ;;
-  download)
-    cmd_download "$@"
-    ;;
+  setup)    cmd_setup ;;
+  submit)   cmd_submit "$@" ;;
+  download) cmd_download "$@" ;;
   *)
     echo "Usage: $0 {setup|submit|download} [args...]" >&2
-    echo "" >&2
-    echo "Commands:" >&2
     echo "  setup                    首次登录即梦" >&2
     echo "  submit <payload.json>    提交视频生成任务" >&2
     echo "  download <output.mp4>    下载最新生成的视频" >&2
