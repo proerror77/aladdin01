@@ -39,6 +39,8 @@ tools:
 | `audio_paths` | string[]? | 音频文件本地绝对路径 |
 | `generate_audio` | bool | 是否生成音频 |
 | `dialogue` | string? | 对白内容 |
+| `session_id` | string | Trace session 标识（由 team-lead 传入） |
+| `trace_file` | string | Trace 文件名，如 `ep01-shot-01-trace`（由 team-lead 传入） |
 
 ## 输出
 
@@ -157,3 +159,25 @@ tools:
 - 首次使用前需运行 `./scripts/api-caller.sh jimeng-web setup` 完成登录
 - CSS 选择器可能因即梦 UI 更新而失效，失败时检查 `actionbook browser snapshot` 输出
 - Seedance 2.0 API 开放后，切换 `generation_backend: "api"` 回到 gen-worker 模式
+
+## Trace 写入
+
+在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
+
+```bash
+# 开始生成
+./scripts/trace.sh {session_id} {trace_file} start '{"prompt":"...前100字...","duration":{N},"mode":"browser","ref_images":[...]}'
+
+# 浏览器提交
+./scripts/trace.sh {session_id} {trace_file} browser_submit '{"submit_attempt":{N}}'
+
+# 等待生成
+./scripts/trace.sh {session_id} {trace_file} browser_wait '{"elapsed_s":{N},"status":"processing"}'
+
+# 下载视频
+./scripts/trace.sh {session_id} {trace_file} browser_download '{"video_path":"outputs/{ep}/videos/shot-{N}.mp4","download_attempt":{N}}'
+
+# 完成 / 失败
+./scripts/trace.sh {session_id} {trace_file} complete '{"submit_retries":{N},"download_retries":{N}}'
+./scripts/trace.sh {session_id} {trace_file} fail '{"error":"...","submit_retries":{N},"download_retries":{N}}'
+```

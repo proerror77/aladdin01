@@ -8,6 +8,7 @@
 #   ./scripts/api-caller.sh image_gen download <image_url> <output_file>
 #   ./scripts/api-caller.sh moderation check-file <text_file>
 #   ./scripts/api-caller.sh env-check  # 检查环境变量
+#   ./scripts/api-caller.sh trace-summary <session_dir>  # 生成 LLM 摘要（需要 DEEPSEEK_API_KEY）
 #
 # Seedance payload 格式（火山方舟官方规范）：
 # {
@@ -325,9 +326,103 @@ print(json.dumps(payload))
     esac
     ;;
 
+  trace-summary)
+    # LLM 摘要生成（需要 DEEPSEEK_API_KEY）
+    SESSION_DIR="${ACTION}"  # 第二个参数是 session 目录路径
+    if [[ -z "$SESSION_DIR" ]]; then
+      echo "ERROR: 用法: $0 trace-summary <session_dir>" >&2
+      exit 1
+    fi
+    if [[ ! -d "$SESSION_DIR" ]]; then
+      echo "ERROR: Session 目录不存在: $SESSION_DIR" >&2
+      exit 1
+    fi
+
+    # 读取摘要模型配置
+    TRACE_API_URL="${DEEPSEEK_API_URL:-https://api.deepseek.com/v1/chat/completions}"
+    TRACE_MODEL="${DEEPSEEK_MODEL:-deepseek-chat}"
+    TRACE_API_KEY="${DEEPSEEK_API_KEY:-}"
+
+    if [[ -z "$TRACE_API_KEY" ]]; then
+      echo "ERROR: DEEPSEEK_API_KEY 未设置。请设置后重试。" >&2
+      exit 1
+    fi
+
+    # 收集所有 trace 事件
+    TRACE_CONTENT=""
+    for f in "$SESSION_DIR"/*.jsonl; do
+      [[ -f "$f" ]] || continue
+      FNAME="$(basename "$f")"
+      TRACE_CONTENT+="=== $FNAME ===\n"
+      TRACE_CONTENT+="$(cat "$f")\n\n"
+    done
+
+    if [[ -z "$TRACE_CONTENT" ]]; then
+      echo "ERROR: Session 目录中没有 trace 文件" >&2
+      exit 1
+    fi
+
+    # 构建摘要 prompt
+    SUMMARY_PROMPT="你是一个 AI 短剧生产系统的可观测性分析师。请分析以下 agent trace 日志，生成结构化摘要报告。
+
+报告格式：
+# Session 摘要: {session_id}
+
+## 路径标签
+每集的 phase 链路 + 关键指标
+
+## 关键决策点
+影响最终结果的 agent 决策（编号列表）
+
+## 异常标记
+失败、高重试、改写等异常（用 emoji 标记严重程度）
+
+## 质量评估
+成功率、重试率、合规覆盖率等指标
+
+## 优化建议
+基于异常模式的改进方向
+
+以下是 trace 日志：
+
+$TRACE_CONTENT"
+
+    # 写入临时 payload
+    PAYLOAD_FILE="/tmp/trace_summary_payload.json"
+    jq -cn \
+      --arg model "$TRACE_MODEL" \
+      --arg content "$SUMMARY_PROMPT" \
+      '{
+        model: $model,
+        messages: [{role: "user", content: $content}],
+        max_tokens: 2000,
+        temperature: 0.3
+      }' > "$PAYLOAD_FILE"
+
+    # 调用 API
+    RESPONSE=$(curl -sS --fail-with-body \
+      --connect-timeout "$CONNECT_TIMEOUT" \
+      --max-time 120 \
+      -H "Authorization: Bearer $TRACE_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d @"$PAYLOAD_FILE" \
+      "$TRACE_API_URL")
+
+    # 提取摘要内容并写入 summary.md
+    SUMMARY=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+    if [[ -z "$SUMMARY" ]]; then
+      echo "ERROR: LLM 摘要生成失败，响应: $RESPONSE" >&2
+      exit 1
+    fi
+
+    echo "$SUMMARY" > "$SESSION_DIR/summary.md"
+    echo "摘要已生成: $SESSION_DIR/summary.md"
+    rm -f "$PAYLOAD_FILE"
+    ;;
+
   *)
     echo "ERROR: Unknown service: ${SERVICE}" >&2
-    echo "Valid services: seedance, image_gen, moderation, jimeng-web, env-check" >&2
+    echo "Valid services: seedance, image_gen, moderation, jimeng-web, env-check, trace-summary" >&2
     exit 1
     ;;
 esac

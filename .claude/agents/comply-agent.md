@@ -16,6 +16,8 @@ tools:
 ## 输入
 
 - `script/{ep}.md` — 原始剧本
+- `session_id` — Trace session 标识（由 team-lead 传入）
+- `trace_file` — Trace 文件名，如 `ep01-phase1-trace`（由 team-lead 传入）
 
 ## 输出
 
@@ -120,4 +122,28 @@ cat outputs/{ep}/render-script.md > /tmp/moderation_input_{ep}.txt
     }
   }
 }
+```
+
+## Trace 写入
+
+在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
+
+```bash
+# 读取输入
+./scripts/trace.sh {session_id} {trace_file} read_input '{"input":"script/{ep}.md","size":{字数}}'
+
+# 第一层扫描
+./scripts/trace.sh {session_id} {trace_file} layer1_scan '{"paragraphs":{N},"hits":{N},"keywords":[...]}'
+
+# 第二层 LLM 评分
+./scripts/trace.sh {session_id} {trace_file} layer2_llm '{"scores":{"violence":{N},"sexual":{N},"hate":{N},"self_harm":{N}},"decision":"..."}'
+
+# 改写
+./scripts/trace.sh {session_id} {trace_file} rewrite '{"count":{N},"changes":[{"from":"...","to":"...","reason":"..."}]}'
+
+# 第三层 Moderation
+./scripts/trace.sh {session_id} {trace_file} layer3_moderation '{"flagged":false,"max_score":{"category":{score}}}'
+
+# 写入产出
+./scripts/trace.sh {session_id} {trace_file} write_output '{"files":["render-script.md","compliance-report.md","phase1.json"]}'
 ```

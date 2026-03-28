@@ -17,6 +17,8 @@ tools:
 
 - `outputs/{ep}/render-script.md` — 合规剧本
 - 用户选择的视觉风格和目标媒介（由 team-lead 传入）
+- `session_id` — Trace session 标识（由 team-lead 传入）
+- `trace_file` — Trace 文件名，如 `ep01-phase2-trace`（由 team-lead 传入）
 
 ## 输出
 
@@ -239,4 +241,28 @@ shots:
     }
   }
 }
+```
+
+## Trace 写入
+
+在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
+
+```bash
+# 读取输入
+./scripts/trace.sh {session_id} {trace_file} read_input '{"render_script":"outputs/{ep}/render-script.md","platform_config":"config/platforms/seedance-v2.yaml"}'
+
+# 场景分析
+./scripts/trace.sh {session_id} {trace_file} analyze_scenes '{"scene_count":{N},"scenes":["场景1","场景2"]}'
+
+# 镜次拆分
+./scripts/trace.sh {session_id} {trace_file} generate_shots '{"shot_count":{N},"total_duration":{X}}'
+
+# 参考图分配
+./scripts/trace.sh {session_id} {trace_file} assign_refs '{"characters":[{"name":"...","form_id":"..."}],"scenes":[{"name":"...","time_of_day":"..."}]}'
+
+# 提示词组装
+./scripts/trace.sh {session_id} {trace_file} assemble_prompts '{"avg_prompt_len":{N},"max_prompt_len":{N}}'
+
+# 写入产出
+./scripts/trace.sh {session_id} {trace_file} write_output '{"files":["visual-direction.yaml","visual-direction.md","phase2.json"]}'
 ```

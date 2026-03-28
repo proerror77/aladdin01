@@ -22,6 +22,8 @@ tools:
 - `state/design-lock.json` — 已锁定的参考图清单
 - `assets/characters/images/` — 角色参考图
 - `assets/scenes/images/` — 场景参考图
+- `session_id` — Trace session 标识（由 team-lead 传入）
+- `trace_file` — Trace 文件名，如 `ep01-phase3-trace`（由 team-lead 传入）
 
 ## 输出
 
@@ -96,4 +98,22 @@ design-agent 发现 {N} 个缺失的参考图：
     "missing": 0
   }
 }
+```
+
+## Trace 写入
+
+在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
+
+```bash
+# 读取输入
+./scripts/trace.sh {session_id} {trace_file} read_input '{"visual_direction":"outputs/{ep}/visual-direction.yaml","design_lock":"state/design-lock.json"}'
+
+# 角色图校验
+./scripts/trace.sh {session_id} {trace_file} check_characters '{"total":{N},"found":{N},"missing":[]}'
+
+# 场景图校验
+./scripts/trace.sh {session_id} {trace_file} check_scenes '{"total":{N},"found":{N},"missing":[]}'
+
+# 写入产出
+./scripts/trace.sh {session_id} {trace_file} write_output '{"files":["art-direction-review.md","phase3.json"],"all_valid":true}'
 ```

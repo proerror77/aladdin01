@@ -121,6 +121,16 @@ script/ 目录下没有找到剧本文件。
 mkdir -p outputs/{ep}/videos
 ```
 
+生成 session ID（格式：`start-{YYYYMMDD}-{HHMMSS}`）：
+```bash
+SESSION_ID="start-$(date +%Y%m%d-%H%M%S)"
+```
+
+写入 session 开始事件：
+```bash
+./scripts/trace.sh $SESSION_ID session session_start '{"type":"start","episodes":["{ep}"],"config":{"visual_style":"...","ratio":"...","backend":"..."}}'
+```
+
 初始化 `state/progress.json`：
 ```json
 {
@@ -164,14 +174,21 @@ mkdir -p outputs/{ep}/videos
 ```
 spawn comply-agent
   输入：script/{ep}.md
+  session_id: $SESSION_ID
+  trace_file: {ep}-phase1-trace
   输出：outputs/{ep}/render-script.md（合规后的剧本）
   等待完成
 ```
+
+spawn 前写入 trace：`./scripts/trace.sh $SESSION_ID session spawn '{"agent":"comply-agent","ep":"{ep}","phase":1}'`
+完成后写入 trace：`./scripts/trace.sh $SESSION_ID session complete '{"agent":"comply-agent","ep":"{ep}","phase":1,"duration_s":{N},"summary":"..."}'`
 
 **Phase 2 — 视觉指导**
 ```
 spawn visual-agent
   输入：outputs/{ep}/render-script.md + 视觉风格 + 目标媒介
+  session_id: $SESSION_ID
+  trace_file: {ep}-phase2-trace
   等待完成
 ```
 
@@ -194,6 +211,8 @@ spawn visual-agent
 ```
 spawn design-agent
   输入：render-script + visual-direction.yaml + state/design-lock.json（可选）
+  session_id: $SESSION_ID
+  trace_file: {ep}-phase3-trace
   输出：art-direction-review.md（校验报告）
   等待完成
 ```
@@ -225,6 +244,8 @@ spawn design-agent
 ```
 spawn voice-agent
   输入：render-script + visual-direction.yaml
+  session_id: $SESSION_ID
+  trace_file: {ep}-phase4-trace
   auto_voice_match: true（如果 --auto-voice 或 --auto-approve 启用）
   等待完成
 ```
@@ -255,10 +276,10 @@ spawn voice-agent
 
 3. 并行 spawn gen-workers：
 ```
-spawn gen-worker (shot-1 params)
-spawn gen-worker (shot-2 params)
+spawn gen-worker (shot-1 params, session_id=$SESSION_ID, trace_file={ep}-shot-01-trace)
+spawn gen-worker (shot-2 params, session_id=$SESSION_ID, trace_file={ep}-shot-02-trace)
 ...
-spawn gen-worker (shot-N params)
+spawn gen-worker (shot-N params, session_id=$SESSION_ID, trace_file={ep}-shot-{N}-trace)
 等待所有 worker 完成
 ```
 
@@ -283,7 +304,7 @@ spawn gen-worker (shot-N params)
 3. 串行 spawn browser-gen-worker（浏览器同时只能做一件事）：
 ```
 for each shot in shots:
-  spawn browser-gen-worker (shot params)
+  spawn browser-gen-worker (shot params, session_id=$SESSION_ID, trace_file={ep}-shot-{N}-trace)
   等待完成
   等待 wait_between 秒
 ```
@@ -377,3 +398,21 @@ outputs/{ep}/videos/
 ```
 
 输出最终结果给用户。
+
+### 6. Session Trace 收尾
+
+写入 session 结束事件：
+```bash
+./scripts/trace.sh $SESSION_ID session session_end '{"duration_s":{N},"stats":{"total_shots":{N},"succeeded":{S},"failed":{F}}}'
+```
+
+如果配置了 `DEEPSEEK_API_KEY`，自动生成 LLM 摘要：
+```bash
+./scripts/api-caller.sh trace-summary state/traces/$SESSION_ID
+```
+
+输出 trace 信息：
+```
+📊 Trace 已记录：state/traces/$SESSION_ID/
+运行 ~trace 查看路径概览和诊断信息
+```
