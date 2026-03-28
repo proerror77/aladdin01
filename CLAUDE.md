@@ -105,7 +105,7 @@ generation_backend: "browser"  # 从 "api" 改为 "browser"
 team-lead
 ├── comply-agent           Phase 1: 合规预检
 ├── visual-agent           Phase 2: 视觉指导 → 🔴人工确认（--auto-approve 跳过）
-├── design-agent           Phase 3: 美术指导 → 🔴人工确认（--auto-approve 跳过）
+├── design-agent           Phase 3: 美术校验 → 🔴人工确认（--auto-approve 跳过）
 ├── voice-agent            Phase 4: 音色配置（交互式 / --auto-voice 自动匹配）
 ├── gen-worker × N         Phase 5: 视频生成（并行，backend=api）
 └── browser-gen-worker × 1 Phase 5: 视频生成（串行，backend=browser）
