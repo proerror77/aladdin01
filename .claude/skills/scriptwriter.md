@@ -311,8 +311,8 @@ spawn **format-converter-agent**：
 5. 复制角色/场景档案到标准位置
 
 **产出**：
-- `raw/{project-name}-complete.docx`（完整剧本，Word 格式）
-- `outputs/scriptwriter/{project-name}/complete.md`（完整剧本，Markdown）
+- `raw/{project-name}-complete.md`（完整剧本，供 ~preprocess 直接读取）
+- `outputs/scriptwriter/{project-name}/complete.md`（完整剧本，备份）
 - `outputs/scriptwriter/{project-name}/characters/*.yaml`（角色档案）
 - `outputs/scriptwriter/{project-name}/scenes/*.yaml`（场景档案）
 
@@ -331,7 +331,7 @@ spawn **format-converter-agent**：
 - 总字数：约 {words} 字
 
 📁 产出文件：
-- 完整剧本：raw/{project-name}-complete.docx
+- 完整剧本：raw/{project-name}-complete.md
 - 分集剧本：outputs/scriptwriter/{project-name}/episodes/ep*.md
 - 角色档案：outputs/scriptwriter/{project-name}/characters/*.yaml
 - 场景档案：outputs/scriptwriter/{project-name}/scenes/*.yaml
@@ -339,12 +339,12 @@ spawn **format-converter-agent**：
 - 质量报告：outputs/scriptwriter/{project-name}/review-report.md
 
 🎬 下一步：
-1. 运行 ~preprocess raw/{project-name}-complete.docx {project-name}
+1. 运行 ~preprocess raw/{project-name}-complete.md {project-name}
 2. 运行 ~design 生成参考图
 3. 运行 ~batch 开始批量生产
 
-或者直接运行快捷命令：
-~scriptwriter-to-video {project-name}  # 一键执行完整流程
+或者直接运行一键命令：
+~scriptwriter-to-video --resume {project-name}  # 从阶段 2 继续
 ```
 
 ## 时长模式说明
