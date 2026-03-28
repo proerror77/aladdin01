@@ -4,13 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概览
 
-AI 短剧自动生成系统。从剧本输入到视频输出的全链路自动化，基于 Claude Code Agent Teams 架构。
+AI 短剧自动生成系统。从创意发想到视频输出的全链路自动化，基于 Claude Code Agent Teams 架构。
+
+**完整 E2E 流程**：`~scriptwriter`（创意→剧本） → `~preprocess`（剧本拆解） → `~design`（参考图） → `~batch`/`~start`（视频生成）
 
 ## 快速开始
 
 ```bash
 # 检查环境变量
 ./scripts/api-caller.sh env-check
+
+# 从创意生成完整剧本（可选，替代手写剧本）
+~scriptwriter                           # 交互式创作
+~scriptwriter --idea "你的创意" --episodes 15 --length short
 
 # 长篇剧本预处理（.docx/.md/.txt → 分集剧本 + 角色档案）
 ~preprocess /path/to/script.docx
@@ -98,6 +104,21 @@ generation_backend: "browser"  # 从 "api" 改为 "browser"
 - Seedance 2.0 API 开放后改回 `generation_backend: "api"` 即可
 
 ## Agent Teams 架构
+
+### 剧本创作模式（~scriptwriter）
+
+```
+scriptwriter (skill orchestrator)
+├── outline-agent              Step 2: 故事大纲（结构、角色、场景、分集规划）
+│                              → 🔴人工确认（outline.md）
+├── character-creator          Step 3: 角色档案（内联处理）
+├── scene-creator              Step 4: 场景档案（内联处理）
+├── episode-writer-agent × N   Step 5: 分集剧本（并行，每集一个 agent）
+│                              → 🔴每 5 集人工确认
+├── script-reviewer-agent      Step 6: 质量检查（连贯性、一致性、时长、对白）
+│                              → 🔴人工确认（review-report.md）
+└── format-converter           Step 7: 格式转换（内联处理，输出 .docx + .md）
+```
 
 ### 单剧本模式（~start）
 
@@ -457,6 +478,13 @@ outputs/{ep}/    # 各剧本产出（报告 + 视频）
   ├── voice-assignment.md
   ├── generation-report.md
   └── videos/
+outputs/scriptwriter/{project}/  # 剧本创作产出（~scriptwriter）
+  ├── outline.md
+  ├── characters/*.yaml
+  ├── scenes/*.yaml
+  ├── episodes/ep*.md
+  ├── review-report.md
+  └── complete.md
 assets/          # 全局资产（角色图/场景图/音色）
   ├── characters/images/
   ├── characters/voices/
@@ -467,7 +495,7 @@ config/          # 平台/合规/音色/API 配置
   ├── voices/
   └── api-endpoints.yaml
 state/           # 进度状态（独立状态文件）
-.claude/agents/  # Agent 定义（preprocess/comply/visual/design/voice/gen-worker）
-.claude/skills/  # Skill 定义（~preprocess, ~start, ~batch, ~status, ~review）
+.claude/agents/  # Agent 定义（outline/episode-writer/script-reviewer/preprocess/comply/visual/design/voice/gen-worker）
+.claude/skills/  # Skill 定义（~scriptwriter, ~preprocess, ~start, ~batch, ~status, ~review）
 scripts/         # api-caller.sh（统一 API 调用）
 ```
