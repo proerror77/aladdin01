@@ -52,29 +52,31 @@
 
 1. 收集创意信息（交互式或从参数获取）
 2. spawn outline-agent 生成大纲
-3. 🔴 **确认点 1**：大纲确认（异步飞书审核）
+3. 🔴 **确认点 1**：大纲确认（Auto-Gate + 异步飞书审核）
    ```
-   写入 state/reviews/{review-id}.json:
-     type: "text", checkpoint: "outline"
-     content.summary: 剧名、集数、主角、核心冲突
-     content.files: [outline.md]
+   spawn gate-agent:
+     checkpoint: "outline"
+     target_files: [outline.md]
+     scoring_config: config/scoring/auto-gate-rules.yaml
 
-   调用 ./scripts/notify.sh review state/reviews/{review-id}.json
-   → 飞书发送文字审核卡片（通过/重做/终止）
-   → session 结束，等待回调
+   gate-agent 评分后三种结果：
+   A) ≥85 分 auto_approve → 跳过飞书，直接继续步骤 4
+   B) 50-85 分 human_review → 推飞书卡片（附评分报告），session 结束等回调
+   C) <50 分 auto_reject → 自动重跑 outline-agent（退回原因作为修改指令）
 
-   回调后新 session 读取 response:
-   - approve → 继续步骤 4
-   - redo → 重跑 outline-agent（reason 作为修改指令）
-   - terminate → 更新 e2e-progress.json 为 terminated
+   飞书回调后：approve → 继续 / redo → 重做 / terminate → 终止
    ```
 4. 生成角色档案和场景档案
 5. spawn episode-writer-agent × N 并行生成分集剧本
 6. spawn script-reviewer-agent 质量检查
-7. 🔴 **确认点 2**：质量报告确认（异步飞书审核）
+7. 🔴 **确认点 2**：质量报告确认（Auto-Gate + 异步飞书审核）
    ```
-   同上模式：写 review state → notify → session 结束 → 等回调
-   type: "text", checkpoint: "quality"
+   spawn gate-agent:
+     checkpoint: "episode_quality"
+     target_files: [所有 ep*.md]
+     context_files: [outline.md, review-report.md]
+
+   同上三种结果：auto_approve / human_review / auto_reject
    - redo → 重跑有问题的集数（reason 指出问题）
    ```
 8. 格式转换：
@@ -137,21 +139,19 @@
 执行：
 1. 读取所有角色/场景档案
 2. 按优先级生成参考图（protagonist 迭代 → supporting 审核 → minor 自动）
-3. 🔴 **确认点 3**：主角形象确认（异步飞书审核 — 视觉类）
+3. 🔴 **确认点 3**：主角形象确认（Auto-Gate + 异步飞书审核 — 视觉类）
    ```
-   写入 state/reviews/{review-id}.json:
-     type: "visual", checkpoint: "character"
-     assets: [所有主角参考图路径]
+   spawn gate-agent:
+     checkpoint: "character_design"
+     target_files: [所有主角参考图路径]
+     context_files: [角色档案 YAML]
 
-   调用 ./scripts/notify.sh review state/reviews/{review-id}.json
-   → 飞书发送视觉审核卡片（含 Web 链接）
-   → 用户在 Web 页面查看图片、选中不满意的角色 → 通过/重做/终止
-   → session 结束，等待回调
+   gate-agent 评分（身份一致性/风格统一/参考图质量/裁切格式）：
+   A) ≥85 分 auto_approve → 跳过飞书，直接继续阶段 4
+   B) 50-85 分 human_review → 推飞书视觉卡片（含 Web 链接 + 评分报告）
+   C) <50 分 auto_reject → 自动重跑 ~design（退回原因 + 低分维度）
 
-   回调后新 session 读取 response:
-   - approve → 继续阶段 4
-   - redo → 重跑 ~design（selected_items + reason 指定重做哪些角色）
-   - terminate → 终止
+   飞书/Web 回调后：approve → 继续 / redo → 重做选中角色 / terminate → 终止
    ```
 4. 生成场景参考图（含时间变体）
 5. 锁定 `state/design-lock.json`

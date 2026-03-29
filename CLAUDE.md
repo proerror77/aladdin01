@@ -140,8 +140,9 @@ scriptwriter (skill orchestrator)
 ```
 team-lead
 ├── comply-agent           Phase 1: 合规预检
-├── visual-agent           Phase 2: 视觉指导 → 🔴人工确认（--auto-approve 跳过）
-├── design-agent           Phase 3: 美术校验 → 🔴人工确认（--auto-approve 跳过）
+├── visual-agent           Phase 2: 视觉指导
+│   └── gate-agent         评分过关（prompt 质量 + 安全预检）
+├── design-agent           Phase 3: 美术校验
 ├── voice-agent            Phase 4: 音色配置（交互式 / --auto-voice 自动匹配）
 ├── gen-worker × N         Phase 5: 视频生成（并行，backend=api）
 └── browser-gen-worker × 1 Phase 5: 视频生成（串行，backend=browser）
@@ -362,6 +363,41 @@ uvicorn server:app --host 0.0.0.0 --port 8080 --reload
 - `state/reviews/` — 审核状态文件
 
 详细设计见 `docs/plans/2026-03-29-lark-review-integration-design.md`。
+
+## Auto-Gate 自动评分过关
+
+所有确认点在推飞书之前，先由 `gate-agent` 自动评分：
+
+```
+产出完成 → gate-agent 评分 → ≥85 分自动过（不推飞书）
+                            → 50-85 分推飞书人审（附评分报告）
+                            → <50 分自动退回重做（附退回原因）
+```
+
+### 评分类型
+
+| 类型 | 适用确认点 | 维度 |
+|------|-----------|------|
+| text_scoring.outline | 大纲确认 | 结构完整性、角色设计、冲突看点、节奏、伏笔、受众匹配 |
+| text_scoring.episode_quality | 质量报告 | 剧情连贯、角色一致、时长控制、对白自然、悬念钩子 |
+| prompt_scoring.visual_direction | 视觉指导 | 5-block 结构、单动词、长度、Quality Suffix、风格具体性、安全合规 |
+| visual_scoring.character_design | 主角形象 | 身份一致性、风格统一、参考图质量、裁切格式 |
+
+### Prompt 安全预检
+
+`gate-agent` 在评分 visual_direction 时额外执行 prompt 安全预检：
+- 对照 `config/compliance/blocklist.yaml` 检查 prompt 中的敏感词
+- 检查 Seedance 2.0 已知拒绝模式（多动词、超长、负面描述）
+- 检查 5-block 结构完整性（Subject/Action/Camera/Style/Quality Suffix）
+
+不通过的 prompt 在 Phase 2 就拦住，不等 Phase 5 API 被拒才发现。
+
+### 配置
+
+评分规则：`config/scoring/auto-gate-rules.yaml`
+- 可调整阈值（默认 ≥85 自动过，<50 自动退回）
+- 可调整每个维度的权重
+- 连续自动过关保护：超过 10 次连续自动过后强制人审一次
 
 ## 可观测性（Agent Trace Log）
 
