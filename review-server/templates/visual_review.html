@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>视觉审核 — {{ review.content.title }}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #1a1a2e; color: #eee; }
+    .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .card { background: #16213e; border-radius: 12px; padding: 32px; margin-bottom: 24px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .header h1 { font-size: 20px; }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+    .badge-pending { background: #fff3cd; color: #856404; }
+    .badge-approved { background: #d4edda; color: #155724; }
+    .badge-redo { background: #cce5ff; color: #004085; }
+    .meta { display: flex; gap: 24px; margin-bottom: 20px; font-size: 14px; color: #aaa; }
+    .meta strong { color: #eee; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .gallery-item { background: #0f3460; border-radius: 8px; overflow: hidden; cursor: pointer; position: relative; }
+    .gallery-item img { width: 100%; height: 280px; object-fit: cover; display: block; }
+    .gallery-item video { width: 100%; height: 280px; object-fit: cover; display: block; }
+    .gallery-item .label { padding: 8px 12px; font-size: 13px; color: #aaa; }
+    .gallery-item .label strong { color: #eee; }
+    .gallery-item.selected { outline: 3px solid #007bff; }
+    .gallery-item .check { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .gallery-item.selected .check { background: #007bff; }
+    .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 100; }
+    .lightbox.show { display: flex; }
+    .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+    .lightbox .close { position: absolute; top: 20px; right: 20px; font-size: 32px; color: white; cursor: pointer; }
+    .actions { display: flex; gap: 12px; margin-top: 24px; }
+    .btn { padding: 10px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+    .btn-approve { background: #28a745; color: white; }
+    .btn-redo { background: #007bff; color: white; }
+    .btn-terminate { background: #dc3545; color: white; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .reason-input { width: 100%; padding: 10px; border: 1px solid #333; border-radius: 8px; font-size: 14px; margin-top: 12px; display: none; background: #0f3460; color: #eee; }
+    .reason-input.show { display: block; }
+    .hint { font-size: 12px; color: #666; margin-top: 8px; }
+    .result-msg { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+    .result-msg.show { display: block; }
+    .result-msg.success { background: #155724; color: #d4edda; }
+    .history { margin-top: 16px; }
+    .history-item { font-size: 13px; color: #888; padding: 8px 0; border-bottom: 1px solid #333; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <h1>{{ review.content.title }}</h1>
+        <span class="badge badge-{{ review.status }}">{{ review.status }}</span>
+      </div>
+
+      <div class="meta">
+        <div><strong>项目</strong> {{ review.project }}</div>
+        <div><strong>迭代</strong> 第 {{ review.iteration }} 轮</div>
+        <div><strong>资源</strong> {{ assets|length }} 个</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom: 16px; font-size: 16px;">参考图预览 <span class="hint">（点击图片放大，点击选中要重做的）</span></h2>
+
+      <div class="gallery">
+        {% for asset in assets %}
+        <div class="gallery-item" data-path="{{ asset.path }}" onclick="toggleSelect(this)">
+          <div class="check">{{ "✓" if false else "" }}</div>
+          {% if asset.name.endswith('.mp4') or asset.name.endswith('.mov') %}
+          <video src="{{ asset.url }}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
+          {% else %}
+          <img src="{{ asset.url }}" onclick="event.stopPropagation(); openLightbox('{{ asset.url }}')" loading="lazy">
+          {% endif %}
+          <div class="label"><strong>{{ asset.name }}</strong></div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if review.history %}
+      <div class="history">
+        <strong>历史记录：</strong>
+        {% for h in review.history %}
+        <div class="history-item">
+          第 {{ h.iteration }} 轮：{{ h.action }} {% if h.reason %}— {{ h.reason }}{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if review.status == 'pending' or review.status == 'redo' %}
+      <textarea id="reason" class="reason-input" placeholder="请输入重做原因（如：林风发型改为寸头，苏晚眼睛要更大）..."></textarea>
+
+      <div class="actions">
+        <button class="btn btn-approve" onclick="submitAction('approve')">✅ 全部通过</button>
+        <button class="btn btn-redo" onclick="showReason()">🔄 重做选中</button>
+        <button class="btn btn-terminate" onclick="submitAction('terminate')">❌ 终止</button>
+      </div>
+      {% endif %}
+
+      <div id="result" class="result-msg"></div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <span class="close">&times;</span>
+    <img id="lightbox-img" src="">
+  </div>
+
+  <script>
+    const selected = new Set();
+    let redoMode = false;
+
+    function toggleSelect(el) {
+      const path = el.dataset.path;
+      if (selected.has(path)) {
+        selected.delete(path);
+        el.classList.remove('selected');
+        el.querySelector('.check').textContent = '';
+      } else {
+        selected.add(path);
+        el.classList.add('selected');
+        el.querySelector('.check').textContent = '✓';
+      }
+    }
+
+    function openLightbox(url) {
+      document.getElementById('lightbox-img').src = url;
+      document.getElementById('lightbox').classList.add('show');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('show');
+    }
+
+    function showReason() {
+      const input = document.getElementById('reason');
+      if (!redoMode) {
+        input.classList.add('show');
+        input.focus();
+        redoMode = true;
+      } else {
+        submitAction('redo');
+      }
+    }
+
+    async function submitAction(action) {
+      const btns = document.querySelectorAll('.btn');
+      btns.forEach(b => b.disabled = true);
+
+      const body = {};
+      if (action === 'redo') {
+        body.reason = document.getElementById('reason').value;
+        body.selected_items = [...selected];
+      }
+
+      try {
+        const resp = await fetch(`/review/{{ review_id }}/${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const data = await resp.json();
+        const result = document.getElementById('result');
+        if (resp.ok) {
+          result.className = 'result-msg show success';
+          result.textContent = action === 'approve' ? '✅ 已通过，流程继续中...'
+            : action === 'redo' ? `🔄 已提交重做（${selected.size} 项选中），等待重新生成...`
+            : '❌ 已终止';
+        } else {
+          result.className = 'result-msg show';
+          result.style.background = '#721c24'; result.style.color = '#f8d7da';
+          result.textContent = `错误: ${data.detail}`;
+          btns.forEach(b => b.disabled = false);
+        }
+      } catch (e) {
+        const result = document.getElementById('result');
+        result.className = 'result-msg show';
+        result.style.background = '#721c24'; result.style.color = '#f8d7da';
+        result.textContent = `请求失败: ${e.message}`;
+        btns.forEach(b => b.disabled = false);
+      }
+    }
+  </script>
+</body>
+</html>

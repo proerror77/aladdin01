@@ -1,0 +1,68 @@
+{
+  "type": "template",
+  "data": {
+    "template_id": "alert",
+    "template_variable": {
+      "title": "{{title}}",
+      "project": "{{project}}",
+      "severity": "{{severity}}",
+      "detail": "{{detail}}",
+      "trace_url": "{{trace_url}}",
+      "created_at": "{{created_at}}"
+    }
+  },
+  "card": {
+    "header": {
+      "template": "red",
+      "title": {
+        "tag": "plain_text",
+        "content": "⚠️ [{{project}}] {{title}}"
+      }
+    },
+    "elements": [
+      {
+        "tag": "div",
+        "fields": [
+          {
+            "is_short": true,
+            "text": {
+              "tag": "lark_md",
+              "content": "**项目**\n{{project}}"
+            }
+          },
+          {
+            "is_short": true,
+            "text": {
+              "tag": "lark_md",
+              "content": "**严重程度**\n{{severity}}"
+            }
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "text": {
+          "tag": "lark_md",
+          "content": "{{detail}}"
+        }
+      },
+      {
+        "tag": "hr"
+      },
+      {
+        "tag": "action",
+        "actions": [
+          {
+            "tag": "button",
+            "text": {
+              "tag": "plain_text",
+              "content": "🔍 查看 Trace 诊断"
+            },
+            "type": "default",
+            "url": "{{trace_url}}"
+          }
+        ]
+      }
+    ]
+  }
+}

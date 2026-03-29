@@ -52,15 +52,31 @@
 
 1. 收集创意信息（交互式或从参数获取）
 2. spawn outline-agent 生成大纲
-3. 🔴 **确认点 1**：大纲确认
+3. 🔴 **确认点 1**：大纲确认（异步飞书审核）
    ```
-   大纲已生成：outputs/scriptwriter/{project}/outline.md
-   确认后继续？(yes/no/revise)
+   写入 state/reviews/{review-id}.json:
+     type: "text", checkpoint: "outline"
+     content.summary: 剧名、集数、主角、核心冲突
+     content.files: [outline.md]
+
+   调用 ./scripts/notify.sh review state/reviews/{review-id}.json
+   → 飞书发送文字审核卡片（通过/重做/终止）
+   → session 结束，等待回调
+
+   回调后新 session 读取 response:
+   - approve → 继续步骤 4
+   - redo → 重跑 outline-agent（reason 作为修改指令）
+   - terminate → 更新 e2e-progress.json 为 terminated
    ```
 4. 生成角色档案和场景档案
 5. spawn episode-writer-agent × N 并行生成分集剧本
-6. 🔴 **确认点 2**（每 5 集）：剧本确认
-7. spawn script-reviewer-agent 质量检查
+6. spawn script-reviewer-agent 质量检查
+7. 🔴 **确认点 2**：质量报告确认（异步飞书审核）
+   ```
+   同上模式：写 review state → notify → session 结束 → 等回调
+   type: "text", checkpoint: "quality"
+   - redo → 重跑有问题的集数（reason 指出问题）
+   ```
 8. 格式转换：
    - 合并分集剧本为完整文件
    - **写入 `raw/{project}-complete.md`**（供 ~preprocess 直接读取）
@@ -121,7 +137,22 @@
 执行：
 1. 读取所有角色/场景档案
 2. 按优先级生成参考图（protagonist 迭代 → supporting 审核 → minor 自动）
-3. 🔴 **确认点 3**：主角形象确认（~design 内置的审核流程）
+3. 🔴 **确认点 3**：主角形象确认（异步飞书审核 — 视觉类）
+   ```
+   写入 state/reviews/{review-id}.json:
+     type: "visual", checkpoint: "character"
+     assets: [所有主角参考图路径]
+
+   调用 ./scripts/notify.sh review state/reviews/{review-id}.json
+   → 飞书发送视觉审核卡片（含 Web 链接）
+   → 用户在 Web 页面查看图片、选中不满意的角色 → 通过/重做/终止
+   → session 结束，等待回调
+
+   回调后新 session 读取 response:
+   - approve → 继续阶段 4
+   - redo → 重跑 ~design（selected_items + reason 指定重做哪些角色）
+   - terminate → 终止
+   ```
 4. 生成场景参考图（含时间变体）
 5. 锁定 `state/design-lock.json`
 
@@ -201,13 +232,15 @@ Trace 日志：state/traces/{session-id}/
 
 ## 确认点总结
 
-| 确认点 | 阶段 | 内容 | 可跳过？ |
-|--------|------|------|---------|
-| 🔴 确认点 1 | 阶段 1 | 大纲确认 | 否（影响全局方向） |
-| 🔴 确认点 2 | 阶段 1 | 质量报告确认 | 否（影响剧本质量） |
-| 🔴 确认点 3 | 阶段 3 | 主角形象确认 | 否（~design 内置） |
+| 确认点 | 阶段 | 类型 | 审核方式 | 可跳过？ |
+|--------|------|------|---------|---------|
+| 🔴 确认点 1 | 阶段 1 | text | 飞书卡片按钮 | 否 |
+| 🔴 确认点 2 | 阶段 1 | text | 飞书卡片按钮 | 否 |
+| 🔴 确认点 3 | 阶段 3 | visual | 飞书链接 → Web 页面 | 否 |
 
-阶段 2 和阶段 4 全自动，无确认点。
+所有确认点走异步飞书通知，session 结束等回调。审核结果（通过/重做/终止）通过 Review Server webhook 写入 `state/reviews/`，Remote Trigger 唤醒新 session 继续。
+
+重做上限：每个确认点最多 5 次（`config/lark/lark-config.yaml` 中 `max_iterations`）。
 
 ## 断点续传
 

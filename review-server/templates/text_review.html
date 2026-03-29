@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>审核 — {{ review.content.title }}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; color: #333; }
+    .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    .card { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .header h1 { font-size: 20px; }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+    .badge-pending { background: #fff3cd; color: #856404; }
+    .badge-approved { background: #d4edda; color: #155724; }
+    .badge-redo { background: #cce5ff; color: #004085; }
+    .badge-terminated { background: #f8d7da; color: #721c24; }
+    .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .meta-item { font-size: 14px; color: #666; }
+    .meta-item strong { color: #333; }
+    .summary { background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 20px; white-space: pre-wrap; font-size: 14px; line-height: 1.6; }
+    .files { margin-bottom: 20px; }
+    .files li { font-size: 13px; color: #666; margin: 4px 0; font-family: monospace; }
+    .actions { display: flex; gap: 12px; margin-top: 24px; }
+    .btn { padding: 10px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.85; }
+    .btn-approve { background: #28a745; color: white; }
+    .btn-redo { background: #007bff; color: white; }
+    .btn-terminate { background: #dc3545; color: white; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .reason-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-top: 12px; display: none; }
+    .reason-input.show { display: block; }
+    .history { margin-top: 16px; }
+    .history-item { font-size: 13px; color: #666; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .result-msg { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+    .result-msg.show { display: block; }
+    .result-msg.success { background: #d4edda; color: #155724; }
+    .result-msg.error { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <h1>{{ review.content.title }}</h1>
+        <span class="badge badge-{{ review.status }}">{{ review.status }}</span>
+      </div>
+
+      <div class="meta">
+        <div class="meta-item"><strong>项目</strong><br>{{ review.project }}</div>
+        <div class="meta-item"><strong>阶段</strong><br>{{ review.stage }}</div>
+        <div class="meta-item"><strong>确认点</strong><br>{{ review.checkpoint }}</div>
+        <div class="meta-item"><strong>迭代轮次</strong><br>第 {{ review.iteration }} 轮</div>
+      </div>
+
+      <div class="summary">{{ review.content.summary }}</div>
+
+      {% if review.content.files %}
+      <div class="files">
+        <strong>相关文件：</strong>
+        <ul>
+          {% for f in review.content.files %}
+          <li>{{ f }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if review.history %}
+      <div class="history">
+        <strong>历史记录：</strong>
+        {% for h in review.history %}
+        <div class="history-item">
+          第 {{ h.iteration }} 轮：{{ h.action }} {% if h.reason %}— {{ h.reason }}{% endif %}
+          <span style="float:right; color:#999;">{{ h.responded_at }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if review.status == 'pending' or review.status == 'redo' %}
+      <textarea id="reason" class="reason-input" placeholder="请输入重做原因（如：主角发型改为寸头）..."></textarea>
+
+      <div class="actions">
+        <button class="btn btn-approve" onclick="submitAction('approve')">✅ 通过</button>
+        <button class="btn btn-redo" onclick="showReason()">🔄 重做</button>
+        <button class="btn btn-terminate" onclick="submitAction('terminate')">❌ 终止</button>
+      </div>
+      {% else %}
+      <div class="result-msg show success">
+        已处理：{{ review.status }}
+        {% if review.response and review.response.responded_at %}
+        （{{ review.response.responded_at }}）
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div id="result" class="result-msg"></div>
+    </div>
+  </div>
+
+  <script>
+    let redoMode = false;
+
+    function showReason() {
+      const input = document.getElementById('reason');
+      if (!redoMode) {
+        input.classList.add('show');
+        input.focus();
+        redoMode = true;
+      } else {
+        submitAction('redo');
+      }
+    }
+
+    async function submitAction(action) {
+      const btns = document.querySelectorAll('.btn');
+      btns.forEach(b => b.disabled = true);
+
+      const body = {};
+      if (action === 'redo') {
+        body.reason = document.getElementById('reason').value;
+      }
+
+      try {
+        const resp = await fetch(`/review/{{ review_id }}/${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const data = await resp.json();
+
+        const result = document.getElementById('result');
+        if (resp.ok) {
+          result.className = 'result-msg show success';
+          result.textContent = action === 'approve' ? '✅ 已通过，流程继续中...'
+            : action === 'redo' ? '🔄 已提交重做请求，等待重新生成...'
+            : '❌ 已终止';
+        } else {
+          result.className = 'result-msg show error';
+          result.textContent = `错误: ${data.detail || '未知错误'}`;
+          btns.forEach(b => b.disabled = false);
+        }
+      } catch (e) {
+        const result = document.getElementById('result');
+        result.className = 'result-msg show error';
+        result.textContent = `请求失败: ${e.message}`;
+        btns.forEach(b => b.disabled = false);
+      }
+    }
+  </script>
+</body>
+</html>

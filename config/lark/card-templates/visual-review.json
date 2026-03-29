@@ -1,0 +1,81 @@
+{
+  "type": "template",
+  "data": {
+    "template_id": "visual_review",
+    "template_variable": {
+      "title": "{{title}}",
+      "project": "{{project}}",
+      "stage": "{{stage}}",
+      "checkpoint": "{{checkpoint}}",
+      "iteration": "{{iteration}}",
+      "summary": "{{summary}}",
+      "review_id": "{{review_id}}",
+      "review_url": "{{review_url}}",
+      "thumbnail_count": "{{thumbnail_count}}",
+      "created_at": "{{created_at}}"
+    }
+  },
+  "card": {
+    "header": {
+      "template": "purple",
+      "title": {
+        "tag": "plain_text",
+        "content": "🎨 [{{project}}] {{title}}"
+      }
+    },
+    "elements": [
+      {
+        "tag": "div",
+        "fields": [
+          {
+            "is_short": true,
+            "text": {
+              "tag": "lark_md",
+              "content": "**项目**\n{{project}}"
+            }
+          },
+          {
+            "is_short": true,
+            "text": {
+              "tag": "lark_md",
+              "content": "**迭代轮次**\n第 {{iteration}} 轮"
+            }
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "text": {
+          "tag": "lark_md",
+          "content": "📄 **摘要**\n{{summary}}\n\n🖼️ 共 {{thumbnail_count}} 张参考图待审核"
+        }
+      },
+      {
+        "tag": "hr"
+      },
+      {
+        "tag": "action",
+        "actions": [
+          {
+            "tag": "button",
+            "text": {
+              "tag": "plain_text",
+              "content": "🔍 在浏览器中审核"
+            },
+            "type": "primary",
+            "url": "{{review_url}}"
+          }
+        ]
+      },
+      {
+        "tag": "note",
+        "elements": [
+          {
+            "tag": "plain_text",
+            "content": "视觉内容请在 Web 页面审核，支持图片放大、版本对比"
+          }
+        ]
+      }
+    ]
+  }
+}
