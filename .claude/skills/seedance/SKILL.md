@@ -45,6 +45,45 @@ version: 2.0.0
 - 有参考视频时生成消耗更多
 - 视频延长时，选择的生成时长应为"新增部分"的时长（例如延长5秒，生成长度也选5秒）
 
+### 核心规则（来自 ARQ Studio 生产验证）
+
+**5-Block Prompt 结构**（每个 prompt 必须包含）：
+1. **SUBJECT**：谁/什么在画面中，服装、场景、情绪。具体物理化描述
+2. **ACTION**：**一个动词，一个动作**。多个动词会让模型混乱，严格遵守
+3. **CAMERA**：构图、运镜、镜头感
+4. **STYLE**：单一美学锚点 + 灯光 + 色彩（不要只写"cinematic"）
+5. **QUALITY SUFFIX**（每个 prompt 末尾必加）："4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture"
+
+**Prompt 长度限制**：
+- text-to-video：120-280 词（<30 太随机，>280 模型开始丢指令）
+- image-to-video：50-80 词最大（长 prompt 会覆盖参考图的身份信息）
+
+**禁止事项**：
+- 不要用 negative prompts（"no blur, no shaking"），改用正面描述（"sharp clarity, stable picture"）
+- 不要一个 prompt 多个动作动词
+- 参考图不要拼网格图（turnaround grid），必须单独裁切每个角度
+
+**参考图权重规则**：
+- @图片1 获得 40-50% 更多注意力权重——最重要的参考图必须放 slot 1
+- 角色一致性：每角色 3 张图（正面/3/4侧/侧面），可达 75-85% 身份一致性
+- image-to-video 开头加 "@图片1为首帧"，不要再描述角色外貌（模型会从文字重建而非从图片复用）
+- 身份锁定短语（跨镜次角色一致时加）："与@图片1为同一人物，不要改变面部比例、眼型、发型"
+
+**灯光关键词**（按 Seedance 响应强度排序）：
+1. "motivated lighting" — 最强电影感信号
+2. "practical light sources visible in frame" — 即时真实感
+3. "warm tungsten bounce" — 亲密室内
+4. "volumetric dust particles" — 大气深度
+5. "negative fill" — 用阴影塑造面部
+
+**胶片锚点**（比泛泛的"cinematic"有效 10 倍）：
+- "Kodak Vision3 500T" — 温暖电影色调
+- "ARRI Alexa color science" — 高端数字
+- "35mm film grain" — 独立电影质感
+
+**中英双语策略**：
+Seedance 由字节跳动训练，中文语料密度更高。空间关系、布料材质、天气描述、建筑细节用中文更精准。建议：英文写完按 5-block 结构 → 翻译中文 → 两版都跑。复杂物理描述（风吹布料、雨打石面、光折射玻璃）中文版通常锁得更紧。
+
 ## @引用系统
 
 ### 官方命名规范
