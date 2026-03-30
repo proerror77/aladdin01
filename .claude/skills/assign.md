@@ -7,9 +7,21 @@
 ```
 ~assign ep01-ep20 alice    # Producer 分配 ep01-ep20 给 alice
 ~assign ep41-ep60          # 操作者自己认领 ep41-ep60
+~assign ep01-ep20 alice --phase 5   # alice 只负责 Phase 5（视频生成）
+~assign --status pending alice       # 分配所有 pending 的集数给 alice
+~assign --status failed bob          # 分配所有 failed 的集数给 bob
 ~assign --list             # 查看未分配的集数
 ~assign --clear ep01       # 清除 ep01 的分配（释放回未分配池）
 ```
+
+## 参数
+
+| 参数 | 说明 |
+|------|------|
+| --phase N | 限制负责范围到指定 phase（如 --phase 5 只负责视频生成） |
+| --status pending\|failed | 按当前状态筛选集数（读取 state/ 中的状态文件） |
+| --list | 查看未分配的集数 |
+| --clear ep01 | 清除指定集数的分配 |
 
 ## 前置条件
 
@@ -26,8 +38,22 @@
    ⚠️ 冲突：ep05 已被 bob 锁定（task-002）
    是否继续分配未锁定的集数？(yes/no)
    ```
-4. 创建任务记录，写入 `state/task-board.json`
-5. 输出确认：
+4. 如果指定了 `--phase N`，任务记录中新增 `phase_scope` 字段：
+   - `phase_scope` 记录负责的 phase 编号（如 `5`）
+   - `batch --mine` 读取 `phase_scope` 后只执行对应阶段，跳过其他 phase
+   - 未指定 `--phase` 时 `phase_scope` 为 `null`，表示负责所有 phase
+5. 如果指定了 `--status pending|failed`：
+   - 读取 `state/{ep}-phase*.json` 和 `state/{ep}-shot-*.json`
+   - 按 status 筛选匹配的集数
+   - 输出筛选结果让用户确认后创建任务：
+     ```
+     按状态 "failed" 筛选到以下集数：
+     ep03, ep07, ep15（共 3 集）
+
+     确认分配给 bob？(yes/no)
+     ```
+6. 创建任务记录，写入 `state/task-board.json`
+7. 输出确认：
    ```
    ✅ 任务已分配
 
@@ -82,8 +108,20 @@ ep61-ep80  (20 集)
       "role": "operator",
       "status": "in_progress",
       "current_phase": 3,
+      "phase_scope": null,
       "created_at": "2026-03-27T12:00:00Z",
       "updated_at": "2026-03-27T14:30:00Z"
+    },
+    {
+      "id": "task-002",
+      "episodes": ["jiuba-ep21", "...", "jiuba-ep40"],
+      "owner": "bob",
+      "role": "operator",
+      "status": "pending",
+      "current_phase": null,
+      "phase_scope": 5,
+      "created_at": "2026-03-27T13:00:00Z",
+      "updated_at": "2026-03-27T13:00:00Z"
     }
   ],
   "unassigned": ["jiuba-ep21", "...", "jiuba-ep40"]
