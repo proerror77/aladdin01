@@ -114,14 +114,14 @@ user_invocable: true
       "tier": "protagonist",
       "status": "locked",
       "rounds": 3,
-      "forms": ["default"],
+      "variants": ["default"],
       "images": ["assets/characters/images/凌霄-front.png", "..."]
     },
     "判官": {
       "tier": "supporting",
       "status": "locked",
       "rounds": 1,
-      "forms": ["default", "膨胀"],
+      "variants": ["default", "膨胀"],
       "images": ["assets/characters/images/判官-default-front.png", "..."]
     }
   },
