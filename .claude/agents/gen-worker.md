@@ -21,7 +21,7 @@ tools:
 | `shot_id` | string | 镜次 ID（如 ep01-s01-shot01） |
 | `shot_index` | int | 镜次序号（如 1） |
 | `prompt` | string | 组装好的 Seedance 提示词 |
-| `duration` | int | 视频时长（4-12 秒，Seedance 1.5 pro） |
+| `duration` | int | 视频时长（范围由 `config/platforms/seedance-v2.yaml` 的 `duration_min`/`duration_max` 决定） |
 | `ratio` | string | 宽高比（`16:9` / `9:16` / `4:3` / `1:1` / `3:4` / `21:9` / `adaptive`） |
 | `resolution` | string | 分辨率（`480p` / `720p` / `1080p`，默认 `1080p`） |
 | `generation_mode` | string | 生成模式：`text2video` 或 `img2video` |
@@ -33,6 +33,8 @@ tools:
 | `output_suffix` | string? | 输出文件后缀（A/B 测试用，如 `-a` 或 `-b`）。默认为空。 |
 | `variant` | string? | 变体标识（如 `baseline`），写入状态文件。 |
 | `variant_prompt` | string? | 变体变换后的提示词，写入状态文件。 |
+| `session_id` | string | Trace session 标识（由 team-lead 传入） |
+| `trace_file` | string | Trace 文件名，如 `ep01-shot-01-trace`（由 team-lead 传入） |
 
 ## 输出
 
@@ -177,8 +179,12 @@ LOOP:
 ```
 
 **说明**：
-- `generate_audio: true` 时，提示词中可包含对白（格式：`角色名: "台词内容"`），模型自动处理唇形同步
-- 如无对白，`generate_audio` 设为 `false`
+- `generate_audio: true` 的触发条件（满足任意一条即设为 true）：
+  - 提示词含 `开口说道："` — 有口型同步台词
+  - 提示词含 `画外音（` — 有旁白/内心独白
+  - 提示词含 `说道："` — 简写对白
+  - `dialogue` 参数非空
+- 以上均不满足时，`generate_audio` 设为 `false`
 - `ratio: "adaptive"` 表示由模型根据参考图自动决定宽高比
 
 将 payload 写入临时文件（避免 shell 注入）：
@@ -266,3 +272,34 @@ mv shot-{N}{output_suffix}.mp4 outputs/{ep}/videos/
 ```
 
 向 team-lead 发送消息：`shot-{N} 失败，已重试 5 次 + 改写 3 轮，需人工处理`
+
+## Trace 写入
+
+在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
+
+```bash
+# 开始生成
+./scripts/trace.sh {session_id} {trace_file} start '{"prompt":"...前100字...","duration":{N},"mode":"{generation_mode}","ref_image":"..."}'
+
+# 提交 API
+./scripts/trace.sh {session_id} {trace_file} api_submit '{"task_id":"cgt-...","api_call":{N}}'
+
+# 轮询状态
+./scripts/trace.sh {session_id} {trace_file} api_poll '{"task_id":"cgt-...","status":"processing","poll_count":{N},"elapsed_s":{N}}'
+
+# API 返回结果
+./scripts/trace.sh {session_id} {trace_file} api_result '{"status":"failed","rejection":"content policy: violence detected","api_call":{N}}'
+
+# 重试
+./scripts/trace.sh {session_id} {trace_file} retry '{"attempt":{N},"strategy":"same_prompt"}'
+
+# 提示词改写
+./scripts/trace.sh {session_id} {trace_file} rewrite '{"round":{N},"old_prompt":"...前50字...","new_prompt":"...前50字...","change_reason":"..."}'
+
+# 下载视频
+./scripts/trace.sh {session_id} {trace_file} download '{"video_path":"outputs/{ep}/videos/shot-{N}.mp4"}'
+
+# 完成 / 失败
+./scripts/trace.sh {session_id} {trace_file} complete '{"total_api_calls":{N},"original_retries":{N},"rewrite_rounds":{N}}'
+./scripts/trace.sh {session_id} {trace_file} fail '{"total_api_calls":{N},"error":"...","last_rejection":"..."}'
+```

@@ -1,0 +1,196 @@
+# Auto-Gate 评分规则配置
+#
+# 每个确认点的自动过关逻辑：
+#   score >= auto_approve_threshold → 自动通过（不推飞书）
+#   score <  auto_reject_threshold  → 自动退回重做（推飞书通知结果）
+#   其他区间 → 推飞书让人审
+
+# 全局默认阈值
+defaults:
+  auto_approve_threshold: 85    # ≥85 分自动过
+  auto_reject_threshold: 50     # <50 分自动退回
+  max_auto_approve_streak: 10   # 连续自动过关超过 N 次后强制人审一次（防止漂移）
+
+# --- 文字评分维度 ---
+
+text_scoring:
+  outline:
+    dimensions:
+      - name: structure_completeness
+        weight: 0.20
+        description: "三幕/五幕结构是否完整，起承转合是否清晰"
+        rubric:
+          90: "结构完整，节奏分明，每幕有明确目标"
+          70: "结构基本完整，但某一幕过长/过短"
+          50: "结构模糊，缺少明确的幕间转折"
+          30: "无明确结构，流水账"
+      - name: character_design
+        weight: 0.20
+        description: "角色数量合理、有独特性、有成长弧光"
+        rubric:
+          90: "角色有层次，主角有清晰弧光，配角有功能性"
+          70: "角色基本合理，但弧光不明显"
+          50: "角色脸谱化，缺少独特性"
+          30: "角色混乱或过多/过少"
+      - name: conflict_hook
+        weight: 0.20
+        description: "核心冲突是否有吸引力，看点是否明确"
+        rubric:
+          90: "冲突有张力，看点清晰，能吸引目标受众"
+          70: "冲突存在但缺乏新意"
+          50: "冲突模糊，看点不明确"
+          30: "无冲突或冲突逻辑不成立"
+      - name: pacing
+        weight: 0.15
+        description: "分集节奏是否合理，每集有看点和悬念"
+        rubric:
+          90: "节奏紧凑，每集有钩子，整体有起伏"
+          70: "节奏基本合理，个别集平淡"
+          50: "节奏不均匀，多集无看点"
+          30: "节奏混乱，无法吸引观众"
+      - name: foreshadowing
+        weight: 0.10
+        description: "伏笔设置是否巧妙，回收是否自然"
+        rubric:
+          90: "伏笔精巧，回收自然，前后呼应"
+          70: "有伏笔但回收较生硬"
+          50: "伏笔少或未回收"
+          30: "无伏笔或前后矛盾"
+      - name: audience_fit
+        weight: 0.15
+        description: "是否符合目标受众的审美和价值观"
+        rubric:
+          90: "精准匹配目标受众，风格统一"
+          70: "基本匹配，但某些元素偏离"
+          50: "受众定位模糊"
+          30: "严重偏离目标受众"
+
+  episode_quality:
+    dimensions:
+      - name: plot_continuity
+        weight: 0.25
+        description: "剧情前后连贯，无逻辑漏洞"
+        rubric:
+          90: "逻辑严密，前后呼应，无矛盾"
+          70: "基本连贯，有小瑕疵"
+          50: "有明显逻辑问题"
+          30: "严重不连贯"
+      - name: character_consistency
+        weight: 0.25
+        description: "角色说话方式、行为习惯、性格一致"
+        rubric:
+          90: "角色高度一致，语言有辨识度"
+          70: "基本一致，偶有跳脱"
+          50: "角色前后不一"
+          30: "角色混乱，无法区分"
+      - name: duration_control
+        weight: 0.20
+        description: "每集字数在目标范围内"
+        rubric:
+          90: "全部在目标范围内"
+          70: "90%+ 在范围内"
+          50: "70-90% 在范围内"
+          30: "<70% 在范围内"
+      - name: dialogue_quality
+        weight: 0.20
+        description: "对白自然、口语化、符合角色人设"
+        rubric:
+          90: "对白自然有力，符合角色"
+          70: "基本自然，偶有书面语"
+          50: "书面语偏多，不够自然"
+          30: "对白生硬，脱离角色"
+      - name: hook_cliffhanger
+        weight: 0.10
+        description: "每集结尾有悬念或钩子"
+        rubric:
+          90: "每集都有有力的钩子"
+          70: "大部分有钩子"
+          50: "部分缺少钩子"
+          30: "多数无钩子"
+
+# --- Prompt 评分维度 ---
+
+prompt_scoring:
+  visual_direction:
+    dimensions:
+      - name: five_block_structure
+        weight: 0.25
+        description: "是否包含 Subject/Action/Camera/Style/Quality 五个 block"
+        rubric:
+          90: "五个 block 齐全且描述具体"
+          70: "四个 block 齐全"
+          50: "三个或更少"
+          30: "无结构"
+      - name: single_action_verb
+        weight: 0.15
+        description: "每个 prompt 只有一个主要动作动词（Seedance 2.0 规则）"
+        rubric:
+          90: "严格一个动词"
+          70: "一个主动词 + 一个辅助（可接受）"
+          50: "两个独立动作"
+          30: "三个以上动作"
+      - name: prompt_length
+        weight: 0.15
+        description: "text2video 120-280词，img2video 50-80词"
+        rubric:
+          90: "全部在最佳范围内"
+          70: "90%+ 在范围内"
+          50: "70-90% 在范围内"
+          30: "<70% 在范围内"
+      - name: quality_suffix
+        weight: 0.10
+        description: "每个 prompt 末尾包含 Quality Suffix"
+        rubric:
+          90: "全部包含完整 Quality Suffix"
+          70: "90%+ 包含"
+          50: "70-90% 包含"
+          30: "<70% 包含"
+      - name: style_specificity
+        weight: 0.15
+        description: "风格描述是否具体（非泛泛 cinematic，而是含灯光/胶片/色调细节）"
+        rubric:
+          90: "每个 prompt 有 ≥2 个具体风格锚点（灯光+胶片/色调）"
+          70: "多数有 1 个具体风格锚点"
+          50: "只有泛泛的 cinematic/realistic"
+          30: "无风格描述"
+      - name: platform_compliance
+        weight: 0.20
+        description: "prompt 符合 Seedance 2.0 平台技术规则（无多动词、无超长、无负面描述、无网格图引用）"
+        rubric:
+          90: "完全符合 Seedance 2.0 平台规则"
+          70: "基本符合，有 1-2 处灰色地带（如辅助动词）"
+          50: "有明确违规（如两个独立动作或超长 prompt）"
+          30: "高风险（三个以上动作或严重超长）"
+
+# --- 视觉评分维度 ---
+
+visual_scoring:
+  character_design:
+    dimensions:
+      - name: identity_consistency
+        weight: 0.30
+        description: "角色在不同镜次中面部/体型/服装一致"
+      - name: style_coherence
+        weight: 0.25
+        description: "所有角色图风格统一（不混搭写实/动漫/半写实）"
+      - name: reference_quality
+        weight: 0.25
+        description: "参考图质量：清晰、构图合理、角度有用（正面/3/4/侧面）"
+      - name: crop_format
+        weight: 0.20
+        description: "单独裁切而非拼图网格（Seedance 2.0 规则）"
+
+  scene_design:
+    dimensions:
+      - name: atmosphere_match
+        weight: 0.30
+        description: "场景氛围与剧情情绪匹配"
+      - name: time_variant_coverage
+        weight: 0.25
+        description: "时间变体（白天/夜晚/黄昏）是否覆盖完整"
+      - name: detail_richness
+        weight: 0.25
+        description: "场景细节丰富度（道具、光线、材质）"
+      - name: consistency
+        weight: 0.20
+        description: "同一场景不同时间变体的一致性"

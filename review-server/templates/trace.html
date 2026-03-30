@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trace — {{ session_id }}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: "SF Mono", Monaco, monospace; background: #0d1117; color: #c9d1d9; font-size: 13px; }
+    .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+    h1 { font-size: 18px; margin-bottom: 24px; color: #58a6ff; }
+    h2 { font-size: 15px; margin: 24px 0 12px; color: #8b949e; }
+    .event { padding: 6px 12px; border-left: 3px solid #30363d; margin-bottom: 2px; }
+    .event:hover { background: #161b22; }
+    .event .ts { color: #8b949e; }
+    .event .step { color: #58a6ff; font-weight: bold; }
+    .event .detail { color: #c9d1d9; }
+    .event.spawn { border-left-color: #3fb950; }
+    .event.complete { border-left-color: #58a6ff; }
+    .event.error { border-left-color: #f85149; }
+    .event.session_start { border-left-color: #d2a8ff; }
+    .event.session_end { border-left-color: #d2a8ff; }
+    .summary { background: #161b22; padding: 16px; border-radius: 8px; margin-bottom: 24px; white-space: pre-wrap; line-height: 1.6; }
+    .files { list-style: none; }
+    .files li { padding: 4px 0; }
+    .files a { color: #58a6ff; text-decoration: none; }
+    .files a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Trace: {{ session_id }}</h1>
+
+    {% if summary %}
+    <h2>LLM Summary</h2>
+    <div class="summary">{{ summary }}</div>
+    {% endif %}
+
+    <h2>Session Events</h2>
+    {% for event in events %}
+    <div class="event {{ event.step }}">
+      <span class="ts">{{ event.ts }}</span>
+      <span class="step">{{ event.step }}</span>
+      <span class="detail">
+        {% if event.agent %}{{ event.agent }}{% endif %}
+        {% if event.ep %}[{{ event.ep }}]{% endif %}
+        {% if event.phase %}Phase {{ event.phase }}{% endif %}
+        {% if event.summary %}— {{ event.summary }}{% endif %}
+        {% if event.error %}— {{ event.error }}{% endif %}
+        {% if event.duration_s %}({{ event.duration_s }}s){% endif %}
+      </span>
+    </div>
+    {% endfor %}
+
+    {% if trace_files %}
+    <h2>Agent Trace Files</h2>
+    <ul class="files">
+      {% for f in trace_files %}
+      <li><a href="/assets/state/traces/{{ session_id }}/{{ f }}">{{ f }}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</body>
+</html>

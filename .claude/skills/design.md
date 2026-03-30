@@ -160,12 +160,24 @@ user_invocable: true
 ./scripts/api-caller.sh image_gen download "<image_url>" <output_path>
 ```
 
+**payload.json 格式（OpenAI images 标准格式）**：
+```json
+{
+  "model": "nano-banana-vip",
+  "prompt": "角色/场景描述（英文，详细）",
+  "n": 1,
+  "size": "1024x1024"
+}
+```
+
+> 注意：`IMAGE_GEN_API_URL` 未配置时自动 fallback 到 tuzi（`https://api.tu-zi.com/v1`），统一使用 `nano-banana-vip` 生成角色/场景参考图。
+
 **图片命名规则：**
 
 | 类型 | 命名 |
 |------|------|
 | 单形态角色三视图 | `{角色名}-front.png` / `-side.png` / `-back.png` |
-| 多形态角色三视图 | `{角色名}-{form_id}-front.png` / `-side.png` / `-back.png` |
+| 多变体角色三视图 | `{角色名}-{variant_id}-front.png` / `-side.png` / `-back.png` |
 | 单集角色正面图 | `{角色名}-front.png` |
 | 场景时间变体 | `{场景名}-{time_of_day}.png` |
 

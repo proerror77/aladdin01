@@ -81,6 +81,7 @@ generation_backend: "api"
 browser_backend:
   profile: "jimeng"              # Actionbook profile 名称（持久化登录状态）
   stealth: true                  # 启用 stealth 模式
+  concurrency: 1                  # 并行标签页数量（1=串行，2-3=多标签页并行，需实测即梦限流）
   wait_between: 30               # 任务间隔（秒）
   download_poll_interval: 30     # 下载轮询间隔（秒）
   download_max_wait: 600         # 下载最大等待（秒）

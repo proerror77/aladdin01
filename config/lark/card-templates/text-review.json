@@ -1,0 +1,140 @@
+{
+  "type": "template",
+  "data": {
+    "template_id": "text_review",
+    "template_variable": {
+      "title": "{{title}}",
+      "project": "{{project}}",
+      "stage": "{{stage}}",
+      "checkpoint": "{{checkpoint}}",
+      "iteration": "{{iteration}}",
+      "summary": "{{summary}}",
+      "files": "{{files}}",
+      "review_id": "{{review_id}}",
+      "created_at": "{{created_at}}"
+    }
+  },
+  "_comment": "以下为飞书卡片 JSON 结构（发送时由 notify.sh 组装）",
+  "card": {
+    "header": {
+      "template": "blue",
+      "title": {
+        "tag": "plain_text",
+        "content": "🎬 [{{project}}] {{title}}"
+      }
+    },
+    "elements": [
+      {
+        "tag": "div",
+        "fields": [
+          {
+            "is_short": true,
+            "text": {
+              "tag": "lark_md",
+              "content": "**项目**\n{{project}}"
+            }
+          },
+          {
+            "is_short": true,
+            "text": {
+              "tag": "lark_md",
+              "content": "**阶段**\n{{stage}}"
+            }
+          },
+          {
+            "is_short": true,
+            "text": {
+              "tag": "lark_md",
+              "content": "**确认点**\n{{checkpoint}}"
+            }
+          },
+          {
+            "is_short": true,
+            "text": {
+              "tag": "lark_md",
+              "content": "**迭代轮次**\n第 {{iteration}} 轮"
+            }
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "text": {
+          "tag": "lark_md",
+          "content": "📄 **摘要**\n{{summary}}"
+        }
+      },
+      {
+        "tag": "div",
+        "text": {
+          "tag": "lark_md",
+          "content": "📁 **相关文件**\n{{files}}"
+        }
+      },
+      {
+        "tag": "hr"
+      },
+      {
+        "tag": "action",
+        "actions": [
+          {
+            "tag": "button",
+            "text": {
+              "tag": "plain_text",
+              "content": "✅ 通过"
+            },
+            "type": "primary",
+            "value": {
+              "action": "approve",
+              "review_id": "{{review_id}}"
+            }
+          },
+          {
+            "tag": "button",
+            "text": {
+              "tag": "plain_text",
+              "content": "🔄 重做"
+            },
+            "type": "default",
+            "value": {
+              "action": "redo",
+              "review_id": "{{review_id}}"
+            },
+            "confirm": {
+              "title": {
+                "tag": "plain_text",
+                "content": "请输入重做原因"
+              },
+              "text": {
+                "tag": "plain_text",
+                "content": "原因将传递给 agent 作为修改依据"
+              }
+            }
+          },
+          {
+            "tag": "button",
+            "text": {
+              "tag": "plain_text",
+              "content": "❌ 终止"
+            },
+            "type": "danger",
+            "value": {
+              "action": "terminate",
+              "review_id": "{{review_id}}"
+            },
+            "confirm": {
+              "title": {
+                "tag": "plain_text",
+                "content": "确认终止？"
+              },
+              "text": {
+                "tag": "plain_text",
+                "content": "终止后已完成的产出保留，可手动修复后 --resume 继续"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -2,6 +2,9 @@
 .env.*
 *.env
 
+# macOS
+.DS_Store
+
 # 生成产物（视频/图片）
 outputs/**/*.mp4
 outputs/**/*.mov
@@ -12,6 +15,9 @@ assets/scenes/images/
 
 # 运行时状态（不追踪具体进度）
 state/*.json
+
+# Trace 日志（运行时产生，不 commit）
+state/traces/*/
 
 # 原始剧本文件（通常较大，不 commit）
 raw/

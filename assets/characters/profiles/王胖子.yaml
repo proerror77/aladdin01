@@ -1,0 +1,14 @@
+name: "王胖子"
+aliases: []
+project: "qyccan"
+tier: "supporting"
+age: 19
+gender: "male"
+appearance: |
+  圆滚滚的身材，面相忠厚，讲义气。
+personality: |
+  老实忠厚，讲义气，负责捧哏和震惊。
+first_episode: "qyccan-ep10"
+episodes: ["qyccan-ep10"]
+voice_hint: "middle-aged-male"
+notes: "叶红衣的跟班，契约了'铁甲龟'（防御型灵兽）。"

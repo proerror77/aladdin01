@@ -19,6 +19,8 @@ tools:
 - `outputs/{ep}/visual-direction.yaml` — 从结构化 audio 字段提取对白信息（更准确）
 - `config/voices/` — 预设音色库
 - `assets/characters/voices/` — 已有角色音色（跨集复用）
+- `session_id` — Trace session 标识（由 team-lead 传入）
+- `trace_file` — Trace 文件名，如 `ep01-phase4-trace`（由 team-lead 传入）
 
 ## 输出
 
@@ -167,4 +169,25 @@ notes: "{角色特征备注}"
     }
   }
 }
+```
+
+## Trace 写入
+
+在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
+
+```bash
+# 读取输入
+./scripts/trace.sh {session_id} {trace_file} read_input '{"render_script":"outputs/{ep}/render-script.md","visual_direction":"outputs/{ep}/visual-direction.yaml"}'
+
+# 提取角色
+./scripts/trace.sh {session_id} {trace_file} extract_characters '{"count":{N},"characters":["角色1","角色2"]}'
+
+# 音色匹配
+./scripts/trace.sh {session_id} {trace_file} match_voices '{"matches":[{"character":"...","voice_source":"auto_match","confidence":"high","preset_id":"..."}]}'
+
+# 写入配置
+./scripts/trace.sh {session_id} {trace_file} write_configs '{"configs":[{"character":"...","path":"assets/characters/voices/.../voice-config.yaml"}]}'
+
+# 写入产出
+./scripts/trace.sh {session_id} {trace_file} write_output '{"files":["voice-assignment.md","phase4.json"]}'
 ```

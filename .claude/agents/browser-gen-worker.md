@@ -1,6 +1,6 @@
 ---
 name: browser-gen-worker
-description: 浏览器视频生成 worker。通过 Actionbook CLI 操作即梦 Web UI，使用 Seedance 2.0 生成视频。串行执行，同一时间只能处理一个镜次。
+description: 浏览器视频生成 worker。通过 Actionbook CLI 操作即梦 Web UI，使用 Seedance 2.0 生成视频。支持可配置并行度（1-3 标签页，默认串行）。
 tools:
   - Read
   - Write
@@ -20,7 +20,7 @@ tools:
 |---|---|---|
 | 后端 | 火山方舟 API | 即梦 Web UI (Actionbook CLI) |
 | 模型 | Seedance 1.5 pro（可配置） | Seedance 2.0（固定） |
-| 并行 | 支持多个并行 | 串行（浏览器同时只能做一件事） |
+| 并行 | 支持多个并行 | 可配置并行度（1-3 标签页，默认串行） |
 | 流程 | 异步：submit → poll → download | 同步：submit 阻塞 → download |
 | 参考图 | URL（需先上传获取 URL） | 本地文件路径（直接上传） |
 | 提示词 | Seedance API 格式 | 即梦 Web UI 脚本格式（含 @引用） |
@@ -39,11 +39,33 @@ tools:
 | `audio_paths` | string[]? | 音频文件本地绝对路径 |
 | `generate_audio` | bool | 是否生成音频 |
 | `dialogue` | string? | 对白内容 |
+| `session_id` | string | Trace session 标识（由 team-lead 传入） |
+| `trace_file` | string | Trace 文件名，如 `ep01-shot-01-trace`（由 team-lead 传入） |
+| `concurrency` | int | 并行标签页数量（默认 1，可配置 1-3） |
 
 ## 输出
 
 - `outputs/{ep}/videos/shot-{N}.mp4` — 生成的视频文件
 - `state/{ep}-shot-{N}.json` — 镜次状态文件
+
+## 多标签页并行模式
+
+当 `concurrency > 1` 时，browser-gen-worker 支持多标签页并行生成：
+
+### 工作流程
+
+1. **初始化**：启动时打开 N 个标签页（N = concurrency），每个标签页导航到即梦创作页面
+2. **任务分配**：将待处理的镜次分配到各标签页队列
+3. **并行提交**：每个标签页独立提交生成任务
+4. **轮询状态**：定期切换标签页检查生成状态，下载已完成的视频
+5. **错误隔离**：单个标签页失败不影响其他标签页
+
+### 限制与注意事项
+
+- 即梦可能有账号级 rate limit，concurrency 过高可能触发限流
+- 多标签页共享同一个浏览器 session（cookie），无需重复登录
+- 建议从 concurrency=2 开始测试，观察是否有限流或异常
+- 如果遇到限流，自动降级到 concurrency=1（串行模式）
 
 ## 执行流程
 
@@ -94,11 +116,20 @@ tools:
 
 ### 提交生成
 
+**串行模式（concurrency=1）**：
+
 ```bash
 ./scripts/api-caller.sh jimeng-web submit /tmp/jimeng_payload_{shot_id}.json
 ```
 
 如果失败，重试最多 `max_retries` 次（默认 3 次），每次间隔 10 秒。
+
+**并行模式（concurrency>1）**：
+
+1. 将镜次分配到 N 个标签页队列（轮询分配）
+2. 依次切换到每个标签页，提交当前队列中的下一个镜次
+3. 提交后不阻塞等待，立即切换到下一个标签页
+4. 所有标签页提交后，进入轮询下载阶段
 
 ### 等待 + 下载
 
@@ -153,7 +184,29 @@ tools:
 
 ## 注意事项
 
-- 浏览器同一时间只能操作一个页面，team-lead 必须串行 spawn browser-gen-worker
+- 默认串行模式（concurrency=1），可配置多标签页并行。team-lead 根据 concurrency 决定 spawn 策略
 - 首次使用前需运行 `./scripts/api-caller.sh jimeng-web setup` 完成登录
 - CSS 选择器可能因即梦 UI 更新而失效，失败时检查 `actionbook browser snapshot` 输出
 - Seedance 2.0 API 开放后，切换 `generation_backend: "api"` 回到 gen-worker 模式
+
+## Trace 写入
+
+在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
+
+```bash
+# 开始生成
+./scripts/trace.sh {session_id} {trace_file} start '{"prompt":"...前100字...","duration":{N},"mode":"browser","ref_images":[...]}'
+
+# 浏览器提交
+./scripts/trace.sh {session_id} {trace_file} browser_submit '{"submit_attempt":{N}}'
+
+# 等待生成
+./scripts/trace.sh {session_id} {trace_file} browser_wait '{"elapsed_s":{N},"status":"processing"}'
+
+# 下载视频
+./scripts/trace.sh {session_id} {trace_file} browser_download '{"video_path":"outputs/{ep}/videos/shot-{N}.mp4","download_attempt":{N}}'
+
+# 完成 / 失败
+./scripts/trace.sh {session_id} {trace_file} complete '{"submit_retries":{N},"download_retries":{N}}'
+./scripts/trace.sh {session_id} {trace_file} fail '{"error":"...","submit_retries":{N},"download_retries":{N}}'
+```

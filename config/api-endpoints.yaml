@@ -40,3 +40,16 @@ tts:
   platform: "pending"
   base_url: "${TTS_API_URL}"
   api_key: "${TTS_API_KEY}"
+
+tuzi:
+  # Tuzi OpenAI-compatible proxy（支持 GPT / Gemini / Claude 等多模型）
+  base_url: "https://api.tu-zi.com/v1"
+  api_key: "${TUZI_API_KEY}"
+  endpoints:
+    chat: "/chat/completions"
+    image: "/images/generations"
+  # 推荐模型
+  models:
+    default: "nano-banana-vip"      # 默认轻量模型（路由到 gemini-2.5-flash）
+    image: "nano-banana-vip"        # 图像生成（支持 /v1/images/generations）
+  timeout_seconds: 120

@@ -17,6 +17,8 @@ tools:
 
 - `outputs/{ep}/render-script.md` — 合规剧本
 - 用户选择的视觉风格和目标媒介（由 team-lead 传入）
+- `session_id` — Trace session 标识（由 team-lead 传入）
+- `trace_file` — Trace 文件名，如 `ep01-phase2-trace`（由 team-lead 传入）
 
 ## 输出
 
@@ -82,8 +84,8 @@ tools:
   references:
     characters:
       - name: "{角色名}"
-        form_id: "default"  # 该镜次中角色的形态 ID，对应 profile 中的 forms[].form_id
-        image_path: "assets/characters/images/{角色名}-{form_id}-front.png"
+        variant_id: "default"  # 该镜次中角色的变体 ID，对应 profile 中的 variants[].variant_id
+        image_path: "assets/characters/images/{角色名}-{variant_id}-front.png"
     scenes:
       - name: "{场景名}"
         time_of_day: "night"  # 与镜次的 time_of_day 一致
@@ -93,14 +95,14 @@ tools:
     {根据 generation_mode 按对应公式组装的完整提示词}
 ```
 
-### 角色形态引用规则
+### 角色变体引用规则
 
-每个镜次引用角色时，必须指定 `form_id`：
+每个镜次引用角色时，必须指定 `variant_id`：
 
 1. 读取 `assets/characters/profiles/{角色名}.yaml`
-2. 如果角色有 `forms` 字段 → 根据剧本上下文选择对应的 `form_id`
-3. 如果角色没有 `forms` 字段 → 使用 `form_id: "default"`，`image_path` 不带 form_id 后缀（即 `{角色名}-front.png`）
-4. `subject` 字段中的外貌描述应使用对应形态的 `appearance`，而非角色的默认 `appearance`
+2. 如果角色有 `variants` 字段 → 根据剧本上下文选择对应的 `variant_id`
+3. 如果角色没有 `variants` 字段 → 使用 `variant_id: "default"`，`image_path` 不带 variant_id 后缀（即 `{角色名}-front.png`）
+4. `subject` 字段中的外貌描述应使用对应变体的 `appearance`，而非角色的默认 `appearance`
 
 ### 场景时间推断规则
 
@@ -113,36 +115,48 @@ tools:
 
 ### 4. 提示词组装
 
-参考 `.claude/skills/seedance/SKILL.md` 的十大能力模式，根据镜次特征选择最佳策略：
+使用**即梦官方脚本格式**，每个镜次 prompt 按以下模板生成：
 
-**text2video 模式**（无参考图）：
 ```
-[subject] + [action] + [scene] + [camera] + [style] + [audio]
-```
+【出镜角色-场景】
+角色：<角色1>，<角色2>
+场景：<场景名-时段（日/夜/黄昏/清晨）>
+[画面]：[角色1]动作；[角色2]动作。[后景]：背景元素。
 
-**img2video 模式**（有参考图）：
-```
-@图片1的人物形象，subject+action, background+action, camera+motion
-```
+画面风格: 风格描述（画质/色调/质感）。
+镜头1：[景别+运镜类型]，[角色]动作描述，开口说道："台词"（语气：情绪描述）
+镜头2：[景别+运镜类型]，[角色]动作描述。画外音（角色名内心独白）："台词"（语气：情绪）
+...
 
-**长镜次（13-15 秒）使用时间戳分镜法**：
-```
-0-3秒：[开场画面]；4-8秒：[主要动作]；9-12秒：[高潮]；13-15秒：[收尾定格]
-```
-
-**有对白镜次**：
-```
-[画面描述]
-台词（角色名，情绪）："台词内容"
-音效：[环境音描述]
+画面风格: 风格描述；搭配环境音效描述；禁止出现字幕、对话框、背景音乐
 ```
 
-提示词质量要求（来自 seedance skill 最佳实践）：
-- 描述要具体有画面感，避免抽象表述
-- 台词和音效与画面描述分行书写
-- 结尾添加 `禁止出现水印、字幕、Logo`
-- 使用镜头语言词汇库中的专业术语（景别、运镜、焦点）
-- 情绪氛围描述不可省略
+**格式规则：**
+
+1. **角色标注**：header 中用 `<角色名>` 尖括号，shot 描述中用 `[角色名]` 方括号
+2. **场景标注**：`<场景名-时段>`，时段用日/夜/黄昏/清晨
+3. **对白格式**：
+   - 有口型同步：`开口说道："台词"（语气：情绪描述）`
+   - 旁白/OS：`画外音（角色名内心独白）："台词"（语气：情绪描述）`
+   - 禁止用 `台词（角色名，情绪）：` 旧格式
+4. **镜头格式**：`镜头N：[景别+运镜]，[角色]具体动作`
+   - 景别：近景/中景/特写/全景/远景
+   - 运镜：固定镜头/推镜头/拉镜头/平移镜头/摇镜头/跟镜头
+5. **后景**：用 `[后景]：` 单独描述背景元素
+6. **风格块写两次**：开头简洁版 + 结尾完整版（含音效和禁止项）
+7. **不写进 prompt 的内容**（这些已是 API 参数）：
+   - 不写比例（`9:16` / `竖屏`）
+   - 不写水印（`禁止出现水印`）
+   - 不写画质数字标准（`4K, Ultra HD` 等）
+
+**有参考图时（img2video）**：
+
+在 `角色：` 行改为 `角色：@图片1 作为<角色1>，@图片2 作为<角色2>`，并在镜头描述中加 `保持角色外观与参考图一致`。
+
+**长镜次（13-15 秒）**：在镜头描述内用时间戳分段：
+```
+镜头1：全景固定镜头，0-3秒[角色]做X，4-8秒[角色]做Y，9-12秒[角色]做Z。
+```
 
 确保每个镜次的 prompt 字段长度 ≤ 2000 字符。
 
@@ -151,7 +165,9 @@ tools:
 完成所有镜次后，自审：
 - [ ] 每个镜次提示词长度 ≤ 2000 字符
 - [ ] 时长均在 current_min–current_max 秒范围内（读自 config/platforms/seedance-v2.yaml）
-- [ ] 所有有对白的镜次都有 audio 字段
+- [ ] 所有有对白的镜次使用正确格式：`开口说道："台词"（语气：xxx）` 或 `画外音（角色名内心独白）：`
+- [ ] prompt 中无 `9:16`、`禁止出现水印`、`4K Ultra HD` 等 API 参数内容
+- [ ] 每个镜次有 `[角色名]` 标注和 `镜头N：景别+运镜` 结构
 - [ ] 镜次覆盖了剧本所有关键情节
 - [ ] 节奏合理（不过于密集或稀疏）
 
@@ -239,4 +255,28 @@ shots:
     }
   }
 }
+```
+
+## Trace 写入
+
+在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
+
+```bash
+# 读取输入
+./scripts/trace.sh {session_id} {trace_file} read_input '{"render_script":"outputs/{ep}/render-script.md","platform_config":"config/platforms/seedance-v2.yaml"}'
+
+# 场景分析
+./scripts/trace.sh {session_id} {trace_file} analyze_scenes '{"scene_count":{N},"scenes":["场景1","场景2"]}'
+
+# 镜次拆分
+./scripts/trace.sh {session_id} {trace_file} generate_shots '{"shot_count":{N},"total_duration":{X}}'
+
+# 参考图分配
+./scripts/trace.sh {session_id} {trace_file} assign_refs '{"characters":[{"name":"...","variant_id":"..."}],"scenes":[{"name":"...","time_of_day":"..."}]}'
+
+# 提示词组装
+./scripts/trace.sh {session_id} {trace_file} assemble_prompts '{"avg_prompt_len":{N},"max_prompt_len":{N}}'
+
+# 写入产出
+./scripts/trace.sh {session_id} {trace_file} write_output '{"files":["visual-direction.yaml","visual-direction.md","phase2.json"]}'
 ```

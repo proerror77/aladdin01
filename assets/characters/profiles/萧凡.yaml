@@ -1,0 +1,14 @@
+name: "萧凡"
+aliases: ["天命之子"]
+project: "qyccan"
+tier: "supporting"
+age: 18
+gender: "male"
+appearance: |
+  身穿朴素布衣，眼神坚毅，嘴角常勾起自信的歪嘴笑。手指上戴古朴黑戒。
+personality: |
+  外表正义凛然，实则自负偏执。典型"气运之子"人设——沉寂三年后崛起复仇。
+first_episode: "qyccan-ep09"
+episodes: ["qyccan-ep09", "qyccan-ep10"]
+voice_hint: "young-male-gentle"
+notes: "天命之子/气运之子，戒指中藏有'老爷爷'灵魂导师。灵兽为小火鸟。苏夜的宿命对手。"

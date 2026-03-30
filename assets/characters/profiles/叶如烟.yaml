@@ -1,0 +1,14 @@
+name: "叶如烟"
+aliases: []
+project: "qyccan"
+tier: "supporting"
+age: 17
+gender: "female"
+appearance: |
+  白莲花长相，面容清秀但眼神透着算计。ep05后面纱遮脸（被苏夜喷毒后长麻子）。
+personality: |
+  绿茶，嫉妒叶红衣，处处下绊子，表面温柔实则狠毒。
+first_episode: "qyccan-ep05"
+episodes: ["qyccan-ep05", "qyccan-ep06"]
+voice_hint: "young-female-sweet"
+notes: "叶红衣的妹妹，暗中给叶红衣下'噬灵散'毒药。灵兽为双头魔狼（二阶巅峰）。"

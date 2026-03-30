@@ -1,0 +1,31 @@
+name: "苏夜"
+aliases: ["小绿", "小青", "修罗"]
+project: "qyccan"
+tier: "protagonist"
+age: 28
+gender: "male"
+appearance: |
+  初始形态：通体碧绿、肥嘟嘟的青玉蚕，眼神欠揍，拇指大小。
+  后续进化形态各异，但始终保持一双金色瞳孔。
+variants:
+  - variant_id: "qingyu-can"
+    variant_label: "青玉蚕（初始形态）"
+    appearance: |
+      通体碧绿、肥嘟嘟的蚕宝宝，拇指大小，两只肉乎乎的短腿，圆滚滚的身体。
+    tags: ["凡胎", "昆虫", "萌"]
+  - variant_id: "bilin-she"
+    variant_label: "碧鳞毒蛇（一阶进化）"
+    appearance: |
+      筷子长的小蛇，通体碧绿色精致鳞片，金色瞳孔，吐信子。
+    tags: ["灵智", "毒蛇", "小巧"]
+  - variant_id: "xuanming-mang"
+    variant_label: "玄冥黑蟒（二阶进化）"
+    appearance: |
+      三米长巨蟒，通体漆黑，鳞片泛冷光，头顶两个小鼓包（龙角雏形），金色瞳孔。
+    tags: ["地煞", "巨蟒", "威压"]
+personality: |
+  腹黑、嘴炮王者、极其护短、贪吃。前世雇佣兵王，性格强势但重情。
+first_episode: "qyccan-ep01"
+episodes: ["qyccan-ep01", "qyccan-ep02", "qyccan-ep03", "qyccan-ep04", "qyccan-ep05", "qyccan-ep06", "qyccan-ep07", "qyccan-ep08", "qyccan-ep09", "qyccan-ep10"]
+voice_hint: "young-male-cool"
+notes: "前世为龙国特种部队队长，代号'修罗'。进化路线：青玉蚕→碧鳞蛇→玄冥黑蟒→紫金蛟→幽冥骨龙→太虚古龙神"

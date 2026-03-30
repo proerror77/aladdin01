@@ -1,0 +1,15 @@
+name: "叶红衣"
+aliases: []
+project: "qyccan"
+tier: "protagonist"
+age: 18
+gender: "female"
+appearance: |
+  红衣似火，高冷御姐脸，眼神倔强而落寞。身材修长，发髻常散乱（初期逃亡状态）。
+  后期逐渐恢复自信，气质凌厉。
+personality: |
+  外冷内热，倔强不服输，曾为天才后灵根受损被弃，但骨子里有韧劲。
+first_episode: "qyccan-ep01"
+episodes: ["qyccan-ep01", "qyccan-ep02", "qyccan-ep03", "qyccan-ep04", "qyccan-ep05", "qyccan-ep06", "qyccan-ep07", "qyccan-ep08", "qyccan-ep09", "qyccan-ep10"]
+voice_hint: "young-female-cool"
+notes: "叶家大小姐，灵根受损后被逼嫁纨绔，绝望中用圣兽召唤石契约苏夜。"

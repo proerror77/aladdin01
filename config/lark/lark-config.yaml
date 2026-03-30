@@ -1,0 +1,37 @@
+# 飞书集成配置
+#
+# 环境变量:
+#   LARK_APP_ID      — 飞书应用 App ID
+#   LARK_APP_SECRET  — 飞书应用 App Secret
+#   REVIEW_SERVER_URL — Review Server 地址
+
+# 审核通知群
+chat_id: ""  # 填入飞书群 chat_id（oc_xxxxx）
+
+# Review Server
+review_server:
+  url: "${REVIEW_SERVER_URL:-http://localhost:8080}"
+  port: 8080
+
+# Webhook 验证
+webhook:
+  verification_token: ""  # 飞书开放平台 → 事件订阅 → Verification Token
+
+# Remote Trigger（Claude Code）
+remote_trigger:
+  trigger_id: ""  # Claude Code Remote Trigger ID，用于审核回调唤醒 session
+
+# 卡片模板路径
+card_templates:
+  text_review: "config/lark/card-templates/text-review.json"
+  visual_review: "config/lark/card-templates/visual-review.json"
+  alert: "config/lark/card-templates/alert.json"
+
+# 重做上限
+max_iterations: 5
+
+# 告警规则
+alerts:
+  shot_failure: true              # shot 生成失败后告警
+  compliance_threshold: 0.3       # 合规拦截比例超过 30% 告警
+  stage_timeout_multiplier: 3     # 阶段耗时超过预期 3 倍告警
