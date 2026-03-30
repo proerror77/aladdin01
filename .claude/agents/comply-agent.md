@@ -112,18 +112,6 @@ cat outputs/{ep}/render-script.md > /tmp/moderation_input_{ep}.txt
 }
 ```
 
-同时更新索引文件 `state/progress.json` 中的 `{ep}` 条目：
-```json
-{
-  "episodes": {
-    "{ep}": {
-      "status": "in_progress",
-      "current_phase": 1
-    }
-  }
-}
-```
-
 ## Trace 写入
 
 在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：

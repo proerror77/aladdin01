@@ -80,6 +80,7 @@ tools:
   audio: |
     角色名: "台词内容"
     （无对白则写：无对白）
+  has_dialogue: false  # 该镜次是否有对白（true = generate_audio: true）
   transition: "切换/淡入淡出/叠化"
   references:
     characters:
@@ -165,7 +166,8 @@ tools:
 完成所有镜次后，自审：
 - [ ] 每个镜次提示词长度 ≤ 2000 字符
 - [ ] 时长均在 current_min–current_max 秒范围内（读自 config/platforms/seedance-v2.yaml）
-- [ ] 所有有对白的镜次使用正确格式：`开口说道："台词"（语气：xxx）` 或 `画外音（角色名内心独白）：`
+- [ ] 所有有对白的镜次 has_dialogue: true，无对白的镜次 has_dialogue: false
+- [ ] has_dialogue: true 的镜次 audio 字段包含正确格式的对白
 - [ ] prompt 中无 `9:16`、`禁止出现水印`、`4K Ultra HD` 等 API 参数内容
 - [ ] 每个镜次有 `[角色名]` 标注和 `镜头N：景别+运镜` 结构
 - [ ] 镜次覆盖了剧本所有关键情节
@@ -241,18 +243,6 @@ shots:
   "data": {
     "shot_count": {N},
     "total_duration": {X}
-  }
-}
-```
-
-同时更新索引文件 `state/progress.json` 中的 `{ep}` 条目：
-```json
-{
-  "episodes": {
-    "{ep}": {
-      "status": "awaiting_review",
-      "current_phase": 2
-    }
   }
 }
 ```
