@@ -179,12 +179,10 @@ LOOP:
 ```
 
 **说明**：
-- `generate_audio: true` 的触发条件（满足任意一条即设为 true）：
-  - 提示词含 `开口说道："` — 有口型同步台词
-  - 提示词含 `画外音（` — 有旁白/内心独白
-  - 提示词含 `说道："` — 简写对白
-  - `dialogue` 参数非空
-- 以上均不满足时，`generate_audio` 设为 `false`
+- `generate_audio` 由 `visual-direction.yaml` 中该 shot 的 `has_dialogue` 字段决定：
+  - `has_dialogue: true` → `generate_audio: true`
+  - `has_dialogue: false` 或字段不存在 → `generate_audio: false`
+- 不再做 prompt 文本字符串匹配
 - `ratio: "adaptive"` 表示由模型根据参考图自动决定宽高比
 
 将 payload 写入临时文件（避免 shell 注入）：

@@ -217,6 +217,7 @@ case "$SERVICE" in
     fi
     # 规范化 BASE_URL
     BASE_URL=$(normalize_base_url "$BASE_URL")
+    BASE_URL="${BASE_URL%/v1}"  # 去掉尾部 /v1，避免与 endpoint 路径重复
 
     case "$ACTION" in
       generate)
