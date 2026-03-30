@@ -72,6 +72,24 @@ jobs:
             sys.exit(1)
           "
 
+  bats-tests:
+    name: Bats Regression Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bats-core
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq bats
+
+      - name: Run api-caller.bats
+        run: bats tests/api-caller.bats
+
+      - name: Run concat-episode.bats
+        run: bats tests/concat-episode.bats
+
   secret-scan:
     name: Secret Scan
     runs-on: ubuntu-latest
