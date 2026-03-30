@@ -157,6 +157,25 @@ cmd_submit() {
   ab_browser goto "$JIMENG_VIDEO_URL"
   wait_seconds 4
 
+  # --- 0. UI 健康检查 ---
+  log "检查即梦 UI 可用性..."
+  wait_seconds 4
+  local ui_ok
+  ui_ok=$(ab_eval "
+    (function() {
+      // 检查关键 UI 元素是否存在
+      var hasInput = document.querySelector('textarea, [contenteditable]') !== null;
+      var hasBtn = document.querySelector('button') !== null;
+      return hasInput && hasBtn ? 'ok' : 'mismatch';
+    })()
+  " 2>/dev/null || echo "error")
+  if [[ "$ui_ok" != "ok" ]]; then
+    err "UI_SELECTOR_MISMATCH: 即梦页面关键元素未找到，UI 可能已更新。请检查 jimeng-web.sh 中的选择器。"
+    err "当前页面标题: $(ab_eval "document.title" 2>/dev/null || echo "unknown")"
+    exit 2
+  fi
+  log "UI 健康检查通过"
+
   # --- 2. 配置：参考模式 → 全能参考 ---
   log "设置参考模式: 全能参考"
   _select_combobox 2 "全能参考"

@@ -176,7 +176,7 @@ tools:
   "video_path": "",
   "submit_retries": {n},
   "download_retries": {n},
-  "error_message": "..."
+  "error_message": "..."  // UI_SELECTOR_MISMATCH = 即梦 UI 已更新，需检查 jimeng-web.sh 选择器
 }
 ```
 
