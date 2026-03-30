@@ -204,14 +204,18 @@ team-lead
 
 - **merge-agent 已废弃**：角色融合功能已内联到 preprocess-agent Step 2.5（仅 >100 集长剧本需要）
 - **Phase 3 为纯文件检查**：design-agent 只做 O(1) 级别的文件存在性校验，不经过 gate-agent、不推飞书
+- **progress.json 只读**：各 phase agent 只写自己的 `state/{ep}-phaseN.json`，`progress.json` 由 `~status` 查询时动态汇总，不在运行时写入（避免 ~batch 并发冲突）
+- **generate_audio 由 has_dialogue 字段决定**：visual-agent 在 visual-direction.yaml 中为每个 shot 标注 `has_dialogue: bool`，gen-worker 直接读取，不做 prompt 文本匹配
+- **~design 幂等**：生成前检查目标图片是否已存在，已存在则跳过，保护人工打磨的主角形象
+- **gen-worker 并发上限**：`config/platforms/seedance-v2.yaml` 的 `max_concurrent_workers`（默认 30）控制 ~batch Phase 5 的并发数，避免触发 API rate limit
 
 ## 状态文件结构
 
-**避免并发写入冲突**，每个 agent 写入独立状态文件：
+**避免并发写入冲突**，每个 agent 写入独立状态文件，`progress.json` 只由 `~status` 汇总读取：
 
 ```
 state/
-├── progress.json           # 索引文件（汇总）
+├── progress.json           # 只读索引（由 ~status 动态汇总，不在运行时写入）
 ├── progress-schema.yaml    # Schema 定义
 ├── design-lock.json        # 参考图锁定（~design 产出）
 ├── task-board.json         # 任务看板（多人协作模式）
