@@ -179,8 +179,12 @@ LOOP:
 ```
 
 **说明**：
-- `generate_audio: true` 时，提示词中可包含对白（格式：`角色名: "台词内容"`），模型自动处理唇形同步
-- 如无对白，`generate_audio` 设为 `false`
+- `generate_audio: true` 的触发条件（满足任意一条即设为 true）：
+  - 提示词含 `开口说道："` — 有口型同步台词
+  - 提示词含 `画外音（` — 有旁白/内心独白
+  - 提示词含 `说道："` — 简写对白
+  - `dialogue` 参数非空
+- 以上均不满足时，`generate_audio` 设为 `false`
 - `ratio: "adaptive"` 表示由模型根据参考图自动决定宽高比
 
 将 payload 写入临时文件（避免 shell 注入）：
