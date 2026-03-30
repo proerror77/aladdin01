@@ -2,6 +2,9 @@
 .env.*
 *.env
 
+# macOS
+.DS_Store
+
 # 生成产物（视频/图片）
 outputs/**/*.mp4
 outputs/**/*.mov
