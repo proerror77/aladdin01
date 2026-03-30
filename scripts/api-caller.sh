@@ -7,8 +7,11 @@
 #   ./scripts/api-caller.sh image_gen generate <payload.json>
 #   ./scripts/api-caller.sh image_gen download <image_url> <output_file>
 #   ./scripts/api-caller.sh moderation check-file <text_file>
+#   ./scripts/api-caller.sh tuzi chat <payload.json>         # Tuzi LLM（nano-banana-vip 等）
+#   ./scripts/api-caller.sh tuzi image <payload.json>        # Tuzi 图像生成（gpt-4o-image）
+#   ./scripts/api-caller.sh tuzi models                      # 列出可用模型
 #   ./scripts/api-caller.sh env-check  # 检查环境变量
-#   ./scripts/api-caller.sh trace-summary <session_dir>  # 生成 LLM 摘要（需要 DEEPSEEK_API_KEY）
+#   ./scripts/api-caller.sh trace-summary <session_dir>  # 生成 LLM 摘要（DEEPSEEK 或 TUZI）
 #
 # Seedance payload 格式（火山方舟官方规范）：
 # {
@@ -42,13 +45,13 @@ INPUT="${3:-}"
 
 if [[ -z "$SERVICE" ]]; then
   echo "Usage: $0 <service> <action> <input>" >&2
-  echo "Services: seedance, image_gen, moderation, env-check" >&2
+  echo "Services: seedance, image_gen, moderation, tuzi, jimeng-web, env-check, trace-summary" >&2
   exit 1
 fi
 
 if [[ "$SERVICE" != "env-check" && -z "$ACTION" ]]; then
   echo "Usage: $0 <service> <action> <input>" >&2
-  echo "Services: seedance, image_gen, moderation, env-check" >&2
+  echo "Services: seedance, image_gen, moderation, tuzi, jimeng-web, env-check, trace-summary" >&2
   exit 1
 fi
 
@@ -119,11 +122,22 @@ safe_curl() {
 if [[ "$SERVICE" == "env-check" ]]; then
   missing=0
   [[ -z "${ARK_API_KEY:-}" ]] && echo "Missing: ARK_API_KEY" >&2 && ((missing++))
-  [[ -z "${IMAGE_GEN_API_URL:-}" ]] && echo "Missing: IMAGE_GEN_API_URL" >&2 && ((missing++))
-  [[ -z "${IMAGE_GEN_API_KEY:-}" ]] && echo "Missing: IMAGE_GEN_API_KEY" >&2 && ((missing++))
-  [[ -z "${OPENAI_API_KEY:-}" ]] && echo "Missing: OPENAI_API_KEY" >&2 && ((missing++))
+  # image_gen：IMAGE_GEN_API_URL 未设时可 fallback 到 tuzi，给出提示而不报错
+  if [[ -z "${IMAGE_GEN_API_URL:-}" ]]; then
+    if [[ -n "${TUZI_API_KEY:-}" ]]; then
+      echo "Info: IMAGE_GEN_API_URL not set, will fallback to tuzi (gpt-4o-image)"
+    else
+      echo "Missing: IMAGE_GEN_API_URL (or set TUZI_API_KEY as fallback)" >&2
+      ((missing++))
+    fi
+  else
+    [[ -z "${IMAGE_GEN_API_KEY:-}" ]] && echo "Missing: IMAGE_GEN_API_KEY" >&2 && ((missing++))
+  fi
+  [[ -z "${OPENAI_API_KEY:-}" ]] && echo "Optional: OPENAI_API_KEY (enables Moderation API in Phase 1 Layer 3)"
+  # tuzi 为可选（若设置则启用 LLM 摘要 / 图像生成 fallback）
+  [[ -z "${TUZI_API_KEY:-}" ]] && echo "Optional: TUZI_API_KEY (enables tuzi service + image_gen fallback)"
   if [[ $missing -eq 0 ]]; then
-    echo "All environment variables are set."
+    echo "All required environment variables are set."
     exit 0
   else
     echo "$missing environment variable(s) missing." >&2
@@ -188,8 +202,17 @@ case "$SERVICE" in
   image_gen)
     BASE_URL="${IMAGE_GEN_API_URL:-}"
     API_KEY="${IMAGE_GEN_API_KEY:-}"
-    if [[ -z "$BASE_URL" || -z "$API_KEY" ]]; then
-      echo "ERROR: IMAGE_GEN_API_URL and IMAGE_GEN_API_KEY must be set" >&2
+    # 若 IMAGE_GEN_API_URL 未配置，自动 fallback 到 tuzi
+    if [[ -z "$BASE_URL" ]]; then
+      if [[ -z "${TUZI_API_KEY:-}" ]]; then
+        echo "ERROR: IMAGE_GEN_API_URL and IMAGE_GEN_API_KEY must be set (or set TUZI_API_KEY as fallback)" >&2
+        exit 1
+      fi
+      BASE_URL="https://api.tu-zi.com"
+      API_KEY="${TUZI_API_KEY}"
+      echo "Info: IMAGE_GEN_API_URL not set, using tuzi fallback (nano-banana-vip)" >&2
+    elif [[ -z "$API_KEY" ]]; then
+      echo "ERROR: IMAGE_GEN_API_KEY must be set" >&2
       exit 1
     fi
     # 规范化 BASE_URL
@@ -292,6 +315,53 @@ print(json.dumps(payload))
     esac
     ;;
 
+  tuzi)
+    # Tuzi OpenAI-compatible proxy（nano-banana-vip / gpt-4o-image 等）
+    API_KEY="${TUZI_API_KEY:-}"
+    if [[ -z "$API_KEY" ]]; then
+      echo "ERROR: TUZI_API_KEY must be set" >&2
+      exit 1
+    fi
+    TUZI_BASE="https://api.tu-zi.com/v1"
+
+    case "$ACTION" in
+      chat)
+        # 通用对话：INPUT 为 payload JSON 文件
+        # payload 格式：{"model": "nano-banana-vip", "messages": [...], "max_tokens": N}
+        if [[ ! -f "$INPUT" ]]; then
+          echo "ERROR: Payload file not found: $INPUT" >&2
+          exit 1
+        fi
+        safe_curl "120" -X POST "${TUZI_BASE}/chat/completions" \
+          -H "Authorization: Bearer ${API_KEY}" \
+          -H "Content-Type: application/json" \
+          -d @"${INPUT}"
+        ;;
+      image)
+        # 图像生成：INPUT 为 payload JSON 文件
+        # payload 格式：{"model": "gpt-4o-image", "prompt": "...", "n": 1, "size": "1024x1024"}
+        if [[ ! -f "$INPUT" ]]; then
+          echo "ERROR: Payload file not found: $INPUT" >&2
+          exit 1
+        fi
+        safe_curl "120" -X POST "${TUZI_BASE}/images/generations" \
+          -H "Authorization: Bearer ${API_KEY}" \
+          -H "Content-Type: application/json" \
+          -d @"${INPUT}"
+        ;;
+      models)
+        # 列出可用模型
+        safe_curl "30" "${TUZI_BASE}/models" \
+          -H "Authorization: Bearer ${API_KEY}"
+        ;;
+      *)
+        echo "ERROR: Unknown tuzi action: ${ACTION}" >&2
+        echo "Valid actions: chat, image, models" >&2
+        exit 1
+        ;;
+    esac
+    ;;
+
   jimeng-web)
     # 即梦 Web UI 浏览器自动化（通过 Actionbook CLI）
     # 用于 Seedance 2.0 API 未开放时的替代方案
@@ -338,13 +408,18 @@ print(json.dumps(payload))
       exit 1
     fi
 
-    # 读取摘要模型配置
-    TRACE_API_URL="${DEEPSEEK_API_URL:-https://api.deepseek.com/v1/chat/completions}"
-    TRACE_MODEL="${DEEPSEEK_MODEL:-deepseek-chat}"
-    TRACE_API_KEY="${DEEPSEEK_API_KEY:-}"
-
-    if [[ -z "$TRACE_API_KEY" ]]; then
-      echo "ERROR: DEEPSEEK_API_KEY 未设置。请设置后重试。" >&2
+    # 读取摘要模型配置（优先 DEEPSEEK，fallback 到 tuzi）
+    if [[ -n "${DEEPSEEK_API_KEY:-}" ]]; then
+      TRACE_API_URL="${DEEPSEEK_API_URL:-https://api.deepseek.com/v1/chat/completions}"
+      TRACE_MODEL="${DEEPSEEK_MODEL:-deepseek-chat}"
+      TRACE_API_KEY="${DEEPSEEK_API_KEY}"
+    elif [[ -n "${TUZI_API_KEY:-}" ]]; then
+      TRACE_API_URL="https://api.tu-zi.com/v1/chat/completions"
+      TRACE_MODEL="nano-banana-vip"
+      TRACE_API_KEY="${TUZI_API_KEY}"
+      echo "Info: DEEPSEEK_API_KEY not set, using tuzi (nano-banana-vip) for trace summary" >&2
+    else
+      echo "ERROR: DEEPSEEK_API_KEY 或 TUZI_API_KEY 未设置，请设置其中一个后重试。" >&2
       exit 1
     fi
 
@@ -422,7 +497,7 @@ $TRACE_CONTENT"
 
   *)
     echo "ERROR: Unknown service: ${SERVICE}" >&2
-    echo "Valid services: seedance, image_gen, moderation, jimeng-web, env-check, trace-summary" >&2
+    echo "Valid services: seedance, image_gen, moderation, tuzi, jimeng-web, env-check, trace-summary" >&2
     exit 1
     ;;
 esac
