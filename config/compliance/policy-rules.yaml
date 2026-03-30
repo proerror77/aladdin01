@@ -6,7 +6,7 @@ version: "1.0"
 # LLM 判断层（第二层）
 llm_check:
   enabled: true
-  model: "claude-sonnet-4-6"
+  model: "${LLM_MODEL:-claude-sonnet-4-6}"  # 可通过环境变量覆盖
   # 判断维度
   dimensions:
     - name: violence_level

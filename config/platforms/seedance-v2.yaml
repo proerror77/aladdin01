@@ -60,6 +60,11 @@ resolution_options:
 reference_syntax: "@{asset_name}"
 dialogue_format: "lip_sync"
 
+# 批量模式并发控制
+# ~batch Phase 5 同时运行的 gen-worker 数量上限
+# 超过此值会触发 API rate limit，实际吞吐反而下降
+max_concurrent_workers: 30
+
 retry:
   max_original_retries: 5
   max_rewrite_rounds: 3

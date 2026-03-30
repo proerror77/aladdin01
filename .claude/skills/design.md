@@ -26,6 +26,8 @@ user_invocable: true
 
 ### 2. 按优先级顺序生成
 
+> **幂等性保证**：生成前检查目标图片文件是否已存在（`assets/characters/images/{角色名}-front.png` 或 `assets/scenes/images/{场景名}-{time_of_day}.png`）。文件已存在则跳过生成，直接进入审核步骤。即使 `state/design-lock.json` 不存在或损坏，已生成的图片也不会被覆盖。
+
 所有角色和场景在同一步完成，按以下顺序：
 
 ---
