@@ -202,22 +202,22 @@ spawn visual-agent
 
 共 {N} 个镜次，总时长约 {X} 秒。
 
-确认后继续美术指导阶段？(yes/no)
+确认后继续美术校验阶段？(yes/no)
 ```
 - 输入 `yes` → 继续 Phase 3
 - 输入 `no` → 进入修改流程（~review revise {ep}）
 
-**Phase 3 — 美术校验**
+**Phase 3 — 美术校验（纯文件存在性检查）**
 ```
 spawn design-agent
-  输入：render-script + visual-direction.yaml + state/design-lock.json（可选）
+  输入：visual-direction.yaml + state/design-lock.json（可选）
   session_id: $SESSION_ID
   trace_file: {ep}-phase3-trace
   输出：art-direction-review.md（校验报告）
   等待完成
 ```
 
-**重要**：Phase 3 是**纯校验阶段**，不生成任何参考图。design-agent 只检查 visual-direction.yaml 中引用的参考图是否存在：
+**重要**：Phase 3 是 **O(1) 级别的文件存在性检查**，不经过 gate-agent，不推飞书审核。design-agent 只检查 visual-direction.yaml 中引用的参考图是否存在：
 - 如果 `state/design-lock.json` 存在：读取已锁定的参考图清单，校验文件是否存在
 - 如果 `state/design-lock.json` 不存在：检查 `assets/characters/images/` 和 `assets/scenes/images/` 中是否有对应的参考图
 - 如果发现缺失的参考图：提示用户先运行 `~design` 生成参考图，然后再继续
@@ -226,7 +226,7 @@ spawn design-agent
 
 🔴 **人工确认点 2**（`--auto-approve` 时跳过）
 
-如果 `--auto-approve` 启用：直接继续 Phase 4，输出日志 `[auto-approve] 美术指导自动通过`。
+如果 `--auto-approve` 启用：直接继续 Phase 4，输出日志 `[auto-approve] 美术校验自动通过`。
 
 否则：
 ```
@@ -301,12 +301,17 @@ spawn gen-worker (shot-N params, session_id=$SESSION_ID, trace_file={ep}-shot-{N
 | generate_audio | shots[].has_dialogue | 是否生成音频 |
 | dialogue | shots[].audio | 对白内容 |
 
-3. 串行 spawn browser-gen-worker（浏览器同时只能做一件事）：
+3. 串行 spawn browser-gen-worker（默认串行，可通过 `browser_backend.concurrency` 配置多标签页并行）：
 ```
-for each shot in shots:
-  spawn browser-gen-worker (shot params, session_id=$SESSION_ID, trace_file={ep}-shot-{N}-trace)
+concurrency = 1:
+  for each shot in shots:
+    spawn browser-gen-worker (shot params, concurrency=1, session_id=$SESSION_ID, trace_file={ep}-shot-{N}-trace)
+    等待完成
+    等待 wait_between 秒
+
+concurrency > 1:
+  spawn browser-gen-worker (所有 shot params, concurrency=N, session_id=$SESSION_ID)
   等待完成
-  等待 wait_between 秒
 ```
 
 注意：browser 模式不支持 A/B 测试（API 调用量翻倍在浏览器模式下不现实）。
