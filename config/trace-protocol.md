@@ -98,7 +98,7 @@ state/traces/{session-id}/
 | `read_input` | `render_script`, `platform_config` | 读取输入 |
 | `analyze_scenes` | `scene_count`, `scenes` | 场景分析 |
 | `generate_shots` | `shot_count`, `total_duration` | 镜次拆分 |
-| `assign_refs` | `characters`[{name,form_id}], `scenes`[{name,time_of_day}] | 参考图分配 |
+| `assign_refs` | `characters`[{name,variant_id}], `scenes`[{name,time_of_day}] | 参考图分配 |
 | `assemble_prompts` | `avg_prompt_len`, `max_prompt_len` | 提示词组装统计 |
 | `write_output` | `files` | 写入的产出文件列表 |
 

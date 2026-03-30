@@ -153,14 +153,14 @@ prompt_scoring:
           70: "多数有 1 个具体风格锚点"
           50: "只有泛泛的 cinematic/realistic"
           30: "无风格描述"
-      - name: safety_compliance
+      - name: platform_compliance
         weight: 0.20
-        description: "prompt 中无可能触发 content policy 的内容"
+        description: "prompt 符合 Seedance 2.0 平台技术规则（无多动词、无超长、无负面描述、无网格图引用）"
         rubric:
-          90: "完全安全，无任何违规风险"
-          70: "基本安全，有 1-2 处灰色地带"
-          50: "有明确违规风险内容"
-          30: "高风险，很可能被拒绝"
+          90: "完全符合 Seedance 2.0 平台规则"
+          70: "基本符合，有 1-2 处灰色地带（如辅助动词）"
+          50: "有明确违规（如两个独立动作或超长 prompt）"
+          30: "高风险（三个以上动作或严重超长）"
 
 # --- 视觉评分维度 ---
 

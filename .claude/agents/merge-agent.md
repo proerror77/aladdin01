@@ -1,5 +1,6 @@
 ---
 name: merge-agent
+# DEPRECATED: 此 agent 已废弃，角色融合功能已内联到 preprocess-agent Step 2.5
 description: 跨集角色融合 agent。在分段扫描完成后，识别同一角色的不同名字（正名/昵称/笔误），输出统一的角色映射表。
 tools:
   - Read
@@ -7,6 +8,8 @@ tools:
 ---
 
 # merge-agent — 跨集角色融合
+
+> **已废弃**：角色融合功能已内联到 preprocess-agent Step 2.5。保留此文件仅供参考。
 
 ## 职责
 

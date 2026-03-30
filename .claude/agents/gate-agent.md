@@ -144,16 +144,17 @@ else:
    → 自动触发 outline-agent 重做，退回原因作为修改指令
 ```
 
-## Prompt 安全预检（特殊功能）
+## Prompt 平台合规预检（特殊功能）
 
-当 checkpoint 为 `visual_direction` 时，额外执行 **Prompt Safety Precheck**：
+当 checkpoint 为 `visual_direction` 时，额外执行 **Prompt Platform Compliance Precheck**。
+
+**职责划分**：Phase 1 comply-agent 负责内容合规（政策/法律/道德），prompt 基于 render-script 生成，不应再含敏感词。Phase 2 gate-agent 负责平台合规（Seedance 2.0 技术限制），确保 prompt 不会被平台拒绝。
 
 对每个 prompt 检查：
-1. 是否含暴力/色情/仇恨关键词（对照 `config/compliance/blocklist.yaml`）
-2. 是否含 Seedance 已知拒绝模式（如多动词、超长描述）
-3. 是否遵循 5-block 结构
+1. 是否含 Seedance 已知拒绝模式（如多动词、超长描述、负面描述、网格图引用）
+2. 是否遵循 5-block 结构
 
-安全不通过的 prompt 标记在报告中，建议 visual-agent 改写后再提交 Phase 5。
+不通过的 prompt 标记在报告中，建议 visual-agent 改写后再提交 Phase 5。
 
 ## 注意事项
 

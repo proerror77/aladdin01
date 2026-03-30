@@ -5,34 +5,46 @@ dimensions:
     name: "画面质量"
     description: "画面清晰度、光影效果、色彩表现、整体质感"
     scale: { min: 1, max: 5 }
-    weight: 0.25
+    weight: 0.20
   scene_match:
     name: "场景匹配度"
     description: "生成画面与剧本描述的场景、环境、氛围匹配程度"
     scale: { min: 1, max: 5 }
-    weight: 0.20
+    weight: 0.15
   character_consistency:
     name: "角色一致性"
     description: "角色外观、服装、体型与设定的一致程度"
     scale: { min: 1, max: 5 }
-    weight: 0.20
+    weight: 0.15
   motion_quality:
     name: "动作自然度"
     description: "角色动作、镜头运动的自然流畅程度"
     scale: { min: 1, max: 5 }
-    weight: 0.20
+    weight: 0.15
   lip_sync:
     name: "唇形同步"
     description: "对白镜次的唇形同步准确率（无对白镜次跳过此项）"
     scale: { min: 1, max: 5 }
     weight: 0.15
     conditional: "has_dialogue"
+  camera_stability:
+    name: "镜头稳定性"
+    description: "镜头运动是否平稳流畅、无抖动或突兀切换"
+    scale: { min: 1, max: 5 }
+    weight: 0.10
+  lighting_coherence:
+    name: "光影一致性"
+    description: "同一场景不同镜次的光线方向和色温是否连贯"
+    scale: { min: 1, max: 5 }
+    weight: 0.10
 
 scoring_rules:
   no_dialogue_weights:
-    visual_quality: 0.30
-    scene_match: 0.25
-    character_consistency: 0.25
-    motion_quality: 0.20
+    visual_quality: 0.25
+    scene_match: 0.18
+    character_consistency: 0.18
+    motion_quality: 0.17
+    camera_stability: 0.12
+    lighting_coherence: 0.10
   winner_threshold: 0.0
   tie_policy: "variant_a"
