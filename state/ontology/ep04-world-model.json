@@ -1,0 +1,310 @@
+{
+  "world_id": "qyccan-ep04",
+  "episode": "ep04",
+  "created_at": "2026-04-01T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "snake_green",
+        "variants": {
+          "snake_green": {
+            "variant_id": "snake_green",
+            "label": "碧鳞蛇（ep03进化后）",
+            "appearance": "筷子长的小蛇，通体覆盖精致碧绿色鳞片，金色瞳孔，吐着信子，头顶有两个小鼓包。",
+            "tags": ["灵智级", "毒蛇", "敏捷"]
+          }
+        },
+        "physical": {
+          "size": "筷子长",
+          "weight": "极轻",
+          "mobility": "蛇形滑行/闪电突袭",
+          "durability": "脆弱但敏捷"
+        },
+        "abilities": [
+          {
+            "name": "吞天口",
+            "type": "active",
+            "description": "张嘴化作漆黑漩涡黑洞，吞噬目标",
+            "unlock_episode": "ep01"
+          },
+          {
+            "name": "无限吞噬进化",
+            "type": "passive",
+            "description": "吞噬任何东西可获得进化点",
+            "unlock_episode": "ep01"
+          },
+          {
+            "name": "剧毒獠牙",
+            "type": "active",
+            "description": "毒牙咬下注入剧毒，可蔓延",
+            "unlock_episode": "ep03"
+          },
+          {
+            "name": "闪电突袭",
+            "type": "active",
+            "description": "瞬间移动到目标身后",
+            "unlock_episode": "ep03"
+          },
+          {
+            "name": "百毒不侵",
+            "type": "passive",
+            "description": "可吞噬任何毒素转化为进化点，对毒素免疫",
+            "unlock_episode": "ep04",
+            "unlock_condition": "吞噬噬灵散毒素"
+          }
+        ],
+        "constraints": [
+          {
+            "type": "communication",
+            "description": "碧鳞蛇形态以嘶嘶声说话，内心独白以OS呈现",
+            "active_until": "ep07"
+          }
+        ],
+        "evolution_timeline": [
+          {"episode": "ep01", "form": "青玉蚕", "trigger": "重生到万兽天界"},
+          {"episode": "ep03", "form": "碧鳞蛇", "trigger": "吞噬聚灵佩，进化点满"},
+          {"episode": "ep07", "form": "玄冥黑金蟒", "trigger": "吞噬双头魔狼妖丹"}
+        ],
+        "ep_state": {
+          "abilities_unlocked_this_ep": ["百毒不侵"],
+          "notable_action": "主动吞噬噬灵散毒素救治叶红衣",
+          "evolution_points_gained": "吞噬毒素多次+5进化点"
+        }
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "physical": {
+          "height": "高挑",
+          "build": "纤细",
+          "clothing": "红衣（ep04开头修炼时敞开领口，汗水淋漓）"
+        },
+        "abilities": [
+          {
+            "name": "剑术",
+            "type": "active",
+            "description": "基础剑术，灵力微弱",
+            "constraints": ["灵根受损，灵力微弱"]
+          }
+        ],
+        "constraints": [
+          {
+            "type": "power",
+            "description": "灵根受损，中毒后更虚弱",
+            "active_until": "ep08"
+          },
+          {
+            "type": "health",
+            "description": "被噬灵散下毒，ep04内解毒",
+            "active_until": "ep04"
+          }
+        ],
+        "ep_state": {
+          "health_event": "修炼时被噬灵散毒发作，苏夜吸毒救治后恢复"
+        }
+      },
+      {
+        "id": "yeruyan",
+        "name": "叶如烟",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {
+          "appearance": "装扮妖艳，眼神透着算计，阴阳怪气",
+          "build": "妖媚"
+        },
+        "abilities": [
+          {
+            "name": "下毒",
+            "type": "active",
+            "description": "用噬灵散给叶红衣下毒"
+          }
+        ],
+        "constraints": [],
+        "ep_state": {
+          "notable_action": "ep04结尾敲门，送安神汤（内有毒），ep05继续"
+        }
+      },
+      {
+        "id": "system",
+        "name": "系统",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"form": "无实体，只有声音"},
+        "abilities": [
+          {"name": "检测", "type": "active", "description": "检测毒素、物品信息"},
+          {"name": "技能提示", "type": "passive", "description": "提示技能获得"}
+        ],
+        "constraints": [{"type": "interaction", "description": "只能与苏夜沟通"}]
+      }
+    ],
+    "locations": [
+      {
+        "id": "yehongyi_room",
+        "name": "叶红衣闺房",
+        "type": "indoor",
+        "spatial": {
+          "size": "small",
+          "terrain": "室内卧室",
+          "features": ["床", "桌椅", "窗户"],
+          "danger_level": "none"
+        },
+        "temporal_variants": {
+          "night": {
+            "lighting": "烛光昏暗",
+            "atmosphere": "私密温馨，暗藏危机"
+          }
+        },
+        "significance": "ep04主要场景，苏夜救治中毒的叶红衣"
+      }
+    ],
+    "props": [
+      {
+        "id": "shiling_poison",
+        "name": "噬灵散",
+        "description": "附骨之疽毒素，如跗骨之蛆盘踞心脉，可废灵根",
+        "owner": "yeruyan",
+        "condition": "absorbed",
+        "significance": "ep04叶红衣修炼时毒发，苏夜吞噬解毒并获得百毒不侵",
+        "states": {
+          "active": "在叶红衣体内活动",
+          "absorbed": "ep04被苏夜吞噬清除"
+        }
+      },
+      {
+        "id": "anxin_soup",
+        "name": "安神汤（含噬灵散）",
+        "description": "叶如烟送来的汤，内含高浓度噬灵散",
+        "owner": "yeruyan",
+        "condition": "pending",
+        "significance": "ep04结尾叶如烟送来，ep05苏夜喝掉",
+        "states": {
+          "pending": "ep04结尾送来，ep05处理"
+        }
+      }
+    ]
+  },
+  "relationships": {
+    "social": [
+      {
+        "type": "contract",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "契约关系，生死与共",
+        "established": "ep01",
+        "strength": "unbreakable"
+      },
+      {
+        "type": "hostile_hidden",
+        "from": "yeruyan",
+        "to": "yehongyi",
+        "description": "叶如烟暗中给叶红衣下毒，表面妹妹情深",
+        "established": "ep04"
+      },
+      {
+        "type": "guidance",
+        "from": "system",
+        "to": "suye",
+        "description": "系统指导苏夜",
+        "established": "ep01",
+        "strength": "permanent"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "confined_to",
+        "from": "yehongyi",
+        "to": "yehongyi_room",
+        "description": "叶红衣在闺房修炼、中毒、被救",
+        "established": "ep04"
+      }
+    ],
+    "causal": [
+      {
+        "type": "triggers",
+        "from": "shiling_poison_attack",
+        "to": "suye_detox_action",
+        "description": "噬灵散毒发，苏夜主动吸毒解毒",
+        "episode": "ep04"
+      },
+      {
+        "type": "triggers",
+        "from": "suye_absorb_poison",
+        "to": "unlock_baidubuqin",
+        "description": "苏夜吞噬噬灵散毒素，获得被动技能百毒不侵",
+        "episode": "ep04"
+      },
+      {
+        "type": "triggers",
+        "from": "yeruyan_arrival",
+        "to": "next_episode_hook",
+        "description": "叶如烟送来安神汤，引出ep05剧情",
+        "episode": "ep04"
+      }
+    ],
+    "temporal": [
+      {
+        "type": "before",
+        "event_a": "yehongyi_poisoned",
+        "event_b": "suye_detect_poison",
+        "description": "叶红衣中毒后苏夜系统检测到毒素"
+      },
+      {
+        "type": "after",
+        "event_a": "suye_absorb_poison",
+        "event_b": "yehongyi_recovers",
+        "description": "苏夜吸完毒后叶红衣才恢复"
+      }
+    ]
+  },
+  "physics": {
+    "gravity": "normal",
+    "magic_system": {
+      "type": "cultivation",
+      "description": "修炼需要灵气，毒素可被特殊灵兽吸收转化",
+      "rules": [
+        "修炼需要灵气，进入走火入魔有风险",
+        "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+        "吞噬毒素可获得毒属性抗性和进化点",
+        "百毒不侵的灵兽对任何毒素免疫"
+      ]
+    },
+    "power_scaling": "strict",
+    "energy_system": {
+      "type": "spiritual_energy",
+      "sources": ["灵石", "灵草", "毒素（苏夜专属）"],
+      "consumption": ["修炼", "战斗", "进化"]
+    }
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {
+        "character": "suye",
+        "constraint": "碧鳞蛇形态只能嘶嘶叫，内心独白OS",
+        "active_episodes": ["ep03", "ep04", "ep05", "ep06"],
+        "unlock_condition": "进化到玄冥蟒（ep07）"
+      }
+    ],
+    "ability_unlocks": [
+      {
+        "character": "suye",
+        "ability": "百毒不侵",
+        "unlock_episode": "ep04",
+        "unlock_condition": "吞噬噬灵散毒素"
+      }
+    ],
+    "world_rules": [
+      {"rule": "契约不可解除", "description": "生死与共"},
+      {"rule": "毒素可转化", "description": "苏夜可将毒素转化为进化点和抗性"},
+      {"rule": "走火入魔危险", "description": "修炼时被毒干扰会走火入魔甚至死亡"}
+    ],
+    "forbidden_changes": [
+      {"type": "character_death", "target": "suye", "reason": "主角不能死"},
+      {"type": "character_death", "target": "yehongyi", "reason": "女主角不能死，苏夜会救她"}
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "shot_id": "qyccan-ep03-shot-01",
+  "episode": "qyccan-ep03",
+  "scene_id": "ye_family_gate",
+  "shot_number": 1,
+  "scene_goal": "赵无极发现玉佩被啃，愤怒踩踏，制造紧张",
+  "duration_sec": 15,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "suye@qyccan-ep03-shot-01",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/苏夜-qingyucan-front.png"
+      ],
+      "must_preserve": [
+        "通体碧绿",
+        "肥嘟嘟"
+      ],
+      "current_state": {
+        "form": "青玉蚕",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "专注啃咬",
+        "props_in_possession": [
+          "二品聚灵佩（正在啃咬）"
+        ],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "zhaowuji",
+      "state_ref": "zhaowuji@qyccan-ep03-shot-01",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": [
+        "衣着华丽"
+      ],
+      "current_state": {
+        "form": "人形",
+        "costume": "华丽公子服",
+        "injury": "none",
+        "emotion": "大怒",
+        "props_in_possession": [
+          "折扇"
+        ],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶家大门口",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/叶家府邸-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/苏夜-qingyucan-front.png",
+      "assets/scenes/images/叶家府邸-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "赵无极发现腰间玉佩被拿走，看向地上趴着的绿色肥蚕，怒火中烧，肥蚕疯狂啃咬发光玉佩，浑然不理会赵无极，叶家大门口背景，围观人群，古风建筑，中景镜头，平视角度，静止，玄幻风格，冲突紧张，自然光，高清画质，4K超清，电影级画质，人物情绪鲜明"
+  },
+  "forbidden_changes": [
+    "不要让苏夜提前进化"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "修炼需要灵气",
+      "灵兽等级严格",
+      "血脉压制",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": false,
+        "current_form": "青玉蚕（凡胎级）",
+        "active_abilities": [
+          "无限吞噬进化"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "shot_id": "qyccan-ep02-shot-02",
+  "episode": "qyccan-ep02",
+  "scene_id": "heiwu_forest",
+  "shot_number": 2,
+  "scene_goal": "叶红衣追上家仆乙，展示剑术身法，冷酷处决",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "yehongyi",
+      "state_ref": "叶红衣@qyccan-ep02-shot-02",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/叶红衣-front.png"
+      ],
+      "must_preserve": ["红衣", "高挑", "纤细"],
+      "current_state": {
+        "form": "人形",
+        "costume": "红衣（破损）",
+        "injury": "轻伤",
+        "emotion": "冷漠",
+        "props_in_possession": ["软剑"],
+        "knowledge": ["家仆乙是追杀自己的刺客"]
+      }
+    }
+  ],
+  "background": {
+    "location": "黑雾森林",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/黑雾森林-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "slightly_low",
+    "movement": "tracking",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/叶红衣-front.png",
+      "assets/scenes/images/黑雾森林-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "叶红衣拔出软剑，几步追上逃跑的家仆乙，一剑刺穿他的肩膀，家仆乙惨叫倒地，叶红衣神情冷漠，黑雾森林，树林背景，自然光，中景镜头，略低角度，跟踪运镜，玄幻风格，动作利落，高清画质，4K超清，电影级画质，剑光凌冽"
+  },
+  "forbidden_changes": [
+    "叶红衣必须穿红衣",
+    "不要让叶红衣展示高阶灵力（灵根受损）"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": ["灵根受损的修士实力大幅削弱"],
+    "character_abilities": {
+      "yehongyi": {
+        "can_use_full_power": false,
+        "current_form": "人形",
+        "active_abilities": ["剑术（弱化版）"]
+      }
+    }
+  }
+}

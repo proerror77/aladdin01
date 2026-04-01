@@ -1,0 +1,283 @@
+{
+  "world_id": "qyccan-ep09",
+  "episode": "ep09",
+  "created_at": "2026-04-01T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "xuanming_python",
+        "variants": {
+          "xuanming_python": {
+            "variant_id": "xuanming_python",
+            "label": "玄冥黑金蟒（缩小态 + 全形态）",
+            "appearance": "缩小时盘在叶红衣肩上；全形态长达三米，漆黑鳞片泛着金色纹路，头顶两个小鼓包，金色瞳孔，威严霸气。",
+            "tags": ["地煞级", "巨蟒", "威压", "可说话", "大小如意"]
+          }
+        },
+        "physical": {
+          "size": "可变（缩小如手指 / 全形三米）",
+          "weight": "可变",
+          "mobility": "蜿蜒高速",
+          "durability": "强韧"
+        },
+        "abilities": [
+          {"name": "吞天口", "type": "active", "description": "张嘴吞噬一切", "unlock_episode": "ep01"},
+          {"name": "无限吞噬进化", "type": "passive", "description": "吞噬获得进化点", "unlock_episode": "ep01"},
+          {"name": "可以说话", "type": "passive", "description": "声音低沉沙哑", "unlock_episode": "ep07"},
+          {"name": "大小如意", "type": "active", "description": "随意缩放身体", "unlock_episode": "ep06"},
+          {"name": "龙威迫人", "type": "passive", "description": "地煞级气息威压", "unlock_episode": "ep07"},
+          {"name": "玄冥之力", "type": "active", "description": "吸取妖兽能量", "unlock_episode": "ep07"},
+          {"name": "气运吞噬", "type": "active", "description": "吞噬含有天命气运的物品，掠夺气运之子的机缘", "unlock_episode": "ep09"}
+        ],
+        "constraints": [],
+        "evolution_timeline": [
+          {"episode": "ep07", "form": "玄冥黑金蟒", "trigger": "吞噬双头魔狼妖丹"}
+        ]
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "physical": {"height": "高挑", "build": "纤细", "clothing": "红衣"},
+        "abilities": [
+          {"name": "剑术", "type": "active", "description": "基础剑术"},
+          {"name": "天风学院核心院特招生", "type": "passive", "description": "被学院深处的神秘声音特招进核心院", "unlock_episode": "ep09"}
+        ],
+        "constraints": []
+      },
+      {
+        "id": "xiaofan",
+        "name": "萧凡",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"height": "中等偏高", "build": "健壮", "clothing": "朴素布衣"},
+        "abilities": [
+          {"name": "紫色血脉", "type": "passive", "description": "百年难遇天才，测灵石显示紫色光芒带金色火光"},
+          {"name": "剑术", "type": "active", "description": "名门正道剑法"},
+          {"name": "正道之光", "type": "passive", "description": "浑身散发正道气息，与苏夜天然对立"}
+        ],
+        "constraints": [
+          {"type": "power_gap", "description": "ep09时实力不及苏夜，被戒指老爷爷劝阻直接冲突"}
+        ]
+      },
+      {
+        "id": "qinger",
+        "name": "青儿",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"height": "纤细", "build": "清冷绝美", "clothing": "素衣"},
+        "abilities": [],
+        "constraints": []
+      },
+      {
+        "id": "ring_elder",
+        "name": "戒指老爷爷",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"form": "无实体，萧凡戒指里的灵魂，混响声音"},
+        "abilities": [
+          {"name": "神魂激励", "type": "active", "description": "激励萧凡，为其指引方向"},
+          {"name": "气运感知", "type": "passive", "description": "感知苏夜吞噬天地气运的能力，认定其为宿命之敌"}
+        ],
+        "constraints": [{"type": "form", "description": "只有萧凡能听到，混响状态"}]
+      },
+      {
+        "id": "mentor",
+        "name": "导师",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": {"form": "高傲中年男性"},
+        "abilities": [],
+        "constraints": []
+      },
+      {
+        "id": "system",
+        "name": "系统",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"form": "无实体，只有声音"},
+        "abilities": [{"name": "气运检测", "type": "active", "description": "检测到测灵石含天命气运，建议吞噬"}],
+        "constraints": [{"type": "interaction", "description": "只能与苏夜沟通"}]
+      }
+    ],
+    "locations": [
+      {
+        "id": "tianfeng_plaza",
+        "name": "天风学院广场",
+        "type": "outdoor",
+        "spatial": {
+          "size": "vast",
+          "terrain": "学院广场",
+          "features": ["测灵石（巨大）", "招牌", "测试区", "围观人群"],
+          "danger_level": "low"
+        },
+        "temporal_variants": {
+          "day": {
+            "lighting": "阳光明媚",
+            "atmosphere": "热闹人山人海"
+          }
+        },
+        "contains": ["导师", "新生众", "叶红衣", "苏夜", "萧凡", "青儿", "赵无极"],
+        "significance": "ep09主场景，天才萧凡登场，苏夜吃测灵石事件"
+      }
+    ],
+    "props": [
+      {
+        "id": "celing_stone",
+        "name": "测灵石",
+        "description": "天风学院广场上用于测试新生血脉潜力的巨大石头，蕴含天命气运",
+        "owner": "tianfeng_academy",
+        "condition": "destroyed",
+        "significance": "苏夜直接从测灵石上咬下一块吃掉，并吸收其中天命气运，导致整块测灵石爆炸",
+        "states": {
+          "intact": "完整测灵石，发出赤橙黄绿青蓝紫各色光",
+          "bitten": "被苏夜咬下一块，黑气缭绕",
+          "destroyed": "ep09被苏夜吞噬气运后震碎"
+        }
+      },
+      {
+        "id": "black_ring",
+        "name": "古朴黑戒",
+        "description": "萧凡手指上的古朴黑戒，里面住着戒指老爷爷的灵魂",
+        "owner": "xiaofan",
+        "condition": "intact",
+        "significance": "戒指老爷爷通过黑戒与萧凡沟通，识别苏夜为宿命之敌"
+      }
+    ]
+  },
+  "relationships": {
+    "social": [
+      {
+        "type": "contract",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "契约关系，生死与共",
+        "established": "ep01",
+        "strength": "unbreakable"
+      },
+      {
+        "type": "destined_rivalry",
+        "from": "suye",
+        "to": "xiaofan",
+        "description": "苏夜吞噬天命气运，被戒指老爷爷认定为萧凡宿命之敌",
+        "established": "ep09"
+      },
+      {
+        "type": "companion",
+        "from": "qinger",
+        "to": "xiaofan",
+        "description": "青儿温柔陪伴，依附萧凡",
+        "established": "ep09"
+      },
+      {
+        "type": "guidance",
+        "from": "ring_elder",
+        "to": "xiaofan",
+        "description": "戒指老爷爷通过黑戒指导萧凡",
+        "established": "ep09"
+      },
+      {
+        "type": "guidance",
+        "from": "system",
+        "to": "suye",
+        "description": "系统指导苏夜吞噬气运",
+        "established": "ep01",
+        "strength": "permanent"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "attends",
+        "from": "yehongyi",
+        "to": "tianfeng_plaza",
+        "description": "叶红衣和苏夜来天风学院参加新生测试",
+        "established": "ep09"
+      },
+      {
+        "type": "attends",
+        "from": "xiaofan",
+        "to": "tianfeng_plaza",
+        "description": "萧凡来参加入学测试",
+        "established": "ep09"
+      }
+    ],
+    "causal": [
+      {
+        "type": "triggers",
+        "from": "suye_devour_stone",
+        "to": "yunjie_qi_absorption",
+        "description": "苏夜吞噬测灵石中的天命气运，并将其转化为力量",
+        "episode": "ep09"
+      },
+      {
+        "type": "triggers",
+        "from": "stone_explosion",
+        "to": "mysterious_voice_special_recruit",
+        "description": "测灵石爆炸引来学院深处神秘声音，特招叶红衣进核心院",
+        "episode": "ep09"
+      },
+      {
+        "type": "triggers",
+        "from": "ring_elder_warning",
+        "to": "xiaofan_rivalry_oath",
+        "description": "戒指老爷爷警告后，萧凡立誓将苏夜和叶红衣铲除",
+        "episode": "ep09"
+      }
+    ],
+    "temporal": [
+      {
+        "type": "before",
+        "event_a": "xiaofan_test",
+        "event_b": "yehongyi_test",
+        "description": "萧凡测灵在叶红衣测灵之前"
+      },
+      {
+        "type": "after",
+        "event_a": "stone_explosion",
+        "event_b": "special_recruit",
+        "description": "测灵石爆炸后才有神秘声音特招"
+      }
+    ]
+  },
+  "physics": {
+    "gravity": "normal",
+    "magic_system": {
+      "type": "cultivation",
+      "description": "修炼需要灵气，灵兽可以进化",
+      "rules": [
+        "测灵石显示血脉潜力：赤橙黄绿青蓝紫，紫色最高",
+        "天命气运可以被吞噬和掠夺",
+        "正道之光与玄冥之力天然对立",
+        "契约关系生死与共，不可解除"
+      ]
+    },
+    "power_scaling": "strict",
+    "energy_system": {
+      "type": "spiritual_energy",
+      "sources": ["灵石", "天命气运", "测灵石"],
+      "consumption": ["修炼", "战斗", "进化"]
+    }
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {"character": "suye", "constraint": "玄冥蟒形态可以说话，声音低沉沙哑", "active_episodes": ["ep09"]},
+      {"character": "xiaofan", "constraint": "ep09时实力不及苏夜，被劝阻直接对抗", "active_episodes": ["ep09"]}
+    ],
+    "ability_unlocks": [
+      {"character": "suye", "ability": "气运吞噬", "unlock_episode": "ep09", "unlock_condition": "吞噬测灵石中的天命气运"}
+    ],
+    "world_rules": [
+      {"rule": "契约不可解除", "description": "人类与灵兽的契约一旦建立，生死与共，不可解除"},
+      {"rule": "天命气运可被掠夺", "description": "苏夜通过吞噬可以掠夺天命之子的气运机缘"}
+    ],
+    "forbidden_changes": [
+      {"type": "character_death", "target": "suye", "reason": "主角不能死"},
+      {"type": "character_death", "target": "yehongyi", "reason": "女主角不能死"},
+      {"type": "character_death", "target": "xiaofan", "reason": "天命之子ep09不能死，是长期对手"}
+    ]
+  }
+}

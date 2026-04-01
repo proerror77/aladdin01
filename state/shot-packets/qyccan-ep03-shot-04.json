@@ -1,0 +1,75 @@
+{
+  "shot_id": "qyccan-ep03-shot-04",
+  "episode": "qyccan-ep03",
+  "scene_id": "ye_family_gate",
+  "shot_number": 4,
+  "scene_goal": "赵无极不服，召唤烈火犬，升级战斗压力",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "zhaowuji",
+      "state_ref": "zhaowuji@qyccan-ep03-shot-04",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": [
+        "衣着华丽"
+      ],
+      "current_state": {
+        "form": "人形",
+        "costume": "华丽公子服",
+        "injury": "none",
+        "emotion": "强作镇定，傲慢",
+        "props_in_possession": [
+          "折扇"
+        ],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶家大门口",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/叶家府邸-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "full_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/scenes/images/叶家府邸-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "赵无极愣了一下，强作镇定，双手一挥召唤出烈火犬，浑身冒火的大狗从光芒中出现，龇牙咧嘴，围观人群惊呼，叶家大门口，全景镜头，平视角度，静止，玄幻风格，召唤特效，火焰光效，高清画质，4K超清，电影级画质，魔法召唤震撼"
+  },
+  "forbidden_changes": [],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "修炼需要灵气",
+      "灵兽等级严格",
+      "血脉压制",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇",
+        "active_abilities": [
+          "剧毒獠牙",
+          "闪电突袭"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "shot_id": "qyccan-ep02-shot-01",
+  "episode": "qyccan-ep02",
+  "scene_id": "heiwu_forest",
+  "shot_number": 1,
+  "scene_goal": "家仆乙被苏夜吓到，仓皇逃跑，制造喜剧反差",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "苏夜@qyccan-ep02-shot-01",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/苏夜-qingyucan-front.png"
+      ],
+      "must_preserve": ["通体碧绿", "肥嘟嘟", "拇指大小", "肉乎乎的小短腿"],
+      "current_state": {
+        "form": "青玉蚕",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "嘚瑟",
+        "props_in_possession": [],
+        "knowledge": ["刚协助杀死家仆甲", "想要叶红衣补刀家仆乙"]
+      }
+    }
+  ],
+  "background": {
+    "location": "黑雾森林",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/黑雾森林-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/scenes/images/黑雾森林-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "家仆乙惊恐地看着地上的碧绿肥蚕，退后两步，转身拔腿就跑，黑雾森林背景，树木参天，自然光透过树叶，中景镜头，平视角度，静止，玄幻风格，紧张气氛，自然光，高清画质，4K超清，电影级画质，人物表情惊恐细腻"
+  },
+  "forbidden_changes": [
+    "不要让苏夜说话（青玉蚕形态无法说话）",
+    "不要改变苏夜的碧绿颜色",
+    "不要让苏夜飞行"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": ["修炼需要灵气", "灵兽等级严格"],
+    "character_abilities": {
+      "suye": {
+        "can_speak": false,
+        "can_fly": false,
+        "current_form": "青玉蚕（凡胎级）",
+        "active_abilities": ["吞天口"]
+      }
+    }
+  }
+}

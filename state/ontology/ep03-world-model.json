@@ -1,0 +1,314 @@
+{
+  "world_id": "qyccan-ep03",
+  "episode": "ep03",
+  "created_at": "2026-04-01T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "snake_green",
+        "variants": {
+          "default": {
+            "variant_id": "default",
+            "label": "青玉蚕（初始形态）",
+            "appearance": "通体碧绿、肥嘟嘟的蚕宝宝，拇指大小。",
+            "tags": ["凡胎级", "昆虫", "萌系"]
+          },
+          "snake_green": {
+            "variant_id": "snake_green",
+            "label": "碧鳞蛇（第一次进化）",
+            "appearance": "筷子长的小蛇，通体覆盖精致碧绿色鳞片，金色瞳孔，吐着信子，头顶有两个小鼓包。",
+            "tags": ["灵智级", "毒蛇", "敏捷"]
+          }
+        },
+        "physical": {
+          "size": "筷子长（碧鳞蛇形态）",
+          "weight": "轻",
+          "mobility": "闪电突袭（极速移动）",
+          "durability": "较强（鳞片防护）"
+        },
+        "abilities": [
+          {
+            "name": "吞天口",
+            "type": "active",
+            "description": "张嘴化作漆黑漩涡黑洞，可吞噬比自己大数倍的目标",
+            "unlock_episode": "ep01",
+            "constraints": ["需要系统激活", "消耗体力"]
+          },
+          {
+            "name": "无限吞噬进化",
+            "type": "passive",
+            "description": "吞噬任何东西可获得进化点",
+            "unlock_episode": "ep01",
+            "constraints": ["需要绑定契约者"]
+          },
+          {
+            "name": "剧毒獠牙",
+            "type": "active",
+            "description": "毒牙咬击，注入剧毒，可让二阶灵兽瞬间中毒倒地",
+            "unlock_episode": "ep03",
+            "constraints": ["需要近身攻击"]
+          },
+          {
+            "name": "闪电突袭",
+            "type": "active",
+            "description": "身形一晃瞬间消失，极速移动到敌人身后，如一道绿色闪电",
+            "unlock_episode": "ep03",
+            "constraints": ["短距离瞬移"]
+          }
+        ],
+        "constraints": [
+          {
+            "type": "communication",
+            "description": "碧鳞蛇形态不能说话，只能发出嘶嘶声",
+            "active_until": "ep07"
+          }
+        ],
+        "evolution_timeline": [
+          { "episode": "ep01", "form": "青玉蚕", "trigger": "重生到万兽天界" },
+          { "episode": "ep03", "form": "碧鳞蛇", "trigger": "吞噬聚灵佩，进化点满" },
+          { "episode": "ep07", "form": "玄冥黑金蟒", "trigger": "吞噬双头魔狼妖丹和狂暴能量" }
+        ],
+        "ep_state": {
+          "evolution_event": "青玉蚕→碧鳞蛇（本集进化）",
+          "new_abilities": ["剧毒獠牙", "闪电突袭"],
+          "notable_action": "闪电突袭绕到烈火犬背后，剧毒獠牙一击秒杀二阶灵兽"
+        }
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "physical": { "height": "高挑", "build": "纤细", "clothing": "红衣" },
+        "abilities": [
+          {
+            "name": "剑术",
+            "type": "active",
+            "description": "基础剑术，身法还在但灵力微弱",
+            "constraints": ["灵根受损"]
+          }
+        ],
+        "constraints": [
+          { "type": "power", "description": "灵根受损，灵力微弱", "active_until": "ep08" },
+          { "type": "social", "description": "被叶家抛弃，地位低下", "active_until": "ep08" }
+        ],
+        "ep_state": {
+          "notable_action": "苏夜进化后，高冷回击赵无极婚约"
+        }
+      },
+      {
+        "id": "zhaowuji",
+        "name": "赵无极",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": { "age": "20岁", "build": "衣着华丽", "appearance": "一脸傲慢" },
+        "abilities": [
+          {
+            "name": "召唤灵兽",
+            "type": "active",
+            "description": "召唤二阶灵兽烈火犬",
+            "constraints": ["烈火犬已被苏夜秒杀"]
+          }
+        ],
+        "ep_state": {
+          "notable_event": "召唤烈火犬被苏夜秒杀，狼狈逃窜"
+        }
+      },
+      {
+        "id": "liehuoquan",
+        "name": "烈火犬",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": { "size": "大型犬", "appearance": "浑身冒火的大狗", "element": "火" },
+        "abilities": [
+          { "name": "火焰喷射", "type": "active", "description": "张嘴喷出火焰" }
+        ],
+        "fate": "ep03被苏夜剧毒獠牙秒杀，口吐白沫倒地"
+      },
+      {
+        "id": "system",
+        "name": "系统",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": { "form": "无实体，只有声音" },
+        "abilities": [
+          { "name": "进化点统计", "type": "passive", "description": "实时统计苏夜的进化点" },
+          { "name": "进化触发", "type": "active", "description": "进化点满后触发形态变更" }
+        ],
+        "constraints": [
+          { "type": "interaction", "description": "只能与苏夜沟通" }
+        ]
+      }
+    ],
+    "locations": [
+      {
+        "id": "ye_family_gate",
+        "name": "叶家大门口",
+        "type": "outdoor",
+        "spatial": {
+          "size": "medium",
+          "terrain": "古风建筑门口",
+          "features": ["大门", "围观群众区域", "战斗空间"],
+          "danger_level": "low"
+        },
+        "temporal_variants": {
+          "day": { "lighting": "正午自然光", "atmosphere": "围观群众紧张对峙" }
+        },
+        "significance": "苏夜进化为碧鳞蛇、秒杀烈火犬的地方"
+      }
+    ],
+    "props": [
+      {
+        "id": "juling_pendant",
+        "name": "二品聚灵佩",
+        "description": "内含高纯度灵气的玉佩",
+        "owner": "suye",
+        "condition": "consumed",
+        "significance": "苏夜吞噬后进化点满，触发第一次进化",
+        "states": {
+          "intact": "完整状态",
+          "consumed": "ep03被苏夜吞噬完毕，触发进化"
+        }
+      }
+    ]
+  },
+  "relationships": {
+    "social": [
+      {
+        "type": "contract",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "契约关系，生死与共",
+        "established": "ep01",
+        "strength": "unbreakable"
+      },
+      {
+        "type": "hostile",
+        "from": "zhaowuji",
+        "to": "suye",
+        "description": "赵无极因聚灵佩被抢、烈火犬被秒杀而仇恨苏夜",
+        "established": "ep02",
+        "strength": "antagonistic"
+      },
+      {
+        "type": "summoner",
+        "from": "zhaowuji",
+        "to": "liehuoquan",
+        "description": "赵无极召唤烈火犬参战",
+        "established": "ep03",
+        "resolved": "ep03"
+      },
+      {
+        "type": "guidance",
+        "from": "system",
+        "to": "suye",
+        "description": "系统指导苏夜进化",
+        "established": "ep01",
+        "strength": "permanent"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "battle_at",
+        "from": "suye",
+        "to": "ye_family_gate",
+        "description": "苏夜在叶家大门口进化并与烈火犬战斗",
+        "established": "ep03"
+      }
+    ],
+    "causal": [
+      {
+        "type": "triggers",
+        "from": "devour_juling_pendant",
+        "to": "first_evolution",
+        "description": "吞噬聚灵佩→进化点满→青玉蚕进化为碧鳞蛇",
+        "episode": "ep03"
+      },
+      {
+        "type": "triggers",
+        "from": "zhaowuji_summon",
+        "to": "liehuoquan_killed",
+        "description": "赵无极召唤烈火犬→苏夜闪电突袭+剧毒獠牙秒杀",
+        "episode": "ep03"
+      },
+      {
+        "type": "triggers",
+        "from": "liehuoquan_killed",
+        "to": "zhaowuji_flee",
+        "description": "烈火犬被秒杀→赵无极狼狈逃窜",
+        "episode": "ep03"
+      }
+    ],
+    "temporal": [
+      {
+        "type": "before",
+        "event_a": "suye_evolution",
+        "event_b": "liehuoquan_battle",
+        "description": "苏夜先进化为碧鳞蛇，再与烈火犬战斗"
+      },
+      {
+        "type": "after",
+        "event_a": "zhaowuji_flee",
+        "event_b": "liehuoquan_killed",
+        "description": "烈火犬被秒杀后赵无极逃走"
+      }
+    ]
+  },
+  "physics": {
+    "gravity": "normal",
+    "magic_system": {
+      "type": "cultivation",
+      "description": "修炼需要灵气，灵兽可以进化",
+      "rules": [
+        "人类通过觉醒魂宫契约灵兽战斗",
+        "灵兽等级：凡胎、灵智、地煞、天罡、君王、帝皇、神话",
+        "吞噬可以获得能力和进化点",
+        "契约关系生死与共，不可解除",
+        "进化时会获得新技能",
+        "毒属性攻击可以让火属性灵兽瞬间熄灭"
+      ]
+    },
+    "power_scaling": "strict",
+    "energy_system": {
+      "type": "spiritual_energy",
+      "sources": ["灵石", "灵草", "妖兽精血", "法宝", "聚灵佩"],
+      "consumption": ["修炼", "战斗", "进化"]
+    }
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {
+        "character": "suye",
+        "constraint": "碧鳞蛇形态不能说话",
+        "active_episodes": ["ep03", "ep04", "ep05", "ep06"],
+        "unlock_condition": "进化到玄冥蟒（ep07）"
+      },
+      {
+        "character": "yehongyi",
+        "constraint": "灵根受损，实力受限",
+        "active_episodes": ["ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07"],
+        "unlock_condition": "灵根修复（ep08后）"
+      }
+    ],
+    "ability_unlocks": [
+      { "character": "suye", "ability": "吞天口", "unlock_episode": "ep01", "unlock_condition": "契约成功" },
+      { "character": "suye", "ability": "剧毒獠牙", "unlock_episode": "ep03", "unlock_condition": "进化到碧鳞蛇" },
+      { "character": "suye", "ability": "闪电突袭", "unlock_episode": "ep03", "unlock_condition": "进化到碧鳞蛇" }
+    ],
+    "world_rules": [
+      { "rule": "契约不可解除", "description": "人类与灵兽的契约一旦建立，不可解除" },
+      { "rule": "进化需要进化点", "description": "苏夜的进化需要积累足够的进化点" },
+      { "rule": "灵兽等级严格", "description": "凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话" },
+      { "rule": "进化获得新技能", "description": "每次形态进化都会解锁新的技能" }
+    ],
+    "forbidden_changes": [
+      { "type": "character_death", "target": "suye", "reason": "主角不能死" },
+      { "type": "character_death", "target": "yehongyi", "reason": "女主角不能死" },
+      { "type": "contract_break", "target": "suye_yehongyi_contract", "reason": "契约不可解除" },
+      { "type": "regression", "target": "suye_evolution", "reason": "苏夜不会退化回青玉蚕" }
+    ]
+  }
+}

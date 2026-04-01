@@ -1,0 +1,74 @@
+{
+  "shot_id": "qyccan-ep03-shot-07",
+  "episode": "qyccan-ep03",
+  "scene_id": "ye_family_gate",
+  "shot_number": 7,
+  "scene_goal": "烈火犬轰然倒地，全场死寂，苏夜威压扫视",
+  "duration_sec": 12,
+  "dialogue_mode": "none",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "suye@qyccan-ep03-shot-07",
+      "variant": "snake_green",
+      "ref_assets": [
+        "assets/characters/images/苏夜-bilinse-front.png"
+      ],
+      "must_preserve": [
+        "碧绿色鳞片",
+        "金色瞳孔"
+      ],
+      "current_state": {
+        "form": "碧鳞蛇",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "冷然威压",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶家大门口",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/叶家府邸-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "full_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/苏夜-bilinse-front.png",
+      "assets/scenes/images/叶家府邸-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "庞大的烈火犬轰然倒地，口吐白沫抽搐，火焰完全熄灭，全场所有人沉默，震惊表情，碧鳞蛇昂头冷然扫视众人，全景镜头，平视角度，静止，玄幻风格，肃杀气氛，自然光，高清画质，4K超清，电影级画质，震撼对比"
+  },
+  "forbidden_changes": [],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "修炼需要灵气",
+      "灵兽等级严格",
+      "血脉压制",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇",
+        "active_abilities": []
+      }
+    }
+  }
+}

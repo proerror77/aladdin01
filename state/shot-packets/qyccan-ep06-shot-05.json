@@ -1,0 +1,82 @@
+{
+  "shot_id": "qyccan-ep06-shot-05",
+  "episode": "qyccan-ep06",
+  "scene_id": "arena",
+  "shot_number": 5,
+  "scene_goal": "苏夜变成手臂粗蟒蛇，尾巴抽飞双头狼（大小如意高潮）",
+  "duration_sec": 15,
+  "dialogue_mode": "none",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "苏夜@qyccan-ep06-shot-05",
+      "variant": "snake_green",
+      "ref_assets": [
+        "assets/characters/images/苏夜-bilinse-front.png"
+      ],
+      "must_preserve": [
+        "碧绿色鳞片",
+        "金色瞳孔",
+        "体型手臂粗细（大小如意）"
+      ],
+      "current_state": {
+        "form": "碧鳞蛇（手臂粗，大小如意）",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "战斗中",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "擂台",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/擂台-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "full_shot",
+    "angle": "eye_level",
+    "movement": "dynamic",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/苏夜-bilinse-side.png",
+      "assets/scenes/images/擂台-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "系统技能大小如意发动，筷子细的碧鳞蛇瞬间膨胀成手臂粗细的蟒蛇，蛇尾带着劲风抽在双头狼的一个脑袋上，啪的一声，双头狼被抽得横飞，砸在擂台柱子上，全景镜头，平视角度，动态运镜，玄幻风格，技能特效，力量冲击，震撼画面，高清画质，4K超清，电影级画质，战斗特效炸裂"
+  },
+  "forbidden_changes": [
+    "苏夜体型只是手臂粗，不是真正的大蟒蛇"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "血脉压制：龙威对啸月狼血统有天然压制",
+      "大小如意（ep06解锁）",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇（灵智级）",
+        "active_abilities": [
+          "大小如意（ep06新解锁）",
+          "龙威（ep06雏形）",
+          "剧毒獠牙",
+          "闪电突袭",
+          "百毒不侵"
+        ]
+      }
+    }
+  }
+}

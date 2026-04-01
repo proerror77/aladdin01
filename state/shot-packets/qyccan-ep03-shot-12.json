@@ -1,0 +1,93 @@
+{
+  "shot_id": "qyccan-ep03-shot-12",
+  "episode": "qyccan-ep03",
+  "scene_id": "ye_family_gate",
+  "shot_number": 12,
+  "scene_goal": "定格结尾，苏夜翻白眼抗议叫小蛇，轻松喜剧收场",
+  "duration_sec": 12,
+  "dialogue_mode": "none",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "suye@qyccan-ep03-shot-12",
+      "variant": "snake_green",
+      "ref_assets": [
+        "assets/characters/images/苏夜-bilinse-front.png"
+      ],
+      "must_preserve": [
+        "碧绿色鳞片",
+        "金色瞳孔"
+      ],
+      "current_state": {
+        "form": "碧鳞蛇",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "无奈翻白眼",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "yehongyi",
+      "state_ref": "yehongyi@qyccan-ep03-shot-12",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/叶红衣-front.png"
+      ],
+      "must_preserve": [
+        "红衣"
+      ],
+      "current_state": {
+        "form": "人形",
+        "costume": "红衣",
+        "injury": "轻伤",
+        "emotion": "微微一笑",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶家大门口",
+    "time_of_day": "day",
+    "ref_assets": []
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/叶红衣-front.png",
+      "assets/characters/images/苏夜-bilinse-front.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "碧鳞蛇盘在叶红衣肩膀上，嘶嘶吐信子，叶红衣微微一笑，满不在乎，中景镜头，平视角度，静止，玄幻风格，轻松愉快，暖光，高清画质，4K超清，电影级画质，人兽搭档温馨收尾"
+  },
+  "forbidden_changes": [
+    "叶红衣必须穿红衣"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "修炼需要灵气",
+      "灵兽等级严格",
+      "血脉压制",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇",
+        "active_abilities": []
+      }
+    }
+  }
+}

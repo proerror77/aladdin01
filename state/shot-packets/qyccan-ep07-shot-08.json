@@ -1,0 +1,40 @@
+{
+  "shot_id": "qyccan-ep07-shot-08",
+  "episode": "qyccan-ep07",
+  "scene_id": "arena",
+  "shot_number": 8,
+  "scene_goal": "进化能量爆发，气浪炸开，魔狼瘫倒在地",
+  "duration_sec": 8,
+  "dialogue_mode": "none",
+  "characters": [],
+  "background": {
+    "location": "擂台",
+    "time_of_day": "day",
+    "ref_assets": []
+  },
+  "camera": {
+    "shot_size": "wide_shot",
+    "angle": "high_angle",
+    "movement": "crane",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [],
+    "videos": [],
+    "audios": [],
+    "prompt": "擂台中央爆发出一股强烈气浪，烟尘四溅，双头魔狼精力耗尽缓缓瘫倒在地，光芒逐渐消散，观众席人群惊呼后退，广角镜头，俯视角度，升降运镜，玄幻风格，爆炸气浪，震撼特效，4K超清，电影级画质，宏大镜头"
+  },
+  "forbidden_changes": [
+    "气浪爆发必须是震撼的宏大效果",
+    "魔狼必须是倒地状态而非死亡血腥"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": ["越阶进化需要消耗大量高阶妖力"],
+    "character_abilities": {}
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "shot_id": "qyccan-ep04-shot-11",
+  "episode": "qyccan-ep04",
+  "scene_id": "yehongyi_room",
+  "shot_number": 11,
+  "scene_goal": "叶如烟端着汤碗进入，装扮妖艳，眼神算计",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "yeruyan",
+      "state_ref": "叶如烟@qyccan-ep04-shot-11",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": [
+        "妖艳装扮",
+        "算计眼神"
+      ],
+      "current_state": {
+        "form": "人形",
+        "costume": "妖艳",
+        "injury": "none",
+        "emotion": "伪装温柔，暗含算计",
+        "props_in_possession": [
+          "安神汤（内含毒）"
+        ],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶红衣闺房",
+    "time_of_day": "night",
+    "ref_assets": [
+      "assets/scenes/images/叶红衣闺房-night.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/叶红衣-front.png",
+      "assets/scenes/images/叶红衣闺房-night.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "叶如烟端着一碗散发药香的汤走进来，装扮妖艳，笑容甜蜜眼神阴暗，叶红衣冷冷看着她，闺房内景，近景镜头，平视角度，静止，玄幻风格，绿茶伪装，烛光，高清画质，4K超清，电影级画质，角色表情对比"
+  },
+  "forbidden_changes": [],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "修炼需要灵气",
+      "毒素可被苏夜吸收转化",
+      "百毒不侵（ep04解锁）",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇（灵智级）",
+        "active_abilities": [
+          "剧毒獠牙",
+          "闪电突袭",
+          "吞天口",
+          "无限吞噬进化",
+          "百毒不侵（ep04解锁）"
+        ]
+      }
+    }
+  }
+}

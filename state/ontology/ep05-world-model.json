@@ -1,0 +1,205 @@
+{
+  "world_id": "qyccan-ep05",
+  "episode": "ep05",
+  "created_at": "2026-04-01T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "snake_green",
+        "variants": {
+          "snake_green": {
+            "variant_id": "snake_green",
+            "label": "碧鳞蛇（ep03进化后）",
+            "appearance": "筷子长的小蛇，通体覆盖精致碧绿色鳞片，金色瞳孔，吐信子。",
+            "tags": ["灵智级", "毒蛇", "敏捷"]
+          }
+        },
+        "physical": {"size": "筷子长", "weight": "极轻", "mobility": "蛇形滑行/跳跃"},
+        "abilities": [
+          {"name": "吞天口", "type": "active", "unlock_episode": "ep01"},
+          {"name": "无限吞噬进化", "type": "passive", "unlock_episode": "ep01"},
+          {"name": "剧毒獠牙", "type": "active", "unlock_episode": "ep03"},
+          {"name": "闪电突袭", "type": "active", "unlock_episode": "ep03"},
+          {"name": "百毒不侵", "type": "passive", "unlock_episode": "ep04",
+           "description": "可吞噬任何毒素转化为进化点，本集派上用场（喝毒汤）"}
+        ],
+        "constraints": [
+          {"type": "communication", "description": "以嘶嘶声说话，OS内心独白", "active_until": "ep07"}
+        ],
+        "ep_state": {
+          "notable_action": "跳入毒汤喝干，对着叶如烟反吐绿烟致其长麻子；训练叶红衣；持续进化",
+          "evolution_progress": "吞噬多种药草矿石，体型变长，鳞片光泽增加"
+        }
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "physical": {"height": "高挑", "build": "纤细", "clothing": "红衣"},
+        "abilities": [
+          {"name": "剑术", "type": "active", "constraints": ["灵根受损，灵力微弱"]}
+        ],
+        "constraints": [
+          {"type": "power", "description": "灵根受损，灵力微弱", "active_until": "ep08"}
+        ],
+        "ep_state": {"notable_action": "接受苏夜训练，逐渐提升战斗力，备战家族大比"}
+      },
+      {
+        "id": "yeruyan",
+        "name": "叶如烟",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"appearance": "装扮妖艳，带安神汤"},
+        "abilities": [{"name": "下毒", "type": "active"}],
+        "constraints": [],
+        "ep_state": {
+          "notable_event": "被苏夜反吐绿烟，脸上长满麻子，狼狈逃走，扬言家族大比报复"
+        }
+      },
+      {
+        "id": "system",
+        "name": "系统",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"form": "无实体，只有声音"},
+        "abilities": [{"name": "检测", "type": "active"}],
+        "constraints": [{"type": "interaction", "description": "只能与苏夜沟通"}]
+      }
+    ],
+    "locations": [
+      {
+        "id": "yehongyi_room",
+        "name": "叶红衣闺房",
+        "type": "indoor",
+        "spatial": {"size": "small", "terrain": "室内", "features": ["床", "桌椅"], "danger_level": "none"},
+        "temporal_variants": {"night": {"lighting": "烛光", "atmosphere": "私密"}}
+      },
+      {
+        "id": "training_ground",
+        "name": "练武场",
+        "type": "outdoor",
+        "spatial": {"size": "medium", "terrain": "练武场地", "features": ["空地", "树木"], "danger_level": "low"},
+        "temporal_variants": {"day": {"lighting": "阳光", "atmosphere": "训练氛围"}},
+        "significance": "ep05后半段训练蒙太奇场景"
+      }
+    ],
+    "props": [
+      {
+        "id": "anxin_soup",
+        "name": "安神汤（含高浓度噬灵散）",
+        "owner": "yeruyan",
+        "condition": "consumed_by_suye",
+        "significance": "苏夜跳入喝干，百毒不侵技能发挥作用",
+        "states": {
+          "full": "叶如烟端着，内含毒药",
+          "consumed_by_suye": "ep05苏夜喝干，毒素被吸收"
+        }
+      }
+    ]
+  },
+  "relationships": {
+    "social": [
+      {
+        "type": "contract",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "契约关系，生死与共",
+        "established": "ep01",
+        "strength": "unbreakable"
+      },
+      {
+        "type": "hostile_hidden",
+        "from": "yeruyan",
+        "to": "yehongyi",
+        "description": "叶如烟再次送毒，被苏夜识破反制",
+        "established": "ep04"
+      },
+      {
+        "type": "mentor_student",
+        "from": "suye",
+        "to": "yehongyi",
+        "description": "苏夜训练叶红衣备战家族大比",
+        "established": "ep05"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "moves_between",
+        "from": "all_characters",
+        "to": "yehongyi_room",
+        "description": "ep05前半段在闺房"
+      },
+      {
+        "type": "moves_to",
+        "from": "yehongyi",
+        "to": "training_ground",
+        "description": "ep05后半段在练武场训练"
+      }
+    ],
+    "causal": [
+      {
+        "type": "triggers",
+        "from": "yeruyan_deliver_soup",
+        "to": "suye_jump_in_soup",
+        "description": "叶如烟送来毒汤，苏夜系统检测后跳入喝干",
+        "episode": "ep05"
+      },
+      {
+        "type": "triggers",
+        "from": "suye_reverse_exhale",
+        "to": "yeruyan_face_pox",
+        "description": "苏夜打嗝对叶如烟吐绿烟，叶如烟脸上长满麻子",
+        "episode": "ep05"
+      }
+    ],
+    "temporal": [
+      {
+        "type": "before",
+        "event_a": "yeruyan_expelled",
+        "event_b": "training_montage",
+        "description": "叶如烟被赶走后才开始训练蒙太奇"
+      }
+    ]
+  },
+  "physics": {
+    "gravity": "normal",
+    "magic_system": {
+      "type": "cultivation",
+      "description": "修炼需要灵气",
+      "rules": [
+        "百毒不侵：苏夜对任何毒素免疫并可吸收转化",
+        "灵兽训练可提升契约者实力",
+        "家族大比：叶家内部修炼者竞技"
+      ]
+    },
+    "power_scaling": "strict",
+    "energy_system": {
+      "type": "spiritual_energy",
+      "sources": ["药草", "矿石", "毒素（苏夜专属）"],
+      "consumption": ["修炼", "战斗", "进化"]
+    }
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {
+        "character": "suye",
+        "constraint": "碧鳞蛇形态，体型在ep05因吞噬变长，鳞片光泽增加",
+        "active_episodes": ["ep05"],
+        "unlock_condition": "无（渐进式成长）"
+      }
+    ],
+    "ability_unlocks": [],
+    "world_rules": [
+      {"rule": "百毒不侵已激活", "description": "苏夜对任何毒素免疫"},
+      {"rule": "家族大比临近", "description": "叶家内部大比是本集后半段的叙事动力"}
+    ],
+    "forbidden_changes": [
+      {"type": "character_death", "target": "suye", "reason": "主角不能死"},
+      {"type": "character_death", "target": "yehongyi", "reason": "女主角不能死"}
+    ]
+  }
+}

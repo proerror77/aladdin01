@@ -1,0 +1,57 @@
+{
+  "shot_id": "qyccan-ep06-shot-10",
+  "episode": "qyccan-ep06",
+  "scene_id": "arena",
+  "shot_number": 10,
+  "scene_goal": "台下观众集体震惊，家主长老目瞪口呆",
+  "duration_sec": 10,
+  "dialogue_mode": "none",
+  "characters": [],
+  "background": {
+    "location": "擂台",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/擂台-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "full_shot",
+    "angle": "eye_level",
+    "movement": "pan",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/scenes/images/擂台-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "观众席上所有人震惊地看着擂台，家族长老和家主嘴巴微张，无数人面面相觑，全场哗然，全景镜头，平视角度，横摇运镜，玄幻风格，集体震惊，人群效果，高清画质，4K超清，电影级画质，群演震惊表情细腻"
+  },
+  "forbidden_changes": [],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "血脉压制：龙威对啸月狼血统有天然压制",
+      "大小如意（ep06解锁）",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇（灵智级）",
+        "active_abilities": [
+          "大小如意（ep06新解锁）",
+          "龙威（ep06雏形）",
+          "剧毒獠牙",
+          "闪电突袭",
+          "百毒不侵"
+        ]
+      }
+    }
+  }
+}

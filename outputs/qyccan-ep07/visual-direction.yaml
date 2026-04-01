@@ -1,0 +1,311 @@
+---
+# Visual Direction - qyccan-ep07
+# 视觉指导文件 - 开局青玉蚕 第7集
+# 生成时间: 2026-04-01
+# 基于: outputs/qyccan-ep07/render-script.md + state/ontology/ep07-world-model.json
+
+episode_id: "qyccan-ep07"
+episode_title: "吞噬！进阶三阶！"
+total_shots: 12
+estimated_duration: 180
+
+shots:
+  - shot_id: "qyccan-ep07-shot-01"
+    scene_description: "叶红衣剑指叶如烟，双方对峙，叶如烟眼神疯狂"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        must_preserve: ["红衣", "高挑纤细", "持剑姿态"]
+      - character_id: "yeruyan"
+        character_name: "叶如烟"
+        variant_id: "default"
+        must_preserve: ["华贵服饰", "疯狂眼神"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      叶红衣身着红衣高举长剑指向对面，眼神坚定冷静，对面叶如烟华贵服饰，眼中闪过疯狂之色，
+      背景是阳光下的擂台，观众席人头攒动，
+      中景镜头，平视角度，静止，
+      玄幻武侠风格，阳光直射，紧张对峙氛围，
+      4K超清，电影级画质，细腻光影
+    has_dialogue: true
+
+  - shot_id: "qyccan-ep07-shot-02"
+    scene_description: "叶如烟捏碎狂暴丹，红色雾气笼罩双头魔狼"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "yeruyan"
+        character_name: "叶如烟"
+        variant_id: "default"
+        must_preserve: ["华贵服饰", "狂笑表情"]
+      - character_id: "shuangtou_molang"
+        character_name: "双头魔狼"
+        variant_id: "default"
+        must_preserve: ["双头", "红色雾气笼罩"]
+    camera:
+      shot_size: "full_shot"
+      angle: "slightly_low"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      叶如烟手握红色珠子捏碎，一股狂暴红色雾气从手中喷涌而出，笼罩旁边的双头魔狼，
+      双头魔狼双眼渐渐变成血红，体型膨胀，擂台上烟雾弥漫，
+      全景镜头，略低角度，静止，
+      玄幻风格，红色魔气特效，压迫氛围，
+      4K超清，电影级画质，魔气粒子效果
+    has_dialogue: true
+
+  - shot_id: "qyccan-ep07-shot-03"
+    scene_description: "长老席众人惊呼禁药，暴走双头魔狼体型膨胀狂吼"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "elders"
+        character_name: "长老席"
+        variant_id: "default"
+        must_preserve: ["多名长老", "惊呼表情"]
+      - character_id: "shuangtou_molang"
+        character_name: "双头魔狼"
+        variant_id: "berserk"
+        must_preserve: ["双头", "血红眼睛", "体型膨胀", "狂暴状态"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "slightly_low"
+      movement: "pan"
+    duration: 8
+    seedance_prompt: |
+      评判席上众长老面色大变惊呼指点，擂台中央血眼双头巨狼体型膨胀为两倍，张开双嘴狂嚎，
+      观众席人群向后退散，
+      中景镜头，略低角度，平移运镜，
+      玄幻风格，压迫恐惧氛围，狂暴特效，
+      4K超清，电影级画质，细腻动态
+    has_dialogue: true
+
+  - shot_id: "qyccan-ep07-shot-04"
+    scene_description: "暴走魔狼极速扑向苏夜，苏夜被拍飞撞在护栏"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "bilinse"
+        must_preserve: ["碧绿鳞片", "小蛇形态", "金色瞳孔"]
+      - character_id: "shuangtou_molang"
+        character_name: "双头魔狼"
+        variant_id: "berserk"
+        must_preserve: ["双头", "血红眼睛", "体型膨胀"]
+    camera:
+      shot_size: "wide_shot"
+      angle: "low_angle"
+      movement: "tracking"
+    duration: 8
+    seedance_prompt: |
+      血眼双头巨狼以极快速度冲向小蛇苏夜，一爪拍出，苏夜碧绿小蛇身形被弹射撞在擂台护栏上，几片碧绿鳞片飞溅，
+      擂台边缘护栏震动，
+      广角镜头，低角度，追踪运镜，
+      玄幻风格，快速动作冲击感，
+      4K超清，电影级画质，动态模糊
+    has_dialogue: true
+
+  - shot_id: "qyccan-ep07-shot-05"
+    scene_description: "苏夜怒起，决意不装，弹射而出缠绕魔狼颈部"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "bilinse"
+        must_preserve: ["碧绿鳞片", "金色瞳孔", "愤怒表情"]
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "dolly"
+    duration: 10
+    seedance_prompt: |
+      碧绿小蛇苏夜金色瞳孔中燃起怒火，身体骤然弹射而出如绿色闪电，灵活缠绕上暴走魔狼的颈部，
+      系统文字提示浮现，
+      特写镜头，平视角度，推进运镜，
+      玄幻风格，高速动作，决意出击，
+      4K超清，电影级画质，运动感
+    has_dialogue: true
+
+  - shot_id: "qyccan-ep07-shot-06"
+    scene_description: "苏夜死死缠绕魔狼颈部绞杀，毒牙刺入腹部吞噬狂暴能量"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "bilinse"
+        must_preserve: ["碧绿鳞片", "金色瞳孔"]
+      - character_id: "shuangtou_molang"
+        character_name: "双头魔狼"
+        variant_id: "berserk"
+        must_preserve: ["双头", "体型庞大"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      碧绿小蛇像绳索一样死死缠绕住暴走双头魔狼的颈部，魔狼疯狂挣扎，小蛇毒牙刺入魔狼腹部，红色能量如流水顺着牙齿流向蛇身，
+      擂台烟尘弥漫，
+      中景镜头，平视角度，静止，
+      玄幻风格，能量吸取特效，紧张战斗，
+      4K超清，电影级画质，细腻光影
+    has_dialogue: true
+
+  - shot_id: "qyccan-ep07-shot-07"
+    scene_description: "魔狼动作越来越慢，苏夜身上碧绿鳞片出现黑色纹路，开始发光"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "bilinse"
+        must_preserve: ["碧绿鳞片", "黑色纹路出现", "发光特效"]
+    camera:
+      shot_size: "close_up"
+      angle: "low_angle"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      缠绕在魔狼身上的小蛇苏夜，碧绿鳞片上逐渐浮现出黑色纹路，全身散发出神秘光芒，系统进化提示文字爆闪，
+      魔狼动作越来越迟缓，
+      特写镜头，仰视角度，静止，
+      玄幻风格，进化光效，蜕变特效，
+      4K超清，电影级画质，神秘光晕
+    has_dialogue: false
+
+  - shot_id: "qyccan-ep07-shot-08"
+    scene_description: "一股气浪炸开，烟尘中进化能量爆发，魔狼瘫倒"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "shuangtou_molang"
+        character_name: "双头魔狼"
+        variant_id: "defeated"
+        must_preserve: ["倒地姿态", "灵力散尽"]
+    camera:
+      shot_size: "wide_shot"
+      angle: "high_angle"
+      movement: "crane"
+    duration: 8
+    seedance_prompt: |
+      擂台中央爆发出一股强烈气浪，烟尘四溅，双头魔狼精力耗尽缓缓瘫倒在地，光芒逐渐消散，
+      观众席人群惊呼后退，
+      广角镜头，俯视角度，升降运镜，
+      玄幻风格，爆炸气浪，震撼特效，
+      4K超清，电影级画质，宏大镜头
+    has_dialogue: false
+
+  - shot_id: "qyccan-ep07-shot-09"
+    scene_description: "烟尘中玄冥黑金蟒缓缓抬头，三米黑金巨蟒震慑全场"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        must_preserve: ["漆黑巨蟒", "三米体长", "金色纹路", "头顶两个小鼓包", "金色瞳孔", "威严"]
+    camera:
+      shot_size: "full_shot"
+      angle: "low_angle"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      烟尘中一条长达三米的漆黑巨蟒缓缓抬起头，鳞片泛着金色纹路，头顶有两个小鼓包，金色瞳孔冷冷扫视全场，气息威压弥漫，
+      擂台上残余烟尘缭绕，
+      全景镜头，仰视角度，静止，
+      玄幻风格，威压气息，震慑氛围，帝王气势，
+      4K超清，电影级画质，史诗级登场
+    has_dialogue: false
+
+  - shot_id: "qyccan-ep07-shot-10"
+    scene_description: "长老席大惊失色，认出气息接近三阶地煞级妖兽"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "elders"
+        character_name: "长老席"
+        variant_id: "default"
+        must_preserve: ["惊骇表情", "多名长老"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "pan"
+    duration: 8
+    seedance_prompt: |
+      评判席众长老面色惨白惊骇万分，有人颤抖着手指向擂台中央，眼中满是震惊与恐惧，窃窃私语，
+      座位区人群向后退缩，
+      中景镜头，平视角度，平移运镜，
+      玄幻风格，震惊恐惧氛围，
+      4K超清，电影级画质，细腻表情
+    has_dialogue: true
+
+  - shot_id: "qyccan-ep07-shot-11"
+    scene_description: "叶红衣惊喜回望，苏夜回头第一次开口说话"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        must_preserve: ["红衣", "惊喜表情"]
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        must_preserve: ["漆黑巨蟒", "金色纹路", "头顶小鼓包", "金色瞳孔"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶红衣满脸惊喜地望向身旁的漆黑巨蟒，巨蟒缓缓回过头，金色瞳孔对视，嘴唇微动，
+      擂台背景，阳光洒落，
+      中景镜头，平视角度，静止，
+      玄幻风格，温馨感动瞬间，光芒柔和，
+      4K超清，电影级画质，情感特写
+    has_dialogue: true
+
+  - shot_id: "qyccan-ep07-shot-12"
+    scene_description: "全场震惊，蛇开口说话，苏夜威严宣告自己名字"
+    location:
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        must_preserve: ["漆黑巨蟒", "金色纹路", "威严霸气", "头顶小鼓包", "金色瞳孔"]
+    camera:
+      shot_size: "close_up"
+      angle: "low_angle"
+      movement: "dolly"
+    duration: 10
+    seedance_prompt: |
+      漆黑巨蟒苏夜抬起头，金色瞳孔中流露出傲然与不屑，嘴唇微动说出话语，周围人群愕然惊呼，
+      镜头从低角度缓缓推进巨蟒头部特写，
+      特写镜头，仰视角度，推进运镜，
+      玄幻风格，帝王降临，霸气宣言，
+      4K超清，电影级画质，震撼收尾
+    has_dialogue: true

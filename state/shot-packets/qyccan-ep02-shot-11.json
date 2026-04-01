@@ -1,0 +1,65 @@
+{
+  "shot_id": "qyccan-ep02-shot-11",
+  "episode": "qyccan-ep02",
+  "scene_id": "ye_family_gate",
+  "shot_number": 11,
+  "scene_goal": "赵无极愤怒，叶红衣慌乱应对，反差喜剧效果",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "zhaowuji",
+      "state_ref": "赵无极@qyccan-ep02-shot-11",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": ["衣着华丽"],
+      "current_state": {
+        "form": "人形",
+        "costume": "华丽公子服",
+        "injury": "none",
+        "emotion": "大怒，愤怒指向苏夜",
+        "props_in_possession": ["折扇"],
+        "knowledge": ["聚灵佩被偷"]
+      }
+    },
+    {
+      "id": "yehongyi",
+      "state_ref": "叶红衣@qyccan-ep02-shot-11",
+      "variant": "default",
+      "ref_assets": ["assets/characters/images/叶红衣-front.png"],
+      "must_preserve": ["红衣"],
+      "current_state": {
+        "form": "人形",
+        "costume": "红衣",
+        "injury": "轻伤",
+        "emotion": "脸色苍白，不知所措",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶家大门",
+    "time_of_day": "day",
+    "ref_assets": ["assets/scenes/images/叶家府邸-day.png"]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/叶红衣-front.png",
+      "assets/scenes/images/叶家府邸-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "赵无极大怒指向地上的青玉蚕，叶红衣脸色苍白不知所措，围观群众惊讶后退，叶家府邸背景，中景镜头，平视角度，静止，玄幻风格，冲突紧张，自然光，高清画质，4K超清，电影级画质，人物情绪对比强烈"
+  },
+  "forbidden_changes": ["叶红衣必须穿红衣"],
+  "repair_policy": {"max_retries": 3, "prefer_local_edit": true},
+  "ontology_constraints": {"world_rules": [], "character_abilities": {}}
+}

@@ -1,0 +1,422 @@
+---
+# Visual Direction - qyccan-ep04
+# 视觉指导文件 - 开局青玉蚕 第4集
+# 生成时间: 2026-04-01
+# 基于: outputs/qyccan-ep04/render-script.md（合规版）
+# 苏夜 ep03-06 使用 variant_id: "snake_green"（碧鳞蛇）
+
+episode_id: "qyccan-ep04"
+episode_title: "其实我是一条有文化的蛇"
+total_shots: 12
+estimated_duration: 162
+
+shots:
+  - shot_id: "qyccan-ep04-shot-01"
+    scene_description: "夜晚，叶红衣闺房，叶红衣打坐修炼，苏夜旁观"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "打坐修炼，眉头紧锁，神情痛苦"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "盘在枕头上，眯眼旁观"
+        must_preserve: ["碧绿色鳞片", "金色瞳孔"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      简陋闺房夜色，叶红衣盘腿打坐，神情痛苦，眉头紧锁，
+      枕头上盘着一条碧绿小蛇，金色瞳孔悄悄注视着她，
+      烛火摇曳，昏暗室内，柔和烛光，
+      中景镜头，平视角度，静止，
+      玄幻风格，烛光氛围，安静紧张，高清画质，
+      4K超清，电影级画质，光影细腻
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/scenes/images/叶红衣闺房-night.png"
+
+  - shot_id: "qyccan-ep04-shot-02"
+    scene_description: "叶红衣喷出黑血倒下，苏夜察觉"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "喷出黑血，虚弱倒下"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "猛地睁大眼，警觉"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶红衣突然喷出一口黑色的血，身体无力地倒在床上，
+      碧绿小蛇猛地睁开金色瞳孔，警觉抬起头，
+      烛光摇曳，室内昏暗，黑色毒气隐约从叶红衣体内散出，
+      中景镜头，平视角度，静止，
+      玄幻风格，毒素黑气特效，紧张气氛，高清画质，
+      4K超清，电影级画质，危机感强烈
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "毒……"
+      - character: "苏夜"
+        text: "毒？"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/scenes/images/叶红衣闺房-night.png"
+
+  - shot_id: "qyccan-ep04-shot-03"
+    scene_description: "系统检测毒素，苏夜决定吸毒"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "眼神一冷，快速思考"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      碧绿小蛇金色瞳孔闪烁，系统UI浮现：检测到噬灵散毒素，盘踞心脉，
+      小蛇眼神一冷，快速向叶红衣靠近，
+      特写镜头，平视角度，静止，
+      玄幻风格，系统UI特效，决断气息，烛光，高清画质，
+      4K超清，电影级画质，细节丰富
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-bilinse-front.png"
+
+  - shot_id: "qyccan-ep04-shot-04"
+    scene_description: "苏夜吸取毒气，黑色毒气被吸入体内"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "靠近叶红衣心脉处，吸吮黑色毒气"
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "昏迷，黑气从体内被抽出"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 15
+    seedance_prompt: |
+      碧绿小蛇靠近叶红衣，张嘴吸取从她体内溢出的黑色毒气，
+      黑色丝缕毒气被一点一点吸入蛇口，叶红衣脸色渐渐好转，
+      特效：X光透视感，黑色毒气如线条被引出，
+      特写镜头，平视角度，静止，
+      玄幻风格，吸毒特效，黑气流动，高清画质，
+      4K超清，电影级画质，毒素特效细腻
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/characters/images/叶红衣-front.png"
+
+  - shot_id: "qyccan-ep04-shot-05"
+    scene_description: "系统提示获得技能，苏夜完成解毒"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "肚子鼓鼓，满足打毒嗝"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      碧绿小蛇肚子微微鼓起，满足地打了个嗝，绿光从口中溢出，
+      系统UI浮现：吞噬噬灵散毒素，进化点+5+5+5，获得：百毒不侵，
+      特写镜头，平视角度，静止，
+      玄幻风格，技能获得特效，成就感，高清画质，
+      4K超清，电影级画质，轻松收尾
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-bilinse-front.png"
+
+  - shot_id: "qyccan-ep04-shot-06"
+    scene_description: "叶红衣醒来，发现苏夜，感激"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "缓缓醒来，气色红润，震惊看向苏夜"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "四仰八叉躺在旁边，肚子鼓鼓，一脸满足"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶红衣缓缓睁开眼，气色红润了许多，看向旁边四仰八叉躺着的碧绿小蛇，
+      小蛇肚子鼓鼓的，一脸满足，翻了个肚皮，
+      闺房烛光昏黄，夜色温暖，
+      中景镜头，平视角度，静止，
+      玄幻风格，温馨烛光，感激氛围，高清画质，
+      4K超清，电影级画质，人物互动温情
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "是你……帮我吸了毒？"
+      - character: "苏夜"
+        text: "嗝~不用谢。"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/scenes/images/叶红衣闺房-night.png"
+
+  - shot_id: "qyccan-ep04-shot-07"
+    scene_description: "叶红衣感激捧起苏夜，想给起名"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "眼含泪光，捧起苏夜贴脸"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "被贴脸，挣扎抗议"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶红衣眼含泪光，双手捧起碧绿小蛇贴在脸上蹭，
+      小蛇拼命挣扎，不满地扭动身子，
+      特写镜头，平视角度，静止，
+      玄幻风格，温馨搞笑，烛光柔和，高清画质，
+      4K超清，电影级画质，人物表情细腻
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "原来你这么厉害！以后你就叫小青吧！"
+      - character: "苏夜"
+        text: "我叫苏夜！"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-bilinse-front.png"
+
+  - shot_id: "qyccan-ep04-shot-08"
+    scene_description: "苏夜挣扎抗议被叫小青"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "全力挣扎，眼神无奈"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      碧绿小蛇在叶红衣手心拼命扭动，嘶嘶声不断，金色瞳孔透出无奈，
+      叶红衣继续开心地蹭，完全无视抗议，
+      特写镜头，平视角度，静止，
+      玄幻风格，喜剧节奏，温馨，高清画质，
+      4K超清，电影级画质，搞笑互动
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-bilinse-front.png"
+
+  - shot_id: "qyccan-ep04-shot-09"
+    scene_description: "门外传来敲门声，叶如烟声音阴阳怪气"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "神情警惕，看向门口"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "眼神一冷，竖起头"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      闺房房门处，隐约看到门缝透出走廊的光，
+      叶红衣和碧绿小蛇同时侧头看向门口，小蛇眼神一冷，
+      门缝中透出阴柔的声音，阴阳怪气，
+      中景镜头，平视角度，静止，
+      玄幻风格，紧张预感，烛光昏黄，高清画质，
+      4K超清，电影级画质，悬念收尾
+    has_dialogue: true
+    dialogue:
+      - character: "叶如烟"
+        text: "姐姐，听说你回来了？妹妹特意送来了一碗安神汤。"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/scenes/images/叶红衣闺房-night.png"
+
+  - shot_id: "qyccan-ep04-shot-10"
+    scene_description: "苏夜眼神冷锐，察觉来者不善"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "眼神冷锐，嗅了嗅空气"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      碧绿小蛇的金色瞳孔冷锐地盯着门口，轻嗅空气，
+      眼中闪过一丝警惕和嘲讽，
+      特写镜头，平视角度，静止，
+      玄幻风格，警觉氛围，烛光，高清画质，
+      4K超清，电影级画质，眼神特写传神
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "来者不善。"
+    reference_images:
+      - "assets/characters/images/苏夜-bilinse-front.png"
+
+  - shot_id: "qyccan-ep04-shot-11"
+    scene_description: "叶如烟出现，端着汤碗，妖冶算计"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "yeruyan"
+        character_name: "叶如烟"
+        variant_id: "default"
+        state: "端着药碗走进来，假笑，眼神算计"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶如烟推门走进来，妆容妖冶，眼神带着算计，
+      手端一碗冒热气的汤，嘴角挂着假笑，
+      闺房背景，烛光昏暗，
+      中景镜头，平视角度，静止，
+      玄幻风格，算计气息，烛光氛围，高清画质，
+      4K超清，电影级画质，反派登场
+    has_dialogue: true
+    dialogue:
+      - character: "叶如烟"
+        text: "姐姐，听说你为了拒婚，契约了一条蚕子？真是给叶家丢脸呢。"
+    reference_images:
+      - "assets/characters/images/叶如烟-turnaround.png"
+      - "assets/scenes/images/叶红衣闺房-night.png"
+
+  - shot_id: "qyccan-ep04-shot-12"
+    scene_description: "叶红衣和苏夜对视，叶如烟强迫递汤"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "night"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "冷漠，拒绝接汤"
+      - character_id: "yeruyan"
+        character_name: "叶如烟"
+        variant_id: "default"
+        state: "假笑，强行递碗"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "盯着那碗汤，眼神冷冽"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 13
+    seedance_prompt: |
+      叶如烟将汤碗强行递向叶红衣，叶红衣冷漠拒绝，
+      肩头的碧绿小蛇死死盯着那碗汤，金色瞳孔闪烁危险的光，
+      三人对峙，烛光摇曳，
+      中景镜头，平视角度，静止，
+      玄幻风格，紧张对峙，阴谋氛围，高清画质，
+      4K超清，电影级画质，悬念收尾
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "不必了。"
+      - character: "叶如烟"
+        text: "这可是爹爹特意吩咐的，姐姐不喝，就是不孝哦。"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/叶如烟-turnaround.png"
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/scenes/images/叶红衣闺房-night.png"
+
+---
+# 视觉指导说明
+
+## 角色变体使用
+- 苏夜全集使用 variant_id: "snake_green"（碧鳞蛇，ep03进化后）
+- 叶红衣全集使用 variant_id: "default"
+- 叶如烟 shot-11、12 登场，使用 variant_id: "default"
+
+## 场景时间
+- 全集在叶红衣闺房 time_of_day: "night"（夜晚）
+
+## 合规注意
+- 本集已大幅改写原始剧本性暗示内容，视觉指导不含任何裸露/色情元素
+- 苏夜解毒场景为特效画面，以黑气流动表达，无身体接触特写

@@ -1,0 +1,68 @@
+{
+  "shot_id": "qyccan-ep07-shot-12",
+  "episode": "qyccan-ep07",
+  "scene_id": "arena",
+  "shot_number": 12,
+  "scene_goal": "苏夜第一次开口宣告名字，全场震惊，集末高光",
+  "duration_sec": 10,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "suye",
+      "variant": "xuanming_python",
+      "ref_assets": [
+        "assets/packs/characters/suye-xuanmingmang-front.png",
+        "assets/packs/characters/suye-xuanmingmang-side.png",
+        "assets/packs/characters/suye-xuanmingmang-back.png"
+      ],
+      "must_preserve": ["漆黑巨蟒", "金色纹路", "威严霸气", "头顶小鼓包", "金色瞳孔"],
+      "current_state": {
+        "form": "玄冥黑金蟒",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "傲慢不屑",
+        "props_in_possession": [],
+        "knowledge": ["获得说话能力", "正式宣告自己名字"]
+      }
+    }
+  ],
+  "background": {
+    "location": "擂台",
+    "time_of_day": "day",
+    "ref_assets": []
+  },
+  "camera": {
+    "shot_size": "close_up",
+    "angle": "low_angle",
+    "movement": "dolly",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/packs/characters/suye-xuanmingmang-front.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "漆黑巨蟒苏夜抬起头，金色瞳孔中流露出傲然与不屑，嘴唇微动说出话语，周围人群愕然惊呼，镜头从低角度缓缓推进巨蟒头部特写，特写镜头，仰视角度，推进运镜，玄幻风格，帝王降临，霸气宣言，4K超清，电影级画质，震撼收尾"
+  },
+  "forbidden_changes": [
+    "苏夜必须是漆黑巨蟒，金色纹路清晰",
+    "头部特写必须彰显威严气势",
+    "不要让苏夜显得弱小"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": ["血脉压制：高等血脉对低等血脉有天然压制作用"],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "玄冥黑金蟒（地煞级）",
+        "active_abilities": ["龙威迫人", "可以说话", "玄冥之力"]
+      }
+    }
+  }
+}

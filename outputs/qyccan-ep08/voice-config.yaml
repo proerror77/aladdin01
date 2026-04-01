@@ -1,0 +1,27 @@
+episode: "qyccan-ep08"
+tts_platform: "pending"
+voices:
+  - character: "叶红衣"
+    voice_id: "zh_female_01"
+    style: "清冷娇柔"
+    note: "冷漠施压→真心笑容；有情绪变化"
+
+  - character: "苏夜"
+    voice_id: "zh_male_低沉冷静"
+    style: "青年男性 / 低沉沙哑冷静"
+    note: "玄冥蟒形态，低沉威压；腹黑嘴炮；威慑叶家；夜间与叶红衣对话"
+
+  - character: "叶家家主"
+    voice_id: "zh_male_06"
+    style: "中年男性 / 威严"
+    note: "谄媚讨好→惊吓哆嗦"
+
+  - character: "叶家大长老"
+    voice_id: "zh_male_07"
+    style: "老年男性 / 威严沉稳"
+    note: "顽固愤怒→心痛→被按住"
+
+  - character: "系统"
+    voice_id: "zh_system_01"
+    style: "无性别 / 机械提示音"
+    note: "炸响提示音，无感情"

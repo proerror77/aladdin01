@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S /Users/proerror/Documents/aladdin01/.venv/bin/python
 """
 vectordb-manager.py — LanceDB 向量库管理
 
@@ -236,7 +236,17 @@ def cmd_upsert_world_model(args):
         print(f"✓ 写入实体: {len(entity_rows)} 条（episode={episode}）")
 
     # ── 关系 ──────────────────────────────────────────────
-    relations = wm.get("relationships", [])
+    # relationships 可能是 dict{type: []} 或 list[]
+    raw_rels = wm.get("relationships", {})
+    if isinstance(raw_rels, dict):
+        relations = []
+        for rel_type, items in raw_rels.items():
+            if isinstance(items, list):
+                for item in items:
+                    item.setdefault("type", rel_type)
+                    relations.append(item)
+    else:
+        relations = raw_rels
     rel_rows = []
     for r in relations:
         desc = f"{r.get('from', '')} {r.get('relation', '')} {r.get('to', '')}"

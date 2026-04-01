@@ -1,0 +1,281 @@
+{
+  "world_id": "qyccan-ep10",
+  "episode": "ep10",
+  "created_at": "2026-04-01T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "xuanming_python",
+        "variants": {
+          "xuanming_python": {
+            "variant_id": "xuanming_python",
+            "label": "玄冥黑金蟒（全形态 + 缩小态）",
+            "appearance": "全形态三米漆黑巨蟒，鳞片泛金色纹路，头顶两个小鼓包，金色瞳孔；缩小态如拳头大小。",
+            "tags": ["地煞级", "巨蟒", "威压", "可说话", "大小如意", "魔气吞噬"]
+          }
+        },
+        "physical": {"size": "可变", "weight": "可变", "mobility": "黑色闪电级", "durability": "强韧"},
+        "abilities": [
+          {"name": "吞天口", "type": "active", "description": "张嘴吞噬一切", "unlock_episode": "ep01"},
+          {"name": "无限吞噬进化", "type": "passive", "description": "吞噬获得进化点", "unlock_episode": "ep01"},
+          {"name": "可以说话", "type": "passive", "description": "声音低沉沙哑", "unlock_episode": "ep07"},
+          {"name": "大小如意", "type": "active", "description": "随意缩放身体", "unlock_episode": "ep06"},
+          {"name": "龙威迫人", "type": "passive", "description": "地煞级气息威压", "unlock_episode": "ep07"},
+          {"name": "魔气吞噬", "type": "active", "description": "吸取灵兽体内灵力，使其萎靡不振甚至品阶倒退", "unlock_episode": "ep10"},
+          {"name": "气运吞噬", "type": "active", "description": "吞噬气运之子的机缘", "unlock_episode": "ep09"}
+        ],
+        "constraints": [],
+        "evolution_timeline": [
+          {"episode": "ep07", "form": "玄冥黑金蟒", "trigger": "吞噬双头魔狼妖丹"}
+        ]
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "physical": {"height": "高挑", "build": "纤细", "clothing": "红衣"},
+        "abilities": [
+          {"name": "天风学院核心院特招生", "type": "passive", "description": "ep09特招进核心院"}
+        ],
+        "constraints": []
+      },
+      {
+        "id": "wangpangzi",
+        "name": "王胖子",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"height": "矮胖", "build": "肥胖可爱", "clothing": "学院服"},
+        "abilities": [],
+        "constraints": []
+      },
+      {
+        "id": "xiaofan",
+        "name": "萧凡",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"height": "中等偏高", "build": "健壮", "clothing": "朴素布衣"},
+        "abilities": [
+          {"name": "剑术", "type": "active", "description": "名门正道剑法"},
+          {"name": "正道之光", "type": "passive", "description": "浑身散发正道气息"}
+        ],
+        "constraints": [
+          {"type": "power_gap", "description": "ep10时无法独立抗衡苏夜，被戒指老爷爷拦住"}
+        ]
+      },
+      {
+        "id": "qinger",
+        "name": "青儿",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"height": "纤细", "build": "清冷绝美", "clothing": "素衣"},
+        "abilities": [],
+        "constraints": []
+      },
+      {
+        "id": "ring_elder",
+        "name": "戒指老爷爷",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"form": "无实体，萧凡戒指里的灵魂，混响声音"},
+        "abilities": [
+          {"name": "审时度势", "type": "active", "description": "识别苏夜实力，劝阻萧凡直接冲突"}
+        ],
+        "constraints": [{"type": "form", "description": "只有萧凡能听到"}]
+      },
+      {
+        "id": "system",
+        "name": "系统",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"form": "无实体，只有声音"},
+        "abilities": [{"name": "机缘检测", "type": "active", "description": "检测萧凡的机缘，提示苏夜抢夺"}],
+        "constraints": [{"type": "interaction", "description": "只能与苏夜沟通"}]
+      },
+      {
+        "id": "senior_a",
+        "name": "学长A",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": {"form": "高年级男生，嚣张"},
+        "fate": "ep10被苏夜抽脸，灵力被吸干"
+      },
+      {
+        "id": "senior_b",
+        "name": "学长B",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": {"form": "高年级男生，愤怒"},
+        "fate": "ep10召唤灵兽被苏夜吸干灵力"
+      }
+    ],
+    "locations": [
+      {
+        "id": "academy_dorm",
+        "name": "聚灵阁（宿舍区）",
+        "type": "outdoor_indoor",
+        "spatial": {
+          "size": "medium",
+          "terrain": "学院宿舍楼",
+          "features": ["聚灵阁大门", "灵泉眼（地下）", "宿舍楼入口"],
+          "danger_level": "medium"
+        },
+        "temporal_variants": {
+          "day": {
+            "lighting": "阳光明媚",
+            "atmosphere": "激烈竞争"
+          }
+        },
+        "contains": ["叶红衣", "苏夜", "王胖子", "学长们", "萧凡", "青儿"],
+        "significance": "ep10主场景，苏夜抢占聚灵阁灵泉眼，吸干学长灵力"
+      }
+    ],
+    "props": [
+      {
+        "id": "juling_ge",
+        "name": "聚灵阁",
+        "description": "天风学院最好的宿舍，灵气最浓，阁楼下有灵泉眼，是新生最大机缘",
+        "owner": "suye（夺取）",
+        "condition": "occupied",
+        "significance": "苏夜抢夺萧凡第一个机缘，占领聚灵阁",
+        "states": {
+          "vacant": "原本被高年级学长占据",
+          "occupied": "ep10被苏夜强占"
+        }
+      },
+      {
+        "id": "spirit_artifact",
+        "name": "黑猩猩颈上灵器",
+        "description": "学长黑猩猩灵兽颈上闪闪发光的灵器",
+        "owner": "suye（夺取）",
+        "condition": "consumed",
+        "significance": "苏夜当场吞下，进化点增加",
+        "states": {
+          "intact": "黑猩猩灵兽颈上",
+          "consumed": "ep10被苏夜扯下并吞噬"
+        }
+      }
+    ]
+  },
+  "relationships": {
+    "social": [
+      {
+        "type": "contract",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "契约关系，生死与共",
+        "established": "ep01",
+        "strength": "unbreakable"
+      },
+      {
+        "type": "ally",
+        "from": "wangpangzi",
+        "to": "yehongyi",
+        "description": "王胖子作为新朋友，与叶红衣一起争夺聚灵阁",
+        "established": "ep10"
+      },
+      {
+        "type": "intensified_rivalry",
+        "from": "xiaofan",
+        "to": "suye",
+        "description": "苏夜抢了萧凡的机缘，萧凡发誓铲除苏夜和叶红衣",
+        "established": "ep10"
+      },
+      {
+        "type": "guidance",
+        "from": "ring_elder",
+        "to": "xiaofan",
+        "description": "戒指老爷爷拦住萧凡，防止正面冲突",
+        "established": "ep09",
+        "strength": "permanent"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "occupies",
+        "from": "suye",
+        "to": "academy_dorm",
+        "description": "苏夜强占聚灵阁门口，如同门神",
+        "established": "ep10"
+      }
+    ],
+    "causal": [
+      {
+        "type": "triggers",
+        "from": "system_alert_xiaofan_yunjie",
+        "to": "suye_grab_juling",
+        "description": "系统提示萧凡机缘在聚灵阁，苏夜立即抢占",
+        "episode": "ep10"
+      },
+      {
+        "type": "triggers",
+        "from": "senior_block",
+        "to": "suye_counterattack",
+        "description": "学长阻拦，触发苏夜展示魔气吞噬新能力",
+        "episode": "ep10"
+      },
+      {
+        "type": "triggers",
+        "from": "xiaofan_humiliation",
+        "to": "xiaofan_revenge_oath",
+        "description": "苏夜抢走机缘并嘲讽，萧凡立誓复仇",
+        "episode": "ep10"
+      }
+    ],
+    "temporal": [
+      {
+        "type": "before",
+        "event_a": "arrive_dorm",
+        "event_b": "senior_confrontation",
+        "description": "到达宿舍区先于与学长冲突"
+      },
+      {
+        "type": "after",
+        "event_a": "seniors_defeated",
+        "event_b": "xiaofan_oath",
+        "description": "学长被击败后萧凡发誓"
+      }
+    ]
+  },
+  "physics": {
+    "gravity": "normal",
+    "magic_system": {
+      "type": "cultivation",
+      "description": "修炼需要灵气，灵兽可以进化",
+      "rules": [
+        "吞噬可以获得能力和进化点",
+        "魔气吞噬可直接吸取灵兽灵力",
+        "灵兽品阶被吸干可能倒退",
+        "契约关系生死与共，不可解除",
+        "天风学院宿舍靠抢"
+      ]
+    },
+    "power_scaling": "strict",
+    "energy_system": {
+      "type": "spiritual_energy",
+      "sources": ["灵泉眼", "灵器", "地煞级灵兽灵力"],
+      "consumption": ["修炼", "战斗", "进化"]
+    }
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {"character": "suye", "constraint": "玄冥蟒形态可以说话，声音低沉沙哑", "active_episodes": ["ep10"]},
+      {"character": "xiaofan", "constraint": "ep10不能独自对抗苏夜，实力差距过大", "active_episodes": ["ep10"]}
+    ],
+    "ability_unlocks": [
+      {"character": "suye", "ability": "魔气吞噬", "unlock_episode": "ep10", "unlock_condition": "吸收ep09测灵石黑气后新能力首次实战使用"}
+    ],
+    "world_rules": [
+      {"rule": "契约不可解除", "description": "人类与灵兽的契约一旦建立，生死与共，不可解除"},
+      {"rule": "机缘可以抢夺", "description": "苏夜主动抢夺天命之子的机缘，走上反派之路"}
+    ],
+    "forbidden_changes": [
+      {"type": "character_death", "target": "suye", "reason": "主角不能死"},
+      {"type": "character_death", "target": "yehongyi", "reason": "女主角不能死"},
+      {"type": "character_death", "target": "xiaofan", "reason": "天命之子，长期对手，ep10不能死"}
+    ]
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "world_id": "qyccan-ep06",
+  "episode": "ep06",
+  "created_at": "2026-04-01T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "snake_green",
+        "variants": {
+          "snake_green": {
+            "variant_id": "snake_green",
+            "label": "碧鳞蛇（ep03进化后，ep06新解锁大小如意+龙威雏形）",
+            "appearance": "筷子长的小蛇（正常形态），使用大小如意后变成手臂粗细的蟒蛇，通体碧绿鳞片，金色瞳孔。",
+            "tags": ["灵智级", "毒蛇", "敏捷", "龙威雏形"]
+          }
+        },
+        "physical": {"size": "筷子长（正常）/手臂粗（大小如意后）", "weight": "极轻/变重", "mobility": "蛇形滑行/闪电突袭"},
+        "abilities": [
+          {"name": "吞天口", "type": "active", "unlock_episode": "ep01"},
+          {"name": "无限吞噬进化", "type": "passive", "unlock_episode": "ep01"},
+          {"name": "剧毒獠牙", "type": "active", "unlock_episode": "ep03"},
+          {"name": "闪电突袭", "type": "active", "unlock_episode": "ep03"},
+          {"name": "百毒不侵", "type": "passive", "unlock_episode": "ep04"},
+          {
+            "name": "大小如意",
+            "type": "active",
+            "description": "可在一定范围内改变自身体型大小，ep06首次使用时变成手臂粗细的蟒蛇",
+            "unlock_episode": "ep06",
+            "unlock_condition": "进化到一定程度自动解锁",
+            "constraints": ["变大程度有限（只能变大一点点）", "消耗体力"]
+          },
+          {
+            "name": "龙威",
+            "type": "passive",
+            "description": "修出龙威雏形，对低等级血脉有天然威压，令其恐惧臣服",
+            "unlock_episode": "ep06",
+            "unlock_condition": "修出龙威雏形",
+            "constraints": ["雏形阶段，威压范围有限"]
+          }
+        ],
+        "constraints": [
+          {"type": "communication", "description": "以嘶嘶声说话，OS内心独白", "active_until": "ep07"}
+        ],
+        "evolution_timeline": [
+          {"episode": "ep01", "form": "青玉蚕", "trigger": "重生"},
+          {"episode": "ep03", "form": "碧鳞蛇", "trigger": "吞噬聚灵佩"},
+          {"episode": "ep06", "form": "碧鳞蛇（龙威雏形）", "trigger": "修炼突破"},
+          {"episode": "ep07", "form": "玄冥黑金蟒", "trigger": "吞噬双头魔狼妖丹"}
+        ],
+        "ep_state": {
+          "abilities_unlocked_this_ep": ["大小如意", "龙威"],
+          "notable_action": "家族大比中用大小如意+尾巴抽飞双头魔狼，龙威压制啸月狼血统"
+        }
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "physical": {"height": "高挑", "build": "纤细", "clothing": "劲装（战斗装扮）"},
+        "abilities": [
+          {"name": "剑术", "type": "active", "constraints": ["灵根受损"]},
+          {"name": "训练后基础战力提升", "type": "passive", "description": "经过苏夜训练，基础反应和身法提升"}
+        ],
+        "constraints": [{"type": "power", "description": "灵根受损，灵力微弱", "active_until": "ep08"}]
+      },
+      {
+        "id": "yeruyan",
+        "name": "叶如烟",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"appearance": "戴着面纱遮疙瘩，得意", "build": "妖艳"},
+        "abilities": [
+          {"name": "双头魔狼召唤", "type": "active", "description": "契约二阶巅峰妖兽双头魔狼"}
+        ],
+        "constraints": [],
+        "ep_state": {
+          "notable_event": "家族大比擂台上被苏夜打败，叶红衣反击，彻底失势"
+        }
+      },
+      {
+        "id": "shuangtou_molang",
+        "name": "双头魔狼",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": {"build": "庞大双头狼", "special": "有啸月狼血统"},
+        "abilities": [
+          {"name": "双头咬击", "type": "active"},
+          {"name": "啸月狼血统", "type": "passive", "description": "二阶巅峰，气势压人"}
+        ],
+        "constraints": [],
+        "fate": "ep06被苏夜龙威压制，被苏夜尾巴抽飞，夹尾巴瑟瑟发抖，无法再战"
+      },
+      {
+        "id": "ye_family_head",
+        "name": "叶家家主",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": {"appearance": "长老装扮，表情严肃"},
+        "abilities": [],
+        "constraints": []
+      },
+      {
+        "id": "system",
+        "name": "系统",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {"form": "无实体，只有声音"},
+        "abilities": [{"name": "技能提示", "type": "passive"}],
+        "constraints": [{"type": "interaction", "description": "只能与苏夜沟通"}]
+      }
+    ],
+    "locations": [
+      {
+        "id": "arena",
+        "name": "擂台",
+        "type": "outdoor",
+        "spatial": {
+          "size": "large",
+          "terrain": "擂台比武场",
+          "features": ["擂台柱子", "观众台", "开阔战场"],
+          "danger_level": "high"
+        },
+        "temporal_variants": {
+          "day": {
+            "lighting": "正午阳光",
+            "atmosphere": "人山人海，紧张热烈"
+          }
+        },
+        "significance": "ep06全集场景，叶家家族大比，苏夜龙威首展"
+      }
+    ],
+    "props": []
+  },
+  "relationships": {
+    "social": [
+      {
+        "type": "contract",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "契约关系，生死与共",
+        "established": "ep01",
+        "strength": "unbreakable"
+      },
+      {
+        "type": "hostile",
+        "from": "yeruyan",
+        "to": "yehongyi",
+        "description": "家族大比公开对决，叶如烟意图彻底击败叶红衣",
+        "established": "ep05",
+        "resolved": "ep06"
+      },
+      {
+        "type": "summoned_by",
+        "from": "shuangtou_molang",
+        "to": "yeruyan",
+        "description": "叶如烟的契约灵兽",
+        "established": "ep06"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "all_at",
+        "from": "all_characters",
+        "to": "arena",
+        "description": "ep06全集在擂台",
+        "established": "ep06"
+      }
+    ],
+    "causal": [
+      {
+        "type": "triggers",
+        "from": "yehongyi_in_danger",
+        "to": "suye_use_dashou",
+        "description": "叶红衣被双头魔狼逼到绝境，苏夜使用大小如意变大出手",
+        "episode": "ep06"
+      },
+      {
+        "type": "triggers",
+        "from": "suye_tail_strike",
+        "to": "shuangtou_molang_fly",
+        "description": "苏夜尾巴抽在双头狼脑袋上，横飞撞柱",
+        "episode": "ep06"
+      },
+      {
+        "type": "triggers",
+        "from": "longwei_activation",
+        "to": "shuangtou_molang_submit",
+        "description": "苏夜发出龙威，双头魔狼血脉压制，夹尾巴瑟瑟发抖",
+        "episode": "ep06"
+      }
+    ],
+    "temporal": [
+      {
+        "type": "before",
+        "event_a": "suye_show_dashou",
+        "event_b": "longwei_reveal",
+        "description": "先使用大小如意变大，再发出龙威压制"
+      }
+    ]
+  },
+  "physics": {
+    "gravity": "normal",
+    "magic_system": {
+      "type": "cultivation",
+      "description": "修炼需要灵气",
+      "rules": [
+        "血脉压制：高等血脉（龙威）对低等血脉（啸月狼）有天然压制",
+        "大小如意：短时间内改变体型，消耗体力",
+        "灵兽等级严格：苏夜（灵智级）vs 双头魔狼（地煞级巅峰），血脉压制弥补等级差"
+      ]
+    },
+    "power_scaling": "strict",
+    "energy_system": {
+      "type": "spiritual_energy",
+      "sources": ["修炼积累"],
+      "consumption": ["战斗", "大小如意", "龙威"]
+    }
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {
+        "character": "suye",
+        "constraint": "碧鳞蛇形态，大小如意使用后体型暂时变成手臂粗细",
+        "active_episodes": ["ep06"]
+      }
+    ],
+    "ability_unlocks": [
+      {"character": "suye", "ability": "大小如意", "unlock_episode": "ep06"},
+      {"character": "suye", "ability": "龙威", "unlock_episode": "ep06"}
+    ],
+    "world_rules": [
+      {"rule": "血脉压制", "description": "龙威对啸月狼血统有天然压制作用"},
+      {"rule": "大小如意受限", "description": "ep06只能变大一点点（手臂粗），不是真正的大蟒蛇"},
+      {"rule": "契约不可解除", "description": "生死与共"}
+    ],
+    "forbidden_changes": [
+      {"type": "character_death", "target": "suye", "reason": "主角不能死"},
+      {"type": "character_death", "target": "yehongyi", "reason": "女主角不能死"},
+      {"type": "premature_evolution", "target": "suye", "reason": "苏夜ep06不进化为玄冥蟒，只是体型暂时变大"}
+    ]
+  }
+}

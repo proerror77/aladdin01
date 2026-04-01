@@ -1,0 +1,368 @@
+{
+  "world_id": "qyccan-ep08",
+  "episode": "ep08",
+  "created_at": "2026-04-01T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "xuanming_python",
+        "variants": {
+          "xuanming_python": {
+            "variant_id": "xuanming_python",
+            "label": "玄冥黑金蟒（ep07后常规形态）",
+            "appearance": "长达三米的漆黑巨蟒，鳞片泛着金色纹路，头顶有两个小鼓包，金色瞳孔，威严霸气。可缩小形态盘在叶红衣脖子上像黑项圈。",
+            "tags": ["地煞级", "巨蟒", "威压", "可说话", "大小如意"]
+          }
+        },
+        "physical": {
+          "size": "三米（全形）/缩小如项圈（迷你形态）",
+          "weight": "可变",
+          "mobility": "蜿蜒高速",
+          "durability": "强韧"
+        },
+        "abilities": [
+          {
+            "name": "吞天口",
+            "type": "active",
+            "description": "张嘴化作漆黑漩涡黑洞，可吞噬比自己大数倍的目标",
+            "unlock_episode": "ep01"
+          },
+          {
+            "name": "无限吞噬进化",
+            "type": "passive",
+            "description": "吞噬任何东西可获得进化点",
+            "unlock_episode": "ep01"
+          },
+          {
+            "name": "可以说话",
+            "type": "passive",
+            "description": "进化到玄冥蟒后获得说话能力，声音低沉沙哑",
+            "unlock_episode": "ep07"
+          },
+          {
+            "name": "大小如意",
+            "type": "active",
+            "description": "可随意缩小身体，迷你形态可盘在叶红衣脖子上",
+            "unlock_episode": "ep06"
+          },
+          {
+            "name": "龙威迫人",
+            "type": "passive",
+            "description": "散发出地煞级的气息，令低阶妖兽和人类本能畏惧",
+            "unlock_episode": "ep07"
+          },
+          {
+            "name": "玄冥之力",
+            "type": "active",
+            "description": "运用玄冥黑金血脉之力，可直接吸取妖兽能量",
+            "unlock_episode": "ep07"
+          }
+        ],
+        "constraints": [],
+        "evolution_timeline": [
+          {
+            "episode": "ep07",
+            "form": "玄冥黑金蟒",
+            "trigger": "吞噬双头魔狼妖丹和狂暴能量"
+          }
+        ]
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "physical": {
+          "height": "高挑",
+          "build": "纤细",
+          "clothing": "红衣"
+        },
+        "abilities": [
+          {
+            "name": "剑术",
+            "type": "active",
+            "description": "基础剑术",
+            "constraints": ["灵根受损，灵力微弱（ep08后解除）"]
+          },
+          {
+            "name": "威慑谈判",
+            "type": "active",
+            "description": "借助苏夜威名，强硬谈判要求十倍资源赔偿",
+            "unlock_episode": "ep08"
+          }
+        ],
+        "constraints": []
+      },
+      {
+        "id": "ye_patriarch",
+        "name": "叶家家主",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {
+          "height": "中等",
+          "build": "偏胖",
+          "clothing": "家主服饰"
+        },
+        "abilities": [],
+        "constraints": [
+          {
+            "type": "social",
+            "description": "见到苏夜威压后，由强硬转为讨好",
+            "active_from": "ep08"
+          }
+        ]
+      },
+      {
+        "id": "ye_elder",
+        "name": "叶家大长老",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {
+          "height": "高",
+          "build": "消瘦",
+          "clothing": "长老袍"
+        },
+        "abilities": [],
+        "constraints": [
+          {
+            "type": "stubborn",
+            "description": "顽固古板，不愿妥协，但惧怕苏夜",
+            "active_from": "ep08"
+          }
+        ]
+      },
+      {
+        "id": "system",
+        "name": "系统",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {
+          "form": "无实体，只有声音"
+        },
+        "abilities": [
+          {
+            "name": "进化点统计",
+            "type": "passive",
+            "description": "实时统计苏夜的进化点"
+          }
+        ],
+        "constraints": [
+          {
+            "type": "interaction",
+            "description": "只能与苏夜沟通，其他人听不到"
+          }
+        ]
+      }
+    ],
+    "locations": [
+      {
+        "id": "ye_family_hall",
+        "name": "叶家大厅",
+        "type": "indoor",
+        "spatial": {
+          "size": "large",
+          "terrain": "室内大厅",
+          "features": ["极品测灵玉雕", "家族徽章", "豪华陈设", "高位主座"],
+          "danger_level": "low"
+        },
+        "temporal_variants": {
+          "day": {
+            "lighting": "室内明亮灯光",
+            "atmosphere": "威严庄重"
+          }
+        },
+        "contains": ["叶家家主", "叶家大长老", "叶红衣", "苏夜"],
+        "significance": "ep08叶红衣带苏夜威慑叶家，索要十倍资源"
+      },
+      {
+        "id": "yehongyi_room",
+        "name": "叶红衣房间",
+        "type": "indoor",
+        "spatial": {
+          "size": "medium",
+          "terrain": "卧室",
+          "features": ["桌子", "灵石堆", "丹药堆"],
+          "danger_level": "none"
+        },
+        "temporal_variants": {
+          "night": {
+            "lighting": "室内烛光",
+            "atmosphere": "温馨私密"
+          }
+        },
+        "contains": ["叶红衣", "苏夜"],
+        "significance": "ep08苏夜与叶红衣私下交流，透露前世身份"
+      }
+    ],
+    "props": [
+      {
+        "id": "celing_jade",
+        "name": "极品测灵玉雕",
+        "description": "叶家大厅中央象征家族荣誉的极品测灵玉雕",
+        "owner": "ye_family",
+        "condition": "destroyed",
+        "significance": "苏夜尾巴一甩抽成粉末，震慑叶家",
+        "states": {
+          "intact": "完整玉雕，象征家族荣誉",
+          "destroyed": "ep08被苏夜尾巴抽碎成粉末"
+        }
+      },
+      {
+        "id": "lingshi_pile",
+        "name": "灵石堆",
+        "description": "叶家宝库中的大量灵石，十倍赔偿的一部分",
+        "owner": "yehongyi",
+        "condition": "intact",
+        "significance": "苏夜大量吞噬，进化点快速增加"
+      },
+      {
+        "id": "gaopin_danyao",
+        "name": "高阶丹药",
+        "description": "包含大长老那份高阶丹药，被划给叶红衣",
+        "owner": "yehongyi",
+        "condition": "consumed",
+        "significance": "苏夜当自助餐狂吃"
+      }
+    ]
+  },
+  "relationships": {
+    "social": [
+      {
+        "type": "contract",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "契约关系，叶红衣是契约主，苏夜是本命灵兽",
+        "established": "ep01",
+        "strength": "unbreakable"
+      },
+      {
+        "type": "intimidation",
+        "from": "suye",
+        "to": "ye_patriarch",
+        "description": "苏夜通过威慑迫使叶家家主开宝库十倍赔偿",
+        "established": "ep08"
+      },
+      {
+        "type": "intimidation",
+        "from": "suye",
+        "to": "ye_elder",
+        "description": "苏夜威胁大长老，将其彻底震慑",
+        "established": "ep08"
+      },
+      {
+        "type": "guidance",
+        "from": "system",
+        "to": "suye",
+        "description": "系统指导苏夜进化",
+        "established": "ep01",
+        "strength": "permanent"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "visits",
+        "from": "yehongyi",
+        "to": "ye_family_hall",
+        "description": "叶红衣带苏夜回叶家要求赔偿",
+        "established": "ep08"
+      },
+      {
+        "type": "contains",
+        "from": "yehongyi_room",
+        "to": "suye",
+        "description": "夜间苏夜在叶红衣房间吃资源",
+        "established": "ep08"
+      }
+    ],
+    "causal": [
+      {
+        "type": "triggers",
+        "from": "suye_intimidation",
+        "to": "family_compensation",
+        "description": "苏夜威慑导致叶家开宝库十倍赔偿",
+        "episode": "ep08"
+      },
+      {
+        "type": "enables",
+        "from": "resource_acquisition",
+        "to": "suye_power_growth",
+        "description": "大量资源让苏夜实力快速增长",
+        "episode": "ep08"
+      }
+    ],
+    "temporal": [
+      {
+        "type": "before",
+        "event_a": "hall_confrontation",
+        "event_b": "room_conversation",
+        "description": "大厅威慑在房间对话之前"
+      },
+      {
+        "type": "after",
+        "event_a": "ye_ep07_battle",
+        "event_b": "family_visit",
+        "description": "擂台胜利后叶红衣上门索赔"
+      }
+    ]
+  },
+  "physics": {
+    "gravity": "normal",
+    "magic_system": {
+      "type": "cultivation",
+      "description": "修炼需要灵气，灵兽可以进化",
+      "rules": [
+        "人类通过觉醒魂宫契约灵兽战斗",
+        "灵兽等级：凡胎、灵智、地煞、天罡、君王、帝皇、神话",
+        "吞噬可以获得能力和进化点",
+        "契约关系生死与共，不可解除",
+        "化龙需要进化到君王级以上"
+      ]
+    },
+    "power_scaling": "strict",
+    "energy_system": {
+      "type": "spiritual_energy",
+      "sources": ["灵石", "灵草", "妖兽精血", "高阶丹药"],
+      "consumption": ["修炼", "战斗", "进化"]
+    }
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {
+        "character": "suye",
+        "constraint": "玄冥蟒形态可以说话，声音低沉沙哑",
+        "active_episodes": ["ep08", "ep09", "ep10"]
+      },
+      {
+        "character": "suye",
+        "constraint": "化形成人需要达到君王级以上，化龙之后",
+        "active_episodes": ["ep08", "ep09", "ep10"]
+      }
+    ],
+    "ability_unlocks": [],
+    "world_rules": [
+      {
+        "rule": "契约不可解除",
+        "description": "人类与灵兽的契约一旦建立，生死与共，不可解除"
+      },
+      {
+        "rule": "血脉压制",
+        "description": "高等血脉对低等血脉有天然压制作用"
+      }
+    ],
+    "forbidden_changes": [
+      {
+        "type": "character_death",
+        "target": "suye",
+        "reason": "主角不能死"
+      },
+      {
+        "type": "character_death",
+        "target": "yehongyi",
+        "reason": "女主角不能死"
+      }
+    ]
+  }
+}

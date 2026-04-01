@@ -1,0 +1,75 @@
+{
+  "shot_id": "qyccan-ep03-shot-05",
+  "episode": "qyccan-ep03",
+  "scene_id": "ye_family_gate",
+  "shot_number": 5,
+  "scene_goal": "烈火犬喷火，苏夜闪电突袭展示速度",
+  "duration_sec": 12,
+  "dialogue_mode": "none",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "suye@qyccan-ep03-shot-05",
+      "variant": "snake_green",
+      "ref_assets": [
+        "assets/characters/images/苏夜-bilinse-front.png"
+      ],
+      "must_preserve": [
+        "碧绿色鳞片",
+        "金色瞳孔"
+      ],
+      "current_state": {
+        "form": "碧鳞蛇",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "淡定，嘲讽",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶家大门口",
+    "time_of_day": "day",
+    "ref_assets": []
+  },
+  "camera": {
+    "shot_size": "full_shot",
+    "angle": "eye_level",
+    "movement": "dynamic",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/苏夜-bilinse-front.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "烈火犬张嘴喷出一团橙红火球，直扑小蛇，碧鳞蛇身形一晃，瞬间消失在原地，只留下绿色闪光残影，全景镜头，平视角度，动态运镜，玄幻风格，火焰特效，闪电残影，速度感强，高清画质，4K超清，电影级画质，战斗节奏紧张"
+  },
+  "forbidden_changes": [
+    "不要让苏夜受伤"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "修炼需要灵气",
+      "灵兽等级严格",
+      "血脉压制",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇",
+        "active_abilities": [
+          "闪电突袭"
+        ]
+      }
+    }
+  }
+}

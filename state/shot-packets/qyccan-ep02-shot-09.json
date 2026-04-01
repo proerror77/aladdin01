@@ -1,0 +1,67 @@
+{
+  "shot_id": "qyccan-ep02-shot-09",
+  "episode": "qyccan-ep02",
+  "scene_id": "ye_family_gate",
+  "shot_number": 9,
+  "scene_goal": "苏夜弹射偷袭，咬断聚灵佩绳子，喜剧高潮动作戏",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "苏夜@qyccan-ep02-shot-09",
+      "variant": "default",
+      "ref_assets": ["assets/characters/images/苏夜-qingyucan-front.png"],
+      "must_preserve": ["通体碧绿", "肥嘟嘟"],
+      "current_state": {
+        "form": "青玉蚕",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "果断行动",
+        "props_in_possession": [],
+        "knowledge": ["要用弹跳借力咬断玉佩绳子"]
+      }
+    },
+    {
+      "id": "zhaowuji",
+      "state_ref": "赵无极@qyccan-ep02-shot-09",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": ["衣着华丽"],
+      "current_state": {
+        "form": "人形",
+        "costume": "华丽公子服",
+        "injury": "none",
+        "emotion": "大惊失色",
+        "props_in_possession": ["折扇"],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶家大门",
+    "time_of_day": "day",
+    "ref_assets": ["assets/scenes/images/叶家府邸-day.png"]
+  },
+  "camera": {
+    "shot_size": "close_up",
+    "angle": "eye_level",
+    "movement": "slow_motion",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": ["assets/characters/images/苏夜-qingyucan-front.png"],
+    "videos": [],
+    "audios": [],
+    "prompt": "一道绿光射出，青玉蚕跳到赵无极脸上，借力一蹬，准确咬住腰间玉佩绳子，咔嚓断裂，抱着玉佩落地翻滚，动作行云流水，特写镜头，平视角度，慢动作，玄幻风格，动作流畅，高清画质，4K超清，电影级画质，动作细节丰富"
+  },
+  "forbidden_changes": ["不要让苏夜说话（内心独白为OS）"],
+  "repair_policy": {"max_retries": 3, "prefer_local_edit": true},
+  "ontology_constraints": {
+    "world_rules": ["吞噬可以获得进化点"],
+    "character_abilities": {
+      "suye": {"can_speak": false, "can_fly": false, "current_form": "青玉蚕", "active_abilities": ["吞天口"]}
+    }
+  }
+}
