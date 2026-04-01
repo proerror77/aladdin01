@@ -1,9 +1,454 @@
 {
+  "world_id": "qyccan-ep01",
+  "episode": "ep01",
+  "created_at": "2026-04-01T00:00:00Z",
   "entities": {
-    "characters": {
-      "苏夜": {
-        "personality": "冷静、理智"
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "variants": {
+          "default": {
+            "variant_id": "default",
+            "label": "青玉蚕（初始形态）",
+            "appearance": "通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，眼神极其欠揍，樱桃般的小嘴。视野呈现复眼效果。",
+            "tags": ["凡胎级", "昆虫", "萌系"]
+          },
+          "snake_green": {
+            "variant_id": "snake_green",
+            "label": "碧鳞蛇（第一次进化）",
+            "appearance": "筷子长的小蛇，通体覆盖精致碧绿色鳞片，金色瞳孔，吐着信子，头顶有两个小鼓包。",
+            "tags": ["灵智级", "毒蛇", "敏捷"],
+            "unlock_condition": "ep03开始"
+          }
+        },
+        "physical": {
+          "size": "拇指大小",
+          "weight": "极轻",
+          "mobility": "蠕动",
+          "durability": "脆弱"
+        },
+        "abilities": [
+          {
+            "name": "吞天口",
+            "type": "active",
+            "description": "张嘴化作漆黑漩涡黑洞，可吞噬比自己大数倍的目标",
+            "unlock_episode": "ep01",
+            "constraints": ["需要系统激活", "消耗体力"]
+          },
+          {
+            "name": "无限吞噬进化",
+            "type": "passive",
+            "description": "吞噬任何东西（灵草、兽核、法宝、生物）可获得进化点，积累到一定程度可进化",
+            "unlock_episode": "ep01",
+            "constraints": ["需要绑定契约者"]
+          }
+        ],
+        "constraints": [
+          {
+            "type": "communication",
+            "description": "青玉蚕形态不能说话，只能发出蚕叫声",
+            "active_until": "ep07"
+          },
+          {
+            "type": "mobility",
+            "description": "青玉蚕形态不能飞行，只能在地面蠕动或跳跃",
+            "active_until": "ep03"
+          },
+          {
+            "type": "size",
+            "description": "青玉蚕形态体型极小，容易被忽视或踩到",
+            "active_until": "ep03"
+          }
+        ],
+        "evolution_timeline": [
+          {
+            "episode": "ep01",
+            "form": "青玉蚕",
+            "trigger": "重生到万兽天界"
+          },
+          {
+            "episode": "ep03",
+            "form": "碧鳞蛇",
+            "trigger": "吞噬聚灵佩，进化点满"
+          },
+          {
+            "episode": "ep07",
+            "form": "玄冥黑金蟒",
+            "trigger": "吞噬双头魔狼妖丹和狂暴能量"
+          }
+        ]
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "physical": {
+          "height": "高挑",
+          "build": "纤细",
+          "clothing": "红衣（战斗时会破损散乱）"
+        },
+        "abilities": [
+          {
+            "name": "剑术",
+            "type": "active",
+            "description": "基础剑术，虽然灵力微弱但身法还在",
+            "constraints": ["灵根受损，灵力微弱"]
+          },
+          {
+            "name": "契约召唤",
+            "type": "active",
+            "description": "使用圣兽召唤石契约本命灵兽",
+            "unlock_episode": "ep01",
+            "constraints": ["消耗精血", "一生只能契约一次"]
+          }
+        ],
+        "constraints": [
+          {
+            "type": "power",
+            "description": "灵根受损，灵力微弱，无法发挥全部实力",
+            "active_until": "ep08"
+          },
+          {
+            "type": "social",
+            "description": "被家族抛弃，地位低下",
+            "active_until": "ep08"
+          }
+        ]
+      },
+      {
+        "id": "jiapujia",
+        "name": "家仆甲",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": {
+          "build": "壮实",
+          "weapon": "大刀"
+        },
+        "abilities": [],
+        "constraints": [],
+        "fate": "ep01被苏夜吞噬"
+      },
+      {
+        "id": "jiapuyi",
+        "name": "家仆乙",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": {
+          "build": "壮实",
+          "weapon": "大刀"
+        },
+        "abilities": [],
+        "constraints": [],
+        "fate": "ep01被叶红衣杀死"
+      },
+      {
+        "id": "system",
+        "name": "系统",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {
+          "form": "无实体，只有声音"
+        },
+        "abilities": [
+          {
+            "name": "进化点统计",
+            "type": "passive",
+            "description": "实时统计苏夜的进化点"
+          },
+          {
+            "name": "技能提示",
+            "type": "passive",
+            "description": "提示苏夜可用技能和进化路线"
+          },
+          {
+            "name": "检测",
+            "type": "active",
+            "description": "检测物品、毒素、能量等信息"
+          }
+        ],
+        "constraints": [
+          {
+            "type": "interaction",
+            "description": "只能与苏夜沟通，其他人听不到"
+          }
+        ]
       }
+    ],
+    "locations": [
+      {
+        "id": "heiwu_forest",
+        "name": "黑雾森林",
+        "type": "outdoor",
+        "spatial": {
+          "size": "vast",
+          "terrain": "森林",
+          "features": ["树梢", "树下", "灌木丛"],
+          "danger_level": "low"
+        },
+        "temporal_variants": {
+          "day": {
+            "lighting": "自然光透过树叶",
+            "atmosphere": "神秘但不阴森"
+          }
+        },
+        "contains": ["低级妖兽", "灵草"],
+        "significance": "苏夜重生地点，叶红衣契约苏夜的地方"
+      }
+    ],
+    "props": [
+      {
+        "id": "summoning_stone",
+        "name": "圣兽召唤石",
+        "description": "叶家千年传承的至宝，满是裂纹的古老召唤石",
+        "owner": "yehongyi",
+        "condition": "destroyed",
+        "significance": "用于契约本命灵兽，使用后破碎",
+        "states": {
+          "intact": "完整状态，可以使用",
+          "destroyed": "ep01使用后破碎"
+        }
+      },
+      {
+        "id": "lingshi",
+        "name": "下品灵石",
+        "description": "蕴含灵气的石头，可用于修炼或被苏夜吞噬",
+        "owner": "jiapujia",
+        "condition": "consumed",
+        "significance": "苏夜第一次吞噬灵石，获得进化点",
+        "states": {
+          "intact": "完整状态",
+          "consumed": "ep01被苏夜吞噬"
+        }
+      }
+    ]
+  },
+  "relationships": {
+    "social": [
+      {
+        "type": "contract",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "契约关系，叶红衣是契约主，苏夜是本命灵兽",
+        "established": "ep01",
+        "strength": "unbreakable",
+        "constraints": ["生死与共", "心灵感应"]
+      },
+      {
+        "type": "hostile",
+        "from": "jiapujia",
+        "to": "yehongyi",
+        "description": "追杀关系，家仆追杀叶红衣",
+        "established": "ep01",
+        "resolved": "ep01"
+      },
+      {
+        "type": "hostile",
+        "from": "jiapuyi",
+        "to": "yehongyi",
+        "description": "追杀关系，家仆追杀叶红衣",
+        "established": "ep01",
+        "resolved": "ep01"
+      },
+      {
+        "type": "guidance",
+        "from": "system",
+        "to": "suye",
+        "description": "系统指导苏夜进化",
+        "established": "ep01",
+        "strength": "permanent"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "contains",
+        "from": "heiwu_forest",
+        "to": "suye",
+        "description": "苏夜重生在黑雾森林的树梢",
+        "established": "ep01"
+      },
+      {
+        "type": "enters",
+        "from": "yehongyi",
+        "to": "heiwu_forest",
+        "description": "叶红衣被追杀进入黑雾森林",
+        "established": "ep01"
+      }
+    ],
+    "causal": [
+      {
+        "type": "triggers",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "叶红衣使用召唤石，触发苏夜被召唤",
+        "episode": "ep01"
+      },
+      {
+        "type": "enables",
+        "from": "contract",
+        "to": "system_activation",
+        "description": "契约成功后，系统正式激活",
+        "episode": "ep01"
+      },
+      {
+        "type": "triggers",
+        "from": "crisis",
+        "to": "ability_unlock",
+        "description": "生死危机触发吞天口技能",
+        "episode": "ep01"
+      }
+    ],
+    "temporal": [
+      {
+        "type": "before",
+        "event_a": "suye_rebirth",
+        "event_b": "contract",
+        "description": "苏夜重生在叶红衣契约之前"
+      },
+      {
+        "type": "simultaneous",
+        "event_a": "contract",
+        "event_b": "system_activation",
+        "description": "契约和系统激活同时发生"
+      },
+      {
+        "type": "after",
+        "event_a": "first_devour",
+        "event_b": "contract",
+        "description": "第一次吞噬发生在契约之后"
+      }
+    ]
+  },
+  "physics": {
+    "gravity": "normal",
+    "magic_system": {
+      "type": "cultivation",
+      "description": "修炼需要灵气，灵兽可以进化",
+      "rules": [
+        "人类通过觉醒魂宫契约灵兽战斗",
+        "灵兽等级：凡胎、灵智、地煞、天罡、君王、帝皇、神话",
+        "吞噬可以获得能力和进化点",
+        "契约关系生死与共，不可解除"
+      ]
+    },
+    "power_scaling": "strict",
+    "energy_system": {
+      "type": "spiritual_energy",
+      "sources": ["灵石", "灵草", "妖兽精血", "法宝"],
+      "consumption": ["修炼", "战斗", "进化"]
     }
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {
+        "character": "suye",
+        "constraint": "青玉蚕形态不能说话",
+        "active_episodes": ["ep01", "ep02", "ep03", "ep04", "ep05", "ep06"],
+        "unlock_condition": "进化到玄冥蟒（ep07）"
+      },
+      {
+        "character": "suye",
+        "constraint": "青玉蚕形态不能飞行",
+        "active_episodes": ["ep01", "ep02"],
+        "unlock_condition": "进化到碧鳞蛇（ep03）"
+      },
+      {
+        "character": "yehongyi",
+        "constraint": "灵根受损，实力受限",
+        "active_episodes": ["ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07"],
+        "unlock_condition": "灵根修复（ep08后）"
+      }
+    ],
+    "ability_unlocks": [
+      {
+        "character": "suye",
+        "ability": "吞天口",
+        "unlock_episode": "ep01",
+        "unlock_condition": "契约成功 + 生死危机"
+      },
+      {
+        "character": "suye",
+        "ability": "剧毒獠牙",
+        "unlock_episode": "ep03",
+        "unlock_condition": "进化到碧鳞蛇"
+      },
+      {
+        "character": "suye",
+        "ability": "闪电突袭",
+        "unlock_episode": "ep03",
+        "unlock_condition": "进化到碧鳞蛇"
+      },
+      {
+        "character": "suye",
+        "ability": "百毒不侵",
+        "unlock_episode": "ep04",
+        "unlock_condition": "吞噬噬灵散毒素"
+      },
+      {
+        "character": "suye",
+        "ability": "大小如意",
+        "unlock_episode": "ep06",
+        "unlock_condition": "进化到一定程度"
+      },
+      {
+        "character": "suye",
+        "ability": "龙威",
+        "unlock_episode": "ep06",
+        "unlock_condition": "修出龙威雏形"
+      },
+      {
+        "character": "suye",
+        "ability": "说话",
+        "unlock_episode": "ep07",
+        "unlock_condition": "进化到玄冥蟒"
+      }
+    ],
+    "world_rules": [
+      {
+        "rule": "契约不可解除",
+        "description": "人类与灵兽的契约一旦建立，生死与共，不可解除"
+      },
+      {
+        "rule": "进化需要进化点",
+        "description": "苏夜的进化需要积累足够的进化点，通过吞噬获得"
+      },
+      {
+        "rule": "血脉压制",
+        "description": "高等血脉对低等血脉有天然压制作用"
+      },
+      {
+        "rule": "灵兽等级严格",
+        "description": "灵兽等级分明：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话"
+      },
+      {
+        "rule": "系统唯一性",
+        "description": "无限吞噬进化系统只与苏夜绑定，其他人无法使用"
+      }
+    ],
+    "forbidden_changes": [
+      {
+        "type": "character_death",
+        "target": "suye",
+        "reason": "主角不能死"
+      },
+      {
+        "type": "character_death",
+        "target": "yehongyi",
+        "reason": "女主角不能死"
+      },
+      {
+        "type": "contract_break",
+        "target": "suye_yehongyi_contract",
+        "reason": "契约不可解除"
+      },
+      {
+        "type": "system_removal",
+        "target": "system",
+        "reason": "系统是苏夜的核心金手指"
+      }
+    ]
   }
 }

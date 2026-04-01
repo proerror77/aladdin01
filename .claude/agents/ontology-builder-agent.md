@@ -475,6 +475,7 @@ fi
 # 获取当前时间戳
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
+
 # 组装 world-model.json
 cat > /tmp/world_model.json <<EOF
 {
@@ -509,6 +510,43 @@ echo "✓ 世界模型已写入: state/ontology/${ep}-world-model.json"
 echo "  - 实体总数: ${entity_count}"
 echo "  - 关系总数: ${relationship_count}"
 ```
+
+### Step 10: 写入 LanceDB 向量库
+
+world-model.json 写入完成后，立即将实体和关系嵌入向量库：
+
+```bash
+# 检查 LanceDB 是否可用
+if python3 -c "import lancedb" 2>/dev/null; then
+    echo "写入 LanceDB 向量库..."
+
+    # 确保数据库已初始化
+    python3 scripts/vectordb-manager.py init 2>/dev/null || true
+
+    # 写入世界模型（实体 + 关系）
+    python3 scripts/vectordb-manager.py upsert-world-model "state/ontology/${ep}-world-model.json"
+
+    # 顺带索引现有资产（幂等，已存在的不重复写入）
+    if [[ -d "assets/" ]]; then
+        python3 scripts/vectordb-manager.py index-assets assets/
+    fi
+
+    # 记录 trace
+    ./scripts/trace.sh "$session_id" "$trace_file" "write_vectordb" \
+      "{\"db\": \"state/vectordb/lancedb\", \"episode\": \"${ep}\"}"
+
+    echo "✓ LanceDB 写入完成"
+else
+    echo "⚠️ lancedb 未安装，跳过向量库写入（建议：pip3 install lancedb）"
+fi
+```
+
+**说明**：
+- LanceDB 是可选功能，未安装时自动跳过，不影响主流程
+- 向量库写入完成后，memory-agent 会优先使用语义检索
+- 安装命令：`pip3 install lancedb sentence-transformers pyarrow`
+  - `sentence-transformers` 提供本地多语言 embedding（无需 API Key）
+  - 未安装时降级为哈希向量（可运行但语义质量低）
 
 ## 完成后
 

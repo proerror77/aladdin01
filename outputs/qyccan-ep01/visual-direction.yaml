@@ -1,247 +1,458 @@
-episode: "qyccan-ep01"
-visual_style: "玄幻古风 + 喜剧感（东方玄幻，带沙雕喜剧节奏）"
-target_medium: "竖屏短视频（9:16，抖音）"
-total_shots: 5
-total_duration: 42
-ratio: "9:16"
-platform: "seedance-v2"
-default_model: "doubao-seedance-1-5-pro-251215"
+---
+# Visual Direction - qyccan-ep01
+# 视觉指导文件 - 开局青玉蚕 第1集
+# 生成时间: 2026-04-01
+# 基于: outputs/qyccan-ep01/render-script.md + state/ontology/ep01-world-model.json
+
+episode_id: "qyccan-ep01"
+episode_title: "这穿越，草率了！"
+total_shots: 12
+estimated_duration: 180  # 秒（3分钟）
 
 shots:
   - shot_id: "qyccan-ep01-shot-01"
-    shot_index: 1
-    duration: 8
-    scene_name: "黑雾森林树梢"
-    time_of_day: "day"
-    lighting_note: "晨光透过浓密树冠洒落，光束穿透薄雾，斑驳光影打在树叶上，明暗对比强烈"
-    generation_mode: "text2video"
-    subject: |
-      第一人称主观视角。视野呈现昆虫复眼效果——画面分割为六边形蜂巢状多重格子，每格各自成像，整体色调偏绿色冷翡翠。
-      画面极低（贴近树叶表面），周围是巨大翠绿树叶脉络的微距特写。
-    action: |
-      视线缓缓移动扫视四周，停在一片巨大树叶边缘，树叶微微颤动。
-    scene: |
-      黑雾森林树梢，清晨。巨大树叶铺满画面，叶脉纹路清晰如地图，边缘露出远处连绵树海和淡薄黑雾。
-      晨光从上方穿透树冠，体积光束斜切画面。
-    camera: |
-      第一人称主观视角，极低角度贴地拍摄（昆虫视角）。
-      固定镜头，画面中央轻微呼吸感抖动，模拟生物觉醒瞬间的视觉混乱。
-    style: |
-      东方玄幻国漫3D渲染风格，画面清冷翡翠绿色调，带有轻喜剧夸张感。
-      复眼格子效果为核心视觉奇观，motivated lighting（晨光体积感）。
-    audio: |
-      苏夜（混响/OS，困惑）："但我万万没想到……这特么是哪？！"
-      音效：心跳监护仪变为直线的长鸣声"滴——"，紧接猛烈撞击声，渐变为森林虫鸣。
-    transition: "硬切"
-    references:
-      characters:
-        - name: "苏夜"
-          variant_id: "qingyu-can"
-          image_path: "assets/characters/images/苏夜-qingyu-can-front.png"
-      scenes:
-        - name: "黑雾森林树梢"
-          time_of_day: "day"
-          image_path: "assets/scenes/images/黑雾森林-day.png"
-    prompt: |
-      【出镜角色-场景】
-      角色：<苏夜（青玉蚕形态）>
-      场景：<黑雾森林树梢-清晨>
-      [画面]：[苏夜（青玉蚕）]趴在巨大翠绿树叶上，视野为昆虫复眼六边形格子效果，视线极低贴近叶面，叶脉纹路放大如山脉地图，视线缓缓扫视四周。[后景]：连绵黑雾森林，晨光体积光束斜切穿透树冠。
-
-      画面风格: 东方玄幻国漫3D渲染风格，翡翠绿冷色调，motivated lighting，清晨薄雾，体积光粒子飘浮。
-      镜头1：第一人称固定主观镜头，画面呈六边形蜂巢复眼格子效果，视线缓缓扫视，停在树叶边缘，画面带轻微呼吸感抖动模拟生物初次觉醒。画外音（苏夜内心独白）："但我万万没想到……这特么是哪？！"（语气：懵逼崩溃）
-
-      画面风格: 东方玄幻国漫3D渲染风格，画质细腻，光影层次丰富，高清超细节；搭配环境音，监护仪长鸣声渐变为森林虫鸣；禁止出现字幕、对话框、背景音乐
+    scene_description: "苏夜重生为青玉蚕，趴在树叶上"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        variant_label: "青玉蚕（初始形态）"
+        state: "刚重生，懵逼状态"
+        must_preserve: ["通体碧绿", "肥嘟嘟", "拇指大小", "肉乎乎的小短腿"]
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      一只通体碧绿、肥嘟嘟的青玉蚕趴在巨大的树叶上，拇指大小，肉乎乎的小短腿，眼神懵逼，
+      第一人称视角，视野呈现复眼效果，
+      特写镜头，平视角度，静止，
+      玄幻风格，柔和自然光，高清画质，细节丰富，
+      4K超清，电影级画质，细腻光影
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/suye_default.png"
 
   - shot_id: "qyccan-ep01-shot-02"
-    shot_index: 2
-    duration: 8
-    scene_name: "黑雾森林树梢"
-    time_of_day: "day"
-    lighting_note: "日光充足，树叶反光翠绿明亮，阳光直射造成硬朗阴影"
-    generation_mode: "text2video"
-    subject: |
-      一只通体碧绿、肥嘟嘟的青玉蚕（苏夜），拇指大小，趴在一片巨大翠绿树叶上。
-      两只肉乎乎的小短腿支撑着圆滚滚身体，表情萌但眼神透着迷茫和震惊（配合旁白）。
-    action: |
-      苏夜试图直立起身，圆滚滚的身体直接在光滑叶面上失去重心，整个翻滚一圈，肚皮朝天四脚乱蹬。
-    scene: |
-      黑雾森林高处树梢，日光明亮。树叶宽大如蒲扇，边缘微微弯曲，远景是层层叠叠的黑雾森林。
-      叶面光滑反光，衬托小蚕圆滚质感。
-    camera: |
-      拉远镜头：从特写树叶上的小蚕缓缓拉远至中远景，展现渺小的蚕与巨大树叶/森林的强烈对比。
-      翻滚动作切换仰拍特写，强调肚皮朝天的喜剧感。
-    style: |
-      东方玄幻国漫3D渲染风格，色彩饱和明快，小蚕碧绿通透质感，带夸张喜剧变形效果。
-      ARRI Alexa color science，日光自然打光，浅景深虚化背景突出小蚕。
-    audio: |
-      苏夜（VO，惊恐崩溃）："卧槽！手呢？脚呢？我的八块腹肌呢？老子怎么变成一条虫了？！"
-      苏夜（绝望）："穿越成虫？这也太草率了吧！老天爷，你玩我啊！"
-      音效：翻滚肉感扑通声，配夸张喜剧弦乐上扬音效。
-    transition: "硬切"
-    references:
-      characters:
-        - name: "苏夜"
-          variant_id: "qingyu-can"
-          image_path: "assets/characters/images/苏夜-qingyu-can-front.png"
-      scenes:
-        - name: "黑雾森林树梢"
-          time_of_day: "day"
-          image_path: "assets/scenes/images/黑雾森林-day.png"
-    prompt: |
-      【中文版】
-      一只通体碧绿、肥嘟嘟的拇指大小青玉蚕趴在巨大翠绿树叶上，两只肉乎乎的小短腿支撑圆滚滚的身体，眼神迷茫震惊。蚕宝宝试图站立，圆滚滚的身体在光滑叶面失去重心，整个翻滚一圈，肚皮朝天四脚乱蹬，夸张失重感拉满。镜头从特写缓缓拉远，展现渺小的蚕与巨大树叶和层层叠叠黑雾森林的荒诞对比。翻滚瞬间切仰拍特写强调喜剧感。东方玄幻国漫3D渲染风格，色彩明快饱和，碧绿通透小蚕质感，ARRI Alexa色彩科学，日光自然打光，浅景深虚化背景。台词（苏夜，崩溃惊恐）："卧槽！手呢？脚呢？我的八块腹肌呢？老子怎么变成一条虫了？！穿越成虫？这也太草率了吧！" 音效：肉感扑通声配夸张喜剧上扬弦乐。竖屏9:16。禁止出现水印、字幕、Logo。4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture.
-
-      ---
-
-      【English Version】
-      A chubby thumb-sized jade-green silkworm lies on a giant luminous leaf, two stubby little legs supporting its plump round body, eyes wide with bewilderment and shock. The caterpillar attempts to stand upright, loses balance on the smooth leaf surface, rolls over completely, ending belly-up with all four legs flailing — exaggerated zero-gravity comedy. Camera pulls back slowly from a close-up to reveal the absurd contrast: tiny worm vs. enormous leaf vs. towering dark mist forest. At the moment of roll, cut to low-angle close-up for maximum comedic impact. Eastern fantasy 3D anime CGI style, vibrant saturated colors, jade-green translucent worm texture, ARRI Alexa color science, natural daylight, shallow depth-of-field. Dialogue (SuYe, panicked breakdown): "What the hell?! Where are my hands?! My abs?! How did I turn into a WORM?!" SFX: fleshy thud with exaggerated comedy strings swell. Vertical 9:16. No watermarks, subtitles, or logos. 4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture.
+    scene_description: "叶红衣被追杀，冲出灌木丛"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        variant_label: "红衣破损状态"
+        state: "被追杀，绝望"
+        must_preserve: ["红衣", "高挑", "纤细", "发髻散乱"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "slightly_low"
+      movement: "tracking"
+    duration: 12
+    seedance_prompt: |
+      叶红衣跌跌撞撞冲出灌木丛，红衣破损，发髻散乱，身上带着伤痕，神情绝望，
+      背景是黑雾森林的树林，自然光透过树叶，
+      中景镜头，略低角度，跟踪运镜，
+      玄幻风格，紧张氛围，高清画质，
+      4K超清，电影级画质，动态追踪
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "家族抛弃，未婚夫逼杀……叶红衣，你真的要命丧于此吗？"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/scenes/images/heiwu_forest_day.png"
 
   - shot_id: "qyccan-ep01-shot-03"
-    shot_index: 3
-    duration: 8
-    scene_name: "黑雾森林外围树下"
-    time_of_day: "day"
-    lighting_note: "树荫斑驳光影，逆光描边叶红衣轮廓，法阵光芒从地面散发出冷翡翠光晕"
-    generation_mode: "text2video"
-    subject: |
-      叶红衣：18岁，红衣破损（衣袖撕裂，衣摆有血迹），发髻散乱，眼神从绝望期待变为石化崩溃。
-      身材修长，跌坐在大树根部，一双颤抖的手刚握着被捏碎的召唤石碎片，鲜血渗出。
-      苏夜（青玉蚕）：法阵中央，拇指大小的碧绿肥胖蚕宝宝，肚皮着地，一脸懵逼地仰望叶红衣。
-    action: |
-      叶红衣睁开眼，满怀期待地低头看向地面发光法阵中央——对上一只萌萌哒懵逼青玉蚕的眼睛。两人（一人一虫）对视，画面停顿一拍，瞳孔震惊定格。
-    scene: |
-      黑雾森林外围，大树根部空地。地面刻有古老符文的七芒星法阵，发出翡翠绿色流光，碎石周围散落召唤石碎片和血滴。
-      远处树林阴影中隐约有追兵身影（虚焦）。树根盘绕如龙，地面青苔潮湿。
-    camera: |
-      先特写叶红衣满怀期待睁眼的面部，快速切至法阵俯拍全景，再切至叶红衣与苏夜大眼瞪小眼的双人中景反打——叶红衣从上方居高俯视，苏夜从法阵中央仰望，制造强烈的体型反差喜剧感。
-    style: |
-      东方玄幻国漫3D渲染风格，法阵冷翡翠发光效果为画面核心视觉焦点。
-      破败逃亡的暖橙红色（叶红衣服装）与冷绿色法阵光形成强烈冷暖对比。35mm film grain质感，motivated lighting（法阵为光源）。
-    audio: |
-      叶红衣（眼神决绝，颤抖）："这是家族千年传承的至宝，圣兽召唤石……不管召唤出什么，我愿奉你为主！出来吧，我的本命灵兽！"
-      叶红衣（瞳孔地震，崩溃）："青……青玉蚕？是最废物的凡胎级昆虫？我耗尽精血，就召唤了一条肉蚕子？！"
-      苏夜（怒）："喂！有没有礼貌！"
-      音效：召唤法阵激活的晶莹鸣响声，"咻"的一声绿光坠落，法阵光芒散去时的静寂收音。
-    transition: "快切"
-    references:
-      characters:
-        - name: "叶红衣"
-          variant_id: "default"
-          image_path: "assets/characters/images/叶红衣-front.png"
-        - name: "苏夜"
-          variant_id: "qingyu-can"
-          image_path: "assets/characters/images/苏夜-qingyu-can-front.png"
-      scenes:
-        - name: "黑雾森林外围树下"
-          time_of_day: "day"
-          image_path: "assets/scenes/images/黑雾森林-day.png"
-    prompt: |
-      【中文版】
-      叶红衣：破损红衣少女，发髻散乱，手握捏碎的发光召唤石，鲜血渗指缝，跌坐在古树根部，眼神从决绝期待转为瞳孔地震的崩溃。地面七芒星法阵散发冷翡翠流光，法阵中央趴着拇指大小、一脸懵逼的碧绿肥蚕（苏夜）。镜头先特写叶红衣闭眼期待的面孔，切至法阵俯拍，再切双人中景反打——少女从上方俯视，小蚕从地面仰望，大眼瞪小眼对视停顿，体型反差喜剧感爆棚。东方玄幻国漫3D渲染风格，破红衣暖橙与冷翡翠法阵光强烈冷暖对撞，35mm film grain，motivated lighting（法阵为光源）。台词（叶红衣，颤抖决绝）："我愿奉你为主！出来吧，我的本命灵兽！"（叶红衣，崩溃）："青……青玉蚕？我耗尽精血，就召唤了一条肉蚕子？！"（苏夜，怒）："喂！有没有礼貌！" 音效：晶莹召唤鸣响，绿光坠落咻声，法阵消散静寂。竖屏9:16。禁止出现水印、字幕、Logo。4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture.
-
-      ---
-
-      【English Version】
-      YeHongYi — a disheveled girl in torn red robes, crouching against massive ancient tree roots, hands bleeding from crushing a glowing summoning stone, eyes shifting from desperate hope to absolute devastation. On the ground, a seven-pointed runic summoning circle pulses with cool jade-green flowing light. In the circle's center sits a tiny thumb-sized chubby jade worm (SuYe), looking utterly blank and confused. Camera: close-up on YeHongYi's face eyes shut in hope, cut to overhead shot of the glowing circle, then cut to two-shot reverse — the girl looming above, the tiny worm gazing upward, both frozen in a wide-eyed stare-down. The size contrast is the comedy. Eastern fantasy 3D anime CGI style. Warm torn-red costume vs. cold jade-green arcane light — dramatic warm-cool color clash. 35mm film grain, motivated lighting from the summoning circle. Dialogue (YeHongYi, trembling): "No matter what you are, I will serve you as master!" (YeHongYi, shattered): "A jade worm?! I spent my blood essence to summon THIS?!" (SuYe, indignant): "Hey! Where's your manners!" SFX: crystalline summoning chime, green-light swoosh, fading glow silence. Vertical 9:16. No watermarks, subtitles, or logos. 4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture.
+    scene_description: "叶红衣使用召唤石，苏夜被召唤"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "使用召唤石，满怀期待"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "被召唤，化作绿光坠落"
+    camera:
+      shot_size: "full_shot"
+      angle: "high_angle"
+      movement: "zoom_in"
+    duration: 15
+    seedance_prompt: |
+      叶红衣捏碎古老召唤石，鲜血滴落，法阵发光，一道绿光从树梢坠落，
+      光芒散去后，法阵中央趴着一只拇指大小的青玉蚕，通体碧绿，一脸懵逼，
+      全景镜头，俯视角度，推进运镜，
+      玄幻风格，魔法光效，召唤特效，高清画质，
+      4K超清，电影级画质，魔法粒子效果
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "出来吧，我的本命灵兽！"
+      - character: "叶红衣"
+        text: "青……青玉蚕？是最弱小的凡胎级昆虫？"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_default.png"
+      - "assets/scenes/images/heiwu_forest_day.png"
 
   - shot_id: "qyccan-ep01-shot-04"
-    shot_index: 4
-    duration: 10
-    scene_name: "黑雾森林外围树下（家仆追至）"
-    time_of_day: "day"
-    lighting_note: "草丛被拨开，阳光突然切入，形成强烈明暗反差；家仆出场配以压迫阴影，系统光柱从天而降"
-    generation_mode: "text2video"
-    subject: |
-      家仆甲：赵家家仆，面相猥琐，手持大刀，满脸淫邪笑容，身材壮硕但气质下流。
-      家仆乙：同款猥琐家仆，持刀，看向地面法阵痕迹时嘴张大捧腹大笑。
-      叶红衣：护住手心里拇指大小的苏夜（青玉蚕），咬牙切齿，眼神倔强。
-      苏夜（青玉蚕）：趴在叶红衣手心，圆滚滚身体动了一下，眼神从萌逼瞬间变得犀利如刀。
-    action: |
-      两名家仆拨开草丛现身，气势汹汹走向叶红衣。苏夜在叶红衣手心蠕动，眼神骤然犀利——天空炸响系统提示音，一道赛博朋克风格的金色系统光柱从天而降，击中苏夜，全身冒出系统界面光效。
-    scene: |
-      黑雾森林外围空地，草丛茂密，大树盘根。阳光斑驳，远处树影阴暗压迫。
-      系统激活时，整个画面色调瞬间切换为赛博感蓝紫色调，系统界面悬浮字符在空中浮现（中文古风符文与现代数字混合）。
-    camera: |
-      先全景展示家仆出场的压迫气势，推镜头靠近叶红衣护着苏夜的手心特写，再快切至苏夜眼神变犀利的极度近景，最后大仰拍展现系统光柱从天而降砸中苏夜的震撼全景。
-    style: |
-      东方玄幻国漫3D渲染风格，系统激活瞬间叠加赛博朋克视觉冲击。
-      暖色调（阳光、红衣）与系统激活后的冷蓝紫调形成强烈视觉对撞。volumetric dust particles（系统光柱粒子效果）。
-    audio: |
-      家仆甲（淫笑）："嘿嘿，大小姐，跑不动了吧？"
-      家仆乙（爆笑嘲讽）："哈哈哈哈！叶家天才居然契约了一条蚕！"
-      家仆甲（嚣张）："把这蚕交出来，这种恶心的灵兽不配进我们赵家！"
-      系统提示音（炸响，电子合成音）："检测到宿主遭遇生死危机，且已成功绑定契约者，'无限吞噬进化系统'正式激活！新手大礼包强行开启：技能'吞天口'（一级）。"
-      音效：家仆拨开草丛的沙沙声，系统激活的电子震响轰鸣，能量粒子迸射声。
-    transition: "快切"
-    references:
-      characters:
-        - name: "叶红衣"
-          variant_id: "default"
-          image_path: "assets/characters/images/叶红衣-front.png"
-        - name: "苏夜"
-          variant_id: "qingyu-can"
-          image_path: "assets/characters/images/苏夜-qingyu-can-front.png"
-      scenes:
-        - name: "黑雾森林外围"
-          time_of_day: "day"
-          image_path: "assets/scenes/images/黑雾森林-day.png"
-    prompt: |
-      【中文版】
-      两名赵家猥琐家仆手持大刀拨开草丛现身，气势汹汹走向跌坐在地的叶红衣（破损红衣少女，护住手心里的小绿蚕）。家仆嘲笑大笑，叶红衣咬牙倔强对视。手心里的拇指大蚕宝宝蠕动一下，圆萌眼神骤然变得犀利如刀。天空突然炸响电子震鸣——一道赛博朋克金色系统光柱从天而降击中蚕宝宝，全身冒出蓝紫色悬浮界面光效，古风符文与现代数字混合漂浮。全景先展示家仆压迫气势，推镜到手心特写，再快切蚕眼神犀利极近景，最后大仰拍展现光柱砸下。东方玄幻国漫3D渲染风格，暖色调骤然切换赛博蓝紫，volumetric dust particles光柱粒子效果。台词（家仆甲，淫笑）："嘿嘿，大小姐，跑不动了吧？"（家仆乙，爆笑）："叶家天才契约了一条蚕？！"（系统提示音，炸响）："无限吞噬进化系统正式激活！新手大礼包开启：技能吞天口一级！" 音效：草丛沙沙、系统震响轰鸣。竖屏9:16。禁止出现水印、字幕、Logo。4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture.
-
-      ---
-
-      【English Version】
-      Two sleazy Zhao family servants wielding large blades push through the undergrowth and swagger toward YeHongYi (girl in torn red robes, sitting on the ground, cupping a tiny green worm in her hands). The servants mock and laugh; YeHongYi grits her teeth and glares. The thumb-sized jade worm stirs in her palm — its round cute eyes instantly sharpen into a cold killer gaze. Suddenly the sky erupts with an electronic detonation: a cyberpunk golden system light pillar crashes down and hits the worm, its body erupting with blue-purple floating interface glyphs — archaic runes mixed with modern data code. Camera: wide shot showing servants' imposing advance → push-in to close-up of the worm in the palm → rapid cut to extreme close-up of the worm's newly lethal eyes → grand low-angle shot of the system pillar striking from above. Eastern fantasy 3D anime CGI style, warm tones instantly shift to cyber blue-purple, volumetric dust particle pillar effect. Dialogue (servant, leering): "Heh heh, little Miss, can't run anymore?" (servant 2, howling): "A Ye family genius bonded a silkworm?!" (System voice, electronic boom): "Infinite Devouring Evolution System officially activated!" SFX: rustling grass, electronic system detonation, energy scatter. Vertical 9:16. No watermarks, subtitles, or logos. 4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture.
+    scene_description: "家仆追上来，嘲笑叶红衣"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "jiapujia"
+        character_name: "家仆甲"
+        variant_id: "default"
+        state: "淫笑，气势汹汹"
+      - character_id: "jiapuyi"
+        character_name: "家仆乙"
+        variant_id: "default"
+        state: "爆笑，嘲讽"
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "咬牙切齿，护住苏夜"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "在叶红衣手心，眼神犀利"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      两个拿着大刀的家仆追上来，淫笑着看着叶红衣，
+      叶红衣咬牙切齿，手心护着一只碧绿的小蚕，
+      中景镜头，平视角度，静止，
+      玄幻风格，紧张对峙氛围，自然光，高清画质，
+      4K超清，电影级画质，人物表情细腻
+    has_dialogue: true
+    dialogue:
+      - character: "家仆甲"
+        text: "把这蚕交出来，这种恶心的灵兽不配进我们赵家！"
+      - character: "叶红衣"
+        text: "闭嘴……我的灵兽轮不到你们嘲笑！"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_default.png"
 
   - shot_id: "qyccan-ep01-shot-05"
-    shot_index: 5
-    duration: 8
-    scene_name: "黑雾森林外围树下（吞噬结算）"
-    time_of_day: "day"
-    lighting_note: "吞天口激活时漆黑漩涡吞噬所有光线形成局部黑洞效果，吞噬结束后阳光骤然恢复，形成强烈明暗翻转"
-    generation_mode: "text2video"
-    subject: |
-      苏夜（青玉蚕）：拇指大小的碧绿肥蚕，嘴巴原本樱桃般小巧，瞬间化作漆黑漩涡黑洞，迎风暴涨数米，恐怖震撼。
-      吞噬后：蚕宝宝打了个优雅的饱嗝，摆出一个自认为很帅但实际上就是扭了扭腰的Pose，一脸满足。
-      家仆甲：被黑洞一口吞没，连根毛都不剩，消失干净。
-      叶红衣：先是被家仆伸手抓时吓到，之后瞪大眼睛石化，呆若木鸡盯着打嗝的蚕宝宝。
-    action: |
-      家仆甲伸手抓向叶红衣，苏夜口中炸开漆黑漩涡暴涨，将家仆甲整个吞没——然后漩涡瞬间收回，蚕宝宝回到原来拇指大小，打了个饱嗝，扭了扭腰摆Pose。
-    scene: |
-      黑雾森林外围空地，吞噬瞬间周围空气骤然发颤，地面出现裂纹涟漪，家仆乙和叶红衣衣物被黑洞气流撕扯。
-      吞噬结束后空气瞬间安静，只剩一只心满意足的小蚕宝宝站在地上。
-    camera: |
-      千钧一发时推镜特写苏夜张嘴，黑洞暴涨用大仰拍展现震撼体量，吞噬家仆甲用快切硬切消失效果。
-      结算镜头：拉远展现叶红衣石化全景，再切苏夜扭腰摆Pose的特写，低角度仰拍强调荒诞喜感。
-    style: |
-      东方玄幻国漫3D渲染风格，吞天口黑洞为核心视觉奇观——漆黑漩涡边缘发出幽蓝光晕，与周围翠绿色调对撞。
-      吞噬结束后骤然切换轻松喜剧色调。Kodak Vision3 500T胶片暖色，negative fill塑造黑洞边缘戏剧张力。
-    audio: |
-      苏夜（怒吼，发出蚕叫，变声电子加工）："给爷死！！"
-      苏夜（拍拍肚皮，OS，满足）："嗝……味道有点淡。"
-      系统（炸响）："吞噬凡体武夫，进化点+10。"
-      家仆乙（吓傻）："卧槽？杀人蚕？！"
-      音效：漆黑漩涡暴涨的宇宙级轰鸣，家仆甲消失时的空气压缩弹响，饱嗝音效配轻喜剧弦乐，系统得分提示音。
-    transition: "切换"
-    references:
-      characters:
-        - name: "叶红衣"
-          variant_id: "default"
-          image_path: "assets/characters/images/叶红衣-front.png"
-        - name: "苏夜"
-          variant_id: "qingyu-can"
-          image_path: "assets/characters/images/苏夜-qingyu-can-front.png"
-      scenes:
-        - name: "黑雾森林外围"
-          time_of_day: "day"
-          image_path: "assets/scenes/images/黑雾森林-day.png"
-    prompt: |
-      【中文版】
-      家仆伸手抓向叶红衣的千钧一发之际，手心里拇指大的碧绿蚕宝宝猛然张嘴——樱桃小嘴瞬间化作漆黑漩涡黑洞，幽蓝光晕环绕，迎风暴涨数米，震撼恐怖。家仆甲被整个吞没，连根毛不剩干净消失。漩涡骤然收回，蚕宝宝缩回原来拇指大小，打了个优雅饱嗝，扭了扭腰摆了个自认为帅气的Pose。叶红衣全程石化呆若木鸡。推镜特写苏夜张嘴，大仰拍黑洞暴涨，快切家仆消失，拉远叶红衣石化全景，切苏夜扭腰Pose低仰拍喜感特写。东方玄幻国漫3D渲染风格，黑洞漩涡幽蓝光晕对撞翠绿背景，Kodak Vision3 500T暖色胶片，negative fill塑造戏剧张力，吞噬结束切轻喜剧明快色调。台词（苏夜，怒吼发出蚕叫）："给爷死！！"（苏夜，OS，满足）："嗝……味道有点淡。"（系统炸响）："吞噬凡体武夫，进化点+10。"（家仆乙，吓傻）："卧槽？杀人蚕？！" 音效：宇宙级漩涡轰鸣，弹压消失声，饱嗝配喜剧弦乐，系统提示音。竖屏9:16。禁止出现水印、字幕、Logo。4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture.
+    scene_description: "苏夜激活吞天口，吞噬家仆甲"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "张嘴化作漆黑漩涡，吞噬家仆"
+      - character_id: "jiapujia"
+        character_name: "家仆甲"
+        variant_id: "default"
+        state: "被吞噬"
+    camera:
+      shot_size: "close_up"
+      angle: "low_angle"
+      movement: "slow_motion"
+    duration: 15
+    seedance_prompt: |
+      青玉蚕张嘴，樱桃般的小嘴瞬间化作漆黑的漩涡黑洞，迎风暴涨数米，
+      家仆被吞噬，连根毛都没剩下，
+      特写镜头，仰视角度，慢动作，
+      玄幻风格，黑洞特效，吞噬粒子效果，震撼视觉，高清画质，
+      4K超清，电影级画质，魔法特效炸裂
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "给爷死！！"
+      - character: "系统"
+        text: "吞噬凡体武夫，进化点+10。"
+    reference_images:
+      - "assets/characters/images/suye_default.png"
 
-      ---
+  - shot_id: "qyccan-ep01-shot-06"
+    scene_description: "叶红衣击败家仆乙，苏夜吞噬灵石"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "拔剑，冷漠"
+      - character_id: "jiapuyi"
+        character_name: "家仆乙"
+        variant_id: "default"
+        state: "倒地不起"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "吞噬灵石，体型变大"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "pan"
+    duration: 15
+    seedance_prompt: |
+      叶红衣一剑划过，家仆乙倒地不起，
+      青玉蚕在地上拱来拱去，找到灵石，咔嚓咔嚓嚼碎吞下，
+      身上闪过绿光，体型稍微变大，头顶鼓起两个小包，
+      全景镜头，平视角度，横摇运镜，
+      玄幻风格，进化光效，灵气粒子，高清画质，
+      4K超清，电影级画质，魔法进化特效
+    has_dialogue: true
+    dialogue:
+      - character: "系统"
+        text: "吞噬下品灵石3，进化点+30。"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_default.png"
+      - "assets/scenes/images/heiwu_forest_day.png"
 
-      【English Version】
-      The crucial moment: a servant's hand lunges at YeHongYi — and the thumb-sized jade worm in her palm snaps open its tiny cherry mouth. The mouth explodes into a pitch-black swirling vortex, rimmed in eerie blue light, expanding in an instant to meters wide — terrifyingly massive. The servant is swallowed whole, not a hair remaining. The vortex snaps shut. The worm shrinks back to thumb-size, lets out an elegant burp, wriggles its body into a pose it thinks is very cool (it's just a little shimmy). YeHongYi stands completely petrified. Camera: push-in close-up of the worm opening its mouth → grand low-angle shot of the vortex expanding → hard cut to servant vanishing → pull-back wide shot of YeHongYi's petrified expression → low-angle close-up of the worm's smug pose for maximum comedic contrast. Eastern fantasy 3D anime CGI style, black vortex blue-glow clashes against jade-green background, Kodak Vision3 500T warm film grain, negative fill for dramatic shadow on vortex edges, transitions to bright comedy palette after devouring. Dialogue (SuYe, war cry with worm-SFX): "DIE FOR ME!!" (SuYe, smug VO): "Burp… tastes a little bland." (System, boom): "Devoured mortal warrior — Evolution Points +10." (Servant 2, terrified): "WHAT?! A KILLER WORM?!" SFX: cosmic vortex roar, air-compression pop of vanishing, comedic burp with strings, system chime. Vertical 9:16. No watermarks, subtitles, or logos. 4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture.
+  - shot_id: "qyccan-ep01-shot-07"
+    scene_description: "叶红衣和苏夜回城路上，对话"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "神色复杂，看着手里的苏夜"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "躺在她手心，神态自傲"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "tracking"
+    duration: 12
+    seedance_prompt: |
+      叶红衣走在森林小路上，手心托着一只碧绿的小蚕，神色复杂，
+      小蚕躺在她手心，神态自傲，疯狂扭动身体表示抗议，
+      中景镜头，平视角度，跟踪运镜，
+      玄幻风格，温馨氛围，自然光透过树叶，高清画质，
+      4K超清，电影级画质，人物互动自然
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "你到底是什么东西？普通的青玉蚕根本没有攻击力。"
+      - character: "叶红衣"
+        text: "既然全身绿油油的，就叫你小绿吧。"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_default.png"
+      - "assets/scenes/images/heiwu_forest_day.png"
+
+  - shot_id: "qyccan-ep01-shot-08"
+    scene_description: "叶家大门，赵无极出现"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "脸色苍白，下意识藏苏夜"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "藏在袖子里"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 15
+    seedance_prompt: |
+      叶家府邸大门，古风建筑，围观群众指指点点，
+      赵无极摇着扇子，一脸戏谑，衣着华丽，
+      叶红衣脸色苍白，下意识把袖子里的小蚕藏好，
+      全景镜头，平视角度，静止，
+      玄幻风格，古风建筑，自然光，高清画质，
+      4K超清，电影级画质，古风氛围浓厚
+    has_dialogue: true
+    dialogue:
+      - character: "赵无极"
+        text: "哟，这不是我的未婚妻吗？"
+      - character: "赵无极"
+        text: "让我看看，你契约了什么惊天动地的神兽啊？"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/scenes/images/yehongyi_boudoir_day.png"
+
+  - shot_id: "qyccan-ep01-shot-09"
+    scene_description: "苏夜抢夺赵无极的聚灵佩"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "跳到赵无极脸上，咬断玉佩绳子"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "slow_motion"
+    duration: 12
+    seedance_prompt: |
+      一道绿光射出，青玉蚕跳到赵无极脸上，借力一蹬，
+      准确咬住腰间玉佩绳子，咔嚓断裂，抱着玉佩落地翻滚，动作行云流水，
+      特写镜头，平视角度，慢动作，
+      玄幻风格，动作流畅，高清画质，
+      4K超清，电影级画质，动作细节丰富
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "为了进化点！冲鸭！"
+      - character: "赵无极"
+        text: "哎哟！什么东西？！"
+    reference_images:
+      - "assets/characters/images/suye_default.png"
+
+  - shot_id: "qyccan-ep01-shot-10"
+    scene_description: "苏夜进化为碧鳞蛇"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        variant_label: "碧鳞蛇（第一次进化）"
+        state: "进化完成，光芒炸裂"
+    camera:
+      shot_size: "close_up"
+      angle: "low_angle"
+      movement: "zoom_in"
+    duration: 15
+    seedance_prompt: |
+      青玉蚕身上爆发刺眼强光，光芒炸裂，弹开赵无极的脚，
+      烟尘散去，原本的肥蚕不见了，取而代之的是一条筷子长的小蛇，
+      通体覆盖精致碧绿色鳞片，金色瞳孔，吐着信子，直立起上半身，
+      特写镜头，仰视角度，推进运镜，
+      玄幻风格，进化光效炸裂，震撼视觉，高清画质，
+      4K超清，电影级画质，进化特效震撼
+    has_dialogue: true
+    dialogue:
+      - character: "系统"
+        text: "恭喜宿主，完成第一阶段进化。种族变更：碧鳞毒蛇。"
+      - character: "苏夜"
+        text: "刚才那只脚，是你的吧？"
+    reference_images:
+      - "assets/characters/images/suye_snake_green.png"
+
+  - shot_id: "qyccan-ep01-shot-11"
+    scene_description: "苏夜秒杀烈火犬"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "闪电突袭，咬烈火犬"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "dynamic"
+    duration: 15
+    seedance_prompt: |
+      碧鳞蛇身形一晃，化作绿色闪电折线，瞬间消失，
+      下一秒出现在烈火犬脖子后面，毒牙狠狠咬下，
+      烈火犬身上火焰变成惨绿色，迅速熄灭，轰然倒地，口吐白沫，
+      全景镜头，平视角度，动态运镜，
+      玄幻风格，闪电特效，毒液特效，战斗震撼，高清画质，
+      4K超清，电影级画质，战斗特效炸裂
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "玩火？太慢了！"
+      - character: "烈火犬"
+        text: "嗷呜！！！"
+    reference_images:
+      - "assets/characters/images/suye_snake_green.png"
+
+  - shot_id: "qyccan-ep01-shot-12"
+    scene_description: "叶红衣装逼，赵无极逃走"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "恢复高冷神态，装逼"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "盘在肩膀，昂起头"
+    camera:
+      shot_size: "medium_shot"
+      angle: "slightly_low"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      碧鳞蛇优哉游哉爬回叶红衣肩膀，像围巾一样盘好，昂起头，
+      叶红衣恢复高冷神态，伸手摸蛇的冰凉鳞片，
+      赵无极面红耳赤，收起半死不活的狗，狼狈逃走，
+      中景镜头，略低角度，静止，
+      玄幻风格，胜利氛围，自然光，高清画质，
+      4K超清，电影级画质，人物表情细腻
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "看来你的狗，还不如我的蚕……哦不，我的蛇！"
+      - character: "叶红衣"
+        text: "谢谢你，小……小蛇。"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_snake_green.png"
+
+---
+# 视觉指导说明
+
+## 角色变体使用
+- 苏夜在 shot-01 到 shot-09 使用 variant_id: "default"（青玉蚕形态）
+- 苏夜在 shot-10 到 shot-12 使用 variant_id: "snake_green"（碧鳞蛇形态）
+- 叶红衣全集使用 variant_id: "default"（红衣破损状态）
+
+## 场景时间
+- 全部镜次使用 time_of_day: "day"（白天）
+
+## Seedance 提示词格式
+- 遵循 5-block 结构：主体 + 动作 + 场景 + 镜头 + 风格
+- 最大长度：2000 字符
+- 对白格式：角色名: "台词内容"（唇形同步）
+- 参考图引用：@{角色名}
+
+## 时长分配
+- 总时长：180 秒（3 分钟）
+- 平均每镜：15 秒
+- 关键镜次（进化、战斗）：15 秒
+- 对话镜次：12 秒
+- 动作镜次：10-15 秒
