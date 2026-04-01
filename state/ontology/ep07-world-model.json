@@ -1,97 +1,43 @@
 {
   "world_id": "qyccan-ep07",
   "episode": "ep07",
-  "created_at": "2026-04-01T00:00:00Z",
+  "schema_version": "2.1",
+  "created_at": "2026-04-01T12:30:00Z",
   "entities": {
+
     "characters": [
       {
         "id": "suye",
         "name": "苏夜",
         "tier": "protagonist",
         "current_variant": "xuanming_python",
+        "current_costume": "none",
         "variants": {
-          "bilinse": {
-            "variant_id": "bilinse",
-            "label": "碧鳞蛇（第二形态，ep07前段）",
-            "appearance": "筷子长的小蛇，通体覆盖精致碧绿色鳞片，金色瞳孔，吐着信子，头顶有两个小鼓包。",
-            "tags": ["灵智级", "毒蛇", "敏捷"]
+          "snake_green": {
+            "variant_id": "snake_green",
+            "label": "碧鳞蛇（本集前半段）",
+            "appearance": "碧绿色鳞片蟒蛇，手臂粗细，大小如意状态"
           },
           "xuanming_python": {
             "variant_id": "xuanming_python",
-            "label": "玄冥黑金蟒（第三形态，ep07进化后）",
-            "appearance": "长达三米的巨蟒，通体漆黑，鳞片泛着金色纹路，头顶有两个小鼓包，金色瞳孔，威严霸气，气息接近三阶地煞级妖兽。",
-            "tags": ["地煞级", "巨蟒", "威压", "可说话"],
-            "unlock_condition": "ep07吞噬双头魔狼妖丹和狂暴能量"
+            "label": "玄冥黑金蟒（ep07-shot09 进化后）",
+            "appearance": "长达三米，通体漆黑，头顶隐约有两个小鼓包的巨蟒，金色瞳孔，鳞片泛冷光"
           }
-        },
-        "physical": {
-          "size": "三米（玄冥形态）",
-          "weight": "沉重",
-          "mobility": "蜿蜒高速",
-          "durability": "强韧"
         },
         "abilities": [
-          {
-            "name": "吞天口",
-            "type": "active",
-            "description": "张嘴化作漆黑漩涡黑洞，可吞噬比自己大数倍的目标",
-            "unlock_episode": "ep01"
-          },
-          {
-            "name": "无限吞噬进化",
-            "type": "passive",
-            "description": "吞噬任何东西可获得进化点，积累到一定程度可进化",
-            "unlock_episode": "ep01"
-          },
-          {
-            "name": "剧毒獠牙",
-            "type": "active",
-            "description": "注入全部毒液，可击倒二阶妖兽",
-            "unlock_episode": "ep03"
-          },
-          {
-            "name": "绞杀",
-            "type": "active",
-            "description": "像绳索一样缠绕敌人颈部，死死勒住",
-            "unlock_episode": "ep03"
-          },
-          {
-            "name": "可以说话",
-            "type": "passive",
-            "description": "进化到玄冥蟒后获得说话能力，声音低沉沙哑",
-            "unlock_episode": "ep07",
-            "constraints": ["声音嘶哑低沉"]
-          },
-          {
-            "name": "龙威迫人",
-            "type": "passive",
-            "description": "散发出接近三阶地煞级的气息，令低阶妖兽和人类本能畏惧",
-            "unlock_episode": "ep07"
-          },
-          {
-            "name": "玄冥之力",
-            "type": "active",
-            "description": "运用玄冥黑金血脉之力，可直接吸取妖兽狂暴能量转化为己用",
-            "unlock_episode": "ep07"
-          }
+          {"name": "吞天口", "unlock_episode": "ep01"},
+          {"name": "剧毒獠牙", "unlock_episode": "ep03"},
+          {"name": "闪电突袭", "unlock_episode": "ep03"},
+          {"name": "百毒不侵", "unlock_episode": "ep04"},
+          {"name": "大小如意", "unlock_episode": "ep06"},
+          {"name": "龙威", "unlock_episode": "ep06"},
+          {"name": "绞杀", "unlock_episode": "ep07"},
+          {"name": "隔体吞噬", "unlock_episode": "ep07"},
+          {"name": "说话", "unlock_episode": "ep07", "condition": "进化为玄冥黑金蟒后"}
         ],
-        "constraints": [],
-        "evolution_timeline": [
-          {
-            "episode": "ep01",
-            "form": "青玉蚕",
-            "trigger": "重生到万兽天界"
-          },
-          {
-            "episode": "ep03",
-            "form": "碧鳞蛇",
-            "trigger": "吞噬聚灵佩，进化点满"
-          },
-          {
-            "episode": "ep07",
-            "form": "玄冥黑金蟒",
-            "trigger": "吞噬双头魔狼妖丹和狂暴能量，越阶进化"
-          }
+        "constraints": [
+          {"rule": "ep07-shot09 之前不能说话", "until_shot": "ep07-shot09"},
+          {"rule": "ep07-shot09 之后可以说话，声音低沉嘶哑"}
         ]
       },
       {
@@ -99,349 +45,246 @@
         "name": "叶红衣",
         "tier": "protagonist",
         "current_variant": "default",
-        "physical": {
-          "height": "高挑",
-          "build": "纤细",
-          "clothing": "红衣（战斗后微乱）"
+        "current_costume": "default",
+        "costume_variants": {
+          "default": {"description": "正常红衣，发髻整齐"},
+          "battle": {"description": "红衣略乱，持剑对峙状态，ep07-shot01 起"}
         },
-        "abilities": [
-          {
-            "name": "剑术",
-            "type": "active",
-            "description": "基础剑术",
-            "constraints": ["灵根受损，灵力微弱"]
-          }
-        ],
-        "constraints": [
-          {
-            "type": "power",
-            "description": "灵根受损，灵力微弱，无法发挥全部实力",
-            "active_until": "ep08"
-          }
-        ]
+        "abilities": [{"name": "剑术"}, {"name": "契约召唤"}],
+        "constraints": []
       },
       {
         "id": "yeruyan",
         "name": "叶如烟",
         "tier": "supporting",
         "current_variant": "default",
-        "physical": {
-          "build": "中等",
-          "clothing": "华贵服饰"
+        "current_costume": "academy_uniform_damaged",
+        "costume_variants": {
+          "academy_uniform": {"description": "天风学院制服，正常状态"},
+          "academy_uniform_damaged": {"description": "制服略乱，满脸麻子（被苏夜毒液反噬后），ep07 状态"}
         },
-        "abilities": [
-          {
-            "name": "御兽术",
-            "type": "active",
-            "description": "召唤并控制双头魔狼灵兽"
-          },
-          {
-            "name": "狂暴丹雾化",
-            "type": "active",
-            "description": "捏碎狂暴丹，化作红色雾气笼罩灵兽使其暴走，属禁药",
-            "unlock_episode": "ep07"
-          }
-        ],
-        "constraints": [
-          {
-            "type": "ethics",
-            "description": "使用禁药，被裁判席认定违规",
-            "active_from": "ep07"
-          }
-        ],
-        "fate": "ep07使用禁药被认定失败，叶红衣和苏夜取得擂台胜利"
+        "abilities": [{"name": "使用禁药"}, {"name": "控兽"}],
+        "constraints": [{"rule": "已被毒液反噬，脸上有麻子"}]
       },
       {
         "id": "system",
         "name": "系统",
         "tier": "supporting",
         "current_variant": "default",
-        "physical": {
-          "form": "无实体，只有声音"
-        },
-        "abilities": [
-          {
-            "name": "进化点统计",
-            "type": "passive",
-            "description": "实时统计苏夜的进化点"
-          },
-          {
-            "name": "检测",
-            "type": "active",
-            "description": "检测物品、能量信息"
-          },
-          {
-            "name": "进化提示",
-            "type": "active",
-            "description": "提示苏夜吞噬目标和进化路线"
-          }
-        ],
-        "constraints": [
-          {
-            "type": "interaction",
-            "description": "只能与苏夜沟通，其他人听不到"
-          }
-        ]
-      },
-      {
-        "id": "shuangtou_molang",
-        "name": "双头魔狼",
-        "tier": "minor",
-        "current_variant": "berserk",
-        "physical": {
-          "build": "膨胀一倍后的巨型双头狼",
-          "eyes": "血红色（狂暴状态）"
-        },
-        "abilities": [
-          {
-            "name": "暴走冲击",
-            "type": "active",
-            "description": "狂暴丹雾化后失去理智，以极快速度发动攻击"
-          }
-        ],
-        "constraints": [],
-        "fate": "ep07被苏夜绞杀并吞噬妖丹，变成干尸"
-      },
-      {
-        "id": "elders",
-        "name": "长老席",
-        "tier": "minor",
-        "current_variant": "default",
-        "physical": {
-          "form": "多名长老围坐评判席"
-        },
-        "abilities": [],
-        "constraints": []
+        "abilities": [{"name": "进化点统计"}, {"name": "技能提示"}],
+        "constraints": [{"rule": "只有苏夜能听到"}]
       }
     ],
+
     "locations": [
       {
         "id": "arena",
         "name": "擂台",
-        "type": "outdoor",
-        "spatial": {
-          "size": "medium",
-          "terrain": "擂台",
-          "features": ["擂台主台", "护栏", "长老评判席", "观众席"],
-          "danger_level": "medium"
-        },
-        "temporal_variants": {
-          "day": {
-            "lighting": "阳光直射",
-            "atmosphere": "热血紧张"
-          }
-        },
-        "contains": ["叶红衣", "叶如烟", "双头魔狼", "苏夜", "长老席"],
-        "significance": "ep07主战场，苏夜进化为玄冥蟒的地点"
+        "spatial": {"type": "outdoor", "size": "large", "layout": "圆形竞技擂台，四周有护栏，观众席环绕"},
+        "temporal_variants": ["day"],
+        "condition": "intact",
+        "atmosphere": "竞技氛围，阵法光纹地面"
+      },
+      {
+        "id": "elder_seats",
+        "name": "长老席",
+        "spatial": {"type": "outdoor", "size": "medium", "layout": "擂台旁侧的高台座席，供长老观战"},
+        "temporal_variants": ["day"],
+        "atmosphere": "威严肃穆，俯瞰擂台"
       }
     ],
+
     "props": [
       {
         "id": "kuangbao_dan",
         "name": "狂暴丹",
-        "description": "禁药，雾化后可使灵兽暴走，体型膨胀，失去理智",
+        "description": "红色圆形药丹，雾化后散发浓烈红色雾气，可令灵兽暴走失控",
         "owner": "yeruyan",
-        "condition": "used",
-        "significance": "叶如烟使用禁药，导致双头魔狼暴走，最终被苏夜吞噬进化",
+        "condition": "destroyed",
+        "condition_timeline": {
+          "ep07-shot01-start": "intact",
+          "ep07-shot01-end": "destroyed"
+        },
         "states": {
-          "intact": "完整珠子状态",
-          "used": "ep07被叶如烟捏碎，雾化笼罩双头魔狼"
+          "intact": "红色圆形丹药，拳头大小，表面流动红色光芒",
+          "destroyed": "捏碎，散发红色雾气，无实体"
+        },
+        "significance": "禁药，叶如烟使双头魔狼暴走的关键道具",
+        "asset_needed": true
+      },
+      {
+        "id": "moyao_yaodan",
+        "name": "魔狼妖丹",
+        "description": "双头魔狼体内的核心妖丹，被苏夜隔体吞噬后魔狼死亡",
+        "owner": "shuangtou_wolf",
+        "condition": "destroyed",
+        "condition_timeline": {
+          "ep07-shot07": "intact",
+          "ep07-shot08": "destroyed"
+        },
+        "significance": "苏夜进化的关键能量来源",
+        "asset_needed": false
+      }
+    ],
+
+    "creatures": [
+      {
+        "id": "shuangtou_wolf",
+        "name": "双头魔狼",
+        "tier": "enemy",
+        "appearance": "两个狼头，漆黑皮毛，红色双瞳，体型如战马，鬃毛竖立，獠牙锋利",
+        "threat_level": "二阶巅峰妖兽",
+        "variants": {
+          "normal": {
+            "appearance": "双头黑狼，红色瞳孔，体型如马，相对克制",
+            "note": "ep07 开始时的状态，害怕苏夜龙威"
+          },
+          "enraged": {
+            "appearance": "双头黑狼，双眼血红，体型膨胀一倍，全身弥漫红色狂暴雾气，理智全失，疯狂咆哮",
+            "note": "吸入狂暴丹雾气后的状态，ep07-shot01"
+          },
+          "dying": {
+            "appearance": "动作越来越慢，红色能量从体内流向苏夜，逐渐枯萎",
+            "note": "被绞杀+隔体吞噬时，ep07-shot08"
+          }
+        },
+        "abilities": ["双头撕咬", "横扫", "暴走冲锋"],
+        "drop_items": ["魔狼妖丹"],
+        "death_episode": "ep07",
+        "death_shot": "ep07-shot08"
+      }
+    ],
+
+    "vfx": [
+      {
+        "id": "tuntiankou",
+        "name": "吞天口",
+        "owner": "suye",
+        "visual_description": "苏夜张嘴，嘴巴化作漆黑漩涡黑洞，边缘有紫黑色能量流动，可吞噬比自身大数倍的目标，吸入时产生强烈气流",
+        "color_palette": "漆黑紫黑",
+        "scale": "medium",
+        "seedance_keywords": "漆黑漩涡，黑洞吞噬效果，紫黑能量流，空间扭曲，强烈气流吸入",
+        "unlock_episode": "ep01",
+        "visual_variants": {
+          "activated": "嘴部漆黑漩涡，周围物体被强烈吸入，空间扭曲波纹",
+          "charging": "嘴部边缘出现紫黑色光圈，逐渐扩大",
+          "dissipating": "黑洞收缩消失，留下短暂气流痕迹"
         }
       },
       {
-        "id": "molang_yaodan",
-        "name": "双头魔狼妖丹",
-        "description": "二阶巅峰妖兽的核心，蕴含大量妖力和狂暴能量",
-        "owner": "shuangtou_molang",
-        "condition": "consumed",
-        "significance": "苏夜吞噬后越阶进化为玄冥黑金蟒",
-        "states": {
-          "intact": "双头魔狼体内",
-          "consumed": "ep07被苏夜吞噬进化用"
+        "id": "jiaoshu",
+        "name": "绞杀",
+        "owner": "suye",
+        "visual_description": "苏夜蛇身像绳索一样缠绕目标颈部，鳞片发出蓝绿色摩擦光，肌肉极度收紧，被缠目标无法动弹",
+        "color_palette": "蓝绿碧色",
+        "scale": "medium",
+        "seedance_keywords": "蛇身缠绕颈部，蓝绿鳞片光，肌肉收紧特写，勒紧动态，窒息挣扎",
+        "unlock_episode": "ep07"
+      },
+      {
+        "id": "evolution_effect",
+        "name": "进化光效",
+        "owner": "suye",
+        "visual_description": "苏夜全身被金色白色强光包裹，碧绿鳞片逐渐变黑泛金，能量爆发冲击波向四周炸开，烟尘中金色光柱冲天",
+        "color_palette": "金色白色黑色",
+        "scale": "massive",
+        "seedance_keywords": "进化金色光效，能量爆发冲击波，鳞片颜色变化碧绿变漆黑，光柱冲天，烟尘四散",
+        "unlock_episode": "ep07",
+        "visual_variants": {
+          "charging": "碧绿鳞片开始出现黑色纹路，体内能量流动发光",
+          "activated": "轰！气浪爆开，金白色强光覆盖全身，体型急剧增大",
+          "dissipating": "烟尘散去，玄冥黑金蟒缓缓抬起头，金色瞳孔睁开"
         }
+      },
+      {
+        "id": "longwei_ep07",
+        "name": "龙威",
+        "owner": "suye",
+        "visual_description": "苏夜（玄冥黑金蟒形态）昂首，身周漂浮若隐若现的金色龙形虚影，强烈的气压向四周扩散，周围人被压得喘不过气",
+        "color_palette": "金色黑色",
+        "scale": "large",
+        "seedance_keywords": "金色龙威气场，龙形虚影若隐若现，气压扩散波纹，周围人被压制弯腰，威严俯视",
+        "unlock_episode": "ep07"
       }
     ]
+
   },
+
   "relationships": {
     "social": [
-      {
-        "type": "contract",
-        "from": "yehongyi",
-        "to": "suye",
-        "description": "契约关系，叶红衣是契约主，苏夜是本命灵兽",
-        "established": "ep01",
-        "strength": "unbreakable"
-      },
-      {
-        "type": "hostile",
-        "from": "yeruyan",
-        "to": "yehongyi",
-        "description": "叶如烟与叶红衣擂台对决，叶如烟使用禁药",
-        "established": "ep07",
-        "resolved": "ep07"
-      },
-      {
-        "type": "guidance",
-        "from": "system",
-        "to": "suye",
-        "description": "系统指导苏夜吞噬妖丹进化",
-        "established": "ep01",
-        "strength": "permanent"
-      }
+      {"from": "suye", "to": "yehongyi", "relation": "契约", "type": "contract", "strength": "unbreakable"},
+      {"from": "yeruyan", "to": "shuangtou_wolf", "relation": "临时控制（通过狂暴丹）", "type": "control"},
+      {"from": "yeruyan", "to": "yehongyi", "relation": "敌对（嫉妒）", "type": "hostile"},
+      {"from": "suye", "to": "shuangtou_wolf", "relation": "战斗并吞噬", "type": "combat_devour"}
     ],
     "spatial": [
-      {
-        "type": "contains",
-        "from": "arena",
-        "to": "suye",
-        "description": "苏夜在擂台上与双头魔狼战斗，并在此进化",
-        "established": "ep07"
-      },
-      {
-        "type": "contains",
-        "from": "arena",
-        "to": "yehongyi",
-        "description": "叶红衣在擂台上与叶如烟对决",
-        "established": "ep07"
-      }
+      {"from": "arena", "to": "elder_seats", "relation": "相邻（长老席俯瞰擂台）", "type": "adjacent"},
+      {"from": "suye", "to": "arena", "relation": "在擂台上战斗", "type": "located_in"},
+      {"from": "shuangtou_wolf", "to": "arena", "relation": "在擂台上战斗", "type": "located_in"}
     ],
     "causal": [
-      {
-        "type": "triggers",
-        "from": "kuangbao_dan_use",
-        "to": "molang_berserk",
-        "description": "叶如烟捏碎狂暴丹，导致双头魔狼暴走",
-        "episode": "ep07"
-      },
-      {
-        "type": "triggers",
-        "from": "molang_devour",
-        "to": "suye_evolution",
-        "description": "苏夜吞噬双头魔狼妖丹和狂暴能量，触发越阶进化",
-        "episode": "ep07"
-      },
-      {
-        "type": "enables",
-        "from": "xuanming_python_form",
-        "to": "speech_ability",
-        "description": "进化到玄冥黑金蟒后苏夜获得说话能力",
-        "episode": "ep07"
-      }
+      {"from": "kuangbao_dan", "to": "shuangtou_wolf", "relation": "触发暴走", "type": "triggers"},
+      {"from": "shuangtou_wolf", "relation": "被绞杀+隔体吞噬", "to": "evolution_effect", "type": "triggers"},
+      {"from": "evolution_effect", "to": "suye", "relation": "触发进化为玄冥黑金蟒", "type": "triggers"}
     ],
     "temporal": [
-      {
-        "type": "before",
-        "event_a": "kuangbao_dan_use",
-        "event_b": "suye_evolution",
-        "description": "叶如烟使用禁药在苏夜进化之前"
-      },
-      {
-        "type": "before",
-        "event_a": "suye_hit_railing",
-        "event_b": "suye_counterattack",
-        "description": "苏夜被拍飞在反击之前"
-      },
-      {
-        "type": "after",
-        "event_a": "suye_evolution",
-        "event_b": "first_speech",
-        "description": "苏夜进化后第一次开口说话"
-      }
+      {"from": "suye_snake_green", "to": "suye_xuanming_python", "relation": "进化（ep07-shot08至09）", "type": "evolves_to"},
+      {"from": "kuangbao_dan_intact", "to": "kuangbao_dan_destroyed", "relation": "ep07-shot01 捏碎", "type": "state_change"}
     ]
   },
+
   "physics": {
     "gravity": "normal",
-    "magic_system": {
-      "type": "cultivation",
-      "description": "修炼需要灵气，灵兽可以进化",
-      "rules": [
-        "人类通过觉醒魂宫契约灵兽战斗",
-        "灵兽等级：凡胎、灵智、地煞、天罡、君王、帝皇、神话",
-        "吞噬可以获得能力和进化点",
-        "禁药使用违反擂台规则",
-        "越阶进化需要消耗大量高阶妖力"
-      ]
-    },
+    "magic_system": "cultivation",
     "power_scaling": "strict",
-    "energy_system": {
-      "type": "spiritual_energy",
-      "sources": ["灵石", "灵草", "妖兽精血", "妖丹", "狂暴能量"],
-      "consumption": ["修炼", "战斗", "进化"]
+    "energy_system": "灵气驱动，妖力为灵兽专属，狂暴丹可人为激发妖力暴走",
+    "vfx_rules": {
+      "suye_color": "碧绿（snake_green）→ 漆黑金纹（xuanming_python）",
+      "evolution_trigger": "吞噬同阶或高阶妖兽精血，进化点爆表",
+      "longwei_trigger": "玄冥黑金蟒形态自动激活，对低阶妖兽产生血脉压制"
     }
   },
+
   "narrative_constraints": {
     "character_evolution": [
       {
         "character": "suye",
-        "constraint": "玄冥蟒形态可以说话，声音低沉沙哑",
-        "active_episodes": ["ep07", "ep08", "ep09", "ep10"]
-      },
-      {
-        "character": "yehongyi",
-        "constraint": "灵根受损，实力受限",
-        "active_episodes": ["ep07"],
-        "unlock_condition": "灵根修复（ep08后）"
+        "from": "snake_green",
+        "to": "xuanming_python",
+        "trigger": "吞噬双头魔狼妖丹，进化点爆表",
+        "episode": "ep07",
+        "shot": "ep07-shot08-to-09"
       }
     ],
     "ability_unlocks": [
-      {
-        "character": "suye",
-        "ability": "说话",
-        "unlock_episode": "ep07",
-        "unlock_condition": "进化到玄冥蟒"
-      },
-      {
-        "character": "suye",
-        "ability": "龙威迫人",
-        "unlock_episode": "ep07",
-        "unlock_condition": "进化到玄冥蟒"
-      },
-      {
-        "character": "suye",
-        "ability": "玄冥之力",
-        "unlock_episode": "ep07",
-        "unlock_condition": "进化到玄冥蟒"
-      }
+      {"character": "suye", "ability": "绞杀",   "condition": "实战需要", "episode": "ep07"},
+      {"character": "suye", "ability": "隔体吞噬", "condition": "系统提示+实战", "episode": "ep07"},
+      {"character": "suye", "ability": "说话",   "condition": "进化为玄冥黑金蟒后", "episode": "ep07", "shot": "ep07-shot09"}
+    ],
+    "prop_state_rules": [
+      {"prop": "kuangbao_dan", "rule": "ep07-shot01 破碎后不能复原出现"},
+      {"prop": "moyao_yaodan",  "rule": "ep07-shot08 被吞噬后消失，不能出现在后续镜次"}
+    ],
+    "knowledge_states": [
+      {"character": "yehongyi",  "knows": "苏夜进化为玄冥黑金蟒", "since_episode": "ep07", "since_shot": "ep07-shot09"},
+      {"character": "elder_group", "knows": "苏夜是接近三阶地煞的妖兽", "since_episode": "ep07", "since_shot": "ep07-shot09"},
+      {"character": "yehongyi",  "knows": "苏夜可以说话", "since_episode": "ep07", "since_shot": "ep07-shot09"}
+    ],
+    "creature_lifecycle": [
+      {"creature": "shuangtou_wolf", "status": "dead", "since_episode": "ep07", "since_shot": "ep07-shot08", "rule": "ep07-shot08 之后不能出现"}
     ],
     "world_rules": [
-      {
-        "rule": "契约不可解除",
-        "description": "人类与灵兽的契约一旦建立，生死与共，不可解除"
-      },
-      {
-        "rule": "进化需要进化点",
-        "description": "苏夜的进化需要积累足够的进化点，通过吞噬获得"
-      },
-      {
-        "rule": "血脉压制",
-        "description": "高等血脉对低等血脉有天然压制作用"
-      },
-      {
-        "rule": "禁药违规",
-        "description": "擂台使用禁药属于违规行为，判定失败"
-      }
+      "修炼需要灵气",
+      "灵兽可以进化，需要积累进化点",
+      "妖丹是灵兽的能量核心，失去妖丹即死亡",
+      "狂暴丹是禁药，可令灵兽暴走但会损伤其本体",
+      "血脉压制：高阶妖兽对低阶妖兽有天然威压"
     ],
     "forbidden_changes": [
-      {
-        "type": "character_death",
-        "target": "suye",
-        "reason": "主角不能死"
-      },
-      {
-        "type": "character_death",
-        "target": "yehongyi",
-        "reason": "女主角不能死"
-      },
-      {
-        "type": "contract_break",
-        "target": "suye_yehongyi_contract",
-        "reason": "契约不可解除"
-      },
-      {
-        "type": "evolution_reversal",
-        "target": "suye",
-        "reason": "苏夜进化到玄冥蟒不可逆转"
-      }
+      "ep07-shot09 之后苏夜必须是玄冥黑金蟒形态（漆黑 + 金色纹路 + 头顶小鼓包）",
+      "ep07-shot09 之后苏夜可以开口说话，声音低沉嘶哑",
+      "双头魔狼在 shot08 之后不能出现",
+      "狂暴丹在 shot01 之后不能以完整状态出现"
     ]
   }
 }
