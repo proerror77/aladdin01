@@ -1,7 +1,8 @@
 # World Model Schema Definition
 # 定义世界本体模型的数据结构规范
+# v2.1 — 新增 creatures / vfx / costume_variants
 
-version: "1.0"
+version: "2.1"
 
 world_model:
   required_fields:
@@ -15,44 +16,176 @@ world_model:
   optional_fields:
     - narrative_constraints  # 叙事约束
 
+# ──────────────────────────────────────────────
+# 实体类型（6 层）
+# ──────────────────────────────────────────────
+
 entities:
+
+  # 层 1：角色（人形，持续存在）
   characters:
     required_fields:
-      - id             # 角色 ID
+      - id             # 角色 ID（拼音/英文）
       - tier           # 层级：protagonist / supporting / minor
-      - current_variant  # 当前变体
+      - current_variant  # 当前变体 ID
       - physical       # 物理属性
-      - abilities      # 能力
-      - constraints    # 约束
+      - abilities      # 能力列表
+      - constraints    # 约束列表
+    optional_fields:
+      - costume_variants  # 服装变体列表（见层 6）
+      - current_costume   # 当前服装变体 ID（按集追踪）
 
+  # 层 2：场景（地点，持续存在）
   locations:
     required_fields:
       - id             # 场景 ID
-      - spatial        # 空间属性
-      - temporal_variants  # 时间变体
+      - spatial        # 空间属性（type: indoor/outdoor, size, layout）
+      - temporal_variants  # 时间变体列表（day/night/dusk/dawn）
+    optional_fields:
+      - condition      # 场景损坏状态（intact/damaged/destroyed）
+      - condition_timeline  # 状态变化时间线（{ep_shot: condition}）
 
+  # 层 3：道具（物品，有状态，需要资产）
   props:
     required_fields:
       - id             # 道具 ID
-      - description    # 描述
-      - owner          # 所有者
-      - condition      # 状态
+      - name           # 中文名
+      - description    # 外观描述（用于生成参考图）
+      - owner          # 当前持有者（角色 ID）
+      - condition      # 当前状态：intact / damaged / destroyed / missing
+    optional_fields:
+      - significance   # 剧情意义
+      - condition_timeline  # 状态变化时间线（{ep_shot: condition}）
+      - states         # 各状态的视觉描述
+        # intact: "完好状态的外观描述"
+        # damaged: "破损状态的外观描述"
+        # destroyed: "毁坏状态的外观描述"
+      - asset_needed   # 是否需要生成参考图（默认 true）
+
+  # 层 4：怪物/灵兽（非人形战斗实体，有生命周期）
+  creatures:
+    required_fields:
+      - id             # 怪物 ID
+      - name           # 中文名
+      - tier           # enemy / beast / boss
+      - appearance     # 外观描述（用于生成参考图）
+      - threat_level   # 威胁等级（cultivation level）
+    optional_fields:
+      - variants       # 形态变体（normal / enraged / wounded）
+      - abilities      # 能力列表
+      - drop_items     # 吞噬可获得的物品（道具ID列表）
+      - death_episode  # 消亡集数（消亡后不可再出现）
+      - death_shot     # 消亡镜次（精确追踪）
+      - summoned_by    # 召唤者（角色 ID，如果是召唤物）
+
+  # 层 5：特效/技能外观（视觉一致性锚点）
+  vfx:
+    required_fields:
+      - id             # 特效 ID
+      - name           # 技能/特效名
+      - owner          # 使用者（角色 ID）
+      - visual_description  # 详细外观描述
+      - seedance_keywords   # Seedance 提示词关键词（逗号分隔）
+    optional_fields:
+      - reference_image     # 参考图路径（assets/packs/vfx/*.png）
+      - color_palette       # 主色调（用于生成一致的特效图）
+      - scale               # 规模：small/medium/large/massive
+      - unlock_episode      # 解锁集数
+      - visual_variants     # 外观变体（charging / activated / dissipating）
+        # charging: "蓄力阶段的视觉描述"
+        # activated: "释放阶段的视觉描述"
+        # dissipating: "消散阶段的视觉描述"
+
+  # 层 6：服装变体（独立于形态追踪）
+  costume_variants:
+    # 嵌入在 characters 内（characters[].costume_variants）
+    # 也可以作为独立顶层列表（跨角色的服装追踪）
+    fields:
+      - variant_id     # 服装变体 ID
+      - character_id   # 所属角色
+      - name           # 服装名称（破损红衣 / 学院制服 / etc）
+      - description    # 外观描述
+      - first_episode  # 首次出现集数
+      - last_episode   # 最后出现集数（可选）
+      - condition      # 服装状态（intact / damaged / dirty）
+
+# ──────────────────────────────────────────────
+# 关系类型
+# ──────────────────────────────────────────────
 
 relationships:
   types:
-    - social         # 社会关系：契约、师徒、敌对
-    - spatial        # 空间关系：包含、邻近、可见
-    - causal         # 因果关系：导致、阻止、需要
+    - social         # 社会关系：契约、师徒、敌对、亲属
+    - spatial        # 空间关系：包含、邻近、可见、隔离
+    - causal         # 因果关系：导致、阻止、需要、依赖
     - temporal       # 时间关系：之前、之后、同时
+    - ownership      # 新增：持有关系（角色持有道具/生物）
+    - visual         # 新增：视觉参照关系（特效依附于角色）
+
+# ──────────────────────────────────────────────
+# 物理规则
+# ──────────────────────────────────────────────
 
 physics:
   required_fields:
-    - gravity        # 重力：normal / low / high / none
-    - magic_system   # 魔法系统：cultivation / elemental / none
-    - power_scaling  # 力量等级：strict / loose
+    - gravity        # normal / low / high / none
+    - magic_system   # cultivation / elemental / none
+    - power_scaling  # strict / loose
+  optional_fields:
+    - energy_system  # 能量系统描述（灵气、法力、气血等）
+    - vfx_rules      # 特效物理规则（特效颜色与修炼体系的对应关系）
+
+# ──────────────────────────────────────────────
+# 叙事约束
+# ──────────────────────────────────────────────
 
 narrative_constraints:
   optional_fields:
     - character_evolution  # 角色进化时间线
-    - ability_unlocks      # 能力解锁条件
-    - world_rules          # 世界规则
+    - ability_unlocks      # 能力解锁条件（{ability, condition, episode}）
+    - world_rules          # 世界规则（文字列表）
+    - prop_state_rules     # 道具状态规则（destroyed 的道具不能复活）
+    - knowledge_states     # 知识状态（谁在哪集知道了什么）
+      # - character: "角色 ID"
+      #   knows: "知道的内容"
+      #   since_episode: "ep02"
+      #   since_shot: "ep02-shot-08"  # 可选，精确到 shot
+    - creature_lifecycle   # 怪物生命周期（消亡后不可再出现）
+    - costume_continuity   # 服装连续性规则（换装需要合理时机）
+
+# ──────────────────────────────────────────────
+# 资产生成映射（供 asset-factory-agent 使用）
+# ──────────────────────────────────────────────
+
+asset_generation:
+  characters:
+    output_dir: "assets/packs/characters"
+    filename_pattern: "{name}-{variant_id}-{angle}.png"
+    angles: ["front", "side", "back"]
+    background: "white"
+
+  locations:
+    output_dir: "assets/packs/scenes"
+    filename_pattern: "{name}-{time_of_day}-styleframe.png"
+    aspect_ratio: "16:9"
+
+  props:
+    output_dir: "assets/packs/props"
+    filename_pattern: "{name}-{condition}.png"
+    conditions: ["intact", "damaged", "destroyed"]
+    background: "white"
+    skip_if: "condition == destroyed AND no_visual_needed"
+
+  creatures:
+    output_dir: "assets/packs/creatures"
+    filename_pattern: "{name}-{variant}-{angle}.png"
+    angles: ["front", "side"]  # 怪物通常只需正面+侧面
+    background: "transparent_or_white"
+    include_variants: ["normal", "enraged"]  # 跳过 dead 变体
+
+  vfx:
+    output_dir: "assets/packs/vfx"
+    filename_pattern: "{name}-{visual_variant}.png"
+    visual_variants: ["activated"]  # 默认只生成激活状态
+    background: "black"  # 特效图用黑色背景更清晰
+    aspect_ratio: "1:1"

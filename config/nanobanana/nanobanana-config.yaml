@@ -40,10 +40,34 @@ asset_types:
     image_size: "1K"
     prompt_template: |
       道具设计图，{prop_name}，{description}，
-      {condition}，白色背景，产品设计稿风格，
+      {condition}状态，白色背景，产品设计稿风格，
       照片级写实，真人实拍质感，胶片颗粒，细微噪点，
       35毫米胶片拍摄，浅景深，背景虚化，
-      高清细节，无水印
+      高清细节，无水印，无文字
+
+  creature_pack:
+    angles: ["front", "side"]
+    variants: ["normal", "enraged"]
+    aspect_ratio: "1:1"
+    image_size: "2K"
+    prompt_template: |
+      生物/灵兽设计图，{creature_name}，{appearance}，
+      {variant}状态，{angle}视图，
+      白色背景或透明背景，生物设计稿风格，
+      玄幻修仙风格，照片级写实，细节丰富，
+      威慑感强，形态清晰，高清细节，无水印，无文字
+
+  vfx_pack:
+    visual_variants: ["activated", "charging", "dissipating"]
+    aspect_ratio: "1:1"
+    image_size: "1K"
+    background: "black"
+    prompt_template: |
+      魔法特效概念图，{vfx_name}，{visual_description}，
+      {visual_variant}阶段，黑色背景，
+      {color_palette}色调，发光效果，粒子特效，
+      玄幻修仙风格，高清细节，无文字，无水印，
+      特效设计稿风格，视觉冲击力强
 
 time_of_day_mapping:
   day: "白天，明亮自然光"

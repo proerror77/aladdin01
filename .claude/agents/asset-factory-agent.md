@@ -1,6 +1,6 @@
 ---
 name: asset-factory-agent
-description: 资产工厂 agent。调用 Nanobanana 生成角色/场景/道具资产包。
+description: 资产工厂 agent。调用 Nanobanana 生成角色/场景/道具/怪物/特效资产包（6层实体全覆盖）。
 tools:
   - Read
   - Write
@@ -15,16 +15,19 @@ tools:
 
 ## 输入
 
-- `state/ontology/{ep}-world-model.json` — 世界本体模型（可选，用于批量生成）
+- `state/ontology/{ep}-world-model.json` — 世界本体模型（v2.1，含 creatures / vfx / costume_variants）
 - `assets/characters/profiles/*.yaml` — 角色档案
 - `assets/scenes/profiles/*.yaml` — 场景档案
 - `config/nanobanana/nanobanana-config.yaml` — Nanobanana 配置
 
-## 输出
+## 输出（6 层实体全覆盖）
 
 - `assets/packs/characters/{角色名}-{variant}-{angle}.png` — 角色定妆包
 - `assets/packs/scenes/{场景名}-{time_of_day}-styleframe.png` — 场景 styleframe
-- `assets/packs/props/{道具名}-{condition}.png` — 道具包
+- `assets/packs/props/{道具名}-{condition}.png` — 道具包（含状态变体）
+- `assets/packs/creatures/{怪物名}-{variant}-{angle}.png` — 怪物/灵兽包 ✨ 新增
+- `assets/packs/vfx/{技能名}-{visual_variant}.png` — 特效参考图 ✨ 新增
+- `assets/packs/asset-manifest.json` — 资产清单
 
 ## 执行流程
 
@@ -140,41 +143,150 @@ fi
 - `{道具名}-intact.png` - 完好
 - `{道具名}-damaged.png` - 破损
 
-### Step 5: 生成资产清单
+### Step 4: 生成道具包（Layer 3）
 
-创建资产清单文件：
+从本体模型中提取道具，生成各状态图：
+
+```bash
+mkdir -p assets/packs/props
+
+if [[ -f "state/ontology/${ep}-world-model.json" ]]; then
+    # 读取 props（v2.1：包含 states 字段）
+    props=$(jq -r '.entities.props[]' "state/ontology/${ep}-world-model.json")
+
+    echo "$props" | jq -c '.' | while IFS= read -r prop; do
+        prop_name=$(echo "$prop" | jq -r '.name')
+        description=$(echo "$prop" | jq -r '.description')
+        asset_needed=$(echo "$prop" | jq -r '.asset_needed // true')
+
+        [[ "$asset_needed" == "false" ]] && continue
+
+        # 每个状态生成一张（只生成有视觉意义的状态）
+        for condition in intact damaged destroyed; do
+            target="assets/packs/props/${prop_name}-${condition}.png"
+            [[ -f "$target" ]] && continue  # 幂等跳过
+
+            # 跳过 destroyed 状态（视觉无意义时）
+            cond_desc=$(echo "$prop" | jq -r ".states.${condition} // empty")
+            [[ -z "$cond_desc" && "$condition" == "destroyed" ]] && continue
+
+            ./scripts/nanobanana-caller.sh prop-pack \
+                "$prop_name" "$description" "$condition"
+        done
+    done
+fi
+```
+
+**生成内容**：
+- `{道具名}-intact.png` — 完好状态
+- `{道具名}-damaged.png` — 破损状态
+- `{道具名}-destroyed.png` — 毁坏状态（有视觉描述时才生成）
+
+---
+
+### Step 5: 生成怪物/灵兽包（Layer 4）✨ 新增
+
+从本体模型的 `entities.creatures` 中提取怪物：
+
+```bash
+mkdir -p assets/packs/creatures
+
+creatures=$(jq -r '.entities.creatures // []' "state/ontology/${ep}-world-model.json")
+
+echo "$creatures" | jq -c '.[]' 2>/dev/null | while IFS= read -r creature; do
+    creature_name=$(echo "$creature" | jq -r '.name')
+    appearance=$(echo "$creature" | jq -r '.appearance')
+    death_ep=$(echo "$creature" | jq -r '.death_episode // ""')
+
+    # 已死亡的怪物只需要有存档，不需要新生成
+    # （死亡前的集数已经生成过了）
+
+    # 生成各变体
+    variants=$(echo "$creature" | jq -r '(.variants // {"normal": .appearance}) | keys[]')
+    for variant in $variants; do
+        variant_desc=$(echo "$creature" | jq -r ".variants.${variant} // .appearance")
+        for angle in front side; do
+            target="assets/packs/creatures/${creature_name}-${variant}-${angle}.png"
+            [[ -f "$target" ]] && continue
+
+            ./scripts/nanobanana-caller.sh creature-pack \
+                "$creature_name" "$variant_desc" "$variant" "$angle"
+        done
+    done
+done
+```
+
+**生成内容**：
+- `{怪物名}-normal-front.png` — 正常状态正面
+- `{怪物名}-normal-side.png` — 正常状态侧面
+- `{怪物名}-enraged-front.png` — 激怒状态正面（如有）
+
+---
+
+### Step 6: 生成特效参考图（Layer 5）✨ 新增
+
+从本体模型的 `entities.vfx` 中提取技能特效：
+
+```bash
+mkdir -p assets/packs/vfx
+
+vfx_list=$(jq -r '.entities.vfx // []' "state/ontology/${ep}-world-model.json")
+
+echo "$vfx_list" | jq -c '.[]' 2>/dev/null | while IFS= read -r vfx; do
+    vfx_name=$(echo "$vfx" | jq -r '.name')
+    visual_desc=$(echo "$vfx" | jq -r '.visual_description')
+    color_palette=$(echo "$vfx" | jq -r '.color_palette // "玄幻蓝紫"')
+    seedance_keywords=$(echo "$vfx" | jq -r '.seedance_keywords // ""')
+
+    # 只生成 activated 状态（最常用）
+    target="assets/packs/vfx/${vfx_name}-activated.png"
+    [[ -f "$target" ]] && continue
+
+    ./scripts/nanobanana-caller.sh vfx-pack \
+        "$vfx_name" "$visual_desc" "activated" "$color_palette"
+done
+```
+
+**生成内容**：
+- `{技能名}-activated.png` — 释放状态参考图
+- 供 shot-compiler-agent 在生成 Seedance prompt 时引用关键词
+
+---
+
+### Step 7: 生成资产清单
 
 ```bash
 cat > assets/packs/asset-manifest.json << EOF
 {
   "generated_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-  "characters": [
-    $(find assets/packs/characters -name "*.png" | jq -R -s -c 'split("\n")[:-1]')
-  ],
-  "scenes": [
-    $(find assets/packs/scenes -name "*.png" | jq -R -s -c 'split("\n")[:-1]')
-  ],
-  "props": [
-    $(find assets/packs/props -name "*.png" | jq -R -s -c 'split("\n")[:-1]')
-  ]
+  "schema_version": "2.1",
+  "characters": $(find assets/packs/characters -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
+  "scenes":     $(find assets/packs/scenes     -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
+  "props":      $(find assets/packs/props      -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
+  "creatures":  $(find assets/packs/creatures  -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
+  "vfx":        $(find assets/packs/vfx        -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]')
 }
 EOF
 ```
 
-### Step 6: 验证生成结果
-
-检查所有资产是否成功生成：
+### Step 8: 写入 LanceDB
 
 ```bash
-# 统计生成的资产
-character_count=$(find assets/packs/characters -name "*.png" | wc -l)
-scene_count=$(find assets/packs/scenes -name "*.png" | wc -l)
-prop_count=$(find assets/packs/props -name "*.png" | wc -l)
+if .venv/bin/python -c "import lancedb" 2>/dev/null; then
+    .venv/bin/python scripts/vectordb-manager.py index-assets assets/packs/ 2>/dev/null
+    echo "✓ LanceDB 资产索引更新完成"
+fi
+```
 
+### Step 9: 验证生成结果
+
+```bash
 echo "资产生成完成:"
-echo "  角色: $character_count 张"
-echo "  场景: $scene_count 张"
-echo "  道具: $prop_count 张"
+echo "  角色:   $(find assets/packs/characters -name '*.png' 2>/dev/null | wc -l) 张"
+echo "  场景:   $(find assets/packs/scenes     -name '*.png' 2>/dev/null | wc -l) 张"
+echo "  道具:   $(find assets/packs/props      -name '*.png' 2>/dev/null | wc -l) 张"
+echo "  怪物:   $(find assets/packs/creatures  -name '*.png' 2>/dev/null | wc -l) 张"
+echo "  特效:   $(find assets/packs/vfx        -name '*.png' 2>/dev/null | wc -l) 张"
 ```
 
 ## 完成后

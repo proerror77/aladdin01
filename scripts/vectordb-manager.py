@@ -225,6 +225,42 @@ def cmd_upsert_world_model(args):
             "vector":      embed(desc),
         })
 
+    # ── 怪物/灵兽实体（v2.1 新增）──────────────────────────
+    creatures = wm.get("entities", {}).get("creatures", [])
+    for c in creatures:
+        variants = c.get("variants", {"normal": c.get("appearance", "")})
+        for v_id, v_appearance in variants.items():
+            if isinstance(v_appearance, dict):
+                v_appearance = v_appearance.get("appearance", str(v_appearance))
+            desc = f"{c['name']} {v_id} {v_appearance} {c.get('tier', 'enemy')}"
+            entity_rows.append({
+                "id":          f"{c['id']}_{episode}_{v_id}",
+                "name":        c["name"],
+                "entity_type": "creature",
+                "episode":     episode,
+                "tier":        c.get("tier", "enemy"),
+                "variant":     v_id,
+                "description": desc.strip(),
+                "metadata":    json.dumps(c, ensure_ascii=False),
+                "vector":      embed(desc),
+            })
+
+    # ── 特效/VFX 实体（v2.1 新增）────────────────────────
+    vfx_list = wm.get("entities", {}).get("vfx", [])
+    for vfx in vfx_list:
+        desc = f"{vfx['name']} {vfx.get('visual_description', '')} {vfx.get('seedance_keywords', '')}"
+        entity_rows.append({
+            "id":          f"{vfx['id']}_{episode}",
+            "name":        vfx["name"],
+            "entity_type": "vfx",
+            "episode":     episode,
+            "tier":        "vfx",
+            "variant":     vfx.get("owner", ""),
+            "description": desc.strip(),
+            "metadata":    json.dumps(vfx, ensure_ascii=False),
+            "vector":      embed(desc),
+        })
+
     if entity_rows:
         tbl = db.open_table(TABLE_ENTITIES)
         # 删除本集旧数据再插入（幂等）
@@ -571,12 +607,12 @@ def main():
 
     p_sa = sub.add_parser("search-assets", help="语义检索资产")
     p_sa.add_argument("query", help="查询文本")
-    p_sa.add_argument("--type", choices=["character", "scene", "prop"], default=None)
+    p_sa.add_argument("--type", choices=["character", "scene", "prop", "creature", "vfx"], default=None)
     p_sa.add_argument("--n", type=int, default=3)
 
     p_se = sub.add_parser("search-entities", help="语义检索实体")
     p_se.add_argument("query", help="查询文本")
-    p_se.add_argument("--type", choices=["character", "scene", "prop"], default=None)
+    p_se.add_argument("--type", choices=["character", "scene", "prop", "creature", "vfx"], default=None)
     p_se.add_argument("--episode", default=None)
     p_se.add_argument("--n", type=int, default=5)
 
