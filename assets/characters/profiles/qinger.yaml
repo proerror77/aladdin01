@@ -1,0 +1,10 @@
+name: 青儿
+tier: minor
+description: 萧凡的女伴，身世神秘的绝美少女。温柔、依赖萧凡。
+variants:
+- variant_id: default
+  name: 常态
+  appearance: 气质清冷、容貌绝世
+  stage: 第9集起
+personality: 温柔、依赖萧凡
+voice_traits: 温柔清脆

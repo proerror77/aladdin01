@@ -1,0 +1,15 @@
+name: 萧凡
+aliases:
+- 萧凡哥哥
+- 小凡
+tier: supporting
+description: 天命之子，正道气运主角，苏夜的宿敌。自信、正义感强、目中无人。
+variants:
+- variant_id: default
+  name: 常态
+  appearance: 身穿朴素布衣，眼神坚毅，手指戴古朴黑戒，歪嘴笑
+  stage: 第9集起
+personality: 自信、正义感强、目中无人、护短
+voice_traits: 坚毅正气
+灵兽: 小火鸟
+金手指: 戒指老爷爷（灵魂导师）

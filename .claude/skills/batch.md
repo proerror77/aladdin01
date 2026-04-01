@@ -216,6 +216,44 @@ design-agent 发现 {N} 个缺失的参考图：
 
 Phase 3 完成后自动通过（批量模式默认 `--auto-approve`），无需人工确认。
 
+### 5.5 Phase 3.5 并行（Shot Packet 编译 — v2.0 新增）
+
+检查是否存在 `state/ontology/` 目录：
+- 如果存在 → 执行 Phase 3.5
+- 如果不存在 → 跳过 Phase 3.5，输出日志 `[skip] Phase 3.5: 未找到 ontology/，跳过 shot packet 编译`
+
+为每个剧本的所有 shots 编译 shot packets：
+
+```
+for ep in episodes:
+  # 检查 world-model 是否存在
+  if [ ! -f "state/ontology/${ep}-world-model.json" ]; then
+    echo "[skip] ${ep}: 未找到 world-model.json，跳过 Phase 3.5"
+    continue
+  fi
+  
+  # 读取所有 shot_id
+  shot_ids=$(yq eval '.shots[].shot_id' outputs/${ep}/visual-direction.yaml)
+  
+  # 为每个 shot 编译 shot packet（可并行）
+  for shot_id in $shot_ids; do
+    spawn shot-compiler-agent
+      输入：shot_id, visual-direction.yaml, world-model.json
+      session_id: $SESSION_ID
+      trace_file: ${ep}-phase3.5-trace
+      输出：state/shot-packets/${shot_id}.json
+  done
+  
+  # 等待该剧本的所有 shot-compiler-agent 完成
+  wait
+  
+  # 写入状态文件
+  echo '{"episode":"'${ep}'","phase":3.5,"status":"completed","started_at":"...","completed_at":"...","data":{"shot_packets_generated":'$(ls state/shot-packets/${ep}-shot-*.json | wc -l)'}}' > state/${ep}-phase3.5.json
+done
+```
+
+shot-compiler-agent 内部会调用 memory-agent 检索参考资产。
+
 ### 6. Phase 4 并行（音色配置）
 
 **批量模式默认启用 `auto_voice_match`，无交互，可安全并行。**
@@ -293,6 +331,45 @@ concurrency > 1（多标签页并行）:
 注意：concurrency > 1 需实测即梦是否有 rate limit，建议从 2 开始。
 
 每个 gen-worker / browser-gen-worker 写入独立状态文件 `state/{ep}-shot-{N}.json`，无并发冲突。
+
+### 7.5 Phase 6 并行（Audit & Repair — v2.0 新增）
+
+检查是否存在 `state/shot-packets/` 目录：
+- 如果存在 → 执行 Phase 6
+- 如果不存在 → 跳过 Phase 6，输出日志 `[skip] Phase 6: 未找到 shot-packets/，跳过审计和修复`
+
+为每个剧本的所有成功生成的 shots 执行审计和修复（可并行）：
+
+```
+for ep in episodes:
+  if [ ! -d "state/shot-packets" ]; then
+    echo "[skip] ${ep}: 未找到 shot-packets/，跳过 Phase 6"
+    continue
+  fi
+  
+  shot_ids=$(yq eval '.shots[].shot_id' outputs/${ep}/visual-direction.yaml)
+  
+  for shot_id in $shot_ids; do
+    video_file="outputs/${ep}/videos/${shot_id}.mp4"
+    [ ! -f "$video_file" ] && continue
+    
+    spawn qa-agent (shot_id, session_id=$SESSION_ID, trace_file=${ep}-phase6-trace)
+    wait
+    
+    audit_result=$(jq -r '.repair_action' state/audit/${shot_id}-audit.json)
+    
+    if [ "$audit_result" != "pass" ]; then
+      spawn repair-agent (shot_id, repair_strategy=$audit_result, max_retries=3, session_id=$SESSION_ID)
+    fi
+  done
+  
+  wait
+  
+  # 写入状态文件和生成审计报告
+  write_phase6_state ${ep}
+  generate_audit_report ${ep}
+done
+```
 
 ### 8. 批量汇总报告
 

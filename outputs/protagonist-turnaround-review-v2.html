@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主角三视图审核 v2 - qyccan</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .improvements {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        .improvements h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .improvements ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .character-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .character-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .variant-name {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        .turnaround-image {
+            width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            margin-bottom: 15px;
+        }
+        .description {
+            background: #ecf0f1;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+        .prompt-detail {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #856404;
+        }
+        .approval-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            border-left: 4px solid #4caf50;
+        }
+        .approval-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-approve {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-approve:hover {
+            background: #229954;
+        }
+        .btn-reject {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-reject:hover {
+            background: #c0392b;
+        }
+        .btn-regenerate {
+            background: #3498db;
+            color: white;
+        }
+        .btn-regenerate:hover {
+            background: #2980b9;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .note strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>━━━ 主角三视图审核 v2 ━━━</h1>
+    <div class="subtitle">使用详细中文提示词重新生成</div>
+
+    <div class="improvements">
+        <h3>本次改进</h3>
+        <ul>
+            <li>✅ 使用中文提示词（Seedance 2.0 对中文理解更好）</li>
+            <li>✅ 详细外貌描述（颜色、质感、气质、性格特征）</li>
+            <li>✅ 明确一致性要求（"三个视图必须是同一个角色"）</li>
+            <li>✅ 风格明确（角色设计稿风格、短剧风格）</li>
+            <li>✅ 禁止项声明（防止视图融合、背景干扰）</li>
+        </ul>
+    </div>
+
+    <!-- 苏夜 - 青玉蚕 -->
+    <div class="character-section">
+        <div class="character-name">苏夜</div>
+        <div class="variant-name">青玉蚕形态（第 1-2 集）</div>
+        <img src="../assets/characters/images/苏夜-qingyucan-turnaround-v2.png" alt="苏夜-青玉蚕三视图 v2" class="turnaround-image">
+        <div class="description">
+            <strong>外貌设定：</strong>通体碧绿色的蚕宝宝，肥嘟嘟圆滚滚，拇指大小，眼神欠揍带着狡黠，Q版可爱风格但带点痞气
+        </div>
+        <div class="prompt-detail">
+            <strong>提示词要点：</strong>性格特征（腹黑、嘴炮王者、贪吃、无赖）+ 三视图一致性 + 短剧动画风格
+        </div>
+        <div class="approval-section">
+            <h3>审核选项</h3>
+            <div class="button-group">
+                <button class="btn-approve" onclick="approve('苏夜-青玉蚕 v2')">✓ 通过 — 锁定此形象</button>
+                <button class="btn-reject" onclick="reject('苏夜-青玉蚕 v2')">✗ 不满意 — 需要修改</button>
+                <button class="btn-regenerate" onclick="regenerate('苏夜-青玉蚕 v2')">↻ 重新生成 — 换随机种子</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 苏夜 - 碧鳞蛇 -->
+    <div class="character-section">
+        <div class="character-name">苏夜</div>
+        <div class="variant-name">碧鳞蛇形态（第 3-6 集）</div>
+        <img src="../assets/characters/images/苏夜-bilinse-turnaround-v2.png" alt="苏夜-碧鳞蛇三视图 v2" class="turnaround-image">
+        <div class="description">
+            <strong>外貌设定：</strong>筷子长度的小蛇，通体覆盖精致的碧绿色鳞片，金色瞳孔，吐着信子，鳞片纹理清晰，优雅但带着危险感
+        </div>
+        <div class="prompt-detail">
+            <strong>提示词要点：</strong>性格特征（腹黑、狡猾、嘴炮、护短）+ 鳞片纹理 + 金色瞳孔 + 三视图一致性
+        </div>
+        <div class="approval-section">
+            <h3>审核选项</h3>
+            <div class="button-group">
+                <button class="btn-approve" onclick="approve('苏夜-碧鳞蛇 v2')">✓ 通过 — 锁定此形象</button>
+                <button class="btn-reject" onclick="reject('苏夜-碧鳞蛇 v2')">✗ 不满意 — 需要修改</button>
+                <button class="btn-regenerate" onclick="regenerate('苏夜-碧鳞蛇 v2')">↻ 重新生成 — 换随机种子</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 苏夜 - 玄冥蟒 -->
+    <div class="character-section">
+        <div class="character-name">苏夜</div>
+        <div class="variant-name">玄冥蟒形态（第 7-10 集）</div>
+        <img src="../assets/characters/images/苏夜-xuanmingmang-turnaround-v2.png" alt="苏夜-玄冥蟒三视图 v2" class="turnaround-image">
+        <div class="description">
+            <strong>外貌设定：</strong>三米长的巨蟒，通体漆黑色鳞片带金色光泽，头顶有两个小鼓包（龙角雏形），金色瞳孔，威严霸气
+        </div>
+        <div class="prompt-detail">
+            <strong>提示词要点：</strong>性格特征（霸气、护短、腹黑、强大）+ 黑金鳞片 + 头顶鼓包 + 威严气质
+        </div>
+        <div class="approval-section">
+            <h3>审核选项</h3>
+            <div class="button-group">
+                <button class="btn-approve" onclick="approve('苏夜-玄冥蟒 v2')">✓ 通过 — 锁定此形象</button>
+                <button class="btn-reject" onclick="reject('苏夜-玄冥蟒 v2')">✗ 不满意 — 需要修改</button>
+                <button class="btn-regenerate" onclick="regenerate('苏夜-玄冥蟒 v2')">↻ 重新生成 — 换随机种子</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 叶红衣 -->
+    <div class="character-section">
+        <div class="character-name">叶红衣</div>
+        <div class="variant-name">常态（全剧）</div>
+        <img src="../assets/characters/images/叶红衣-turnaround-v2.png" alt="叶红衣三视图 v2" class="turnaround-image">
+        <div class="description">
+            <strong>外貌设定：</strong>18岁中国古装少女，红色长袍似火，高冷御姐脸，眼神透着倔强和落寞，长发飘逸，精致锁骨，气质高冷但带着一丝脆弱
+        </div>
+        <div class="prompt-detail">
+            <strong>提示词要点：</strong>性格特征（高冷、倔强、坚韧、重情义）+ 古装风格 + 写实人物比例 + 御姐气质
+        </div>
+        <div class="approval-section">
+            <h3>审核选项</h3>
+            <div class="button-group">
+                <button class="btn-approve" onclick="approve('叶红衣 v2')">✓ 通过 — 锁定此形象</button>
+                <button class="btn-reject" onclick="reject('叶红衣 v2')">✗ 不满意 — 需要修改</button>
+                <button class="btn-regenerate" onclick="regenerate('叶红衣 v2')">↻ 重新生成 — 换随机种子</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="note">
+        <strong>说明：</strong>本次使用详细中文提示词重新生成，包含性格特征、气质描述、一致性要求。
+        如果满意，请在 Claude Code 中输入 <strong>"通过"</strong> 继续生成配角和场景参考图。
+        如果仍不满意，请具体说明哪里需要改进（颜色、造型、气质、风格等）。
+    </div>
+
+    <script>
+        function approve(name) {
+            alert(`✓ 已通过：${name}\n\n请在 Claude Code 中输入 "通过" 继续流程。`);
+        }
+
+        function reject(name) {
+            const feedback = prompt(`请输入对 ${name} 的修改意见（具体说明颜色、造型、气质、风格等）：`);
+            if (feedback) {
+                alert(`已记录修改意见：${feedback}\n\n请在 Claude Code 中输入修改意见继续。`);
+            }
+        }
+
+        function regenerate(name) {
+            alert(`将重新生成 ${name}（相同提示词，换随机种子）\n\n请在 Claude Code 中输入 "重新生成 ${name}" 继续。`);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+# World Model Schema Definition
+# 定义世界本体模型的数据结构规范
+
+version: "1.0"
+
+world_model:
+  required_fields:
+    - world_id         # 世界 ID，格式：{project}-{episode}
+    - episode          # 集数
+    - created_at       # 创建时间
+    - entities         # 实体集合
+    - relationships    # 关系集合
+    - physics          # 物理规则
+
+  optional_fields:
+    - narrative_constraints  # 叙事约束
+
+entities:
+  characters:
+    required_fields:
+      - id             # 角色 ID
+      - tier           # 层级：protagonist / supporting / minor
+      - current_variant  # 当前变体
+      - physical       # 物理属性
+      - abilities      # 能力
+      - constraints    # 约束
+
+  locations:
+    required_fields:
+      - id             # 场景 ID
+      - spatial        # 空间属性
+      - temporal_variants  # 时间变体
+
+  props:
+    required_fields:
+      - id             # 道具 ID
+      - description    # 描述
+      - owner          # 所有者
+      - condition      # 状态
+
+relationships:
+  types:
+    - social         # 社会关系：契约、师徒、敌对
+    - spatial        # 空间关系：包含、邻近、可见
+    - causal         # 因果关系：导致、阻止、需要
+    - temporal       # 时间关系：之前、之后、同时
+
+physics:
+  required_fields:
+    - gravity        # 重力：normal / low / high / none
+    - magic_system   # 魔法系统：cultivation / elemental / none
+    - power_scaling  # 力量等级：strict / loose
+
+narrative_constraints:
+  optional_fields:
+    - character_evolution  # 角色进化时间线
+    - ability_unlocks      # 能力解锁条件
+    - world_rules          # 世界规则

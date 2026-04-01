@@ -1,0 +1,8 @@
+name: 练武场
+description: 叶家练武场地，开阔的训练场所。
+environment: 外景，开阔场地
+time_variants:
+- 日
+key_features:
+- 训练器械
+- 树木

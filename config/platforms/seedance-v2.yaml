@@ -93,3 +93,13 @@ browser_backend:
   max_retries: 3                 # 提交/下载最大重试次数
   # 浏览器后端固定使用 Seedance 2.0 模型 + 全能参考模式
   # 时长范围 4-15 秒（Seedance 2.0 via Web UI）
+
+# 生成模式配置（v2.0 新增）
+generation_modes:
+  text2video:
+    enabled: true
+    default: false
+  img2video:
+    enabled: true
+    default: true
+    reference_mode: "composition"  # composition / keyframes

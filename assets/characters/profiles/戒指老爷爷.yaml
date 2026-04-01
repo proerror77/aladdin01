@@ -1,0 +1,16 @@
+name: "戒指老爷爷"
+aliases: ["老师"]
+project: "qyccan"
+tier: "supporting"
+age: unknown
+gender: "male"
+appearance: |
+  无实体，灵魂寄居在萧凡手指的古朴黑戒中。
+  声音苍老，混响效果。
+personality: |
+  萧凡的导师，指导他修炼。
+  能感知苏夜的吞噬气运能力，警告萧凡苏夜是宿命之敌。
+first_episode: "qyccan-ep09"
+episodes: ["qyccan-ep09", "qyccan-ep10"]
+voice_hint: "old-male-wise"
+notes: "萧凡的金手指，戒指中的灵魂导师。"

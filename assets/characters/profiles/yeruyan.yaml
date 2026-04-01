@@ -1,0 +1,11 @@
+name: 叶如烟
+tier: supporting
+description: 反派女配，绿茶，嫉妒叶红衣，处处下绊子。
+variants:
+- variant_id: default
+  name: 常态
+  appearance: 白莲花长相，装扮妖艳，戴面纱（遮疙瘩）
+  stage: 全剧
+personality: 绿茶，嫉妒心强，阴险
+voice_traits: 阴阳怪气
+灵兽: 双头魔狼（二阶巅峰妖兽）

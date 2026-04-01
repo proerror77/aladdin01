@@ -1,0 +1,57 @@
+api:
+  base_url: "https://generativelanguage.googleapis.com/v1beta"
+  model: "gemini-3-pro-image-preview"
+  api_key_env: "TUZI_API_KEY"
+
+generation:
+  default_aspect_ratio: "1:1"
+  default_image_size: "2K"
+  use_enhanced_prompts: true  # 启用增强提示词
+  enhancement_rules: "config/nanobanana/prompt-enhancement-rules.yaml"
+
+asset_types:
+  character_pack:
+    angles: ["front", "side", "back"]
+    expressions: ["neutral", "happy", "angry", "sad", "surprised"]
+    aspect_ratio: "1:1"
+    image_size: "2K"
+    prompt_template: |
+      角色设计图，{character_name}，{appearance}，
+      {angle}视图，白色背景，角色设计稿风格，全身像，
+      照片级写实，真人实拍质感，胶片颗粒，细微噪点，
+      真实皮肤肌理，自然毛孔，人物的比例符合正常比例，
+      35毫米胶片拍摄，浅景深，背景虚化，
+      高清细节，无水印，无文字，纯净背景
+
+  scene_styleframe:
+    aspect_ratio: "16:9"
+    image_size: "2K"
+    prompt_template: |
+      场景设计图，{scene_name}，{scene_description}，
+      {time_of_day}，{lighting}，电影级场景概念图，
+      照片级写实，真人实拍质感，35毫米胶片拍摄，
+      伦勃朗光，强烈明暗对比，低饱和色调，
+      胶片颗粒感与肌理质感，镜头畸变，色差，
+      高清细节，无人物，无水印
+
+  prop_pack:
+    conditions: ["intact", "damaged", "destroyed"]
+    aspect_ratio: "1:1"
+    image_size: "1K"
+    prompt_template: |
+      道具设计图，{prop_name}，{description}，
+      {condition}，白色背景，产品设计稿风格，
+      照片级写实，真人实拍质感，胶片颗粒，细微噪点，
+      35毫米胶片拍摄，浅景深，背景虚化，
+      高清细节，无水印
+
+time_of_day_mapping:
+  day: "白天，明亮自然光"
+  night: "夜晚，{lighting}"
+  dusk: "黄昏，暖色调夕阳"
+  dawn: "清晨，柔和晨光"
+
+condition_mapping:
+  intact: "完好无损"
+  damaged: "破损"
+  destroyed: "毁坏"

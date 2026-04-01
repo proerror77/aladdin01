@@ -1,0 +1,95 @@
+name: seedance-v2
+
+# 火山方舟官方模型 ID
+# default_model 为当前推荐使用的模型，gen-worker 默认使用此值
+# 如需切换模型，修改 default_model 即可，无需改动代码
+models:
+  # Seedance 2.0（最新旗舰，API 尚未开放，敬请期待）
+  seedance_2_0: "doubao-seedance-2.0"
+
+  # Seedance 1.5 pro（当前可用最高质量，支持音画同生）
+  seedance_1_5_pro: "doubao-seedance-1-5-pro-251215"
+
+  # Seedance 1.0 系列
+  seedance_1_0_pro: "doubao-seedance-1-0-pro-250528"
+  seedance_1_0_pro_fast: "doubao-seedance-1-0-pro-fast-251015"
+  seedance_1_0_lite_t2v: "doubao-seedance-1-0-lite-t2v-250428"
+  seedance_1_0_lite_i2v: "doubao-seedance-1-0-lite-i2v-250428"
+
+# 当前默认使用的模型（API 开放后改为 seedance_2_0 即可）
+default_model: "doubao-seedance-1-5-pro-251215"
+
+max_prompt_length: 2000
+
+# 官方 content 数组格式
+# text2video:  content 中只放 text
+# img2video:   content 中放 text + image_url（首帧）
+# 首尾帧:      content 中放 text + image_url（首帧）+ image_url（尾帧）
+prompt_formula:
+  text_to_video: "[subject] + [action] + [scene] + [camera] + [style] + [audio]"
+  image_to_video: "subject+action, background+action, camera+motion"
+
+generation_duration:
+  # 各模型时长上限（gen-worker 和 visual-agent 按 default_model 读取对应值）
+  seedance_2_0: {min: 4, max: 15}  # API 尚未开放
+  seedance_1_5_pro: { min: 4, max: 12 }
+  seedance_1_0_pro: { min: 2, max: 12 }
+  seedance_1_0_pro_fast: { min: 2, max: 12 }
+  seedance_1_0_lite_t2v: { min: 2, max: 12 }
+  seedance_1_0_lite_i2v: { min: 2, max: 12 }
+  # 当前默认（与 default_model 对应，切换模型时同步更新）
+  current_min: 4
+  current_max: 12
+
+# 宽高比选项
+ratio_options:
+  - "21:9"
+  - "16:9"
+  - "4:3"
+  - "1:1"
+  - "3:4"
+  - "9:16"
+  - "adaptive"  # 根据参考图自动决定
+
+# 分辨率选项
+resolution_options:
+  - "480p"
+  - "720p"
+  - "1080p"
+
+reference_syntax: "@{asset_name}"
+dialogue_format: "lip_sync"
+
+# 批量模式并发控制
+# ~batch Phase 5 同时运行的 gen-worker 数量上限
+# 超过此值会触发 API rate limit，实际吞吐反而下降
+max_concurrent_workers: 30
+
+retry:
+  max_original_retries: 5
+  max_rewrite_rounds: 3
+  max_rewrite_retries: 3  # 每轮改写后最多重试次数
+
+# 音频配置
+audio:
+  enabled: true
+  # generate_audio: true 时，提示词中包含对白即可触发唇形同步
+  # 对白格式：角色名: "台词内容"
+  dialogue_pattern: '^[^:]+: "[^"]*"$'
+  max_dialogue_length: 500
+
+# 生成后端："api"（火山方舟 API）或 "browser"（即梦 Web UI via Actionbook CLI）
+# Seedance 2.0 API 开放后改回 "api" 即可
+generation_backend: "api"
+
+# 浏览器后端配置（仅 generation_backend: "browser" 时生效）
+browser_backend:
+  profile: "jimeng"              # Actionbook profile 名称（持久化登录状态）
+  stealth: true                  # 启用 stealth 模式
+  concurrency: 1                  # 并行标签页数量（1=串行，2-3=多标签页并行，需实测即梦限流）
+  wait_between: 30               # 任务间隔（秒）
+  download_poll_interval: 30     # 下载轮询间隔（秒）
+  download_max_wait: 600         # 下载最大等待（秒）
+  max_retries: 3                 # 提交/下载最大重试次数
+  # 浏览器后端固定使用 Seedance 2.0 模型 + 全能参考模式
+  # 时长范围 4-15 秒（Seedance 2.0 via Web UI）

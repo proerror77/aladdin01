@@ -1,0 +1,8 @@
+name: "叶家府邸"
+project: "qyccan"
+type: "indoor"
+description: |
+  叶红衣的家族府邸，包括大门、大厅、闺房、练武场、擂台等。
+  古代建筑风格，气派但因家族衰落略显破败。
+first_episode: "qyccan-ep02"
+notes: "叶家的主要场景，包含多个子场景。"

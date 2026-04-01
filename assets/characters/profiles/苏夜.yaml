@@ -1,31 +1,42 @@
 name: "苏夜"
-aliases: ["小绿", "小青", "修罗"]
+aliases: ["小绿", "小青", "毛毛", "龙神大人", "修罗"]
 project: "qyccan"
 tier: "protagonist"
-age: 28
+age: 25
 gender: "male"
 appearance: |
-  初始形态：通体碧绿、肥嘟嘟的青玉蚕，眼神欠揍，拇指大小。
-  后续进化形态各异，但始终保持一双金色瞳孔。
+  前世为龙国特种部队队长，代号"修罗"，拥有八块腹肌的帅气男人。
+  重生后为灵兽形态，随进化不断变化外貌。
 variants:
-  - variant_id: "qingyu-can"
+  - variant_id: "default"
     variant_label: "青玉蚕（初始形态）"
     appearance: |
-      通体碧绿、肥嘟嘟的蚕宝宝，拇指大小，两只肉乎乎的短腿，圆滚滚的身体。
-    tags: ["凡胎", "昆虫", "萌"]
-  - variant_id: "bilin-she"
-    variant_label: "碧鳞毒蛇（一阶进化）"
+      通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，
+      眼神极其欠揍，樱桃般的小嘴。视野呈现复眼效果。
+    tags: ["凡胎级", "昆虫", "萌系"]
+  - variant_id: "snake_green"
+    variant_label: "碧鳞蛇（第一次进化）"
     appearance: |
-      筷子长的小蛇，通体碧绿色精致鳞片，金色瞳孔，吐信子。
-    tags: ["灵智", "毒蛇", "小巧"]
-  - variant_id: "xuanming-mang"
-    variant_label: "玄冥黑蟒（二阶进化）"
+      筷子长的小蛇，通体覆盖精致碧绿色鳞片，金色瞳孔，
+      吐着信子，头顶有两个小鼓包。
+    tags: ["灵智级", "毒蛇", "敏捷"]
+  - variant_id: "snake_large"
+    variant_label: "碧鳞蛇（变大）"
     appearance: |
-      三米长巨蟒，通体漆黑，鳞片泛冷光，头顶两个小鼓包（龙角雏形），金色瞳孔。
-    tags: ["地煞", "巨蟒", "威压"]
+      手臂粗细的蟒蛇，碧绿鳞片发光，体型可大小如意。
+    tags: ["灵智级", "蟒蛇", "威压"]
+  - variant_id: "python_black"
+    variant_label: "玄冥黑金蟒（第二次进化）"
+    appearance: |
+      长达三米的巨蟒，通体漆黑，鳞片泛着冷光，覆盖黑色纹路，
+      头顶有两个明显鼓包（龙角雏形），金色瞳孔，散发龙威气息。
+    tags: ["地煞级", "玄蟒", "霸气", "龙威"]
 personality: |
-  腹黑、嘴炮王者、极其护短、贪吃。前世雇佣兵王，性格强势但重情。
+  腹黑、嘴炮王者、极其护短、贪吃、不讲武德。
+  哪怕是一条蚕，也要走出六亲不认的步伐。
+  对敌人残忍无情，对主人叶红衣极度护短。
+  自称"龙神大人"，目标是进化到顶端重铸人身。
 first_episode: "qyccan-ep01"
 episodes: ["qyccan-ep01", "qyccan-ep02", "qyccan-ep03", "qyccan-ep04", "qyccan-ep05", "qyccan-ep06", "qyccan-ep07", "qyccan-ep08", "qyccan-ep09", "qyccan-ep10"]
-voice_hint: "young-male-cool"
-notes: "前世为龙国特种部队队长，代号'修罗'。进化路线：青玉蚕→碧鳞蛇→玄冥黑蟒→紫金蛟→幽冥骨龙→太虚古龙神"
+voice_hint: "young-male-arrogant"
+notes: "主角，拥有无限吞噬进化系统，可通过吃东西进化。ep01-02为青玉蚕形态，ep03-06为碧鳞蛇形态，ep07开始为玄冥黑金蟒形态。ep07后可以开口说话。"

@@ -1,0 +1,156 @@
+# Shot Packet Schema Definition
+# 定义 shot packet 的数据结构规范
+
+version: "1.0"
+
+shot_packet:
+  required_fields:
+    - shot_id          # 镜次 ID，格式：ep01-shot-01
+    - episode          # 集数，格式：ep01
+    - scene_id         # 场景 ID，格式：ep01-sc03
+    - shot_number      # 镜次编号
+    - scene_goal       # 场景戏剧目标
+    - duration_sec     # 时长（秒）
+    - characters       # 角色列表
+    - background       # 背景信息
+    - camera           # 镜头信息
+    - seedance_inputs  # Seedance 输入参数
+
+  optional_fields:
+    - dialogue_mode    # 对白模式：external_dub / lip_sync
+    - forbidden_changes  # 禁止变化项列表
+    - repair_policy    # 修复策略
+    - ontology_constraints  # 本体约束
+    - metadata         # 元数据
+
+character_entry:
+  required_fields:
+    - id               # 角色 ID
+    - state_ref        # 状态引用，格式：{角色名}@{shot_id}
+    - variant          # 变体 ID
+    - ref_assets       # 参考资产路径列表
+    - must_preserve    # 必须保留的特征列表
+
+  optional_fields:
+    - current_state    # 当前状态快照
+      - emotion
+      - location
+      - knowledge
+      - props_in_possession
+
+background_entry:
+  required_fields:
+    - location         # 场景名称
+    - time_of_day      # 时段：day / night / dusk / dawn
+    - ref_assets       # 参考资产路径列表
+
+  optional_fields:
+    - lighting         # 光线描述
+    - weather          # 天气
+    - atmosphere       # 氛围
+
+camera_entry:
+  required_fields:
+    - shot_size        # 景别：close_up / medium / wide / full
+    - movement         # 运镜：static / push_in / pull_out / pan / tilt / follow
+
+  optional_fields:
+    - lens_style       # 镜头风格：cinematic / documentary / handheld
+    - lighting         # 光线风格
+    - angle            # 角度：eye_level / high_angle / low_angle
+
+seedance_inputs:
+  required_fields:
+    - mode             # 生成模式：text2video / img2video
+    - prompt           # 完整提示词
+
+  optional_fields:
+    - images           # 参考图片路径列表
+    - videos           # 参考视频路径列表
+    - audios           # 参考音频路径列表
+
+repair_policy:
+  optional_fields:
+    - max_retries      # 最大重试次数，默认 2
+    - prefer_local_edit  # 优先局部修复，默认 true
+
+ontology_constraints:
+  optional_fields:
+    - world_rules      # 世界规则列表
+    - character_abilities  # 角色能力约束
+    - narrative_rules  # 叙事规则
+
+# 示例 Shot Packet
+example:
+  shot_id: "ep01-shot-05"
+  episode: "ep01"
+  scene_id: "ep01-sc03"
+  shot_number: 5
+  scene_goal: "苏夜决定保护叶红衣"
+  duration_sec: 8
+  dialogue_mode: "external_dub"
+
+  characters:
+    - id: "苏夜"
+      state_ref: "苏夜@ep01-shot-05"
+      variant: "default"
+      ref_assets:
+        - "assets/packs/characters/苏夜-default-front.png"
+        - "assets/characters/images/苏夜-default-front.png"
+      must_preserve:
+        - "form"
+        - "size"
+        - "color"
+      current_state:
+        emotion: "紧张"
+        location: "叶红衣闺房"
+        knowledge:
+          - "知道叶红衣被欺负"
+
+  background:
+    location: "叶红衣闺房"
+    time_of_day: "night"
+    ref_assets:
+      - "assets/packs/scenes/叶红衣闺房-night-styleframe.png"
+      - "assets/scenes/images/叶红衣闺房-night.png"
+    lighting: "烛光摇曳"
+
+  camera:
+    shot_size: "medium_closeup"
+    movement: "slow_push_in"
+    lens_style: "cinematic"
+
+  seedance_inputs:
+    mode: "img2video"
+    images:
+      - "assets/packs/characters/苏夜-default-front.png"
+      - "assets/packs/scenes/叶红衣闺房-night-styleframe.png"
+    prompt: |
+      【出镜角色-场景】
+      角色：@图片1 作为<苏夜（青玉蚕形态）>
+      场景：<叶红衣闺房-夜>
+      [画面]：[苏夜]从床边爬向窗台，肉乎乎的小短腿一步步挪动。
+      [后景]：古风闺房，烛光摇曳，窗纱轻飘。
+
+      画面风格: 古风玄幻，温馨氛围，柔和光影。
+      镜头1：中景固定镜头，[苏夜]缓慢爬行，复眼视角呈现周围环境。
+
+      画面风格: 古风玄幻，温馨氛围；搭配轻柔环境音；禁止出现字幕、对话框、背景音乐
+
+  forbidden_changes:
+    - "不要改变苏夜的形态（必须是青玉蚕）"
+    - "不要改变苏夜的大小（拇指大小）"
+    - "不要让苏夜说话（ep07 之前不能说话）"
+
+  repair_policy:
+    max_retries: 2
+    prefer_local_edit: true
+
+  ontology_constraints:
+    world_rules:
+      - "gravity: normal"
+      - "magic_system: cultivation"
+    character_abilities:
+      苏夜:
+        can_speak: false
+        can_fly: false

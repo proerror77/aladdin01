@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主角三视图审核 - qyccan</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .character-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .character-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .variant-name {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        .turnaround-image {
+            width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            margin-bottom: 15px;
+        }
+        .description {
+            background: #ecf0f1;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+        .approval-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            border-left: 4px solid #4caf50;
+        }
+        .approval-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-approve {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-approve:hover {
+            background: #229954;
+        }
+        .btn-reject {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-reject:hover {
+            background: #c0392b;
+        }
+        .btn-regenerate {
+            background: #3498db;
+            color: white;
+        }
+        .btn-regenerate:hover {
+            background: #2980b9;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .note strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>━━━ 主角三视图审核 ━━━</h1>
+    <div class="subtitle">正确方法：一张图包含 front/side/back 三个视图，保证一致性</div>
+
+    <!-- 苏夜 - 青玉蚕 -->
+    <div class="character-section">
+        <div class="character-name">苏夜</div>
+        <div class="variant-name">青玉蚕形态（第 1-2 集）</div>
+        <img src="../assets/characters/images/苏夜-qingyucan-turnaround.png" alt="苏夜-青玉蚕三视图" class="turnaround-image">
+        <div class="description">
+            <strong>外貌设定：</strong>通体碧绿、肥嘟嘟的蚕宝宝，眼神欠揍，拇指大小
+        </div>
+        <div class="approval-section">
+            <h3>审核选项</h3>
+            <div class="button-group">
+                <button class="btn-approve" onclick="approve('苏夜-青玉蚕')">✓ 通过 — 锁定此形象</button>
+                <button class="btn-reject" onclick="reject('苏夜-青玉蚕')">✗ 不满意 — 需要修改</button>
+                <button class="btn-regenerate" onclick="regenerate('苏夜-青玉蚕')">↻ 重新生成 — 换随机种子</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 苏夜 - 碧鳞蛇 -->
+    <div class="character-section">
+        <div class="character-name">苏夜</div>
+        <div class="variant-name">碧鳞蛇形态（第 3-6 集）</div>
+        <img src="../assets/characters/images/苏夜-bilinse-turnaround.png" alt="苏夜-碧鳞蛇三视图" class="turnaround-image">
+        <div class="description">
+            <strong>外貌设定：</strong>筷子长，通体覆盖精致碧绿色鳞片的小蛇，金色瞳孔，吐信子
+        </div>
+        <div class="approval-section">
+            <h3>审核选项</h3>
+            <div class="button-group">
+                <button class="btn-approve" onclick="approve('苏夜-碧鳞蛇')">✓ 通过 — 锁定此形象</button>
+                <button class="btn-reject" onclick="reject('苏夜-碧鳞蛇')">✗ 不满意 — 需要修改</button>
+                <button class="btn-regenerate" onclick="regenerate('苏夜-碧鳞蛇')">↻ 重新生成 — 换随机种子</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 苏夜 - 玄冥蟒 -->
+    <div class="character-section">
+        <div class="character-name">苏夜</div>
+        <div class="variant-name">玄冥蟒形态（第 7-10 集）</div>
+        <img src="../assets/characters/images/苏夜-xuanmingmang-turnaround.png" alt="苏夜-玄冥蟒三视图" class="turnaround-image">
+        <div class="description">
+            <strong>外貌设定：</strong>长达三米，通体漆黑，头顶有两个小鼓包，黑金鳞片，金色瞳孔
+        </div>
+        <div class="approval-section">
+            <h3>审核选项</h3>
+            <div class="button-group">
+                <button class="btn-approve" onclick="approve('苏夜-玄冥蟒')">✓ 通过 — 锁定此形象</button>
+                <button class="btn-reject" onclick="reject('苏夜-玄冥蟒')">✗ 不满意 — 需要修改</button>
+                <button class="btn-regenerate" onclick="regenerate('苏夜-玄冥蟒')">↻ 重新生成 — 换随机种子</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 叶红衣 -->
+    <div class="character-section">
+        <div class="character-name">叶红衣</div>
+        <div class="variant-name">常态（全剧）</div>
+        <img src="../assets/characters/images/叶红衣-turnaround.png" alt="叶红衣三视图" class="turnaround-image">
+        <div class="description">
+            <strong>外貌设定：</strong>18岁，红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨
+        </div>
+        <div class="approval-section">
+            <h3>审核选项</h3>
+            <div class="button-group">
+                <button class="btn-approve" onclick="approve('叶红衣')">✓ 通过 — 锁定此形象</button>
+                <button class="btn-reject" onclick="reject('叶红衣')">✗ 不满意 — 需要修改</button>
+                <button class="btn-regenerate" onclick="regenerate('叶红衣')">↻ 重新生成 — 换随机种子</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="note">
+        <strong>说明：</strong>这是正确的三视图生成方法（一张图包含三个视图），参考业界标准做法。
+        如果满意，请在 Claude Code 中输入 <strong>"通过"</strong> 继续生成配角和场景参考图。
+    </div>
+
+    <script>
+        function approve(name) {
+            alert(`✓ 已通过：${name}\n\n请在 Claude Code 中输入 "通过" 继续流程。`);
+        }
+
+        function reject(name) {
+            const feedback = prompt(`请输入对 ${name} 的修改意见：`);
+            if (feedback) {
+                alert(`已记录修改意见：${feedback}\n\n请在 Claude Code 中输入修改意见继续。`);
+            }
+        }
+
+        function regenerate(name) {
+            alert(`将重新生成 ${name}（相同提示词，换随机种子）\n\n请在 Claude Code 中输入 "重新生成 ${name}" 继续。`);
+        }
+    </script>
+</body>
+</html>

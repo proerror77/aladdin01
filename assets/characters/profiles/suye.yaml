@@ -1,0 +1,28 @@
+name: 苏夜
+aliases:
+- 小青
+- 小绿
+- 毛毛
+tier: protagonist
+description: 主角，现代雇佣兵王转生为青玉蚕，通过吞噬系统不断进化。腹黑、嘴炮王者、极其护短、贪吃。
+variants:
+- variant_id: qingyucan
+  name: 青玉蚕形态
+  appearance: 通体碧绿、肥嘟嘟的蚕宝宝，眼神欠揍，拇指大小
+  stage: 第1集
+- variant_id: bilinse
+  name: 碧鳞蛇形态
+  appearance: 筷子长，通体覆盖精致碧绿色鳞片的小蛇，金色瞳孔，吐信子
+  stage: 第2-6集
+- variant_id: xuanmingmang
+  name: 玄冥蟒形态
+  appearance: 长达三米，通体漆黑，头顶有两个小鼓包，黑金鳞片，金色瞳孔
+  stage: 第7集起
+personality: 腹黑、嘴炮王者、极其护短、贪吃、无赖
+voice_traits: 嘶哑低沉（蛇形态），混响（OS旁白）
+key_abilities:
+- 吞天口
+- 剧毒獠牙
+- 闪电突袭
+- 魔气吞噬
+- 百毒不侵
