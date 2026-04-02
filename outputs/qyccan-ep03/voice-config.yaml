@@ -1,0 +1,22 @@
+episode: "qyccan-ep03"
+tts_platform: "pending"
+voices:
+  - character: "叶红衣"
+    voice_id: "zh_female_01"
+    style: "清冷娇柔"
+    note: "有情绪变化：惊呼→冷漠装逼→轻声感谢"
+
+  - character: "苏夜"
+    voice_id: "zh_male_03"
+    style: "青年男性 / 低沉冷静"
+    note: "碧鳞蛇形态，以蛇嘶音低沉说话；腹黑嘲讽"
+
+  - character: "赵无极"
+    voice_id: "zh_male_02"
+    style: "青年男性 / 阴柔傲慢"
+    note: "震惊→恼羞成怒→狼狈逃走"
+
+  - character: "系统"
+    voice_id: "zh_system_01"
+    style: "无性别 / 机械提示音"
+    note: "炸响提示音，无感情"

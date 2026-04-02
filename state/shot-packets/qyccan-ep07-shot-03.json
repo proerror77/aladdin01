@@ -1,0 +1,55 @@
+{
+  "shot_id": "qyccan-ep07-shot-03",
+  "episode": "qyccan-ep07",
+  "scene_id": "arena",
+  "shot_number": 3,
+  "scene_goal": "长老席惊呼禁药，暴走双头魔狼体型膨胀失去理智",
+  "duration_sec": 8,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "elders",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": ["多名长老", "惊呼表情"],
+      "current_state": {
+        "form": "人类",
+        "costume": "长老服饰",
+        "injury": "none",
+        "emotion": "震惊惊呼",
+        "props_in_possession": [],
+        "knowledge": ["认出狂暴丹为禁药"]
+      }
+    }
+  ],
+  "background": {
+    "location": "擂台",
+    "time_of_day": "day",
+    "ref_assets": []
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "slightly_low",
+    "movement": "pan",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [],
+    "videos": [],
+    "audios": [],
+    "prompt": "评判席上众长老面色大变惊呼指点，擂台中央血眼双头巨狼体型膨胀为两倍，张开双嘴狂嚎，观众席人群向后退散，中景镜头，略低角度，平移运镜，玄幻风格，压迫恐惧氛围，狂暴特效，4K超清，电影级画质，细腻动态"
+  },
+  "forbidden_changes": [
+    "双头魔狼必须有两个头",
+    "魔狼眼睛必须是血红色"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": ["高等血脉对低等血脉有天然压制作用"],
+    "character_abilities": {}
+  }
+}

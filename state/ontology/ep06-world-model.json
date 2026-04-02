@@ -1,0 +1,323 @@
+{
+  "world_id": "qyccan-ep06",
+  "episode": "ep06",
+  "created_at": "2026-04-01T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "snake_green",
+        "variants": {
+          "snake_green": {
+            "variant_id": "snake_green",
+            "label": "碧鳞蛇（可大小如意变大）",
+            "appearance": "碧绿色鳞片小蛇，使用大小如意后变成手臂粗细的蟒蛇，嘶嘶声带龙威。",
+            "tags": ["灵智级", "毒蛇", "龙威雏形"]
+          }
+        },
+        "physical": {
+          "size": "筷子长（常态）→手臂粗细（大小如意后）",
+          "weight": "可变",
+          "mobility": "灵活蜿蜒/闪电突袭",
+          "durability": "强（鳞片防护+体型增大）"
+        },
+        "abilities": [
+          { "name": "吞天口", "type": "active", "description": "吞噬目标", "unlock_episode": "ep01" },
+          { "name": "无限吞噬进化", "type": "passive", "description": "吞噬获得进化点", "unlock_episode": "ep01" },
+          { "name": "剧毒獠牙", "type": "active", "description": "毒牙咬击", "unlock_episode": "ep03" },
+          { "name": "闪电突袭", "type": "active", "description": "极速移动", "unlock_episode": "ep03" },
+          { "name": "百毒不侵", "type": "passive", "description": "免疫毒素", "unlock_episode": "ep04" },
+          {
+            "name": "大小如意",
+            "type": "active",
+            "description": "可变换体型大小，从筷子长变到手臂粗细的蟒蛇（目前只能变大一点点）",
+            "unlock_episode": "ep06",
+            "constraints": ["变大幅度有限"]
+          },
+          {
+            "name": "龙威（雏形）",
+            "type": "passive",
+            "description": "嘶嘶声带龙威压制力，对低等血脉灵兽有压制效果，上位血脉压制",
+            "unlock_episode": "ep06",
+            "constraints": ["雏形状态，效果有限"]
+          }
+        ],
+        "constraints": [
+          { "type": "communication", "description": "碧鳞蛇形态不能说话，只能发出嘶嘶声", "active_until": "ep07" }
+        ],
+        "evolution_timeline": [
+          { "episode": "ep01", "form": "青玉蚕", "trigger": "重生" },
+          { "episode": "ep03", "form": "碧鳞蛇", "trigger": "吞噬聚灵佩" },
+          { "episode": "ep07", "form": "玄冥黑金蟒", "trigger": "吞噬魔狼妖丹" }
+        ],
+        "ep_state": {
+          "new_abilities": ["大小如意", "龙威（雏形）"],
+          "notable_action": "大小如意变成手臂粗蟒蛇，一尾巴抽飞双头魔狼，龙威压制令魔狼瑟瑟发抖"
+        }
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "physical": { "height": "高挑", "build": "纤细", "clothing": "劲装（比武装扮）" },
+        "abilities": [
+          {
+            "name": "剑术",
+            "type": "active",
+            "description": "经训练后有所提升",
+            "constraints": ["灵根受损，实力仍受限"]
+          }
+        ],
+        "constraints": [
+          { "type": "power", "description": "灵根受损", "active_until": "ep08" }
+        ],
+        "ep_state": {
+          "notable_event": "参加家族大比，苏夜救场后反击叶如烟"
+        }
+      },
+      {
+        "id": "yeruyan",
+        "name": "叶如烟",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": {
+          "appearance": "脸戴面纱（遮住ep05被毒雾导致的麻子）",
+          "clothing": "华丽"
+        },
+        "abilities": [
+          {
+            "name": "召唤灵兽",
+            "type": "active",
+            "description": "召唤双头魔狼（二阶巅峰）",
+            "constraints": ["使用狂暴丹（禁药）强化灵兽"]
+          }
+        ],
+        "ep_state": {
+          "notable_event": "家族大比上被苏夜+叶红衣击败，使用禁药狂暴丹强化双头魔狼但失败"
+        }
+      },
+      {
+        "id": "shuangtou_molang",
+        "name": "双头魔狼",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": {
+          "size": "巨大",
+          "appearance": "两个头，二阶巅峰妖兽",
+          "element": "暗"
+        },
+        "abilities": [
+          { "name": "双头咬击", "type": "active", "description": "两个头同时攻击" }
+        ],
+        "fate": "ep06被苏夜龙威压制，瑟瑟发抖，预告ep07被吞噬"
+      },
+      {
+        "id": "ye_family_head",
+        "name": "叶家家主",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": { "appearance": "势利眼" },
+        "abilities": [],
+        "ep_state": { "role": "家族大比裁判/观战" }
+      },
+      {
+        "id": "ye_family_elders",
+        "name": "叶家长老们",
+        "tier": "minor",
+        "current_variant": "default",
+        "physical": { "appearance": "长老席" },
+        "abilities": [],
+        "ep_state": { "role": "家族大比观战" }
+      },
+      {
+        "id": "system",
+        "name": "系统",
+        "tier": "supporting",
+        "current_variant": "default",
+        "physical": { "form": "无实体" },
+        "abilities": [
+          { "name": "技能提示", "type": "passive", "description": "提示大小如意技能发动" },
+          { "name": "血脉检测", "type": "active", "description": "检测上位血脉压制" }
+        ],
+        "constraints": [
+          { "type": "interaction", "description": "只能与苏夜沟通" }
+        ]
+      }
+    ],
+    "locations": [
+      {
+        "id": "arena",
+        "name": "擂台",
+        "type": "outdoor",
+        "spatial": {
+          "size": "large",
+          "terrain": "比武擂台",
+          "features": ["擂台", "柱子", "护栏", "观众席", "长老席"],
+          "danger_level": "medium"
+        },
+        "temporal_variants": {
+          "day": { "lighting": "正午阳光", "atmosphere": "人山人海，热血沸腾" }
+        },
+        "significance": "叶家家族大比场地，苏夜展示大小如意和龙威的地方"
+      }
+    ],
+    "props": [
+      {
+        "id": "kuangbao_dan",
+        "name": "狂暴丹（雾化版）",
+        "description": "禁药，可让灵兽暴走但失去理智，体型膨胀一倍",
+        "owner": "yeruyan",
+        "condition": "used",
+        "significance": "叶如烟在ep06末尾使用，强化双头魔狼，但最终在ep07被苏夜击败",
+        "states": {
+          "intact": "红色珠子",
+          "used": "ep06末尾捏碎使用（效果延续到ep07）"
+        }
+      }
+    ]
+  },
+  "relationships": {
+    "social": [
+      {
+        "type": "contract",
+        "from": "yehongyi",
+        "to": "suye",
+        "description": "契约关系，生死与共",
+        "established": "ep01",
+        "strength": "unbreakable"
+      },
+      {
+        "type": "hostile",
+        "from": "yeruyan",
+        "to": "yehongyi",
+        "description": "家族大比上正面对抗",
+        "established": "ep05"
+      },
+      {
+        "type": "summoner",
+        "from": "yeruyan",
+        "to": "shuangtou_molang",
+        "description": "叶如烟召唤双头魔狼",
+        "established": "ep06"
+      },
+      {
+        "type": "blood_suppression",
+        "from": "suye",
+        "to": "shuangtou_molang",
+        "description": "苏夜的上位血脉（龙威雏形）压制双头魔狼（啸月狼血统）",
+        "established": "ep06"
+      },
+      {
+        "type": "guidance",
+        "from": "system",
+        "to": "suye",
+        "description": "系统指导",
+        "established": "ep01",
+        "strength": "permanent"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "battle_at",
+        "from": "suye",
+        "to": "arena",
+        "description": "苏夜在擂台上与双头魔狼战斗",
+        "established": "ep06"
+      }
+    ],
+    "causal": [
+      {
+        "type": "triggers",
+        "from": "molang_attack",
+        "to": "suye_daxiao_ruyi",
+        "description": "双头魔狼攻击叶红衣→苏夜发动大小如意救场",
+        "episode": "ep06"
+      },
+      {
+        "type": "triggers",
+        "from": "suye_daxiao_ruyi",
+        "to": "molang_defeated",
+        "description": "苏夜变大一尾巴抽飞魔狼→龙威压制魔狼瑟瑟发抖",
+        "episode": "ep06"
+      },
+      {
+        "type": "triggers",
+        "from": "molang_defeated",
+        "to": "yeruyan_use_kuangbao",
+        "description": "魔狼被压制→叶如烟使用禁药狂暴丹（延续到ep07）",
+        "episode": "ep06"
+      }
+    ],
+    "temporal": [
+      {
+        "type": "before",
+        "event_a": "yehongyi_challenged",
+        "event_b": "suye_rescue",
+        "description": "叶红衣先被攻击，苏夜再从袖口射出救场"
+      },
+      {
+        "type": "before",
+        "event_a": "molang_defeated",
+        "event_b": "kuangbao_used",
+        "description": "魔狼先被压制，叶如烟再使用禁药"
+      }
+    ]
+  },
+  "physics": {
+    "gravity": "normal",
+    "magic_system": {
+      "type": "cultivation",
+      "description": "修炼需要灵气，灵兽可以进化",
+      "rules": [
+        "灵兽等级：凡胎、灵智、地煞、天罡、君王、帝皇、神话",
+        "上位血脉对低等血脉有天然压制作用",
+        "禁药（如狂暴丹）可临时强化灵兽但失去理智",
+        "大小如意可改变灵兽体型"
+      ]
+    },
+    "power_scaling": "strict",
+    "energy_system": {
+      "type": "spiritual_energy",
+      "sources": ["灵石", "灵草", "药草", "矿石"],
+      "consumption": ["修炼", "战斗", "进化", "大小如意"]
+    }
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {
+        "character": "suye",
+        "constraint": "碧鳞蛇形态不能说话",
+        "active_episodes": ["ep03", "ep04", "ep05", "ep06"],
+        "unlock_condition": "进化到玄冥蟒（ep07）"
+      },
+      {
+        "character": "yehongyi",
+        "constraint": "灵根受损",
+        "active_episodes": ["ep01", "ep02", "ep03", "ep04", "ep05", "ep06", "ep07"],
+        "unlock_condition": "灵根修复（ep08后）"
+      }
+    ],
+    "ability_unlocks": [
+      { "character": "suye", "ability": "吞天口", "unlock_episode": "ep01", "unlock_condition": "契约成功" },
+      { "character": "suye", "ability": "剧毒獠牙", "unlock_episode": "ep03", "unlock_condition": "进化到碧鳞蛇" },
+      { "character": "suye", "ability": "闪电突袭", "unlock_episode": "ep03", "unlock_condition": "进化到碧鳞蛇" },
+      { "character": "suye", "ability": "百毒不侵", "unlock_episode": "ep04", "unlock_condition": "吞噬噬灵散" },
+      { "character": "suye", "ability": "大小如意", "unlock_episode": "ep06", "unlock_condition": "进化到一定程度" },
+      { "character": "suye", "ability": "龙威（雏形）", "unlock_episode": "ep06", "unlock_condition": "修出龙威雏形" }
+    ],
+    "world_rules": [
+      { "rule": "契约不可解除", "description": "不可解除" },
+      { "rule": "血脉压制", "description": "高等血脉对低等血脉有天然压制" },
+      { "rule": "禁药违规", "description": "在正式比赛中使用禁药是违规行为" },
+      { "rule": "灵兽等级严格", "description": "凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话" }
+    ],
+    "forbidden_changes": [
+      { "type": "character_death", "target": "suye", "reason": "主角不能死" },
+      { "type": "character_death", "target": "yehongyi", "reason": "女主角不能死" },
+      { "type": "contract_break", "target": "suye_yehongyi_contract", "reason": "契约不可解除" }
+    ]
+  }
+}

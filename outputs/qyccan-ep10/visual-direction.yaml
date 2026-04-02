@@ -1,0 +1,416 @@
+---
+# Visual Direction - qyccan-ep10
+# 视觉指导文件 - 开局青玉蚕 第10集
+# 生成时间: 2026-04-01
+# 苏夜 ep07+ 使用 variant_id: "xuanming_python"（玄冥黑金蟒）
+
+episode_id: "qyccan-ep10"
+episode_title: "抢夺机缘，反派的自我修养"
+total_shots: 12
+estimated_duration: 168
+
+shots:
+  - shot_id: "qyccan-ep10-shot-01"
+    scene_description: "聚灵阁外，学长们守门，新生们聚集"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters: []
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "pan"
+    duration: 12
+    seedance_prompt: |
+      天风学院内，一座灵气弥漫的古朴阁楼——聚灵阁，
+      高年级学长们守在门口，不让新生靠近，
+      新生们聚集在外，议论纷纷，
+      全景镜头，平视角度，横摇运镜，
+      玄幻风格，学院氛围，灵气粒子飘散，高清画质，
+      4K超清，电影级画质，学院场景宏观
+    has_dialogue: false
+    reference_images:
+      - "assets/scenes/images/聚灵阁-day.png"
+
+  - shot_id: "qyccan-ep10-shot-02"
+    scene_description: "萧凡和青儿也来到聚灵阁外，内心暗喜"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "xiaofan"
+        character_name: "萧凡"
+        variant_id: "default"
+        state: "内心暗喜，看向聚灵阁，抚摸戒指"
+      - character_id: "qinger"
+        character_name: "青儿"
+        variant_id: "default"
+        state: "跟在萧凡身旁"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      萧凡和青儿来到聚灵阁外，萧凡望向阁楼，内心暗喜，
+      轻抚手指上的古朴戒指，眼中带着期盼，
+      聚灵阁背景，灵气弥漫，
+      中景镜头，平视角度，静止，
+      玄幻风格，目标明确，天命气息，高清画质，
+      4K超清，电影级画质，人物内心细腻
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/萧凡-turnaround.png"
+      - "assets/characters/images/青儿-turnaround.png"
+      - "assets/scenes/images/聚灵阁-day.png"
+
+  - shot_id: "qyccan-ep10-shot-03"
+    scene_description: "叶红衣、王胖子和学长们对峙"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "冷漠说让开"
+      - character_id: "wangpangzi"
+        character_name: "王胖子"
+        variant_id: "default"
+        state: "气鼓鼓，站在叶红衣旁边"
+        must_preserve: ["胖乎乎", "圆脸", "憨厚"]
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶红衣冷漠地看着挡路的学长，简短说了句让开，
+      一旁的圆脸胖少年气鼓鼓地瞪着学长，
+      聚灵阁门口，人群围观，
+      全景镜头，平视角度，静止，
+      玄幻风格，对峙紧张，高清画质，
+      4K超清，电影级画质，新人对学长的紧张对峙
+    has_dialogue: true
+    dialogue:
+      - character: "学长A"
+        text: "聚灵阁已被我们预定，识相的新生赶紧走开！"
+      - character: "叶红衣"
+        text: "让开。"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/王胖子-turnaround.png"
+      - "assets/scenes/images/聚灵阁-day.png"
+
+  - shot_id: "qyccan-ep10-shot-04"
+    scene_description: "苏夜弹出抽学长脸，身形暴涨为三米玄蟒"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "身形暴涨为三米玄蟒，盘在门口，金色瞳孔扫视"
+        must_preserve: ["通体漆黑", "冷光鳞片", "金色瞳孔", "三米体型", "头顶两个小鼓包"]
+    camera:
+      shot_size: "full_shot"
+      angle: "low_angle"
+      movement: "zoom_in"
+    duration: 15
+    seedance_prompt: |
+      一道黑影从叶红衣身后窜出，啪的一声抽在学长脸上，
+      随即漆黑玄蟒身形暴涨，三米长的巨蟒盘在聚灵阁门口，
+      鳞片泛着冷光，金色瞳孔冷冷扫过学长们，如一尊门神，
+      全景镜头，仰视角度，推进运镜，
+      玄幻风格，王者登场，压迫气场，高清画质，
+      4K超清，电影级画质，玄蟒气势震撼
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "这地方，就是我的了。"
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/聚灵阁-day.png"
+
+  - shot_id: "qyccan-ep10-shot-05"
+    scene_description: "学长们召唤地煞级灵兽，包围苏夜"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "被多只灵兽包围，毫不慌乱"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "dynamic"
+    duration: 12
+    seedance_prompt: |
+      三只狼、两只虎、一只黑猩猩从光芒中现身，全是地煞级灵兽，
+      气势汹汹包围漆黑玄蟒，玄蟒毫不慌乱，吐了吐信子，
+      全景镜头，平视角度，动态运镜，
+      玄幻风格，多对一对峙，灵兽召唤特效，高清画质，
+      4K超清，电影级画质，战斗前夕张力
+    has_dialogue: true
+    dialogue:
+      - character: "围观新生"
+        text: "这么多地煞级灵兽？这黑蛇不一定挡得住！"
+      - character: "王胖子"
+        text: "苏夜大人，小心！"
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/聚灵阁-day.png"
+
+  - shot_id: "qyccan-ep10-shot-06"
+    scene_description: "苏夜魔气吞噬，吸走灵兽灵力"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "冲入兽群，张嘴吸取，魔气漩涡"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "dynamic"
+    duration: 15
+    seedance_prompt: |
+      漆黑玄蟒如黑色闪电冲入灵兽群，张嘴发出吸力，
+      黑色魔气漩涡从蛇口散出，灵兽体内灵力不受控制地被吸走，
+      灵兽一只只变得萎靡无力，东倒西歪，
+      全景镜头，平视角度，动态运镜，
+      玄幻风格，吞噬特效，魔气漩涡，战斗震撼，高清画质，
+      4K超清，电影级画质，吞噬能力炸裂
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "正好试试我的新能力！魔气吞噬！"
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+
+  - shot_id: "qyccan-ep10-shot-07"
+    scene_description: "萧凡愤怒喝止，戒指老爷爷制止萧凡"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "xiaofan"
+        character_name: "萧凡"
+        variant_id: "default"
+        state: "双目怒睁，手握剑柄，要冲上去"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      萧凡双目怒睁，愤怒地握住剑柄准备冲上去，
+      浑身散发着正气，眼神冰冷，
+      聚灵阁背景，混战烟尘，
+      中景镜头，平视角度，静止，
+      玄幻风格，正义怒火，主角气势，高清画质，
+      4K超清，电影级画质，正邪对立戏剧性
+    has_dialogue: true
+    dialogue:
+      - character: "萧凡"
+        text: "住手！光天化日之下使用妖术吸人修为！你这黑蛇，快放开各位学长！"
+      - character: "戒指老爷爷"
+        text: "不可！小凡！这妖蛇有吞噬一切的神通，你现在还不是它的对手！"
+    reference_images:
+      - "assets/characters/images/萧凡-turnaround.png"
+      - "assets/scenes/images/聚灵阁-day.png"
+
+  - shot_id: "qyccan-ep10-shot-08"
+    scene_description: "苏夜轻蔑扫视萧凡，扯下灵器"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "轻蔑回头，扑向黑猩猩扯下灵器"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "dynamic"
+    duration: 12
+    seedance_prompt: |
+      漆黑玄蟒轻蔑地扫了眼站在外围的萧凡，
+      随即扑向黑猩猩，迅速扯下其脖子上闪光的灵器，
+      得意地咬在嘴里，
+      中景镜头，平视角度，动态运镜，
+      玄幻风格，反派得意，灵器发光，高清画质，
+      4K超清，电影级画质，流畅动作
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "哟，正义大侠怎么站着不动？那这机缘，我收下了！"
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+
+  - shot_id: "qyccan-ep10-shot-09"
+    scene_description: "苏夜盘在聚灵阁门口，宣示主权"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "满足盘在聚灵阁门口，吞下灵器，一脸惬意"
+    camera:
+      shot_size: "full_shot"
+      angle: "low_angle"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      漆黑玄蟒满足地盘在聚灵阁门口，将抢来的发光灵器一口吞下，
+      灵气光芒被吸收，体内绿光一闪，惬意无比，
+      学长们和灵兽倒了一地，新生们远远围观，
+      全景镜头，仰视角度，静止，
+      玄幻风格，反派霸气，王者气场，高清画质，
+      4K超清，电影级画质，统治感强烈
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "还有谁？！不服的尽管来！"
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/聚灵阁-day.png"
+
+  - shot_id: "qyccan-ep10-shot-10"
+    scene_description: "叶红衣扶额劝说，苏夜反派宣言"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "一脸无奈，扶额"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "盘在门口，得意地看着叶红衣"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶红衣扶着额头，无奈地看向得意的漆黑玄蟒，
+      周围新生们小心翼翼地凑近，眼中充满敬畏，
+      聚灵阁门口，灵气弥漫，
+      中景镜头，平视角度，静止，
+      玄幻风格，轻松搞笑对比，高清画质，
+      4K超清，电影级画质，搭档日常
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "苏夜，你是不是做得太绝了？他们修为都受损了……"
+      - character: "苏夜"
+        text: "反派就要有反派的风格！对敌人留情就是对自己残忍！"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/聚灵阁-day.png"
+
+  - shot_id: "qyccan-ep10-shot-11"
+    scene_description: "远处萧凡拳头攥紧，眼神狠厉发誓"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "xiaofan"
+        character_name: "萧凡"
+        variant_id: "default"
+        state: "拳头攥紧，眼神如孤狼狠厉，发誓"
+      - character_id: "qinger"
+        character_name: "青儿"
+        variant_id: "default"
+        state: "气愤地被萧凡拉住"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      萧凡在远处拉住愤怒的青儿，自己拳头攥得紧紧的，
+      眼神如孤狼般狠厉，指甲嵌入手掌，
+      远景聚灵阁门口可见漆黑玄蟒，
+      中景镜头，平视角度，静止，
+      玄幻风格，隐忍怒火，主角背水一战预感，高清画质，
+      4K超清，电影级画质，反派主角正派仇恨确立
+    has_dialogue: true
+    dialogue:
+      - character: "萧凡"
+        text: "叶红衣，苏夜……三十年河东，三十年河西。我萧凡发誓，定要与你们正面较量！"
+    reference_images:
+      - "assets/characters/images/萧凡-turnaround.png"
+      - "assets/characters/images/青儿-turnaround.png"
+
+  - shot_id: "qyccan-ep10-shot-12"
+    scene_description: "结尾：苏夜和叶红衣入住聚灵阁，王胖子跟随"
+    location:
+      scene_id: "juling_pavilion"
+      scene_name: "聚灵阁"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "走进聚灵阁"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "盘在叶红衣肩上缩小态，昂头霸气"
+      - character_id: "wangpangzi"
+        character_name: "王胖子"
+        variant_id: "default"
+        state: "颠颠地跑着跟上，乐呵呵"
+    camera:
+      shot_size: "full_shot"
+      angle: "slightly_low"
+      movement: "tracking"
+    duration: 12
+    seedance_prompt: |
+      叶红衣肩上盘着漆黑小蛇，大步走进聚灵阁，
+      胖乎乎的少年王胖子乐呵呵地跟上，
+      门口的学长们蔫头蔫脑，围观新生们羡慕地看着，
+      全景镜头，略低角度，跟踪运镜，
+      玄幻风格，胜利入场，轻松收尾，高清画质，
+      4K超清，电影级画质，反派团队正式组建
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/characters/images/王胖子-turnaround.png"
+      - "assets/scenes/images/聚灵阁-day.png"
+
+---
+# 视觉指导说明
+
+## 角色变体使用
+- 苏夜 shot-04~09：variant_id: "xuanming_python"（三米玄蟒，恢复大形态）
+- 苏夜 shot-10~12：variant_id: "xuanming_python"（缩小态回到叶红衣肩膀）
+- 王胖子本集首次大量出场，参考图 王胖子-turnaround.png 已存在
+
+## 场景时间
+- 全集在聚灵阁 time_of_day: "day"

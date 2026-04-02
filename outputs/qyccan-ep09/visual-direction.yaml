@@ -1,0 +1,407 @@
+---
+# Visual Direction - qyccan-ep09
+# 视觉指导文件 - 开局青玉蚕 第9集
+# 生成时间: 2026-04-01
+# 苏夜 ep07+ 使用 variant_id: "xuanming_python"（玄冥黑金蟒）
+
+episode_id: "qyccan-ep09"
+episode_title: "天命之子登场，我才是反派？"
+total_shots: 12
+estimated_duration: 168
+
+shots:
+  - shot_id: "qyccan-ep09-shot-01"
+    scene_description: "天风学院广场全景，人山人海，新生入学测试"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters: []
+    camera:
+      shot_size: "full_shot"
+      angle: "high_angle"
+      movement: "pan"
+    duration: 12
+    seedance_prompt: |
+      天风学院宏伟广场，俯瞰人山人海的新生，中央竖着巨型测灵石，
+      古风学院建筑，旗帜飘扬，热闹非凡，字幕：天风学院，
+      全景镜头，俯视角度，横摇运镜，
+      玄幻风格，学院盛况，恢弘气势，高清画质，
+      4K超清，电影级画质，史诗开场
+    has_dialogue: false
+    reference_images:
+      - "assets/scenes/images/天风学院广场-day.png"
+
+  - shot_id: "qyccan-ep09-shot-02"
+    scene_description: "叶红衣兴奋围观，苏夜表情不爽嗅到异味"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "兴奋地看着测试，眼神期待"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "盘在肩上，嗅空气，表情不爽"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶红衣兴奋地踮脚看向测试台，肩膀上漆黑小蛇嗅了嗅空气，
+      随即金色瞳孔闪过一丝不爽，
+      天风学院广场背景，人声喧嚣，
+      中景镜头，平视角度，静止，
+      玄幻风格，活泼氛围，高清画质，
+      4K超清，电影级画质，人物情绪对比有趣
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "好热闹啊。"
+      - character: "苏夜"
+        text: "闻到了一股骄傲自大、目中无人的气息。"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/天风学院广场-day.png"
+
+  - shot_id: "qyccan-ep09-shot-03"
+    scene_description: "萧凡与青儿登场，引众人注目"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "xiaofan"
+        character_name: "萧凡"
+        variant_id: "default"
+        state: "布衣少年，眼神坚毅，小火鸟随行"
+        must_preserve: ["朴素布衣", "眼神坚毅", "英气少年"]
+      - character_id: "qinger"
+        character_name: "青儿"
+        variant_id: "default"
+        state: "气质清冷，容貌绝世，温柔注视萧凡"
+    camera:
+      shot_size: "full_shot"
+      angle: "slightly_low"
+      movement: "tracking"
+    duration: 12
+    seedance_prompt: |
+      朴素布衣的坚毅少年从人群中走出，一只小火鸟飞在身后，
+      身旁是气质清冷绝美的少女，温柔相随，
+      天风学院广场，众人侧目，
+      全景镜头，略低角度，跟踪运镜，
+      玄幻风格，天命少年登场，主角气场，高清画质，
+      4K超清，电影级画质，角色登场气势
+    has_dialogue: true
+    dialogue:
+      - character: "萧凡"
+        text: "老师放心，曾经失去的，我今天全都要拿回来！"
+    reference_images:
+      - "assets/characters/images/萧凡-turnaround.png"
+      - "assets/characters/images/青儿-turnaround.png"
+      - "assets/scenes/images/天风学院广场-day.png"
+
+  - shot_id: "qyccan-ep09-shot-04"
+    scene_description: "萧凡测试，紫色光芒直冲云霄"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "xiaofan"
+        character_name: "萧凡"
+        variant_id: "default"
+        state: "手掌按在测灵石上，气定神闲"
+    camera:
+      shot_size: "full_shot"
+      angle: "low_angle"
+      movement: "zoom_in"
+    duration: 15
+    seedance_prompt: |
+      萧凡手掌按在巨型测灵石上，测灵石爆发出耀眼紫色光芒，光柱直冲云霄，
+      光芒中隐隐浮现金色，全场震惊惊呼，
+      全景镜头，仰视角度，推进运镜，
+      玄幻风格，天命光效，震撼特效，高清画质，
+      4K超清，电影级画质，天才光芒震撼
+    has_dialogue: true
+    dialogue:
+      - character: "导师"
+        text: "紫色潜力！百年难遇的天才！你叫什么名字？"
+      - character: "萧凡"
+        text: "弟子萧凡。"
+    reference_images:
+      - "assets/characters/images/萧凡-turnaround.png"
+      - "assets/scenes/images/天风学院广场-day.png"
+
+  - shot_id: "qyccan-ep09-shot-05"
+    scene_description: "苏夜旁观萧凡，OS吐槽主角味"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "盘在叶红衣肩上，懒洋洋地打哈欠，满不在乎"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      漆黑小蛇懒洋洋地趴在叶红衣肩上，对眼前的骚动毫不在意，
+      打了个懒洋洋的哈欠，金色瞳孔透出轻蔑，
+      特写镜头，平视角度，静止，
+      玄幻风格，旁观者清，高清画质，
+      4K超清，电影级画质，对比搞笑
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "简称，天命之子的味道。"
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+
+  - shot_id: "qyccan-ep09-shot-06"
+    scene_description: "轮到叶红衣测试，苏夜上测试石打哈欠"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "把苏夜放在测试石上"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "懒洋洋趴在测试石上，打哈欠"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶红衣把漆黑小蛇放在测试石上，小蛇懒洋洋地趴着，
+      对着观众打了个大哈欠，一副无所谓的样子，
+      导师在旁等待，全场屏息，
+      中景镜头，平视角度，静止，
+      玄幻风格，轻松搞笑对比，高清画质，
+      4K超清，电影级画质，喜剧感强
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+
+  - shot_id: "qyccan-ep09-shot-07"
+    scene_description: "测试石发出黑气，全场惊恐"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "趴在测试石上，黑气从测试石散出"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      测试石剧烈震动，光芒未亮起，反而散发出令人心悸的漆黑气息，
+      漩涡状黑气向四周蔓延，全场观众惊恐后退，
+      全景镜头，平视角度，静止，
+      玄幻风格，黑气特效，恐慌气氛，高清画质，
+      4K超清，电影级画质，气氛骤变震撼
+    has_dialogue: true
+    dialogue:
+      - character: "导师"
+        text: "黑气？这是反噬血脉！此女与她的灵兽来历不明！快将她控制住！"
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/天风学院广场-day.png"
+
+  - shot_id: "qyccan-ep09-shot-08"
+    scene_description: "苏夜眯眼，一口咬下测试石"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "眯起眼，张嘴猛咬测试石"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "slow_motion"
+    duration: 12
+    seedance_prompt: |
+      漆黑小蛇眯起金色瞳孔，对着测试石猛地咬下，
+      咔嚓一声，咬下一大块，黑气被迅速吸入蛇口，
+      慢动作特写，震撼，
+      特写镜头，平视角度，慢动作，
+      玄幻风格，吞噬特效，冲击感，高清画质，
+      4K超清，电影级画质，吞噬特效炸裂
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "一群人，居然说我和我的契约主人是邪魔？"
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+
+  - shot_id: "qyccan-ep09-shot-09"
+    scene_description: "苏夜嚼石渣，呸的吐出，全场目瞪口呆"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "嚼石渣，呸地吐出渣，一脸嫌弃"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      漆黑小蛇嚼了嚼石头渣，皱了皱"眉头"，呸地吐出石渣，
+      全场所有人表情僵住，导师眼珠子差点瞪出来，
+      中景镜头，平视角度，静止，
+      玄幻风格，极度反差，喜剧节奏，高清画质，
+      4K超清，电影级画质，搞笑冲击
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "味道不错，就是有点硌牙。"
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/天风学院广场-day.png"
+
+  - shot_id: "qyccan-ep09-shot-10"
+    scene_description: "苏夜爆发恐怖气息，震碎整块测试石"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "身上爆发恐怖黑色气息，震碎测试石"
+    camera:
+      shot_size: "full_shot"
+      angle: "low_angle"
+      movement: "zoom_in"
+    duration: 15
+    seedance_prompt: |
+      漆黑小蛇身上突然爆发出远超之前的黑色气息，
+      黑气吸收转化，整块测试石轰隆炸碎，碎石四溅，
+      全场惊呼闪避，烟尘弥漫，
+      全景镜头，仰视角度，推进运镜，
+      玄幻风格，气息爆发特效，震撼冲击，高清画质，
+      4K超清，电影级画质，力量特效震撼
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/天风学院广场-day.png"
+
+  - shot_id: "qyccan-ep09-shot-11"
+    scene_description: "苏夜淡定游回叶红衣肩膀，特招宣布"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "淡定游回叶红衣肩膀，无所谓"
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "脸色苍白，不知所措"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      烟尘中漆黑小蛇淡定地游回叶红衣肩膀盘好，
+      叶红衣脸色苍白，一脸无奈，
+      远处传来苍老的声音宣布特招，全场哗然，
+      中景镜头，平视角度，静止，
+      玄幻风格，喜剧反差，高清画质，
+      4K超清，电影级画质，剧情转折
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "什么破石头，质量太差，炸了。不关我的事。"
+      - character: "老院长声音"
+        text: "管他正道邪魔，力量才是根本。这女娃，特招入内核心院。"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/天风学院广场-day.png"
+
+  - shot_id: "qyccan-ep09-shot-12"
+    scene_description: "萧凡眉头紧锁，苏夜对他咧嘴一笑"
+    location:
+      scene_id: "academy_square"
+      scene_name: "天风学院广场"
+      time_of_day: "day"
+    characters:
+      - character_id: "xiaofan"
+        character_name: "萧凡"
+        variant_id: "default"
+        state: "眉头紧锁，眼神冰冷，护住青儿"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "xuanming_python"
+        state: "回头对萧凡咧出蛇类的危险笑容"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 15
+    seedance_prompt: |
+      萧凡眉头紧锁，眼神如冰地看着叶红衣和那条黑蛇，护住身旁的绝美少女，
+      漆黑小蛇缓缓回头，对他咧出一个危险的笑容，
+      两人对视，剑拔弩张，
+      中景镜头，平视角度，静止，
+      玄幻风格，宿命对决预感，高清画质，
+      4K超清，电影级画质，正邪对立悬念收尾
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "看什么看，小子？多管闲事，小心我把你也一起吃了。"
+    reference_images:
+      - "assets/characters/images/萧凡-turnaround.png"
+      - "assets/characters/images/苏夜-xuanmingmang-front.png"
+      - "assets/scenes/images/天风学院广场-day.png"
+
+---
+# 视觉指导说明
+
+## 角色变体使用
+- 苏夜全集使用 variant_id: "xuanming_python"（玄冥黑金蟒）
+- 萧凡、青儿首次大量出场，使用各自参考图
+
+## 场景时间
+- 全集在天风学院广场 time_of_day: "day"
+
+## 新角色登场
+- 萧凡（shot-03~04/12）：参考图 萧凡-turnaround.png
+- 青儿（shot-03/12）：参考图 青儿-turnaround.png

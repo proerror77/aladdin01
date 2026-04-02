@@ -8,9 +8,11 @@
 ~scriptwriter                           # 交互式创作
 ~scriptwriter --idea "你的创意"          # 直接输入创意
 ~scriptwriter --episodes 20             # 指定集数（默认 10）
+~scriptwriter --episodes 60             # >20 集自动触发季级规划
 ~scriptwriter --length short            # 短剧模式（每集 60-90 秒）
 ~scriptwriter --length medium           # 中剧模式（每集 3-5 分钟）
 ~scriptwriter --length long             # 长剧模式（每集 10-15 分钟）
+~scriptwriter --style realistic-oriental # 绑定风格（可选）
 ```
 
 ## 参数
@@ -21,7 +23,7 @@
 | `--episodes <N>` | 目标集数（默认 10） |
 | `--length <mode>` | 每集时长模式：short/medium/long（默认 short） |
 | `--genre <type>` | 故事类型：romance/mystery/scifi/fantasy/comedy（可选） |
-| `--style <ref>` | 参考风格（可选，如"类似《爱情公寓》"） |
+| `--style <id>` | 绑定风格 ID（可选，见 config/styles/registry.yaml） |
 
 ## 执行流程
 
@@ -117,6 +119,74 @@ spawn **outline-agent**：
 ```
 
 🔴 **人工确认点 1**：
+
+大纲生成后，等待用户确认。用户可以：
+- 确认 → 继续
+- 修改 → 指出需要调整的部分，重新生成
+- 终止 → 结束创作
+
+### 2.5 季级规划（>20 集时触发）
+
+**触发条件**：`--episodes > 20`
+
+如果目标集数 ≤ 20，跳过此步骤，直接进入 Step 3。
+
+**任务**：
+
+1. 读取大纲中的分集概要
+2. 按每季 10 集（可调整）划分季数
+3. 为每季规划：
+   - 核心冲突（本季要解决什么）
+   - 角色弧（主角在本季的成长）
+   - 节奏板（开季抓手 → 中段转折 → 季高潮 → 季末钩子）
+   - 关键节拍（beat_sheet，标注每集的叙事功能）
+   - 新角色/新场景引入
+   - 与上一季的衔接（continuation_from + unresolved_threads）
+
+**产出**：`outputs/scriptwriter/{project-name}/seasons/season-strategy.yaml`
+
+**格式参考**：`config/templates/season-strategy-template.yaml`
+
+**示例**（60 集修仙剧）：
+```yaml
+seasons:
+  - id: "season-01"
+    name: "重生觉醒篇"
+    episodes: "ep01-ep10"
+    core_conflict: "苏夜重生为青玉蚕，在叶家求生存"
+    character_arc: "懵逼蚕宝宝 → 碧鳞蛇 → 玄冥黑金蟒"
+    hook_opening: "重生为虫子的绝望 + 系统激活"
+    climax: "ep07 吞噬双头魔狼，进化为玄冥黑金蟒"
+    hook_ending: "ep10 天命之子萧凡登场"
+    beat_sheet:
+      - {ep: "ep01", beat: "开局", note: "重生+契约+吞天口"}
+      - {ep: "ep03", beat: "第一次进化", note: "青玉蚕→碧鳞蛇"}
+      - {ep: "ep07", beat: "季高潮", note: "吞噬魔狼+进化+开口说话"}
+      - {ep: "ep10", beat: "季末钩子", note: "天命之子登场"}
+
+  - id: "season-02"
+    name: "天风学院篇"
+    episodes: "ep11-ep20"
+    continuation_from: "season-01"
+    unresolved_threads: ["萧凡的天命之子身份", "戒指老爷爷的真实身份"]
+```
+
+🔴 **人工确认点 1.5**（仅 >20 集时）：
+
+季级战略生成后，等待用户确认。用户可以：
+- 确认 → 继续
+- 调整季数/每季集数
+- 修改某季的核心冲突或节奏
+- 终止
+
+### 2.5b 绑定风格（如果指定了 --style）
+
+```bash
+if [[ -n "$style_id" ]]; then
+    yq eval ".project_bindings.${project_name} = \"${style_id}\"" -i config/styles/registry.yaml
+    echo "✓ 项目 ${project_name} 已绑定风格 ${style_id}"
+fi
+```
 ```
 大纲已生成，请查看：outputs/scriptwriter/{project}/outline.md
 

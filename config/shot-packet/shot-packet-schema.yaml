@@ -1,0 +1,144 @@
+# Shot Packet Schema
+# Shot Packet 的结构定义，用于编译完整的镜次指令
+
+version: "1.0"
+description: "Shot Packet 包含镜次的所有必要信息：角色状态、资产引用、本体约束、Seedance 输入参数"
+
+required_fields:
+  - shot_id          # 镜次 ID（ep01-shot-05）
+  - episode          # 集数（ep01）
+  - scene_id         # 场景 ID（ep01-sc03）
+  - shot_number      # 镜次编号（5）
+  - duration_sec     # 时长（秒）
+  - characters       # 角色列表
+  - background       # 背景信息
+  - camera           # 镜头信息
+  - seedance_inputs  # Seedance 输入参数
+
+optional_fields:
+  - forbidden_changes      # 禁止变化项
+  - repair_policy          # 修复策略
+  - ontology_constraints   # 本体约束
+
+schema:
+  shot_id: string
+  episode: string
+  scene_id: string
+  shot_number: integer
+  scene_goal: string         # 戏剧目标
+  duration_sec: integer      # 时长（4-15 秒）
+  dialogue_mode: string      # 对白模式（external_dub / lip_sync / none）
+
+  # 角色信息
+  characters:
+    - id: string             # 角色 ID
+      state_ref: string      # 状态引用（角色名@shot_id）
+      variant: string        # 变体 ID
+      ref_assets: array      # 参考图列表
+      must_preserve: array   # 必须保持的属性（form, size, color, costume）
+      current_state:         # 当前状态快照
+        form: string         # 形态
+        costume: string      # 服装
+        injury: string       # 伤势
+        emotion: string      # 情绪
+        props_in_possession: array  # 持有的道具
+        knowledge: array     # 知识状态
+
+  # 背景信息
+  background:
+    location: string         # 场景名
+    time_of_day: string      # 时段（day/night/dusk/dawn）
+    ref_assets: array        # 场景参考图列表
+
+  # 镜头信息
+  camera:
+    shot_size: string        # 景别（close_up, medium, full, wide）
+    movement: string         # 运动（static, pan, tilt, dolly, crane）
+    lens_style: string       # 镜头风格（cinematic, documentary, etc.）
+
+  # Seedance 输入参数
+  seedance_inputs:
+    mode: string             # 模式（img2video / text2video）
+    images: array            # 参考图列表（img2video 模式）
+    videos: array            # 参考视频列表（可选）
+    audios: array            # 音频列表（可选）
+    prompt: string           # 提示词
+
+  # 禁止变化项
+  forbidden_changes: array   # 禁止变化的内容列表
+
+  # 修复策略
+  repair_policy:
+    max_retries: integer     # 最大重试次数
+    prefer_local_edit: boolean  # 是否优先局部编辑
+
+  # 本体约束
+  ontology_constraints:
+    world_rules: array       # 世界规则
+    character_abilities: object  # 角色能力约束
+
+# 示例
+example:
+  shot_id: "ep01-shot-05"
+  episode: "ep01"
+  scene_id: "ep01-sc03"
+  shot_number: 5
+  scene_goal: "苏夜发现戒指的秘密"
+  duration_sec: 8
+  dialogue_mode: "external_dub"
+
+  characters:
+    - id: "suye"
+      state_ref: "苏夜@ep01-shot-05"
+      variant: "qingyu_silkworm"
+      ref_assets:
+        - "assets/packs/characters/苏夜-qingyu_silkworm-front.png"
+        - "assets/packs/characters/苏夜-qingyu_silkworm-side.png"
+      must_preserve: ["form", "size", "color"]
+      current_state:
+        form: "青玉蚕"
+        costume: "无"
+        injury: "none"
+        emotion: "好奇"
+        props_in_possession: ["戒指老爷爷"]
+        knowledge: []
+
+  background:
+    location: "叶红衣闺房"
+    time_of_day: "night"
+    ref_assets:
+      - "assets/packs/scenes/叶红衣闺房-night-styleframe.png"
+
+  camera:
+    shot_size: "close_up"
+    movement: "static"
+    lens_style: "cinematic"
+
+  seedance_inputs:
+    mode: "img2video"
+    images:
+      - "assets/packs/characters/苏夜-qingyu_silkworm-front.png"
+      - "assets/packs/scenes/叶红衣闺房-night-styleframe.png"
+      - "outputs/ep01/storyboard/ep01-shot-04-end-frame.png"
+    videos: []
+    audios: []
+    prompt: "青色蚕虫爬向戒指，好奇地观察，夜晚闺房，烛光摇曳，特写镜头"
+
+  forbidden_changes:
+    - "不要让苏夜说话"
+    - "不要让苏夜飞行"
+    - "保持青玉蚕形态"
+
+  repair_policy:
+    max_retries: 2
+    prefer_local_edit: true
+
+  ontology_constraints:
+    world_rules:
+      - "修炼需要灵气"
+      - "低境界无法使用高阶法术"
+    character_abilities:
+      suye:
+        can_speak: false
+        can_fly: false
+        can_transform: true

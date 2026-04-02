@@ -43,14 +43,27 @@ tools:
 
 ## 执行流程
 
-### 初始化
+### 初始化（v2.0 升级：支持 shot packet）
+
+**Step 1: 检查 shot packet 是否存在**
+
+检查 `state/shot-packets/{shot_id}.json` 是否存在：
+- 如存在 → 使用 shot packet 模式（v2.0 新流程）
+- 如不存在 → 使用旧模式（读取 visual-direction.yaml）
+
+**Step 2: 读取配置**
 
 读取配置：
-- `config/platforms/seedance-v2.yaml` — 重试参数、音频配置、**模型 ID**（读取 `default_model` 字段）
-- `config/api-endpoints.yaml` — API 端点
+- `config/platforms/seedance-v2.yaml` — 重试参数、音频配置、**模型 ID**（读取 `default_model` 字段）、**`generation_backend`**（`api` 或 `dreamina`）
+  - 如果 `generation_backend == "dreamina"` → 额外读取 `dreamina_backend` 配置（`video_model`, `poll_timeout`, `video_command_strategy`）
+- `config/api-endpoints.yaml` — API 端点（仅 `api` 后端需要）
 - `config/compliance/rewrite-patterns.yaml` — 改写模式
 
+**Step 3: 创建工作目录**
+
 创建工作目录：`outputs/{ep}/videos/`
+
+**Step 4: 写入初始状态文件**
 
 写入初始状态文件 `state/{ep}-shot-{N}{output_suffix}.json`：
 ```json
@@ -62,7 +75,9 @@ tools:
   "started_at": "{ISO8601}",
   "original_retries": 0,
   "rewrite_rounds": 0,
-  "total_api_calls": 0
+  "total_api_calls": 0,
+  "mode": "shot_packet",  // 或 "legacy"
+  "backend": "dreamina"   // 或 "api"
 }
 ```
 
@@ -126,9 +141,171 @@ LOOP:
 
 **总计最大 API 调用次数**：5（原始）+ 3×3（改写后）= 14 次
 
-### submit_to_seedance(prompt)
+### submit_to_seedance(prompt) → submit_to_backend(prompt)
 
-构建 payload（火山方舟官方格式）：
+**后端分发**：
+
+```
+if generation_backend == "api":
+    → ARK API 流程（见下方 "ARK API 后端"）
+elif generation_backend == "dreamina":
+    → Dreamina CLI 流程（见下方 "Dreamina CLI 后端"）
+```
+
+返回统一结构：`{success: bool, submit_id: str, video_url: str, rejection_reason: str}`
+
+---
+
+#### Dreamina CLI 后端
+
+**命令选择策略**（读取 `dreamina_backend.video_command_strategy`）：
+
+| generation_mode | 参考图数量 | strategy=auto | strategy=multimodal | strategy=simple |
+|-----------------|-----------|---------------|--------------------|-----------------| 
+| text2video | 0 | text2video | text2video | text2video |
+| img2video | 1 | image2video | multimodal2video | image2video |
+| img2video | ≥2 | multimodal2video | multimodal2video | image2video(首张) |
+| first_last_frame | 2 | frames2video | frames2video | frames2video |
+
+**URL → 本地路径转换**：
+
+dreamina CLI 需要本地文件路径，不接受 URL：
+- 如果 `reference_image_url` 是本地路径（`assets/...`）→ 直接使用
+- 如果是 URL（`https://...`）→ 先下载到 `/tmp/dreamina_ref_{shot_id}.png`，再传路径
+- Shot Packet 模式中的 `images` 数组通常已是本地路径，可直接使用
+
+**Payload 构建**：
+
+text2video 模式：
+```json
+{
+  "command": "text2video",
+  "prompt": "{current_prompt}",
+  "duration": {duration},
+  "ratio": "{ratio}",
+  "video_resolution": "{dreamina_backend.video_resolution}",
+  "model_version": "{dreamina_backend.video_model}",
+  "poll": {dreamina_backend.poll_timeout}
+}
+```
+
+img2video（单图）模式：
+```json
+{
+  "command": "image2video",
+  "prompt": "{current_prompt}",
+  "image": "{reference_image_local_path}",
+  "duration": {duration},
+  "video_resolution": "{dreamina_backend.video_resolution}",
+  "model_version": "{dreamina_backend.video_model}",
+  "poll": {dreamina_backend.poll_timeout}
+}
+```
+
+img2video（多图，multimodal2video 旗舰）模式：
+```json
+{
+  "command": "multimodal2video",
+  "prompt": "{current_prompt}",
+  "images": ["{ref1_local_path}", "{ref2_local_path}", ...],
+  "duration": {duration},
+  "ratio": "{ratio}",
+  "video_resolution": "{dreamina_backend.video_resolution}",
+  "model_version": "{dreamina_backend.video_model}",
+  "poll": {dreamina_backend.poll_timeout}
+}
+```
+
+首尾帧模式：
+```json
+{
+  "command": "frames2video",
+  "first": "{first_frame_local_path}",
+  "last": "{last_frame_local_path}",
+  "prompt": "{current_prompt}",
+  "duration": {duration},
+  "video_resolution": "{dreamina_backend.video_resolution}",
+  "model_version": "{dreamina_backend.video_model}",
+  "poll": {dreamina_backend.poll_timeout}
+}
+```
+
+将 payload 写入临时文件：
+```bash
+cat > /tmp/dreamina_payload_{shot_id}.json << 'PAYLOAD_EOF'
+{payload}
+PAYLOAD_EOF
+
+result=$(./scripts/api-caller.sh dreamina submit /tmp/dreamina_payload_{shot_id}.json)
+submit_id=$(echo "$result" | jq -r '.submit_id // empty')
+gen_status=$(echo "$result" | jq -r '.gen_status // empty')
+```
+
+**结果判断**：
+- `gen_status == "success"` → 下载视频，返回 `{success: true, submit_id: ...}`
+- `gen_status == "querying"` → 继续轮询：`./scripts/api-caller.sh dreamina query {submit_id}`
+- `gen_status == "fail"` → 读取 `fail_reason`，返回 `{success: false, rejection_reason: ...}`
+
+**下载视频**：
+```bash
+./scripts/api-caller.sh dreamina download {submit_id} outputs/{ep}/videos
+# dreamina 下载的文件名由 CLI 决定，需要重命名
+mv outputs/{ep}/videos/*.mp4 outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
+```
+
+---
+
+#### ARK API 后端
+
+**模式判断**：
+- 如果 `state/shot-packets/{shot_id}.json` 存在 → 使用 shot packet 模式
+- 否则 → 使用旧模式（从传入参数构建 payload）
+
+**Shot Packet 模式（v2.0 新增）**：
+
+1. 读取 `state/shot-packets/{shot_id}.json`
+2. 从 `seedance_inputs` 字段提取：
+   - `mode`（img2video）
+   - `images`（参考图列表）
+   - `prompt`（组装好的提示词）
+   - `duration`
+   - `ratio`
+   - `resolution`
+   - `generate_audio`
+3. 构建 payload（使用 shot packet 中的数据）
+   - 如果 `images` 数组有多张图，按顺序添加到 `content` 数组
+   - 第一张图作为首帧参考，后续图作为额外参考（角色定妆包、场景 styleframe 等）
+   - Seedance API 支持多张参考图，会综合考虑所有参考图的特征
+
+**旧模式（向后兼容）**：
+
+使用传入的参数构建 payload（保持原有逻辑）。
+
+**Payload 构建**（火山方舟官方格式）：
+
+**Shot Packet 模式 - 多张参考图（v2.0）**：
+```json
+{
+  "model": "{default_model from config/platforms/seedance-v2.yaml}",
+  "content": [
+    { "type": "text", "text": "{prompt}" },
+    { "type": "image_url", "image_url": { "url": "{images[0]}" } },
+    { "type": "image_url", "image_url": { "url": "{images[1]}" } },
+    { "type": "image_url", "image_url": { "url": "{images[2]}" } }
+  ],
+  "ratio": "{ratio}",
+  "duration": {duration},
+  "resolution": "{resolution}",
+  "generate_audio": {generate_audio},
+  "watermark": false
+}
+```
+
+**说明**：
+- `images` 数组中的所有图片都会添加到 `content` 数组
+- 第一张图通常是角色定妆包的正面视图
+- 后续图可以是场景 styleframe、其他角色、道具等
+- Seedance API 会综合考虑所有参考图的特征
 
 **有参考图（图生视频-首帧）**：
 ```json
@@ -203,11 +380,19 @@ PAYLOAD_EOF
 
 返回：`{success: bool, task_id: str, video_url: str, rejection_reason: str}`
 
-### download_video(video_url)
+### download_video(result)
 
+**ARK API 后端**：
 ```bash
 ./scripts/api-caller.sh seedance download {video_url} shot-{N}{output_suffix}.mp4
 mv shot-{N}{output_suffix}.mp4 outputs/{ep}/videos/
+```
+
+**Dreamina CLI 后端**：
+```bash
+./scripts/api-caller.sh dreamina download {submit_id} outputs/{ep}/videos
+# 重命名为标准文件名
+mv outputs/{ep}/videos/*.mp4 outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
 ```
 
 ### rewrite_prompt(prompt, rejection_reason)
@@ -276,8 +461,8 @@ mv shot-{N}{output_suffix}.mp4 outputs/{ep}/videos/
 在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
 
 ```bash
-# 开始生成
-./scripts/trace.sh {session_id} {trace_file} start '{"prompt":"...前100字...","duration":{N},"mode":"{generation_mode}","ref_image":"..."}'
+# 开始生成（v2.0 升级：记录模式和后端）
+./scripts/trace.sh {session_id} {trace_file} start '{"prompt":"...前100字...","duration":{N},"mode":"{generation_mode}","backend":"{generation_backend}","ref_image":"...","shot_packet_used":{true/false}}'
 
 # 提交 API
 ./scripts/trace.sh {session_id} {trace_file} api_submit '{"task_id":"cgt-...","api_call":{N}}'

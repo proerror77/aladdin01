@@ -5,11 +5,15 @@ tier: "protagonist"
 age: 18
 gender: "female"
 appearance: |
-  红衣似火，高冷御姐脸，眼神倔强而落寞。身材修长，发髻常散乱（初期逃亡状态）。
-  后期逐渐恢复自信，气质凌厉。
+  红衣似火，高冷御姐脸，眼神中透着倔强和落寞。
+  曾经的天才，因灵根受损被家族排挤，被逼嫁给纨绔少爷。
+  身材高挑，发髻精致（战斗时会散乱），气质高冷但内心坚韧。
 personality: |
-  外冷内热，倔强不服输，曾为天才后灵根受损被弃，但骨子里有韧劲。
+  高冷、坚韧、倔强、重情重义。
+  曾经是天才，灵根受损后被家族抛弃，在绝望中契约了苏夜。
+  起初把苏夜当宠物养，后来发现这宠物是祖宗。
+  对苏夜极度信任和依赖，两人是生死搭档。
 first_episode: "qyccan-ep01"
 episodes: ["qyccan-ep01", "qyccan-ep02", "qyccan-ep03", "qyccan-ep04", "qyccan-ep05", "qyccan-ep06", "qyccan-ep07", "qyccan-ep08", "qyccan-ep09", "qyccan-ep10"]
 voice_hint: "young-female-cool"
-notes: "叶家大小姐，灵根受损后被逼嫁纨绔，绝望中用圣兽召唤石契约苏夜。"
+notes: "女主角，苏夜的契约主。从废材组合一路逆袭。"

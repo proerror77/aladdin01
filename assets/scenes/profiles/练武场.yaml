@@ -1,0 +1,8 @@
+name: "练武场"
+project: "qyccan"
+type: "outdoor"
+description: |
+  叶家的练武场，苏夜训练叶红衣的地方。
+  空旷的场地，有树木、石头等训练设施。
+first_episode: "qyccan-ep05"
+notes: "训练场景，蒙太奇片段。"

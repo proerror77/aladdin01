@@ -1,0 +1,76 @@
+{
+  "shot_id": "qyccan-ep01-shot-01",
+  "episode": "qyccan-ep01",
+  "scene_id": "heiwu_forest",
+  "shot_number": 1,
+  "scene_goal": "建立苏夜重生视角，呈现青玉蚕形态的弱小与懵逼，引发观众好奇",
+  "duration_sec": 10,
+  "dialogue_mode": "none",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "苏夜@qyccan-ep01-shot-01",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/苏夜-qingyucan-front.png",
+        "assets/characters/images/苏夜-qingyucan-side.png"
+      ],
+      "must_preserve": ["通体碧绿", "肥嘟嘟", "拇指大小", "肉乎乎的小短腿"],
+      "current_state": {
+        "form": "青玉蚕",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "懵逼",
+        "props_in_possession": [],
+        "knowledge": ["刚重生到万兽天界", "不知道自己是什么形态"]
+      }
+    }
+  ],
+  "background": {
+    "location": "黑雾森林",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/黑雾森林-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "close_up",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/苏夜-qingyucan-front.png",
+      "assets/scenes/images/黑雾森林-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "一只通体碧绿、肥嘟嘟的青玉蚕趴在巨大的树叶上，拇指大小，肉乎乎的小短腿，眼神懵逼，第一人称视角，视野呈现复眼效果，特写镜头，平视角度，静止，玄幻风格，柔和自然光，高清画质，细节丰富，4K超清，电影级画质，细腻光影"
+  },
+  "forbidden_changes": [
+    "不要让苏夜说话（青玉蚕形态无法说话）",
+    "不要改变苏夜的碧绿颜色",
+    "不要让苏夜变大或形态改变"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "修炼需要灵气，灵兽可以进化",
+      "灵兽等级：凡胎、灵智、地煞、天罡、君王、帝皇、神话",
+      "契约关系生死与共，不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": false,
+        "can_fly": false,
+        "current_form": "青玉蚕（凡胎级）",
+        "active_abilities": []
+      }
+    }
+  }
+}

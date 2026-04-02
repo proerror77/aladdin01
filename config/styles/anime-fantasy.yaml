@@ -1,0 +1,54 @@
+# 动漫玄幻风格
+# 适用：热血、异世界、校园奇幻、轻小说改编
+
+name: "动漫玄幻"
+id: "anime-fantasy"
+
+image_style:
+  base_keywords:
+    - "动漫风格"
+    - "赛璐璐上色"
+    - "高饱和色彩"
+    - "清晰线条"
+    - "日系插画质感"
+
+  lighting:
+    default: "明亮均匀光，高饱和"
+    dramatic: "逆光剪影，光晕效果，色彩爆发"
+    warm: "暖色调，夕阳橙红"
+    cold: "蓝紫冷色调，月光"
+
+  camera:
+    - "清晰对焦"
+    - "平面感"
+    - "干净背景"
+
+  avoid:
+    - "照片级写实"
+    - "胶片颗粒"
+    - "自然毛孔"
+    - "肤质粗糙"
+
+  model_preference:
+    style_definition: "MJ --niji"
+    character_consistency: "🍌Pro"
+    storyboard: "🍌2"
+
+video_style:
+  quality_suffix: "4K超清，动漫画质，色彩鲜艳，线条清晰"
+  style_block:
+    default: "日系动漫风格，高饱和色彩，清晰线条，明亮光影"
+    action: "日系动漫风格，速度线，动态模糊，特效华丽，热血氛围"
+    emotional: "日系动漫风格，柔和光晕，樱花飘落，温暖色调"
+    epic: "日系动漫风格，光柱冲天，能量爆发，史诗级特效"
+  camera_preference: "清晰对焦，平稳运镜，经典动漫镜头语言"
+  color_grade: "高饱和，明亮色调，对比鲜明"
+
+composition:
+  preferred_rules:
+    - name: "速度线"
+      when: "战斗/追逐"
+      keywords: "速度线，动态模糊，冲击感"
+    - name: "仰拍英雄"
+      when: "角色登场/觉醒"
+      keywords: "低角度仰拍，逆光剪影，气势"

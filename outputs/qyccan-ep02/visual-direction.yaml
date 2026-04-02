@@ -1,0 +1,400 @@
+---
+# Visual Direction - qyccan-ep02
+# 视觉指导文件 - 开局青玉蚕 第2集
+# 生成时间: 2026-04-01
+# 基于: outputs/qyccan-ep02/render-script.md
+
+episode_id: "qyccan-ep02"
+episode_title: "这蚕子，有点东西"
+total_shots: 12
+estimated_duration: 162  # 秒
+
+shots:
+  - shot_id: "qyccan-ep02-shot-01"
+    scene_description: "家仆乙被吓到，转身逃跑"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        variant_label: "青玉蚕（初始形态）"
+        state: "在地上蹦跶，眼神犀利"
+        must_preserve: ["通体碧绿", "肥嘟嘟", "拇指大小"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      家仆乙惊恐地看着地上的碧绿肥蚕，退后两步，转身拔腿就跑，
+      黑雾森林背景，树木参天，自然光透过树叶，
+      中景镜头，平视角度，静止，
+      玄幻风格，紧张气氛，自然光，高清画质，
+      4K超清，电影级画质，人物表情惊恐细腻
+    has_dialogue: true
+    dialogue:
+      - character: "家仆乙"
+        text: "妖……妖怪！"
+    reference_images:
+      - "assets/scenes/images/黑雾森林-day.png"
+
+  - shot_id: "qyccan-ep02-shot-02"
+    scene_description: "叶红衣追上家仆乙，一剑刺穿肩膀"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "拔剑，冷漠追击"
+        must_preserve: ["红衣", "高挑", "纤细"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "slightly_low"
+      movement: "tracking"
+    duration: 12
+    seedance_prompt: |
+      叶红衣拔出软剑，几步追上逃跑的家仆乙，一剑刺穿他的肩膀，
+      家仆乙惨叫倒地，叶红衣神情冷漠，
+      黑雾森林，树林背景，自然光，
+      中景镜头，略低角度，跟踪运镜，
+      玄幻风格，动作利落，高清画质，
+      4K超清，电影级画质，剑光凌冽
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "饶命？你们追杀我时，可曾考虑过我的性命？"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/scenes/images/黑雾森林-day.png"
+
+  - shot_id: "qyccan-ep02-shot-03"
+    scene_description: "苏夜发现灵石，疯狂吞噬，体型变大"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "眼睛发光，咔嚓嚼石，肚子鼓起"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      碧绿肥蚕发现闪光灵石，眼睛瞬间发光，迫不及待扑上去，
+      咔嚓咔嚓将灵石嚼碎吞下，肚子鼓了起来，头顶冒出绿光，
+      特写镜头，平视角度，静止，
+      玄幻风格，进化绿光特效，高清画质，
+      4K超清，电影级画质，灵气粒子效果
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-qingyucan-front.png"
+
+  - shot_id: "qyccan-ep02-shot-04"
+    scene_description: "系统提示，苏夜体型变大"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "身上闪绿光，体型稍大，头顶两个小包"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "zoom_in"
+    duration: 10
+    seedance_prompt: |
+      青玉蚕身上闪过一道绿光，体型稍微变大，头顶鼓起两个小圆包，
+      系统文字UI特效浮现：吞噬下品灵石3，进化点+30，
+      特写镜头，平视角度，推进运镜，
+      玄幻风格，系统UI特效，进化粒子，高清画质，
+      4K超清，电影级画质，细腻光影
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-qingyucan-front.png"
+
+  - shot_id: "qyccan-ep02-shot-05"
+    scene_description: "叶红衣和苏夜走在回城路上，对话"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "手心托着苏夜，神色复杂"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "躺在手心，神态自傲"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "tracking"
+    duration: 15
+    seedance_prompt: |
+      叶红衣走在森林小路上，手心托着一只碧绿的小蚕，神色复杂，
+      小蚕躺在她手心，神态自傲，疯狂扭动身体表示抗议，
+      森林背景，自然光透过树叶，温馨氛围，
+      中景镜头，平视角度，跟踪运镜，
+      玄幻风格，温馨自然，高清画质，
+      4K超清，电影级画质，人物互动自然
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "你到底是什么东西？普通的青玉蚕根本没有攻击力。"
+      - character: "叶红衣"
+        text: "既然全身绿油油的，就叫你小绿吧。"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-qingyucan-front.png"
+      - "assets/scenes/images/黑雾森林-day.png"
+
+  - shot_id: "qyccan-ep02-shot-06"
+    scene_description: "叶红衣抱苏夜来到叶家大门，被赵无极拦截"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶家府邸"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "脸色苍白，站在门口"
+      - character_id: "zhaowuji"
+        character_name: "赵无极"
+        variant_id: "default"
+        state: "摇扇戏谑，衣着华丽"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 15
+    seedance_prompt: |
+      叶家府邸大门前，古风建筑，围观群众窃窃私语，
+      赵无极摇着折扇走出来，一脸戏谑，衣着华丽，
+      叶红衣站在门口，脸色苍白，
+      全景镜头，平视角度，静止，
+      玄幻风格，古风建筑，自然光，高清画质，
+      4K超清，电影级画质，古风氛围浓厚
+    has_dialogue: true
+    dialogue:
+      - character: "赵无极"
+        text: "哟，这不是我的未婚妻吗？"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/scenes/images/叶家府邸-day.png"
+
+  - shot_id: "qyccan-ep02-shot-07"
+    scene_description: "赵无极咄咄逼人，叶红衣藏苏夜"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶家府邸"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "下意识把苏夜藏入袖子，面对赵无极步步紧逼"
+      - character_id: "zhaowuji"
+        character_name: "赵无极"
+        variant_id: "default"
+        state: "咄咄逼人，伸手抓叶红衣手腕"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      赵无极上前一步，伸手要抓叶红衣手腕，叶红衣下意识把手缩回，
+      围观群众议论纷纷，古风府邸背景，
+      中景镜头，平视角度，静止，
+      玄幻风格，紧张对峙，自然光，高清画质，
+      4K超清，电影级画质，人物情绪对比鲜明
+    has_dialogue: true
+    dialogue:
+      - character: "赵无极"
+        text: "让我看看，你契约了什么厉害的灵兽？"
+      - character: "叶红衣"
+        text: "放手！"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/scenes/images/叶家府邸-day.png"
+
+  - shot_id: "qyccan-ep02-shot-08"
+    scene_description: "苏夜嗅到玉佩丹药香，跃跃欲试"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶家府邸"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "在袖子里蠢蠢欲动，眼睛发光"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      叶红衣袖口微微动了动，露出一只绿色小蚕脑袋，
+      小蚕嗅了嗅空气，眼睛瞬间发光，垂涎三尺，
+      赵无极腰间玉佩隐隐散发淡淡光芒，
+      特写镜头，平视角度，静止，
+      玄幻风格，灵气光效，高清画质，
+      4K超清，电影级画质，细节丰富
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-qingyucan-front.png"
+
+  - shot_id: "qyccan-ep02-shot-09"
+    scene_description: "苏夜弹射跳到赵无极脸上，咬断玉佩绳"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶家府邸"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "弹射跳跃，借力踹脸，咬断绳子"
+      - character_id: "zhaowuji"
+        character_name: "赵无极"
+        variant_id: "default"
+        state: "被踩脸，大惊失色"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "slow_motion"
+    duration: 12
+    seedance_prompt: |
+      一道绿光射出，青玉蚕跳到赵无极脸上，借力一蹬，
+      准确咬住腰间玉佩绳子，咔嚓断裂，抱着玉佩落地翻滚，动作行云流水，
+      特写镜头，平视角度，慢动作，
+      玄幻风格，动作流畅，高清画质，
+      4K超清，电影级画质，动作细节丰富
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "为了进化点！冲鸭！"
+      - character: "赵无极"
+        text: "哎哟！什么东西？！"
+    reference_images:
+      - "assets/characters/images/苏夜-qingyucan-front.png"
+
+  - shot_id: "qyccan-ep02-shot-10"
+    scene_description: "苏夜抱着玉佩落地，系统提示"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶家府邸"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "抱着玉佩翻滚，眼神发光"
+    camera:
+      shot_size: "close_up"
+      angle: "low_angle"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      青玉蚕抱着闪光玉佩落地翻滚，稳稳停下，眼神发光，
+      玉佩散发出精纯白光，灵气粒子飘散，
+      系统UI浮现：发现二品聚灵佩，内含高纯度灵气！
+      特写镜头，仰视角度，静止，
+      玄幻风格，灵气光效，高清画质，
+      4K超清，电影级画质，魔法粒子细腻
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-qingyucan-front.png"
+
+  - shot_id: "qyccan-ep02-shot-11"
+    scene_description: "赵无极愤怒，叶红衣脸色苍白"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶家府邸"
+      time_of_day: "day"
+    characters:
+      - character_id: "zhaowuji"
+        character_name: "赵无极"
+        variant_id: "default"
+        state: "大怒，指向苏夜"
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "脸色苍白，不知所措"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      赵无极大怒指向地上的青玉蚕，叶红衣脸色苍白不知所措，
+      围观群众惊讶后退，叶家府邸背景，
+      中景镜头，平视角度，静止，
+      玄幻风格，冲突紧张，自然光，高清画质，
+      4K超清，电影级画质，人物情绪对比强烈
+    has_dialogue: true
+    dialogue:
+      - character: "赵无极"
+        text: "哪来的野蚕子！敢吃本少爷的聚灵佩！踩死它！"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/scenes/images/叶家府邸-day.png"
+
+  - shot_id: "qyccan-ep02-shot-12"
+    scene_description: "苏夜准备吞噬玉佩，集结能量"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶家府邸"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "张嘴迎向玉佩，绿光环绕"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "zoom_in"
+    duration: 10
+    seedance_prompt: |
+      青玉蚕张嘴，口中透出绿色光芒，逼近玉佩，
+      玉佩在小蚕嘴边散发璀璨白光，灵气粒子被吸入，
+      特写镜头，平视角度，推进运镜，
+      玄幻风格，吞噬光效，高清画质，
+      4K超清，电影级画质，魔法特效炸裂——下集待续
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-qingyucan-front.png"
+
+---
+# 视觉指导说明
+
+## 角色变体使用
+- 苏夜全集使用 variant_id: "default"（青玉蚕形态，ep02 未进化）
+- 叶红衣全集使用 variant_id: "default"
+
+## 场景时间
+- 2-1、2-2 使用 time_of_day: "day"（黑雾森林）
+- 2-3 使用 time_of_day: "day"（叶家府邸）
+
+## 时长分配
+- 总时长：162 秒
+- 对话镜次：12-15 秒
+- 动作镜次：10-12 秒

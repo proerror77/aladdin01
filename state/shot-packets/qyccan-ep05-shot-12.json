@@ -1,0 +1,101 @@
+{
+  "shot_id": "qyccan-ep05-shot-12",
+  "episode": "qyccan-ep05",
+  "scene_id": "training_ground",
+  "shot_number": 12,
+  "scene_goal": "结尾：苏夜盘在叶红衣肩膀，宣言家族大比要带飞",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "苏夜@qyccan-ep05-shot-12",
+      "variant": "snake_green",
+      "ref_assets": [
+        "assets/characters/images/苏夜-bilinse-front.png"
+      ],
+      "must_preserve": [
+        "碧绿色鳞片",
+        "金色瞳孔"
+      ],
+      "current_state": {
+        "form": "碧鳞蛇（体型渐变长）",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "任务状态",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "yehongyi",
+      "state_ref": "叶红衣@qyccan-ep05-shot-12",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/叶红衣-front.png"
+      ],
+      "must_preserve": [
+        "红衣"
+      ],
+      "current_state": {
+        "form": "人形",
+        "costume": "红衣",
+        "injury": "none",
+        "emotion": "任务状态",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "练武场",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/练武场-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "slightly_low",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/苏夜-bilinse-front.png",
+      "assets/characters/images/叶红衣-front.png",
+      "assets/scenes/images/练武场-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "苏夜盘在叶红衣肩膀上，高昂蛇头，夕阳光打在碧绿鳞片上，鳞片光泽明显变好，叶红衣神情坚定看向远方，中景镜头，略低角度，静止，玄幻风格，热血收尾，暖色夕阳，高清画质，4K超清，电影级画质"
+  },
+  "forbidden_changes": [
+    "叶红衣必须穿红衣"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "百毒不侵已激活",
+      "吞噬可获得进化点",
+      "家族大比临近",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇（灵智级）",
+        "active_abilities": [
+          "剧毒獠牙",
+          "闪电突袭",
+          "百毒不侵",
+          "无限吞噬进化"
+        ]
+      }
+    }
+  }
+}

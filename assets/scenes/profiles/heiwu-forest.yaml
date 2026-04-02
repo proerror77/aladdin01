@@ -1,0 +1,10 @@
+name: 黑雾森林
+description: 新手村，全是低级怪，苏夜重生地点。树木茂密，雾气缭绕。
+environment: 外景，树木茂密，雾气缭绕，有巨大树叶和灌木丛
+time_variants:
+- 日
+- 夜
+key_features:
+- 树梢
+- 树下
+- 灌木丛

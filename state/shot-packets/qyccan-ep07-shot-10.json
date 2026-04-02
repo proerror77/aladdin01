@@ -1,0 +1,52 @@
+{
+  "shot_id": "qyccan-ep07-shot-10",
+  "episode": "qyccan-ep07",
+  "scene_id": "arena",
+  "shot_number": 10,
+  "scene_goal": "长老席大惊失色，认出气息接近三阶地煞级妖兽",
+  "duration_sec": 8,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "elders",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": ["惊骇表情", "多名长老"],
+      "current_state": {
+        "form": "人类",
+        "costume": "长老服饰",
+        "injury": "none",
+        "emotion": "惊骇震惊",
+        "props_in_possession": [],
+        "knowledge": ["认出苏夜气息接近三阶地煞级妖兽"]
+      }
+    }
+  ],
+  "background": {
+    "location": "擂台",
+    "time_of_day": "day",
+    "ref_assets": []
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "pan",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [],
+    "videos": [],
+    "audios": [],
+    "prompt": "评判席众长老面色惨白惊骇万分，有人颤抖着手指向擂台中央，眼中满是震惊与恐惧，窃窃私语，座位区人群向后退缩，中景镜头，平视角度，平移运镜，玄幻风格，震惊恐惧氛围，4K超清，电影级画质，细腻表情"
+  },
+  "forbidden_changes": [],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": ["灵兽等级：凡胎、灵智、地煞、天罡、君王、帝皇、神话"],
+    "character_abilities": {}
+  }
+}

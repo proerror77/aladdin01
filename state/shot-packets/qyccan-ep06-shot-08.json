@@ -1,0 +1,79 @@
+{
+  "shot_id": "qyccan-ep06-shot-08",
+  "episode": "qyccan-ep06",
+  "scene_id": "arena",
+  "shot_number": 8,
+  "scene_goal": "叶如烟崩溃，苏夜示意叶红衣出手",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "苏夜@qyccan-ep06-shot-08",
+      "variant": "snake_green",
+      "ref_assets": [
+        "assets/characters/images/苏夜-bilinse-front.png"
+      ],
+      "must_preserve": [
+        "碧绿色鳞片",
+        "金色瞳孔"
+      ],
+      "current_state": {
+        "form": "碧鳞蛇（筷子长）",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "战斗中",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "擂台",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/擂台-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/叶如烟-turnaround.png",
+      "assets/characters/images/苏夜-bilinse-front.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "叶如烟面纱歪斜，崩溃地看着吓破胆的双头魔狼，难以置信，碧绿蟒蛇侧头望向叶红衣，金色瞳孔示意行动，中景镜头，平视角度，静止，玄幻风格，崩溃反差，反转节奏，高清画质，4K超清，电影级画质，人物表情冲突"
+  },
+  "forbidden_changes": [],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "血脉压制：龙威对啸月狼血统有天然压制",
+      "大小如意（ep06解锁）",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇（灵智级）",
+        "active_abilities": [
+          "大小如意（ep06新解锁）",
+          "龙威（ep06雏形）",
+          "剧毒獠牙",
+          "闪电突袭",
+          "百毒不侵"
+        ]
+      }
+    }
+  }
+}

@@ -78,18 +78,33 @@ audio:
   dialogue_pattern: '^[^:]+: "[^"]*"$'
   max_dialogue_length: 500
 
-# 生成后端："api"（火山方舟 API）或 "browser"（即梦 Web UI via Actionbook CLI）
-# Seedance 2.0 API 开放后改回 "api" 即可
-generation_backend: "api"
+# 生成后端："api"（火山方舟 API）或 "dreamina"（即梦官方 CLI，推荐）
+generation_backend: "dreamina"
 
-# 浏览器后端配置（仅 generation_backend: "browser" 时生效）
-browser_backend:
-  profile: "jimeng"              # Actionbook profile 名称（持久化登录状态）
-  stealth: true                  # 启用 stealth 模式
-  concurrency: 1                  # 并行标签页数量（1=串行，2-3=多标签页并行，需实测即梦限流）
-  wait_between: 30               # 任务间隔（秒）
-  download_poll_interval: 30     # 下载轮询间隔（秒）
-  download_max_wait: 600         # 下载最大等待（秒）
-  max_retries: 3                 # 提交/下载最大重试次数
-  # 浏览器后端固定使用 Seedance 2.0 模型 + 全能参考模式
-  # 时长范围 4-15 秒（Seedance 2.0 via Web UI）
+# dreamina CLI 后端配置（仅 generation_backend: "dreamina" 时生效）
+dreamina_backend:
+  # 视频生成默认模型
+  video_model: "seedance2.0fast"       # seedance2.0 | seedance2.0fast
+  # 图像生成默认模型
+  image_model: "5.0"                    # 3.0 | 3.1 | 4.0 | 4.1 | 4.5 | 4.6 | 5.0 | lab
+  # 视频分辨率
+  video_resolution: "720p"
+  # 图像分辨率
+  image_resolution: "2k"                # 1k | 2k | 4k
+  # poll 超时（秒）
+  poll_timeout: 120
+  # 视频生成首选命令策略
+  # "auto": img2video 有多张参考图时自动升级为 multimodal2video
+  # "multimodal": 始终优先使用 multimodal2video（旗舰）
+  # "simple": 始终使用 text2video / image2video（省 credit）
+  video_command_strategy: "auto"
+
+# 生成模式配置（v2.0 新增）
+generation_modes:
+  text2video:
+    enabled: true
+    default: false
+  img2video:
+    enabled: true
+    default: true
+    reference_mode: "composition"  # composition / keyframes

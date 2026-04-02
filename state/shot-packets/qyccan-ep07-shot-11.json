@@ -1,0 +1,83 @@
+{
+  "shot_id": "qyccan-ep07-shot-11",
+  "episode": "qyccan-ep07",
+  "scene_id": "arena",
+  "shot_number": 11,
+  "scene_goal": "叶红衣惊喜回望，苏夜回头与她对视，情感温馨",
+  "duration_sec": 12,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "yehongyi",
+      "variant": "default",
+      "ref_assets": [
+        "assets/packs/characters/yehongyi-default-front.png"
+      ],
+      "must_preserve": ["红衣", "惊喜表情"],
+      "current_state": {
+        "form": "人类",
+        "costume": "红衣（微乱）",
+        "injury": "light",
+        "emotion": "惊喜感动",
+        "props_in_possession": ["长剑"],
+        "knowledge": ["苏夜进化成功了"]
+      }
+    },
+    {
+      "id": "suye",
+      "variant": "xuanming_python",
+      "ref_assets": [
+        "assets/packs/characters/suye-xuanmingmang-front.png",
+        "assets/packs/characters/suye-xuanmingmang-side.png"
+      ],
+      "must_preserve": ["漆黑巨蟒", "金色纹路", "头顶小鼓包", "金色瞳孔"],
+      "current_state": {
+        "form": "玄冥黑金蟒",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "傲娇温柔",
+        "props_in_possession": [],
+        "knowledge": ["即将第一次开口说话"]
+      }
+    }
+  ],
+  "background": {
+    "location": "擂台",
+    "time_of_day": "day",
+    "ref_assets": []
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/packs/characters/yehongyi-default-front.png",
+      "assets/packs/characters/suye-xuanmingmang-front.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "叶红衣满脸惊喜地望向身旁的漆黑巨蟒，巨蟒缓缓回过头，金色瞳孔对视，嘴唇微动，擂台背景，阳光洒落，中景镜头，平视角度，静止，玄幻风格，温馨感动瞬间，光芒柔和，4K超清，电影级画质，情感特写"
+  },
+  "forbidden_changes": [
+    "苏夜必须是漆黑巨蟒形态",
+    "叶红衣必须是红衣"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": ["契约关系生死与共，不可解除"],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "玄冥黑金蟒（地煞级）",
+        "active_abilities": ["龙威迫人", "可以说话"]
+      }
+    }
+  }
+}

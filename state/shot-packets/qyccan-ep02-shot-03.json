@@ -1,0 +1,69 @@
+{
+  "shot_id": "qyccan-ep02-shot-03",
+  "episode": "qyccan-ep02",
+  "scene_id": "heiwu_forest",
+  "shot_number": 3,
+  "scene_goal": "苏夜发现灵石，疯狂吞噬，体型稍变大，建立吞噬系统机制",
+  "duration_sec": 12,
+  "dialogue_mode": "none",
+  "characters": [
+    {
+      "id": "suye",
+      "state_ref": "苏夜@qyccan-ep02-shot-03",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/苏夜-qingyucan-front.png"
+      ],
+      "must_preserve": ["通体碧绿", "肥嘟嘟"],
+      "current_state": {
+        "form": "青玉蚕",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "兴奋贪吃",
+        "props_in_possession": ["下品灵石×3"],
+        "knowledge": ["灵石可以吞噬获得进化点"]
+      }
+    }
+  ],
+  "background": {
+    "location": "黑雾森林",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/黑雾森林-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "close_up",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/苏夜-qingyucan-front.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "碧绿肥蚕发现闪光灵石，眼睛瞬间发光，迫不及待扑上去，咔嚓咔嚓将灵石嚼碎吞下，肚子鼓了起来，头顶冒出绿光，特写镜头，平视角度，静止，玄幻风格，进化绿光特效，高清画质，4K超清，电影级画质，灵气粒子效果"
+  },
+  "forbidden_changes": [
+    "不要让苏夜说话",
+    "不要让苏夜进化形态（进化发生在ep03）"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": ["吞噬可以获得进化点"],
+    "character_abilities": {
+      "suye": {
+        "can_speak": false,
+        "can_fly": false,
+        "current_form": "青玉蚕（凡胎级）",
+        "active_abilities": ["无限吞噬进化"]
+      }
+    }
+  }
+}

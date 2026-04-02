@@ -1,0 +1,62 @@
+# 水墨国风风格
+# 适用：仙侠、文艺、慢节奏、诗意叙事
+
+name: "水墨国风"
+id: "ink-wash"
+
+image_style:
+  base_keywords:
+    - "水墨画风格"
+    - "淡墨渲染"
+    - "宣纸质感"
+    - "留白构图"
+    - "中国传统绘画"
+
+  lighting:
+    default: "柔和散射光，淡雅"
+    dramatic: "浓墨重彩，强烈黑白对比"
+    warm: "暖黄宣纸色调，烛光"
+    cold: "冷灰水墨，雾气弥漫"
+
+  oriental_enhancement:
+    - "水墨意境"
+    - "禅意空间"
+    - "山水画构图"
+    - "云雾缭绕"
+    - "松竹梅兰"
+
+  camera:
+    - "大量留白"
+    - "远景为主"
+    - "意境优先"
+
+  avoid:
+    - "照片级写实"
+    - "高饱和"
+    - "霓虹"
+    - "赛博"
+    - "动漫"
+
+  model_preference:
+    style_definition: "Seedream 4.0+"
+    character_consistency: "Seedream 4.5/4.6"
+    storyboard: "🍌2"
+
+video_style:
+  quality_suffix: "4K超清，水墨画质，意境深远，笔触细腻"
+  style_block:
+    default: "水墨国风，淡墨渲染，留白意境，柔和光影"
+    action: "水墨国风，浓墨飞溅，动态笔触，气韵生动"
+    emotional: "水墨国风，淡雅色调，烟雨朦胧，诗意氛围"
+    epic: "水墨国风，泼墨山水，气势磅礴，天地苍茫"
+  camera_preference: "缓慢运镜，长镜头，留白过渡"
+  color_grade: "低饱和，灰白为主，偶尔点缀朱红"
+
+composition:
+  preferred_rules:
+    - name: "留白"
+      when: "大部分场景"
+      keywords: "大量留白，意境优先，空间感"
+    - name: "远山近水"
+      when: "自然场景"
+      keywords: "远山淡墨，近水浓墨，层次分明"

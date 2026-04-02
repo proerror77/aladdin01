@@ -1,0 +1,133 @@
+{
+  "shot_id": "qyccan-ep01-shot-04",
+  "episode": "qyccan-ep01",
+  "scene_id": "heiwu_forest",
+  "shot_number": 4,
+  "scene_goal": "家仆追上来嘲笑叶红衣的最弱灵兽，叶红衣护住苏夜，危机升级",
+  "duration_sec": 12,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "jiapujia",
+      "state_ref": "家仆甲@qyccan-ep01-shot-04",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": ["大刀", "壮实体型"],
+      "current_state": {
+        "form": "人形",
+        "costume": "家仆服饰",
+        "injury": "none",
+        "emotion": "淫笑，气势汹汹",
+        "props_in_possession": ["大刀"],
+        "knowledge": ["奉命追杀叶红衣", "看到叶红衣的本命灵兽是青玉蚕"]
+      }
+    },
+    {
+      "id": "jiapuyi",
+      "state_ref": "家仆乙@qyccan-ep01-shot-04",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": ["大刀", "壮实体型"],
+      "current_state": {
+        "form": "人形",
+        "costume": "家仆服饰",
+        "injury": "none",
+        "emotion": "爆笑，嘲讽",
+        "props_in_possession": ["大刀"],
+        "knowledge": ["奉命追杀叶红衣", "看到叶红衣的本命灵兽是青玉蚕"]
+      }
+    },
+    {
+      "id": "yehongyi",
+      "state_ref": "叶红衣@qyccan-ep01-shot-04",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/叶红衣-front.png"
+      ],
+      "must_preserve": ["红衣", "高挑", "纤细"],
+      "current_state": {
+        "form": "人形",
+        "costume": "红衣（破损）",
+        "injury": "身上带有伤痕",
+        "emotion": "咬牙切齿，护住苏夜",
+        "props_in_possession": ["苏夜（手心中）"],
+        "knowledge": ["已契约苏夜", "面临威胁", "灵根受损实力不足"]
+      }
+    },
+    {
+      "id": "suye",
+      "state_ref": "苏夜@qyccan-ep01-shot-04",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/苏夜-qingyucan-front.png"
+      ],
+      "must_preserve": ["通体碧绿", "肥嘟嘟", "拇指大小"],
+      "current_state": {
+        "form": "青玉蚕",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "眼神犀利，评估局势",
+        "props_in_possession": [],
+        "knowledge": ["已与叶红衣契约", "感知到危险", "系统刚激活"]
+      }
+    }
+  ],
+  "background": {
+    "location": "黑雾森林",
+    "time_of_day": "day",
+    "ref_assets": [
+      "assets/scenes/images/黑雾森林-day.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/叶红衣-front.png",
+      "assets/characters/images/苏夜-qingyucan-front.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "两个拿着大刀的家仆追上来，淫笑着看着叶红衣，叶红衣咬牙切齿，手心护着一只碧绿的小蚕，中景镜头，平视角度，静止，玄幻风格，紧张对峙氛围，自然光，高清画质，4K超清，电影级画质，人物表情细腻"
+  },
+  "dialogue": [
+    {
+      "character": "家仆甲",
+      "text": "把这蚕交出来，这种恶心的灵兽不配进我们赵家！"
+    },
+    {
+      "character": "叶红衣",
+      "text": "闭嘴……我的灵兽轮不到你们嘲笑！"
+    }
+  ],
+  "forbidden_changes": [
+    "不要让苏夜在叶红衣手心以外的地方",
+    "不要让家仆有害怕情绪（此时他们还不知道苏夜的能力）",
+    "不要让叶红衣表现出软弱退缩"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "契约关系生死与共，不可解除",
+      "灵兽等级：凡胎为最低等级"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": false,
+        "current_form": "青玉蚕（凡胎级）"
+      },
+      "yehongyi": {
+        "power_limited": true,
+        "constraint": "灵根受损"
+      }
+    }
+  }
+}

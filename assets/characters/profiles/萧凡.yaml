@@ -5,10 +5,14 @@ tier: "supporting"
 age: 18
 gender: "male"
 appearance: |
-  身穿朴素布衣，眼神坚毅，嘴角常勾起自信的歪嘴笑。手指上戴古朴黑戒。
+  身穿朴素布衣，眼神坚毅，手指上戴着古朴黑戒。
+  百年难遇的紫色潜力天才，身边跟着小火鸟。
 personality: |
-  外表正义凛然，实则自负偏执。典型"气运之子"人设——沉寂三年后崛起复仇。
+  自认正道，实则伪善。
+  沉寂三年受尽白眼，测试时爆发紫色潜力。
+  视苏夜和叶红衣为邪魔，发誓要铲除他们。
+  典型的"天命之子"，有戒指老爷爷指导。
 first_episode: "qyccan-ep09"
 episodes: ["qyccan-ep09", "qyccan-ep10"]
-voice_hint: "young-male-gentle"
-notes: "天命之子/气运之子，戒指中藏有'老爷爷'灵魂导师。灵兽为小火鸟。苏夜的宿命对手。"
+voice_hint: "young-male-righteous"
+notes: "重要反派，天命之子，与苏夜是宿命之敌。拥有戒指老爷爷作为金手指。"

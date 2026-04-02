@@ -1,0 +1,11 @@
+name: "叶家大长老"
+aliases: []
+project: "qyccan"
+tier: "minor"
+age: 60
+gender: "male"
+appearance: |
+  顽固古板，老者打扮。
+first_episode: "qyccan-ep08"
+voice_hint: "old-male-stubborn"
+notes: "叶家长老，反对给叶红衣资源，被苏夜威胁后屈服。"

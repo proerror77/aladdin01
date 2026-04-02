@@ -1,0 +1,68 @@
+{
+  "shot_id": "qyccan-ep02-shot-07",
+  "episode": "qyccan-ep02",
+  "scene_id": "ye_family_gate",
+  "shot_number": 7,
+  "scene_goal": "赵无极步步紧逼，叶红衣保护苏夜，营造压迫感",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "yehongyi",
+      "state_ref": "叶红衣@qyccan-ep02-shot-07",
+      "variant": "default",
+      "ref_assets": ["assets/characters/images/叶红衣-front.png"],
+      "must_preserve": ["红衣", "高挑"],
+      "current_state": {
+        "form": "人形",
+        "costume": "红衣",
+        "injury": "轻伤",
+        "emotion": "警惕防御",
+        "props_in_possession": ["袖子里藏着苏夜"],
+        "knowledge": ["赵无极想看灵兽"]
+      }
+    },
+    {
+      "id": "zhaowuji",
+      "state_ref": "赵无极@qyccan-ep02-shot-07",
+      "variant": "default",
+      "ref_assets": [],
+      "must_preserve": ["衣着华丽"],
+      "current_state": {
+        "form": "人形",
+        "costume": "华丽公子服",
+        "injury": "none",
+        "emotion": "咄咄逼人",
+        "props_in_possession": ["折扇", "聚灵佩"],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶家大门",
+    "time_of_day": "day",
+    "ref_assets": ["assets/scenes/images/叶家府邸-day.png"]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/叶红衣-front.png",
+      "assets/scenes/images/叶家府邸-day.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "赵无极上前一步，伸手要抓叶红衣手腕，叶红衣下意识把手缩回，围观群众议论纷纷，古风府邸背景，中景镜头，平视角度，静止，玄幻风格，紧张对峙，自然光，高清画质，4K超清，电影级画质，人物情绪对比鲜明"
+  },
+  "forbidden_changes": ["叶红衣必须穿红衣"],
+  "repair_policy": {"max_retries": 3, "prefer_local_edit": true},
+  "ontology_constraints": {
+    "world_rules": [],
+    "character_abilities": {}
+  }
+}

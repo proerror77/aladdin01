@@ -1,0 +1,382 @@
+---
+# Visual Direction - qyccan-ep06
+# 视觉指导文件 - 开局青玉蚕 第6集
+# 生成时间: 2026-04-01
+# 苏夜 ep03-06 使用 variant_id: "snake_green"（碧鳞蛇，shot-01~04）
+# shot-05~12：苏夜变大蟒蛇（仍是 snake_green 变体，体型大幅增加）
+
+episode_id: "qyccan-ep06"
+episode_title: "家族大比，全员恶人"
+total_shots: 12
+estimated_duration: 162
+
+shots:
+  - shot_id: "qyccan-ep06-shot-01"
+    scene_description: "擂台，叶如烟戴面纱得意，双头魔狼在侧"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "yeruyan"
+        character_name: "叶如烟"
+        variant_id: "default"
+        state: "戴面纱，得意，站在擂台，双头狼在脚边"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      擂台上，戴着面纱的女子神情得意，脚边趴着一只巨大双头狼，双头虎视眈眈，
+      擂台四周人山人海，观众席喧嚣，
+      全景镜头，平视角度，静止，
+      玄幻风格，擂台气氛，古风建筑，自然光，高清画质，
+      4K超清，电影级画质，观众席人潮效果
+    has_dialogue: true
+    dialogue:
+      - character: "叶如烟"
+        text: "下一位挑战者，叶红衣！姐姐，如果你现在认输，我也许会让双头魔狼轻一点。"
+    reference_images:
+      - "assets/characters/images/叶如烟-turnaround.png"
+      - "assets/scenes/images/擂台-day.png"
+
+  - shot_id: "qyccan-ep06-shot-02"
+    scene_description: "叶红衣走上擂台，肩膀空空"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "一身劲装，缓缓走上台，气质冷峻"
+    camera:
+      shot_size: "full_shot"
+      angle: "slightly_low"
+      movement: "tracking"
+    duration: 12
+    seedance_prompt: |
+      叶红衣身穿劲装，从台阶缓缓走上擂台，肩膀空空无灵兽，
+      气质冷峻，眼神坚定，
+      全景镜头，略低角度，跟踪运镜，
+      玄幻风格，英气登场，古风擂台，高清画质，
+      4K超清，电影级画质，人物气场强
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "对付你，还不需要它出手。"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/scenes/images/擂台-day.png"
+
+  - shot_id: "qyccan-ep06-shot-03"
+    scene_description: "叶如烟下令，双头魔狼冲向叶红衣"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "拔剑，应战，被一爪拍飞剑"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "dynamic"
+    duration: 12
+    seedance_prompt: |
+      双头魔狼咆哮冲向叶红衣，叶红衣拔剑迎战，
+      魔狼速度极快，一爪拍飞叶红衣手中的剑，叶红衣被逼后退，
+      全景镜头，平视角度，动态运镜，
+      玄幻风格，战斗紧张，力量悬殊，高清画质，
+      4K超清，电影级画质，战斗冲击力强
+    has_dialogue: true
+    dialogue:
+      - character: "叶如烟"
+        text: "给我撕碎她！"
+      - character: "叶红衣"
+        text: "可恶，境界差距太大了。"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/scenes/images/擂台-day.png"
+
+  - shot_id: "qyccan-ep06-shot-04"
+    scene_description: "危机关头，苏夜从袖口射出，身形暴涨"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "从袖口弹射而出，身形开始暴涨"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "slow_motion"
+    duration: 15
+    seedance_prompt: |
+      双头狼大口咬向叶红衣喉咙，千钧一发，
+      一道绿光从叶红衣袖口射出，碧绿小蛇在空中迎风暴涨，鳞片绽放强光，
+      全景镜头，平视角度，慢动作，
+      玄幻风格，救场特效，绿光冲击，高清画质，
+      4K超清，电影级画质，关键时刻震撼
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "吵死了！还让不让人睡觉了！"
+    reference_images:
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/scenes/images/擂台-day.png"
+
+  - shot_id: "qyccan-ep06-shot-05"
+    scene_description: "苏夜变成手臂粗的蟒蛇，尾巴抽飞双头狼"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "变成手臂粗蟒蛇，猛力一尾抽打双头狼"
+        must_preserve: ["碧绿色鳞片", "金色瞳孔", "体型变为手臂粗细"]
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "dynamic"
+    duration: 15
+    seedance_prompt: |
+      系统技能大小如意发动，筷子细的碧鳞蛇瞬间膨胀成手臂粗细的蟒蛇，
+      蛇尾带着劲风抽在双头狼的一个脑袋上，啪的一声，
+      双头狼被抽得横飞，砸在擂台柱子上，
+      全景镜头，平视角度，动态运镜，
+      玄幻风格，技能特效，力量冲击，震撼画面，高清画质，
+      4K超清，电影级画质，战斗特效炸裂
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-bilinse-side.png"
+      - "assets/scenes/images/擂台-day.png"
+
+  - shot_id: "qyccan-ep06-shot-06"
+    scene_description: "全场寂静，苏夜高昂蛇头发出威压"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "高昂蛇头，信子吞吐，散发威压"
+    camera:
+      shot_size: "full_shot"
+      angle: "low_angle"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      手臂粗的碧绿蟒蛇盘在擂台，高高昂起头，金色瞳孔俯视四方，
+      威压如实质散开，全场鸦雀无声，所有人表情震惊，
+      全景镜头，仰视角度，静止，
+      玄幻风格，威压特效，肃杀气氛，高清画质，
+      4K超清，电影级画质，王者气场压迫
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/scenes/images/擂台-day.png"
+
+  - shot_id: "qyccan-ep06-shot-07"
+    scene_description: "双头狼夹尾巴瑟瑟发抖，血脉压制"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "冷冷注视双头狼"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      被抽倒在地的双头魔狼爬起来，却夹着两条尾巴呜呜颤抖，
+      不敢看碧绿蟒蛇，趴地发抖，上位血脉压制特效显现，
+      中景镜头，平视角度，静止，
+      玄幻风格，血脉压制，霸主气场，高清画质，
+      4K超清，电影级画质，血脉效果细腻
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/苏夜-bilinse-front.png"
+
+  - shot_id: "qyccan-ep06-shot-08"
+    scene_description: "叶如烟崩溃，苏夜示意叶红衣出手"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "yeruyan"
+        character_name: "叶如烟"
+        variant_id: "default"
+        state: "崩溃，面纱歪斜，不敢置信"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "回头看叶红衣一眼，示意"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶如烟面纱歪斜，崩溃地看着吓破胆的双头魔狼，难以置信，
+      碧绿蟒蛇侧头望向叶红衣，金色瞳孔示意行动，
+      中景镜头，平视角度，静止，
+      玄幻风格，崩溃反差，反转节奏，高清画质，
+      4K超清，电影级画质，人物表情冲突
+    has_dialogue: true
+    dialogue:
+      - character: "叶如烟"
+        text: "怎么可能！我的双头魔狼可是有啸月狼血统的！"
+    reference_images:
+      - "assets/characters/images/叶如烟-turnaround.png"
+      - "assets/characters/images/苏夜-bilinse-front.png"
+
+  - shot_id: "qyccan-ep06-shot-09"
+    scene_description: "叶红衣捡起剑，一步步逼向叶如烟"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "捡起剑，步步逼近，神情冷峻"
+      - character_id: "yeruyan"
+        character_name: "叶如烟"
+        variant_id: "default"
+        state: "后退，惊慌失措"
+    camera:
+      shot_size: "medium_shot"
+      angle: "slightly_low"
+      movement: "tracking"
+    duration: 12
+    seedance_prompt: |
+      叶红衣从地上捡起软剑，一步一步向叶如烟逼近，神情冷峻如霜，
+      叶如烟节节后退，慌乱无措，
+      中景镜头，略低角度，跟踪运镜，
+      玄幻风格，强势逆转，压迫感，高清画质，
+      4K超清，电影级画质，强弱逆转戏剧性
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "现在，谁是废物？"
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/叶如烟-turnaround.png"
+      - "assets/scenes/images/擂台-day.png"
+
+  - shot_id: "qyccan-ep06-shot-10"
+    scene_description: "台下观众震惊，家主和长老目瞪口呆"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters: []
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "pan"
+    duration: 10
+    seedance_prompt: |
+      观众席上所有人震惊地看着擂台，家族长老和家主嘴巴微张，
+      无数人面面相觑，全场哗然，
+      全景镜头，平视角度，横摇运镜，
+      玄幻风格，集体震惊，人群效果，高清画质，
+      4K超清，电影级画质，群演震惊表情细腻
+    has_dialogue: false
+    reference_images:
+      - "assets/scenes/images/擂台-day.png"
+
+  - shot_id: "qyccan-ep06-shot-11"
+    scene_description: "苏夜回到叶红衣肩膀，恢复小蛇形态"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "恢复小蛇体型，爬回叶红衣肩膀，昂头"
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "站在擂台中央，气场强大"
+    camera:
+      shot_size: "medium_shot"
+      angle: "slightly_low"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      碧绿小蛇恢复小巧体型，优哉游哉爬上叶红衣肩膀盘好，昂起头，
+      叶红衣站在擂台中央，气场十足，
+      中景镜头，略低角度，静止，
+      玄幻风格，胜利气场，夕阳光效，高清画质，
+      4K超清，电影级画质，人兽搭档霸气
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/scenes/images/擂台-day.png"
+
+  - shot_id: "qyccan-ep06-shot-12"
+    scene_description: "结尾：叶红衣和苏夜霸气收尾"
+    location:
+      scene_id: "arena"
+      scene_name: "擂台"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "高傲，肩膀上苏夜配合昂头"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "盘肩，昂头，霸气"
+    camera:
+      shot_size: "medium_shot"
+      angle: "slightly_low"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      叶红衣肩上盘着碧鳞蛇，两人一前一后站在擂台，
+      夕阳余晖，光影剪影，观众席哑然，
+      中景镜头，略低角度，静止，
+      玄幻风格，胜者气场，史诗感，高清画质，
+      4K超清，电影级画质，强者收尾
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/叶红衣-front.png"
+      - "assets/characters/images/苏夜-bilinse-front.png"
+      - "assets/scenes/images/擂台-day.png"
+
+---
+# 视觉指导说明
+
+## 角色变体使用
+- 苏夜 shot-01~03：variant_id: "snake_green"（筷子大小，藏在袖口）
+- 苏夜 shot-04~06：variant_id: "snake_green"（"大小如意"后手臂粗蟒蛇，同变体但体型膨胀，prompt 中注明体型）
+- 苏夜 shot-07~12：variant_id: "snake_green"（恢复小蛇体型）
+
+## 场景
+- 全集擂台 time_of_day: "day"

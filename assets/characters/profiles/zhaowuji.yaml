@@ -1,0 +1,11 @@
+name: 赵无极
+tier: supporting
+description: 反派小Boss，纨绔少爷，叶红衣的逼婚对象。嚣张跋扈，典型富二代嘴脸，智商欠费。
+variants:
+- variant_id: default
+  name: 常态
+  appearance: 20岁，衣着华丽，摇扇子，一脸肾虚样
+  stage: 全剧
+personality: 嚣张跋扈，富二代，智商欠费
+voice_traits: 尖细傲慢
+灵兽: 烈火犬（二阶灵兽）

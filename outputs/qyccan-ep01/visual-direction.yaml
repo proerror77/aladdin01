@@ -1,0 +1,458 @@
+---
+# Visual Direction - qyccan-ep01
+# 视觉指导文件 - 开局青玉蚕 第1集
+# 生成时间: 2026-04-01
+# 基于: outputs/qyccan-ep01/render-script.md + state/ontology/ep01-world-model.json
+
+episode_id: "qyccan-ep01"
+episode_title: "这穿越，草率了！"
+total_shots: 12
+estimated_duration: 180  # 秒（3分钟）
+
+shots:
+  - shot_id: "qyccan-ep01-shot-01"
+    scene_description: "苏夜重生为青玉蚕，趴在树叶上"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        variant_label: "青玉蚕（初始形态）"
+        state: "刚重生，懵逼状态"
+        must_preserve: ["通体碧绿", "肥嘟嘟", "拇指大小", "肉乎乎的小短腿"]
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "static"
+    duration: 10
+    seedance_prompt: |
+      一只通体碧绿、肥嘟嘟的青玉蚕趴在巨大的树叶上，拇指大小，肉乎乎的小短腿，眼神懵逼，
+      第一人称视角，视野呈现复眼效果，
+      特写镜头，平视角度，静止，
+      玄幻风格，柔和自然光，高清画质，细节丰富，
+      4K超清，电影级画质，细腻光影
+    has_dialogue: false
+    reference_images:
+      - "assets/characters/images/suye_default.png"
+
+  - shot_id: "qyccan-ep01-shot-02"
+    scene_description: "叶红衣被追杀，冲出灌木丛"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        variant_label: "红衣破损状态"
+        state: "被追杀，绝望"
+        must_preserve: ["红衣", "高挑", "纤细", "发髻散乱"]
+    camera:
+      shot_size: "medium_shot"
+      angle: "slightly_low"
+      movement: "tracking"
+    duration: 12
+    seedance_prompt: |
+      叶红衣跌跌撞撞冲出灌木丛，红衣破损，发髻散乱，身上带着伤痕，神情绝望，
+      背景是黑雾森林的树林，自然光透过树叶，
+      中景镜头，略低角度，跟踪运镜，
+      玄幻风格，紧张氛围，高清画质，
+      4K超清，电影级画质，动态追踪
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "家族抛弃，未婚夫逼杀……叶红衣，你真的要命丧于此吗？"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/scenes/images/heiwu_forest_day.png"
+
+  - shot_id: "qyccan-ep01-shot-03"
+    scene_description: "叶红衣使用召唤石，苏夜被召唤"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "使用召唤石，满怀期待"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "被召唤，化作绿光坠落"
+    camera:
+      shot_size: "full_shot"
+      angle: "high_angle"
+      movement: "zoom_in"
+    duration: 15
+    seedance_prompt: |
+      叶红衣捏碎古老召唤石，鲜血滴落，法阵发光，一道绿光从树梢坠落，
+      光芒散去后，法阵中央趴着一只拇指大小的青玉蚕，通体碧绿，一脸懵逼，
+      全景镜头，俯视角度，推进运镜，
+      玄幻风格，魔法光效，召唤特效，高清画质，
+      4K超清，电影级画质，魔法粒子效果
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "出来吧，我的本命灵兽！"
+      - character: "叶红衣"
+        text: "青……青玉蚕？是最弱小的凡胎级昆虫？"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_default.png"
+      - "assets/scenes/images/heiwu_forest_day.png"
+
+  - shot_id: "qyccan-ep01-shot-04"
+    scene_description: "家仆追上来，嘲笑叶红衣"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "jiapujia"
+        character_name: "家仆甲"
+        variant_id: "default"
+        state: "淫笑，气势汹汹"
+      - character_id: "jiapuyi"
+        character_name: "家仆乙"
+        variant_id: "default"
+        state: "爆笑，嘲讽"
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "咬牙切齿，护住苏夜"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "在叶红衣手心，眼神犀利"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      两个拿着大刀的家仆追上来，淫笑着看着叶红衣，
+      叶红衣咬牙切齿，手心护着一只碧绿的小蚕，
+      中景镜头，平视角度，静止，
+      玄幻风格，紧张对峙氛围，自然光，高清画质，
+      4K超清，电影级画质，人物表情细腻
+    has_dialogue: true
+    dialogue:
+      - character: "家仆甲"
+        text: "把这蚕交出来，这种恶心的灵兽不配进我们赵家！"
+      - character: "叶红衣"
+        text: "闭嘴……我的灵兽轮不到你们嘲笑！"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_default.png"
+
+  - shot_id: "qyccan-ep01-shot-05"
+    scene_description: "苏夜激活吞天口，吞噬家仆甲"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "张嘴化作漆黑漩涡，吞噬家仆"
+      - character_id: "jiapujia"
+        character_name: "家仆甲"
+        variant_id: "default"
+        state: "被吞噬"
+    camera:
+      shot_size: "close_up"
+      angle: "low_angle"
+      movement: "slow_motion"
+    duration: 15
+    seedance_prompt: |
+      青玉蚕张嘴，樱桃般的小嘴瞬间化作漆黑的漩涡黑洞，迎风暴涨数米，
+      家仆被吞噬，连根毛都没剩下，
+      特写镜头，仰视角度，慢动作，
+      玄幻风格，黑洞特效，吞噬粒子效果，震撼视觉，高清画质，
+      4K超清，电影级画质，魔法特效炸裂
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "给爷死！！"
+      - character: "系统"
+        text: "吞噬凡体武夫，进化点+10。"
+    reference_images:
+      - "assets/characters/images/suye_default.png"
+
+  - shot_id: "qyccan-ep01-shot-06"
+    scene_description: "叶红衣击败家仆乙，苏夜吞噬灵石"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "拔剑，冷漠"
+      - character_id: "jiapuyi"
+        character_name: "家仆乙"
+        variant_id: "default"
+        state: "倒地不起"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "吞噬灵石，体型变大"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "pan"
+    duration: 15
+    seedance_prompt: |
+      叶红衣一剑划过，家仆乙倒地不起，
+      青玉蚕在地上拱来拱去，找到灵石，咔嚓咔嚓嚼碎吞下，
+      身上闪过绿光，体型稍微变大，头顶鼓起两个小包，
+      全景镜头，平视角度，横摇运镜，
+      玄幻风格，进化光效，灵气粒子，高清画质，
+      4K超清，电影级画质，魔法进化特效
+    has_dialogue: true
+    dialogue:
+      - character: "系统"
+        text: "吞噬下品灵石3，进化点+30。"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_default.png"
+      - "assets/scenes/images/heiwu_forest_day.png"
+
+  - shot_id: "qyccan-ep01-shot-07"
+    scene_description: "叶红衣和苏夜回城路上，对话"
+    location:
+      scene_id: "heiwu_forest"
+      scene_name: "黑雾森林"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "神色复杂，看着手里的苏夜"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "躺在她手心，神态自傲"
+    camera:
+      shot_size: "medium_shot"
+      angle: "eye_level"
+      movement: "tracking"
+    duration: 12
+    seedance_prompt: |
+      叶红衣走在森林小路上，手心托着一只碧绿的小蚕，神色复杂，
+      小蚕躺在她手心，神态自傲，疯狂扭动身体表示抗议，
+      中景镜头，平视角度，跟踪运镜，
+      玄幻风格，温馨氛围，自然光透过树叶，高清画质，
+      4K超清，电影级画质，人物互动自然
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "你到底是什么东西？普通的青玉蚕根本没有攻击力。"
+      - character: "叶红衣"
+        text: "既然全身绿油油的，就叫你小绿吧。"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_default.png"
+      - "assets/scenes/images/heiwu_forest_day.png"
+
+  - shot_id: "qyccan-ep01-shot-08"
+    scene_description: "叶家大门，赵无极出现"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "脸色苍白，下意识藏苏夜"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "藏在袖子里"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "static"
+    duration: 15
+    seedance_prompt: |
+      叶家府邸大门，古风建筑，围观群众指指点点，
+      赵无极摇着扇子，一脸戏谑，衣着华丽，
+      叶红衣脸色苍白，下意识把袖子里的小蚕藏好，
+      全景镜头，平视角度，静止，
+      玄幻风格，古风建筑，自然光，高清画质，
+      4K超清，电影级画质，古风氛围浓厚
+    has_dialogue: true
+    dialogue:
+      - character: "赵无极"
+        text: "哟，这不是我的未婚妻吗？"
+      - character: "赵无极"
+        text: "让我看看，你契约了什么惊天动地的神兽啊？"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/scenes/images/yehongyi_boudoir_day.png"
+
+  - shot_id: "qyccan-ep01-shot-09"
+    scene_description: "苏夜抢夺赵无极的聚灵佩"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "default"
+        state: "跳到赵无极脸上，咬断玉佩绳子"
+    camera:
+      shot_size: "close_up"
+      angle: "eye_level"
+      movement: "slow_motion"
+    duration: 12
+    seedance_prompt: |
+      一道绿光射出，青玉蚕跳到赵无极脸上，借力一蹬，
+      准确咬住腰间玉佩绳子，咔嚓断裂，抱着玉佩落地翻滚，动作行云流水，
+      特写镜头，平视角度，慢动作，
+      玄幻风格，动作流畅，高清画质，
+      4K超清，电影级画质，动作细节丰富
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "为了进化点！冲鸭！"
+      - character: "赵无极"
+        text: "哎哟！什么东西？！"
+    reference_images:
+      - "assets/characters/images/suye_default.png"
+
+  - shot_id: "qyccan-ep01-shot-10"
+    scene_description: "苏夜进化为碧鳞蛇"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        variant_label: "碧鳞蛇（第一次进化）"
+        state: "进化完成，光芒炸裂"
+    camera:
+      shot_size: "close_up"
+      angle: "low_angle"
+      movement: "zoom_in"
+    duration: 15
+    seedance_prompt: |
+      青玉蚕身上爆发刺眼强光，光芒炸裂，弹开赵无极的脚，
+      烟尘散去，原本的肥蚕不见了，取而代之的是一条筷子长的小蛇，
+      通体覆盖精致碧绿色鳞片，金色瞳孔，吐着信子，直立起上半身，
+      特写镜头，仰视角度，推进运镜，
+      玄幻风格，进化光效炸裂，震撼视觉，高清画质，
+      4K超清，电影级画质，进化特效震撼
+    has_dialogue: true
+    dialogue:
+      - character: "系统"
+        text: "恭喜宿主，完成第一阶段进化。种族变更：碧鳞毒蛇。"
+      - character: "苏夜"
+        text: "刚才那只脚，是你的吧？"
+    reference_images:
+      - "assets/characters/images/suye_snake_green.png"
+
+  - shot_id: "qyccan-ep01-shot-11"
+    scene_description: "苏夜秒杀烈火犬"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "闪电突袭，咬烈火犬"
+    camera:
+      shot_size: "full_shot"
+      angle: "eye_level"
+      movement: "dynamic"
+    duration: 15
+    seedance_prompt: |
+      碧鳞蛇身形一晃，化作绿色闪电折线，瞬间消失，
+      下一秒出现在烈火犬脖子后面，毒牙狠狠咬下，
+      烈火犬身上火焰变成惨绿色，迅速熄灭，轰然倒地，口吐白沫，
+      全景镜头，平视角度，动态运镜，
+      玄幻风格，闪电特效，毒液特效，战斗震撼，高清画质，
+      4K超清，电影级画质，战斗特效炸裂
+    has_dialogue: true
+    dialogue:
+      - character: "苏夜"
+        text: "玩火？太慢了！"
+      - character: "烈火犬"
+        text: "嗷呜！！！"
+    reference_images:
+      - "assets/characters/images/suye_snake_green.png"
+
+  - shot_id: "qyccan-ep01-shot-12"
+    scene_description: "叶红衣装逼，赵无极逃走"
+    location:
+      scene_id: "yehongyi_boudoir"
+      scene_name: "叶红衣闺房"
+      time_of_day: "day"
+    characters:
+      - character_id: "yehongyi"
+        character_name: "叶红衣"
+        variant_id: "default"
+        state: "恢复高冷神态，装逼"
+      - character_id: "suye"
+        character_name: "苏夜"
+        variant_id: "snake_green"
+        state: "盘在肩膀，昂起头"
+    camera:
+      shot_size: "medium_shot"
+      angle: "slightly_low"
+      movement: "static"
+    duration: 12
+    seedance_prompt: |
+      碧鳞蛇优哉游哉爬回叶红衣肩膀，像围巾一样盘好，昂起头，
+      叶红衣恢复高冷神态，伸手摸蛇的冰凉鳞片，
+      赵无极面红耳赤，收起半死不活的狗，狼狈逃走，
+      中景镜头，略低角度，静止，
+      玄幻风格，胜利氛围，自然光，高清画质，
+      4K超清，电影级画质，人物表情细腻
+    has_dialogue: true
+    dialogue:
+      - character: "叶红衣"
+        text: "看来你的狗，还不如我的蚕……哦不，我的蛇！"
+      - character: "叶红衣"
+        text: "谢谢你，小……小蛇。"
+    reference_images:
+      - "assets/characters/images/yehongyi_default.png"
+      - "assets/characters/images/suye_snake_green.png"
+
+---
+# 视觉指导说明
+
+## 角色变体使用
+- 苏夜在 shot-01 到 shot-09 使用 variant_id: "default"（青玉蚕形态）
+- 苏夜在 shot-10 到 shot-12 使用 variant_id: "snake_green"（碧鳞蛇形态）
+- 叶红衣全集使用 variant_id: "default"（红衣破损状态）
+
+## 场景时间
+- 全部镜次使用 time_of_day: "day"（白天）
+
+## Seedance 提示词格式
+- 遵循 5-block 结构：主体 + 动作 + 场景 + 镜头 + 风格
+- 最大长度：2000 字符
+- 对白格式：角色名: "台词内容"（唇形同步）
+- 参考图引用：@{角色名}
+
+## 时长分配
+- 总时长：180 秒（3 分钟）
+- 平均每镜：15 秒
+- 关键镜次（进化、战斗）：15 秒
+- 对话镜次：12 秒
+- 动作镜次：10-15 秒

@@ -1,0 +1,66 @@
+{
+  "shot_id": "qyccan-ep07-shot-06",
+  "episode": "qyccan-ep07",
+  "scene_id": "arena",
+  "shot_number": 6,
+  "scene_goal": "苏夜缠绕魔狼颈部同时注毒并吞噬狂暴能量",
+  "duration_sec": 12,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "suye",
+      "variant": "bilinse",
+      "ref_assets": [
+        "assets/packs/characters/suye-bilinse-front.png",
+        "assets/packs/characters/suye-bilinse-side.png"
+      ],
+      "must_preserve": ["碧绿鳞片", "金色瞳孔"],
+      "current_state": {
+        "form": "碧鳞蛇",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "专注冷静",
+        "props_in_possession": [],
+        "knowledge": ["正在吞噬魔狼狂暴能量"]
+      }
+    }
+  ],
+  "background": {
+    "location": "擂台",
+    "time_of_day": "day",
+    "ref_assets": []
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/packs/characters/suye-bilinse-front.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "碧绿小蛇像绳索一样死死缠绕住暴走双头魔狼的颈部，魔狼疯狂挣扎，小蛇毒牙刺入魔狼腹部，红色能量如流水顺着牙齿流向蛇身，擂台烟尘弥漫，中景镜头，平视角度，静止，玄幻风格，能量吸取特效，紧张战斗，4K超清，电影级画质，细腻光影"
+  },
+  "forbidden_changes": [
+    "苏夜此时仍是碧绿小蛇形态，进化未发生",
+    "能量流动方向：从魔狼流向苏夜"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": ["吞噬可以获得能力和进化点", "越阶进化需要消耗大量高阶妖力"],
+    "character_abilities": {
+      "suye": {
+        "can_speak": false,
+        "current_form": "碧鳞蛇（灵智级）",
+        "active_abilities": ["剧毒獠牙", "吞天口", "玄冥之力（觉醒中）"]
+      }
+    }
+  }
+}

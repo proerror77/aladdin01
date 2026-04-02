@@ -1,0 +1,44 @@
+{
+  "date": "2026-03-31",
+  "window": "7d",
+  "metrics": {
+    "commits": 9,
+    "contributors": 1,
+    "prs_merged": 5,
+    "insertions": 15671,
+    "deletions": 748,
+    "net_loc": 14923,
+    "test_loc": 0,
+    "test_ratio": 0.0,
+    "active_days": 3,
+    "sessions": 8,
+    "deep_sessions": 0,
+    "avg_session_minutes": 0,
+    "loc_per_session_hour": 0,
+    "feat_pct": 0.78,
+    "fix_pct": 0.0,
+    "docs_pct": 0.22,
+    "peak_hour": 23,
+    "ai_assisted_commits": 9,
+    "focus_score_pct": 78,
+    "focus_area": ".claude/"
+  },
+  "authors": {
+    "proerror (proerror77)": {
+      "commits": 9,
+      "insertions": 15671,
+      "deletions": 748,
+      "test_ratio": 0.0,
+      "top_area": ".claude/"
+    }
+  },
+  "skill_usage": {
+    "office-hours": 1,
+    "plan-ceo-review": 1,
+    "plan-eng-review": 2,
+    "plan-design-review": 1
+  },
+  "streak_days": 1,
+  "tweetable": "Week of Mar 25: 9 commits (solo), 15.7k LOC, 5 PRs, 100% AI-assisted | Streak: 1d",
+  "note": "Wild Card = proerror77 (GitHub squash merge author). Solo repo. All commits Co-Authored-By Claude Opus 4.6."
+}

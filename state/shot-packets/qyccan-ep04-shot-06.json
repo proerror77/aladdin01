@@ -1,0 +1,101 @@
+{
+  "shot_id": "qyccan-ep04-shot-06",
+  "episode": "qyccan-ep04",
+  "scene_id": "yehongyi_room",
+  "shot_number": 6,
+  "scene_goal": "叶红衣醒来，发现牙印，震惊苏夜帮她吸毒",
+  "duration_sec": 12,
+  "dialogue_mode": "dialogue",
+  "characters": [
+    {
+      "id": "yehongyi",
+      "state_ref": "叶红衣@qyccan-ep04-shot-06",
+      "variant": "default",
+      "ref_assets": [
+        "assets/characters/images/叶红衣-front.png"
+      ],
+      "must_preserve": [
+        "红衣"
+      ],
+      "current_state": {
+        "form": "人形",
+        "costume": "红衣（ep04夜晚修炼）",
+        "injury": "中毒虚弱",
+        "emotion": "任务状态",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "suye",
+      "state_ref": "苏夜@qyccan-ep04-shot-06",
+      "variant": "snake_green",
+      "ref_assets": [
+        "assets/characters/images/苏夜-bilinse-front.png"
+      ],
+      "must_preserve": [
+        "碧绿色鳞片",
+        "金色瞳孔"
+      ],
+      "current_state": {
+        "form": "碧鳞蛇",
+        "costume": "无",
+        "injury": "none",
+        "emotion": "任务状态",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "叶红衣闺房",
+    "time_of_day": "night",
+    "ref_assets": [
+      "assets/scenes/images/叶红衣闺房-night.png"
+    ]
+  },
+  "camera": {
+    "shot_size": "medium_shot",
+    "angle": "eye_level",
+    "movement": "static",
+    "lens_style": "cinematic"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "assets/characters/images/叶红衣-front.png",
+      "assets/characters/images/苏夜-bilinse-front.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "叶红衣缓缓醒来，脸色红润，发现手腕上两个小牙印，碧绿小蛇四仰八叉躺在旁边肚子鼓鼓，叶红衣震惊指着蛇，近景镜头，平视角度，静止，玄幻风格，温馨轻松，烛光，高清画质，4K超清，电影级画质"
+  },
+  "forbidden_changes": [
+    "叶红衣必须穿红衣"
+  ],
+  "repair_policy": {
+    "max_retries": 3,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "修炼需要灵气",
+      "毒素可被苏夜吸收转化",
+      "百毒不侵（ep04解锁）",
+      "契约不可解除"
+    ],
+    "character_abilities": {
+      "suye": {
+        "can_speak": true,
+        "current_form": "碧鳞蛇（灵智级）",
+        "active_abilities": [
+          "剧毒獠牙",
+          "闪电突袭",
+          "吞天口",
+          "无限吞噬进化",
+          "百毒不侵（ep04解锁）"
+        ]
+      }
+    }
+  }
+}

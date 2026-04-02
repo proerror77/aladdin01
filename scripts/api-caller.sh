@@ -10,6 +10,12 @@
 #   ./scripts/api-caller.sh tuzi chat <payload.json>         # Tuzi LLM（nano-banana-vip 等）
 #   ./scripts/api-caller.sh tuzi image <payload.json>        # Tuzi 图像生成（gpt-4o-image）
 #   ./scripts/api-caller.sh tuzi models                      # 列出可用模型
+#   ./scripts/api-caller.sh dreamina submit <payload.json>   # 提交 dreamina 生成任务
+#   ./scripts/api-caller.sh dreamina query <submit_id>       # 查询 dreamina 任务结果
+#   ./scripts/api-caller.sh dreamina download <submit_id> <dir>  # 下载 dreamina 结果
+#   ./scripts/api-caller.sh dreamina credit                  # 查询 dreamina 余额
+#   ./scripts/api-caller.sh dreamina list                    # 查看 dreamina 任务列表
+#   ./scripts/api-caller.sh dreamina login-check             # 检查 dreamina 登录状态
 #   ./scripts/api-caller.sh env-check  # 检查环境变量
 #   ./scripts/api-caller.sh trace-summary <session_dir>  # 生成 LLM 摘要（DEEPSEEK 或 TUZI）
 #
@@ -45,13 +51,13 @@ INPUT="${3:-}"
 
 if [[ -z "$SERVICE" ]]; then
   echo "Usage: $0 <service> <action> <input>" >&2
-  echo "Services: seedance, image_gen, moderation, tuzi, jimeng-web, env-check, trace-summary" >&2
+  echo "Services: seedance, image_gen, moderation, tuzi, dreamina, env-check, trace-summary" >&2
   exit 1
 fi
 
 if [[ "$SERVICE" != "env-check" && -z "$ACTION" ]]; then
   echo "Usage: $0 <service> <action> <input>" >&2
-  echo "Services: seedance, image_gen, moderation, tuzi, jimeng-web, env-check, trace-summary" >&2
+  echo "Services: seedance, image_gen, moderation, tuzi, dreamina, env-check, trace-summary" >&2
   exit 1
 fi
 
@@ -136,6 +142,16 @@ if [[ "$SERVICE" == "env-check" ]]; then
   [[ -z "${OPENAI_API_KEY:-}" ]] && echo "Optional: OPENAI_API_KEY (enables Moderation API in Phase 1 Layer 3)"
   # tuzi 为可选（若设置则启用 LLM 摘要 / 图像生成 fallback）
   [[ -z "${TUZI_API_KEY:-}" ]] && echo "Optional: TUZI_API_KEY (enables tuzi service + image_gen fallback)"
+  # dreamina CLI 检查
+  if command -v dreamina &>/dev/null; then
+    if dreamina user_credit &>/dev/null 2>&1; then
+      echo "Info: dreamina CLI installed and logged in"
+    else
+      echo "Warning: dreamina CLI installed but not logged in (run: dreamina login)" >&2
+    fi
+  else
+    echo "Optional: dreamina CLI not installed (run: curl -fsSL https://jimeng.jianying.com/cli | bash)"
+  fi
   if [[ $missing -eq 0 ]]; then
     echo "All required environment variables are set."
     exit 0
@@ -364,34 +380,205 @@ print(json.dumps(payload))
     ;;
 
   jimeng-web)
-    # 即梦 Web UI 浏览器自动化（通过 Actionbook CLI）
-    # 用于 Seedance 2.0 API 未开放时的替代方案
-    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-    JIMENG_SCRIPT="${SCRIPT_DIR}/jimeng-web.sh"
+    echo "ERROR: jimeng-web backend has been removed. Use 'dreamina' backend instead." >&2
+    echo "Install: curl -fsSL https://jimeng.jianying.com/cli | bash" >&2
+    echo "Login: dreamina login" >&2
+    exit 1
+    ;;
 
-    if [[ ! -x "$JIMENG_SCRIPT" ]]; then
-      echo "ERROR: jimeng-web.sh not found or not executable: $JIMENG_SCRIPT" >&2
+  dreamina)
+    # 即梦官方 CLI（Dreamina CLI）
+    # 支持 text2video, image2video, multimodal2video, multiframe2video, frames2video
+    # 支持 text2image, image2image, image_upscale
+    # 需要先登录：dreamina login
+
+    if ! command -v dreamina &>/dev/null; then
+      echo "ERROR: dreamina CLI not found. Install: curl -fsSL https://jimeng.jianying.com/cli | bash" >&2
       exit 1
     fi
 
     case "$ACTION" in
-      setup)
-        "$JIMENG_SCRIPT" setup
-        ;;
       submit)
+        # JSON payload → CLI flags 转换
         if [[ ! -f "$INPUT" ]]; then
           echo "ERROR: Payload file not found: $INPUT" >&2
           exit 1
         fi
-        "$JIMENG_SCRIPT" submit "$INPUT"
+
+        # 读取 command 字段
+        COMMAND=$(jq -r '.command // empty' "$INPUT")
+        if [[ -z "$COMMAND" ]]; then
+          echo "ERROR: Missing 'command' field in payload" >&2
+          exit 1
+        fi
+
+        # 构建 CLI flags
+        FLAGS=()
+
+        # 通用参数
+        PROMPT=$(jq -r '.prompt // empty' "$INPUT")
+        [[ -n "$PROMPT" ]] && FLAGS+=(--prompt="$PROMPT")
+
+        DURATION=$(jq -r '.duration // empty' "$INPUT")
+        [[ -n "$DURATION" ]] && FLAGS+=(--duration="$DURATION")
+
+        RATIO=$(jq -r '.ratio // empty' "$INPUT")
+        [[ -n "$RATIO" ]] && FLAGS+=(--ratio="$RATIO")
+
+        VIDEO_RESOLUTION=$(jq -r '.video_resolution // empty' "$INPUT")
+        [[ -n "$VIDEO_RESOLUTION" ]] && FLAGS+=(--video_resolution="$VIDEO_RESOLUTION")
+
+        MODEL_VERSION=$(jq -r '.model_version // empty' "$INPUT")
+        [[ -n "$MODEL_VERSION" ]] && FLAGS+=(--model_version="$MODEL_VERSION")
+
+        RESOLUTION_TYPE=$(jq -r '.resolution_type // empty' "$INPUT")
+        [[ -n "$RESOLUTION_TYPE" ]] && FLAGS+=(--resolution_type="$RESOLUTION_TYPE")
+
+        POLL=$(jq -r '.poll // empty' "$INPUT")
+        [[ -n "$POLL" ]] && FLAGS+=(--poll="$POLL")
+
+        # 命令特定参数
+        case "$COMMAND" in
+          text2video)
+            # 无额外参数
+            ;;
+          image2video)
+            IMAGE=$(jq -r '.image // empty' "$INPUT")
+            if [[ -z "$IMAGE" ]]; then
+              echo "ERROR: image2video requires 'image' field" >&2
+              exit 1
+            fi
+            FLAGS+=(--image="$IMAGE")
+            ;;
+          multimodal2video)
+            # 图片数组
+            IMAGES_JSON=$(jq -r '.images // []' "$INPUT")
+            if [[ "$IMAGES_JSON" != "[]" ]]; then
+              while IFS= read -r img; do
+                FLAGS+=(--image="$img")
+              done < <(echo "$IMAGES_JSON" | jq -r '.[]')
+            fi
+            # 视频数组
+            VIDEOS_JSON=$(jq -r '.videos // []' "$INPUT")
+            if [[ "$VIDEOS_JSON" != "[]" ]]; then
+              while IFS= read -r vid; do
+                FLAGS+=(--video="$vid")
+              done < <(echo "$VIDEOS_JSON" | jq -r '.[]')
+            fi
+            # 音频数组
+            AUDIOS_JSON=$(jq -r '.audios // []' "$INPUT")
+            if [[ "$AUDIOS_JSON" != "[]" ]]; then
+              while IFS= read -r aud; do
+                FLAGS+=(--audio="$aud")
+              done < <(echo "$AUDIOS_JSON" | jq -r '.[]')
+            fi
+            ;;
+          multiframe2video)
+            # images 数组（逗号分隔）
+            IMAGES_CSV=$(jq -r '.images // [] | join(",")' "$INPUT")
+            if [[ -z "$IMAGES_CSV" ]]; then
+              echo "ERROR: multiframe2video requires 'images' array" >&2
+              exit 1
+            fi
+            FLAGS+=(--images="$IMAGES_CSV")
+            # transition_prompts 数组
+            TRANSITION_PROMPTS=$(jq -r '.transition_prompts // []' "$INPUT")
+            if [[ "$TRANSITION_PROMPTS" != "[]" ]]; then
+              while IFS= read -r tp; do
+                FLAGS+=(--transition-prompt="$tp")
+              done < <(echo "$TRANSITION_PROMPTS" | jq -r '.[]')
+            fi
+            # transition_durations 数组
+            TRANSITION_DURATIONS=$(jq -r '.transition_durations // []' "$INPUT")
+            if [[ "$TRANSITION_DURATIONS" != "[]" ]]; then
+              while IFS= read -r td; do
+                FLAGS+=(--transition-duration="$td")
+              done < <(echo "$TRANSITION_DURATIONS" | jq -r '.[]')
+            fi
+            ;;
+          frames2video)
+            FIRST=$(jq -r '.first // empty' "$INPUT")
+            LAST=$(jq -r '.last // empty' "$INPUT")
+            if [[ -z "$FIRST" || -z "$LAST" ]]; then
+              echo "ERROR: frames2video requires 'first' and 'last' fields" >&2
+              exit 1
+            fi
+            FLAGS+=(--first="$FIRST" --last="$LAST")
+            ;;
+          text2image)
+            # 无额外参数
+            ;;
+          image2image)
+            # images 数组（逗号分隔）
+            IMAGES_CSV=$(jq -r '.images // [] | join(",")' "$INPUT")
+            if [[ -z "$IMAGES_CSV" ]]; then
+              echo "ERROR: image2image requires 'images' array" >&2
+              exit 1
+            fi
+            FLAGS+=(--images="$IMAGES_CSV")
+            ;;
+          image_upscale)
+            IMAGE=$(jq -r '.image // empty' "$INPUT")
+            if [[ -z "$IMAGE" ]]; then
+              echo "ERROR: image_upscale requires 'image' field" >&2
+              exit 1
+            fi
+            FLAGS+=(--image="$IMAGE")
+            ;;
+          *)
+            echo "ERROR: Unknown dreamina command: $COMMAND" >&2
+            exit 1
+            ;;
+        esac
+
+        # 执行 dreamina CLI
+        dreamina "$COMMAND" "${FLAGS[@]}"
         ;;
+
+      query)
+        # 查询任务结果
+        SUBMIT_ID="$INPUT"
+        if [[ -z "$SUBMIT_ID" ]]; then
+          echo "ERROR: query requires submit_id" >&2
+          exit 1
+        fi
+        dreamina query_result --submit_id="$SUBMIT_ID"
+        ;;
+
       download)
-        OUTPUT_FILE="${4:-video.mp4}"
-        "$JIMENG_SCRIPT" download "$OUTPUT_FILE"
+        # 下载结果
+        SUBMIT_ID="$INPUT"
+        DOWNLOAD_DIR="${4:-.}"
+        if [[ -z "$SUBMIT_ID" ]]; then
+          echo "ERROR: download requires submit_id" >&2
+          exit 1
+        fi
+        dreamina query_result --submit_id="$SUBMIT_ID" --download_dir="$DOWNLOAD_DIR"
         ;;
+
+      credit)
+        # 查询余额
+        dreamina user_credit
+        ;;
+
+      list)
+        # 查看任务列表
+        shift 2  # 跳过 service 和 action
+        dreamina list_task "$@"
+        ;;
+
+      login-check)
+        # 检查登录状态（通过 user_credit）
+        if dreamina user_credit &>/dev/null; then
+          echo '{"logged_in": true}'
+        else
+          echo '{"logged_in": false}'
+        fi
+        ;;
+
       *)
-        echo "ERROR: Unknown jimeng-web action: ${ACTION}" >&2
-        echo "Valid actions: setup, submit, download" >&2
+        echo "ERROR: Unknown dreamina action: ${ACTION}" >&2
+        echo "Valid actions: submit, query, download, credit, list, login-check" >&2
         exit 1
         ;;
     esac
@@ -498,7 +685,7 @@ $TRACE_CONTENT"
 
   *)
     echo "ERROR: Unknown service: ${SERVICE}" >&2
-    echo "Valid services: seedance, image_gen, moderation, tuzi, jimeng-web, env-check, trace-summary" >&2
+    echo "Valid services: seedance, image_gen, moderation, tuzi, dreamina, env-check, trace-summary" >&2
     exit 1
     ;;
 esac

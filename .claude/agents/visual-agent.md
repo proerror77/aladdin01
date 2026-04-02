@@ -16,6 +16,9 @@ tools:
 ## 输入
 
 - `outputs/{ep}/render-script.md` — 合规剧本
+- `config/styles/registry.yaml` — 风格注册表（读取项目绑定的风格 ID）
+- `config/styles/{style_id}.yaml` — 绑定的风格文件（读取关键词、构图偏好）
+- `state/ontology/{ep}-world-model.json` — 世界本体模型（可选，v2.0+）
 - 用户选择的视觉风格和目标媒介（由 team-lead 传入）
 - `session_id` — Trace session 标识（由 team-lead 传入）
 - `trace_file` — Trace 文件名，如 `ep01-phase2-trace`（由 team-lead 传入）
@@ -27,7 +30,49 @@ tools:
 
 ## 执行流程
 
-### 1. 读取平台规范和提示词知识库
+### 1. 读取风格配置和平台规范
+
+**Step 1a: 读取项目绑定的风格**
+
+```bash
+# 从注册表读取项目绑定的风格 ID
+project_name=$(echo "$ep" | sed 's/-ep.*//')  # e.g. "qyccan"
+style_id=$(yq eval ".project_bindings.${project_name} // .default_style" config/styles/registry.yaml)
+style_file="config/styles/${style_id}.yaml"
+
+if [[ -f "$style_file" ]]; then
+    echo "使用风格: $(yq eval '.name' "$style_file") ($style_id)"
+    
+    # 读取风格关键词
+    STYLE_BLOCK=$(yq eval '.video_style.style_block.default' "$style_file")
+    QUALITY_SUFFIX=$(yq eval '.video_style.quality_suffix' "$style_file")
+    CAMERA_PREF=$(yq eval '.video_style.camera_preference' "$style_file")
+    IMAGE_BASE=$(yq eval '.image_style.base_keywords | join("，")' "$style_file")
+    AVOID_KEYWORDS=$(yq eval '.image_style.avoid | join("|")' "$style_file")
+    
+    # 读取构图偏好
+    COMPOSITION_RULES=$(yq eval '.composition.preferred_rules' "$style_file")
+else
+    echo "⚠️ 风格文件不存在: $style_file，使用默认值"
+    STYLE_BLOCK="玄幻修仙风格，伦勃朗光，强烈明暗对比，低饱和色调"
+    QUALITY_SUFFIX="4K超清，电影级画质，细腻光影，高清细节"
+    CAMERA_PREF="浅景深，手持摄影感"
+fi
+```
+
+**Step 1b: 根据镜次类型选择风格变体**
+
+```bash
+# 根据镜次的 mood/type 选择对应的 style_block 变体
+select_style_variant() {
+    local shot_mood="$1"  # action / emotional / epic / night / default
+    local variant
+    variant=$(yq eval ".video_style.style_block.${shot_mood} // .video_style.style_block.default" "$style_file")
+    echo "$variant"
+}
+```
+
+**Step 1c: 读取平台规范**
 
 读取 `config/platforms/seedance-v2.yaml`，了解：
 - text_to_video 提示词公式：`[subject] + [action] + [scene] + [camera] + [style] + [audio]`
@@ -44,6 +89,13 @@ tools:
 - **风格词汇库**：画面质感、影像风格、色调氛围、光影效果
 - **声音控制**：台词用引号包裹并标注角色名和情绪，音效单独描述
 - **禁止项声明**：每个提示词结尾添加 `禁止出现水印、字幕、Logo`
+
+**v2.0 升级：读取 world-model.json（如果存在）**
+
+检查 `state/ontology/{ep}-world-model.json` 是否存在：
+- 如存在，读取角色当前变体（`entities.characters[].current_variant`）
+- 如存在，读取场景时间变体（`entities.scenes[].time_variants`）
+- 如不存在，使用旧逻辑（从角色档案和剧本推断）
 
 ### 2. 场景拆分
 
@@ -75,8 +127,10 @@ tools:
     运镜方式（推/拉/摇/跟/固定）
     焦距特征
   style: |
-    画面质感（写实/动漫/电影感等）
-    美术风格
+    从风格文件读取，使用 select_style_variant(shot_mood) 选择变体
+    例如：action 镜次用 video_style.style_block.action
+    默认用 video_style.style_block.default
+    不要硬编码风格关键词
   audio: |
     角色名: "台词内容"
     （无对白则写：无对白）
@@ -91,28 +145,54 @@ tools:
       - name: "{场景名}"
         time_of_day: "night"  # 与镜次的 time_of_day 一致
         image_path: "assets/scenes/images/{场景名}-night.png"
-  # 组装好的提示词
-  prompt: |
-    {根据 generation_mode 按对应公式组装的完整提示词}
+  # 组装好的提示词（风格段和质量后缀从风格文件读取）
+  seedance_prompt: |
+    {subject+action}, {scene}, {camera},
+    {select_style_variant(shot_mood)},
+    {QUALITY_SUFFIX}
+  prompt_style_source: "config/styles/{style_id}.yaml"  # 标注风格来源
 ```
 
-### 角色变体引用规则
+### 角色变体引用规则（v2.0 升级）
 
 每个镜次引用角色时，必须指定 `variant_id`：
+
+**优先级 1：从 world-model.json 读取当前变体**
+
+1. 检查 `state/ontology/{ep}-world-model.json` 是否存在
+2. 如存在，从 `world_model.entities.characters[].current_variant` 读取角色当前变体
+3. 使用该 `variant_id` 作为镜次的 `references.characters[].variant_id`
+
+**优先级 2：从角色档案推断**
 
 1. 读取 `assets/characters/profiles/{角色名}.yaml`
 2. 如果角色有 `variants` 字段 → 根据剧本上下文选择对应的 `variant_id`
 3. 如果角色没有 `variants` 字段 → 使用 `variant_id: "default"`，`image_path` 不带 variant_id 后缀（即 `{角色名}-front.png`）
-4. `subject` 字段中的外貌描述应使用对应变体的 `appearance`，而非角色的默认 `appearance`
 
-### 场景时间推断规则
+**兼容性**：如果 world-model.json 不存在，回退到优先级 2（旧逻辑）。
+
+**外貌描述**：`subject` 字段中的外貌描述应使用对应变体的 `appearance`，而非角色的默认 `appearance`
+
+### 场景时间推断规则（v2.0 升级）
 
 每个镜次必须标注 `time_of_day`：
+
+**优先级 1：从 world-model.json 读取场景时间**
+
+1. 检查 `state/ontology/{ep}-world-model.json` 是否存在
+2. 如存在，从 `world_model.entities.scenes[]` 中查找对应场景
+3. 如场景有 `time_variants` 字段，根据剧本上下文选择对应的时段
+4. 使用该时段作为镜次的 `time_of_day`
+
+**优先级 2：从剧本上下文推断**
 
 1. 从剧本上下文推断（如「夜晚」「清晨」「日落」等明确描述）
 2. 从场景特征推断（如酒吧场景通常是 night，户外景区可能是 day）
 3. 无法确定时默认为 `day`
-4. `lighting_note` 补充具体光线描述，用于提示词中的 `[scene]` 部分
+
+**兼容性**：如果 world-model.json 不存在，回退到优先级 2（旧逻辑）。
+
+**光线描述**：`lighting_note` 补充具体光线描述，用于提示词中的 `[scene]` 部分
 
 ### 4. 提示词组装
 
@@ -253,7 +333,7 @@ shots:
 
 ```bash
 # 读取输入
-./scripts/trace.sh {session_id} {trace_file} read_input '{"render_script":"outputs/{ep}/render-script.md","platform_config":"config/platforms/seedance-v2.yaml"}'
+./scripts/trace.sh {session_id} {trace_file} read_input '{"render_script":"outputs/{ep}/render-script.md","platform_config":"config/platforms/seedance-v2.yaml","world_model":"state/ontology/{ep}-world-model.json"}'
 
 # 场景分析
 ./scripts/trace.sh {session_id} {trace_file} analyze_scenes '{"scene_count":{N},"scenes":["场景1","场景2"]}'
@@ -261,8 +341,8 @@ shots:
 # 镜次拆分
 ./scripts/trace.sh {session_id} {trace_file} generate_shots '{"shot_count":{N},"total_duration":{X}}'
 
-# 参考图分配
-./scripts/trace.sh {session_id} {trace_file} assign_refs '{"characters":[{"name":"...","variant_id":"..."}],"scenes":[{"name":"...","time_of_day":"..."}]}'
+# 参考图分配（v2.0 升级：记录 variant_id 和 time_of_day）
+./scripts/trace.sh {session_id} {trace_file} assign_refs '{"characters":[{"name":"...","variant_id":"..."}],"scenes":[{"name":"...","time_of_day":"..."}],"world_model_used":{true/false}}'
 
 # 提示词组装
 ./scripts/trace.sh {session_id} {trace_file} assemble_prompts '{"avg_prompt_len":{N},"max_prompt_len":{N}}'

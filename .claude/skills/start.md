@@ -240,6 +240,43 @@ spawn design-agent
 - 输入 `yes` → 继续 Phase 4
 - 输入 `no` → 进入修改流程
 
+**Phase 3.5 — Shot Packet 编译（v2.0 新增）**
+
+检查是否存在 `state/ontology/{ep}-world-model.json`：
+- 如果存在 → 执行 Phase 3.5
+- 如果不存在 → 跳过 Phase 3.5，输出日志 `[skip] Phase 3.5: 未找到 world-model.json，跳过 shot packet 编译`
+
+```
+# 读取所有 shot_id
+shot_ids=$(yq eval '.shots[].shot_id' outputs/{ep}/visual-direction.yaml)
+
+# 为每个 shot 编译 shot packet
+for shot_id in $shot_ids; do
+  spawn shot-compiler-agent
+    输入：shot_id, visual-direction.yaml, world-model.json
+    session_id: $SESSION_ID
+    trace_file: {ep}-phase3.5-trace
+    输出：state/shot-packets/{shot_id}.json
+    等待完成
+done
+```
+
+shot-compiler-agent 内部会调用 memory-agent 检索参考资产。
+
+完成后写入 `state/{ep}-phase3.5.json`：
+```json
+{
+  "episode": "{ep}",
+  "phase": 3.5,
+  "status": "completed",
+  "started_at": "{ISO8601}",
+  "completed_at": "{ISO8601}",
+  "data": {
+    "shot_packets_generated": {N}
+  }
+}
+```
+
 **Phase 4 — 音色配置**
 ```
 spawn voice-agent
@@ -368,6 +405,104 @@ concurrency > 1:
 
    运行 ~ab-review 进行人工评分
    ```
+
+**Phase 6 — Audit & Repair（v2.0 新增）**
+
+检查是否存在 `state/shot-packets/` 目录：
+- 如果存在 → 执行 Phase 6
+- 如果不存在 → 跳过 Phase 6，输出日志 `[skip] Phase 6: 未找到 shot-packets/，跳过审计和修复`
+
+```
+# 读取所有成功生成的 shot_id
+shot_ids=$(yq eval '.shots[].shot_id' outputs/{ep}/visual-direction.yaml)
+
+# 对每个 shot 执行审计和修复
+for shot_id in $shot_ids; do
+  # 检查视频是否存在
+  video_file="outputs/{ep}/videos/${shot_id}.mp4"
+  if [ ! -f "$video_file" ]; then
+    echo "[skip] $shot_id: 视频不存在，跳过审计"
+    continue
+  fi
+  
+  # Phase 6.1: QA 审计
+  spawn qa-agent
+    输入：shot_id, shot_packet, video_file, world-model.json
+    session_id: $SESSION_ID
+    trace_file: {ep}-phase6-trace
+    输出：state/audit/{shot_id}-audit.json
+    等待完成
+  
+  # Phase 6.2: 读取审计结果
+  audit_result=$(jq '.repair_action' state/audit/${shot_id}-audit.json)
+  
+  # Phase 6.3: 根据审计结果执行修复
+  if [ "$audit_result" = "pass" ]; then
+    echo "[pass] $shot_id: 审计通过，无需修复"
+  elif [ "$audit_result" = "local_repair" ]; then
+    spawn repair-agent
+      输入：shot_id, audit_result, shot_packet
+      session_id: $SESSION_ID
+      trace_file: {ep}-phase6-trace
+      repair_strategy: local_repair
+      等待完成
+  elif [ "$audit_result" = "regenerate" ]; then
+    spawn repair-agent
+      输入：shot_id, audit_result, shot_packet
+      session_id: $SESSION_ID
+      trace_file: {ep}-phase6-trace
+      repair_strategy: regenerate
+      max_retries: 3
+      等待完成
+  fi
+done
+```
+
+完成后写入 `state/{ep}-phase6.json`：
+```json
+{
+  "episode": "{ep}",
+  "phase": 6,
+  "status": "completed",
+  "started_at": "{ISO8601}",
+  "completed_at": "{ISO8601}",
+  "data": {
+    "total_shots": {N},
+    "passed": {P},
+    "local_repaired": {L},
+    "regenerated": {R},
+    "failed": {F}
+  }
+}
+```
+
+生成 `outputs/{ep}/audit-report.md`：
+```markdown
+# 审计和修复报告 - {ep}
+
+## 总览
+
+- 总镜次：{N}
+- 直接通过：{P}
+- 局部修复：{L}
+- 重新生成：{R}
+- 修复失败：{F}
+
+## 审计详情
+
+| 镜次 | 审计结果 | 问题类型 | 修复策略 | 修复状态 |
+|------|---------|---------|---------|---------|
+| shot-01 | pass | - | - | - |
+| shot-02 | local_repair | face_mismatch | repair_face | success |
+| shot-03 | regenerate | costume_change, prop_disappeared | regenerate | success |
+| shot-04 | regenerate | multiple_high_severity | regenerate | failed |
+
+## 修复失败镜次（需人工处理）
+
+| 镜次 | 问题 | 已尝试策略 |
+|------|------|-----------|
+| shot-04 | 角色服装突变、道具消失 | regenerate × 3 次 |
+```
 
 ### 5. 汇总结果
 

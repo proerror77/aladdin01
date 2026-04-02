@@ -36,8 +36,9 @@
   "stages": {
     "1_scriptwriter": "pending",
     "2_preprocess": "pending",
-    "3_design": "pending",
-    "4_batch": "pending"
+    "3_build_ontology": "pending",
+    "4_asset_factory": "pending",
+    "5_batch": "pending"
   }
 }
 ```
@@ -127,51 +128,90 @@
 
 更新进度：`2_preprocess: "completed"`, `current_stage: 3`
 
-### 阶段 3：参考图生成（~design）
+### 阶段 3：本体论构建（~build-ontology — v2.0 新增）
 
-更新进度：`3_design: "in_progress"`
+更新进度：`3_build_ontology: "in_progress"`
 
-自动调用 ~design：
+自动调用 ~build-ontology：
 ```
-~design --project {project}
+~build-ontology --all
 ```
 
 执行：
-1. 读取所有角色/场景档案
-2. 按优先级生成参考图（protagonist 迭代 → supporting 审核 → minor 自动）
-3. 🔴 **确认点 3**：主角形象确认（Auto-Gate + 异步飞书审核 — 视觉类）
-   ```
-   spawn gate-agent:
-     checkpoint: "character_design"
-     target_files: [所有主角参考图路径]
-     context_files: [角色档案 YAML]
-
-   gate-agent 评分（身份一致性/风格统一/参考图质量/裁切格式）：
-   A) ≥85 分 auto_approve → 跳过飞书，直接继续阶段 4
-   B) 50-85 分 human_review → 推飞书视觉卡片（含 Web 链接 + 评分报告）
-   C) <50 分 auto_reject → 自动重跑 ~design（退回原因 + 低分维度）
-
-   飞书/Web 回调后：approve → 继续 / redo → 重做选中角色 / terminate → 终止
-   ```
-4. 生成场景参考图（含时间变体）
-5. 锁定 `state/design-lock.json`
+1. 对每个剧本，spawn ontology-builder-agent
+2. 从剧本 + 角色档案 + 场景档案中提取：
+   - 实体（角色变体、场景时间变体、道具状态）
+   - 关系（社交、空间、因果、时间）
+   - 物理规则（重力、魔法系统）
+   - 叙事约束（角色能力、道具状态、知识状态）
+3. 验证逻辑一致性
+4. 写入 `state/ontology/{ep}-world-model.json`
 
 完成后输出：
 ```
-✅ 阶段 3 完成：参考图生成
+✅ 阶段 3 完成：本体论构建
 
-🎨 角色参考图：{N} 张
-🏞️ 场景参考图：{M} 张
-🔒 锁定文件：state/design-lock.json
+🧠 世界模型：{N} 个
+📊 实体总数：{E} 个（角色 {C} + 场景 {S} + 道具 {P}）
+🔗 关系总数：{R} 个
+⚖️ 物理规则：{PR} 条
+📜 叙事约束：{NC} 条
 
-⏭️ 自动进入阶段 4：视频生成...
+⏭️ 自动进入阶段 4：资产工厂...
 ```
 
-更新进度：`3_design: "completed"`, `current_stage: 4`
+更新进度：`3_build_ontology: "completed"`, `current_stage: 4`
 
-### 阶段 4：视频生成（~batch）
+### 阶段 4：资产工厂（~asset-factory — v2.0 新增）
 
-更新进度：`4_batch: "in_progress"`
+更新进度：`4_asset_factory: "in_progress"`
+
+自动调用 ~asset-factory：
+```
+~asset-factory --project {project}
+```
+
+执行：
+1. 读取所有 world-model.json
+2. 提取需要多视角资产的实体：
+   - 角色变体（人形/兽形/鬼形等）
+   - 场景时间变体（day/night/dusk/dawn）
+3. 调用 NanoBanana API 生成多视角资产包：
+   - 角色：front/side/back/3quarter 视角
+   - 场景：styleframe/wide 视角
+4. 写入 `assets/packs/characters/` 和 `assets/packs/scenes/`
+5. 🔴 **确认点 3**：主角多视角资产确认（Auto-Gate + 异步飞书审核 — 视觉类）
+   ```
+   spawn gate-agent:
+     checkpoint: "character_pack"
+     target_files: [所有主角 pack 路径]
+     context_files: [角色档案 YAML]
+
+   gate-agent 评分（身份一致性/视角一致性/风格统一/资产质量）：
+   A) ≥85 分 auto_approve → 跳过飞书，直接继续阶段 5
+   B) 50-85 分 human_review → 推飞书视觉卡片（含 Web 链接 + 评分报告）
+   C) <50 分 auto_reject → 自动重跑 ~asset-factory（退回原因 + 低分维度）
+
+   飞书/Web 回调后：approve → 继续 / redo → 重做选中角色 / terminate → 终止
+   ```
+
+完成后输出：
+```
+✅ 阶段 4 完成：资产工厂
+
+📦 角色资产包：{N} 个（{V} 个视角）
+🏞️ 场景资产包：{M} 个（{T} 个时间变体）
+💾 总文件数：{F} 张
+🔒 锁定文件：state/asset-lock.json
+
+⏭️ 自动进入阶段 5：视频生成...
+```
+
+更新进度：`4_asset_factory: "completed"`, `current_stage: 5`
+
+### 阶段 5：视频生成（~batch）
+
+更新进度：`5_batch: "in_progress"`
 
 自动调用 ~batch（全自动模式）：
 - `--auto-approve`：跳过 Phase 2/3 人工确认
@@ -181,23 +221,27 @@
 1. Phase 1: 合规预检（并行）
 2. Phase 2: 视觉指导（并行，auto-approve）
 3. Phase 3: 美术校验（并行，auto-approve）
-4. Phase 4: 音色配置（并行，auto-match）
-5. Phase 5: 视频生成（并行 gen-workers）
+4. Phase 3.5: Shot Packet 编译（并行，v2.0 新增）
+5. Phase 4: 音色配置（并行，auto-match）
+6. Phase 5: 视频生成（并行 gen-workers）
+7. Phase 6: Audit & Repair（并行，v2.0 新增）
 
 完成后输出：
 ```
-✅ 阶段 4 完成：视频生成
+✅ 阶段 5 完成：视频生成
 
 📊 总览：
 - 总集数：{N}
 - 总镜次：{T}
 - 成功：{S}
 - 失败：{F}
+- 审计通过：{P}
+- 修复成功：{R}
 
 📁 视频文件：outputs/{ep}/videos/
 ```
 
-更新进度：`4_batch: "completed"`
+更新进度：`5_batch: "completed"`
 
 ### 最终汇总
 
@@ -217,8 +261,9 @@
 分集剧本：script/{project}-ep*.md
 角色档案：assets/characters/profiles/*.yaml
 场景档案：assets/scenes/profiles/*.yaml
-角色参考图：assets/characters/images/
-场景参考图：assets/scenes/images/
+世界模型：state/ontology/{ep}-world-model.json
+角色资产包：assets/packs/characters/
+场景资产包：assets/packs/scenes/
 视频文件：outputs/ep*/videos/
 
 ━━━ 可观测性 ━━━
@@ -236,7 +281,7 @@ Trace 日志：state/traces/{session-id}/
 |--------|------|------|---------|---------|
 | 🔴 确认点 1 | 阶段 1 | text | 飞书卡片按钮 | 否 |
 | 🔴 确认点 2 | 阶段 1 | text | 飞书卡片按钮 | 否 |
-| 🔴 确认点 3 | 阶段 3 | visual | 飞书链接 → Web 页面 | 否 |
+| 🔴 确认点 3 | 阶段 4 | visual | 飞书链接 → Web 页面 | 否 |
 
 所有确认点走异步飞书通知，session 结束等回调。审核结果（通过/重做/终止）通过 Review Server webhook 写入 `state/reviews/`，Remote Trigger 唤醒新 session 继续。
 
@@ -254,10 +299,11 @@ Trace 日志：state/traces/{session-id}/
 
 ✅ 阶段 1 剧本创作：已完成
 ✅ 阶段 2 剧本预处理：已完成
-🔄 阶段 3 参考图生成：进行中
-⏳ 阶段 4 视频生成：等待
+✅ 阶段 3 本体论构建：已完成
+🔄 阶段 4 资产工厂：进行中
+⏳ 阶段 5 视频生成：等待
 
-从阶段 3 继续...
+从阶段 4 继续...
 ```
 
 ## 错误处理
