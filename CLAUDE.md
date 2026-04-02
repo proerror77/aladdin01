@@ -95,36 +95,75 @@ export LARK_APP_SECRET="..."    # 飞书应用 Secret（审核通知，可选）
 export REVIEW_SERVER_URL="..."  # Review Server 地址（默认 http://localhost:8080）
 ```
 
-## Browser Backend（Seedance 2.0 via 即梦 Web UI）
+## Dreamina CLI（即梦官方 CLI）
 
-Seedance 2.0 API 未开放时，使用 Actionbook CLI 驱动浏览器操作即梦 Web UI 生成视频。
+即梦官方 AIGC CLI 工具，支持全部生成能力，作为视频/图像生成后端。
 
-### 前置条件
-
-- `actionbook` CLI 已安装（`actionbook --version`，需 >= 0.6.0）
-- `jq` 已安装
-
-### 首次登录
+### 安装
 
 ```bash
-./scripts/api-caller.sh jimeng-web setup
-# 浏览器弹出，手动登录即梦，登录后 Ctrl+C
+curl -fsSL https://jimeng.jianying.com/cli | bash
+```
+
+### 登录
+
+```bash
+dreamina login                    # 浏览器授权
+dreamina login --headless         # 终端 QR 码（适合远程/agent 环境）
+dreamina user_credit              # 验证登录状态 + 查看余额
 ```
 
 ### 切换后端
 
 修改 `config/platforms/seedance-v2.yaml`：
 ```yaml
-generation_backend: "browser"  # 从 "api" 改为 "browser"
+generation_backend: "dreamina"  # 从 "api" 改为 "dreamina"
+```
+
+### 生成能力
+
+| 命令 | 用途 | 关键参数 |
+|------|------|---------|
+| `text2video` | 文生视频 | `--prompt`, `--duration`(4-15), `--ratio`, `--model_version`(seedance2.0/seedance2.0fast) |
+| `image2video` | 图生视频（单图） | `--image`(本地路径), `--prompt`, `--duration`, `--model_version` |
+| `multimodal2video` | 多模态旗舰视频（推荐） | `--image`×9, `--video`×3, `--audio`×3, `--prompt`, Seedance 2.0 |
+| `multiframe2video` | 多帧连贯视频故事 | `--images`(2-20张), `--transition-prompt`, `--transition-duration` |
+| `frames2video` | 首尾帧视频 | `--first`, `--last`, `--prompt`, `--duration` |
+| `text2image` | 文生图 | `--prompt`, `--ratio`, `--resolution_type`(2k/4k), `--model_version`(3.0-5.0) |
+| `image2image` | 图生图 | `--images`, `--prompt`, `--resolution_type` |
+| `image_upscale` | 图片超分 | `--image`, `--resolution_type`(2k/4k/8k) |
+
+### 管理命令
+
+```bash
+dreamina user_credit                              # 查看余额
+dreamina query_result --submit_id=<id>            # 查询异步任务
+dreamina query_result --submit_id=<id> --download_dir=./out  # 查询并下载
+dreamina list_task                                # 查看任务列表
+dreamina list_task --gen_status=success           # 按状态筛选
+dreamina relogin                                  # 重新登录
+dreamina logout                                   # 清除登录
+dreamina import_login_response --file <json>      # 导入登录凭证
+```
+
+### 通过 api-caller.sh 调用
+
+```bash
+./scripts/api-caller.sh dreamina submit <payload.json>   # 提交生成任务
+./scripts/api-caller.sh dreamina query <submit_id>       # 查询任务结果
+./scripts/api-caller.sh dreamina download <submit_id> <dir>  # 下载结果
+./scripts/api-caller.sh dreamina credit                  # 查询余额
+./scripts/api-caller.sh dreamina list                    # 查看任务列表
+./scripts/api-caller.sh dreamina login-check             # 检查登录状态
 ```
 
 ### 注意事项
 
-- browser 模式使用 `browser-gen-worker` agent（而非 `gen-worker`）
-- 支持可配置并行度（1-3 标签页，默认串行，通过 `seedance-v2.yaml` 的 `browser_backend.concurrency` 配置）
-- 不支持 A/B 测试模式
-- CSS 选择器可能因即梦 UI 更新而失效
-- Seedance 2.0 API 开放后改回 `generation_backend: "api"` 即可
+- 所有生成命令消耗 credit，提交前确认余额
+- `multimodal2video` 是最强视频模式，支持 Seedance 2.0 + 混合输入
+- 参考图使用本地文件路径（非 URL）
+- 部分模型首次使用需在即梦 Web 端完成授权确认（`AigcComplianceConfirmationRequired`）
+- `--poll=N` 可让 CLI 等待 N 秒后返回结果，超时则返回 `submit_id` 供后续查询
 
 ## Agent Teams 架构
 
@@ -153,8 +192,7 @@ team-lead
 │   └── gate-agent         评分过关（prompt 质量 + 安全预检）
 ├── design-agent           Phase 3: 美术校验
 ├── voice-agent            Phase 4: 音色配置（交互式 / --auto-voice 自动匹配）
-├── gen-worker × N         Phase 5: 视频生成（并行，backend=api）
-└── browser-gen-worker × 1-3 Phase 5: 视频生成（可配置并行度，backend=browser）
+├── gen-worker × N         Phase 5: 视频生成（并行，backend=api 或 dreamina）
 ```
 
 **v2.0 流程（img2video，可选）**：
@@ -169,7 +207,7 @@ team-lead
 ├── memory-agent           Phase 3.5: 记忆检索（为每个 shot 检索最相关的 references）
 ├── shot-compiler-agent    Phase 3.5: Shot Packet 编译（组装完整的 shot packet）
 ├── voice-agent            Phase 4: 音色配置（交互式 / --auto-voice 自动匹配）
-├── gen-worker × N         Phase 5: 视频生成（img2video 模式，并行）
+├── gen-worker × N         Phase 5: 视频生成（img2video 模式，并行，backend=api 或 dreamina）
 ├── qa-agent               Phase 6: 质量审计（角色一致性 + 本体约束 + 叙事连贯性）
 └── repair-agent           Phase 6: 自动修复（根据 QA 报告重新生成）
 ```
