@@ -98,6 +98,7 @@ send_review() {
       --arg files "$files" \
       --arg review_id "$review_id" \
       --arg webhook_url "${REVIEW_SERVER_URL}/webhook/lark" \
+      --arg created_at "$created_at" \
       '{
         "msg_type": "interactive",
         "card": {
@@ -247,7 +248,8 @@ send_alert() {
       }
     }')
 
-  local alert_id="alert-$(date +%Y%m%d-%H%M%S)"
+  local alert_id
+  alert_id="alert-$(date +%Y%m%d-%H%M%S)"
   echo "$card_json" > "/tmp/lark_${alert_id}.json"
   echo "发送告警: $project — $title"
 

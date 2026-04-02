@@ -37,7 +37,8 @@ generate_image() {
     echo "  宽高比: $aspect_ratio" >&2
     echo "  分辨率: $image_size" >&2
 
-    local payload=$(cat <<EOF
+    local payload
+    payload=$(cat <<EOF
 {
   "contents": [{
     "role": "user",
@@ -54,7 +55,8 @@ generate_image() {
 EOF
 )
 
-    local response=$(curl -s -X POST "${API_URL}?key=${NANOBANANA_API_KEY}" \
+    local response
+    response=$(curl -s -X POST "${API_URL}?key=${NANOBANANA_API_KEY}" \
         -H "Content-Type: application/json" \
         -d "${payload}")
 
@@ -68,7 +70,8 @@ EOF
     echo "$response" | jq -r '.candidates[0].content.parts[0].inline_data.data' | base64 -d > "$output_path"
 
     if [[ -f "$output_path" ]]; then
-        local size=$(du -h "$output_path" | cut -f1)
+        local size
+        size=$(du -h "$output_path" | cut -f1)
         echo "✓ 图像已保存: $output_path ($size)" >&2
         return 0
     else

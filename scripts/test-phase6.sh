@@ -13,6 +13,7 @@ echo ""
 TEST_EP="ep01"
 TEST_SHOT_ID="${TEST_EP}-shot-01"
 TEST_SESSION_ID="test-phase6-$(date +%Y%m%d-%H%M%S)"
+export TEST_SESSION_ID
 
 echo "1. 检查必要的目录和文件..."
 
