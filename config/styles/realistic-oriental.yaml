@@ -1,0 +1,109 @@
+# 写实东方风格
+# 适用：修仙、武侠、古装、东方奇幻
+# 提取来源：qyccan ep01-ep10 实战经验 + 图像生成最佳实践
+
+name: "写实东方"
+id: "realistic-oriental"
+
+# ─── 图像生成风格 ───
+
+image_style:
+  # 基础写实关键词（每张图都加）
+  base_keywords:
+    - "照片级写实"
+    - "真人实拍质感"
+    - "35毫米胶片拍摄"
+    - "胶片颗粒感与肌理质感"
+    - "真实皮肤肌理"
+    - "自然毛孔"
+    - "人物的比例符合正常比例"
+
+  # 光影关键词（按场景氛围选用）
+  lighting:
+    default: "伦勃朗光，强烈明暗对比"
+    warm: "暖黄侧逆光，橙金与暗紫渐变天空"
+    cold: "冷月光，蓝灰色调，阴冷氛围"
+    dramatic: "高反差，暗调氛围，高饱和低明度色调，高曝微过曝"
+    candle: "烛光摇曳，暖橙色调，柔和阴影"
+
+  # 东方文化增强（古装/修仙场景自动追加）
+  oriental_enhancement:
+    - "古韵氛围"
+    - "东方美学"
+    - "木质纹理"
+    - "飞檐斗拱"
+
+  # 镜头质感
+  camera:
+    - "浅景深"
+    - "对焦模糊"
+    - "背景虚化"
+    - "细微噪点"
+
+  # 禁用关键词（gate-agent 检查时使用）
+  avoid:
+    - "完美"
+    - "梦幻"
+    - "唯美"
+    - "仙气"
+    - "超现实"
+    - "卡通"
+    - "动漫"
+
+  # 推荐模型
+  model_preference:
+    style_definition: "MJ"
+    character_consistency: "🍌Pro"
+    eastern_face: "Seedream 4.5/4.6"
+    storyboard: "🍌2"
+
+# ─── Seedance 视频风格 ───
+
+video_style:
+  # 质量后缀（5-block 的第 5 段）
+  quality_suffix: "4K超清，电影级画质，细腻光影，高清细节"
+
+  # 风格段（5-block 的第 4 段）
+  style_block:
+    default: "玄幻修仙风格，伦勃朗光，强烈明暗对比，低饱和色调"
+    action: "玄幻修仙风格，高反差，暗调氛围，动态光影，速度感"
+    emotional: "玄幻修仙风格，柔和自然光，暖色调，情感氛围"
+    epic: "玄幻修仙风格，史诗级光效，金色光芒，气势磅礴"
+    night: "玄幻修仙风格，冷月光，蓝灰色调，神秘氛围"
+
+  # 镜头偏好
+  camera_preference: "浅景深，手持摄影感，轻微运动模糊"
+
+  # 色彩基调
+  color_grade: "低饱和色调，高反差，暗调氛围"
+
+# ─── 构图偏好 ───
+
+composition:
+  # 默认构图法则（visual-agent 参考）
+  preferred_rules:
+    - name: "前景遮挡"
+      when: "近景/特写镜头"
+      keywords: "前景遮挡，对焦模糊，层次丰富"
+
+    - name: "引导线构图"
+      when: "大全景/远景"
+      keywords: "引导线，视线引导，深邃感，无限延伸"
+
+    - name: "框架构图"
+      when: "门/窗/建筑场景"
+      keywords: "框架构图，门框，框架内明暗对比"
+
+    - name: "对称构图"
+      when: "宫廷/朝堂/仪式场景"
+      keywords: "对称构图，中轴线，威严感"
+
+# ─── 提取来源 ───
+
+extracted_from:
+  - source: "outputs/qyccan-ep01/visual-direction.yaml"
+    note: "黑雾森林 + 契约场景，伦勃朗光效果好"
+  - source: "outputs/qyccan-ep07/visual-direction.yaml"
+    note: "擂台战斗 + 进化场景，高反差+动态光影"
+  - source: "docs/IMAGE-GENERATION-BEST-PRACTICES.md"
+    note: "实战案例：前景遮挡/引导线/框架/对称构图"

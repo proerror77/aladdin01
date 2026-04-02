@@ -1,0 +1,73 @@
+# 季级战略模板
+# 由 ~scriptwriter 在 Step 1.5 生成（>20 集时触发）
+
+version: "1.0"
+
+# 项目信息
+project: "{project_name}"
+total_episodes: 60
+episodes_per_season: 10  # 默认每季 10 集，可调整
+
+# 季级战略
+seasons:
+  - id: "season-01"
+    name: "{季名，如：重生觉醒篇}"
+    episodes: "ep01-ep10"
+    episode_count: 10
+
+    # 核心定义
+    core_conflict: "{本季核心冲突}"
+    character_arc: "{主角在本季的成长弧}"
+    power_level: "{主角本季的实力范围}"
+
+    # 节奏板（Beat Sheet）
+    hook_opening: "{开季抓手：第 1 集如何吸引观众}"
+    midpoint_twist: "{中段转折：第 5 集左右的关键转折}"
+    climax: "{季高潮：倒数第 2-3 集的高潮}"
+    hook_ending: "{季末钩子：最后 1 集如何勾住下一季}"
+
+    # 关键节拍
+    beat_sheet:
+      - ep: "ep01"
+        beat: "开局"
+        note: "{开局事件}"
+      - ep: "ep03"
+        beat: "第一次升级"
+        note: "{第一个小高潮}"
+      - ep: "ep05"
+        beat: "中段转折"
+        note: "{中段转折事件}"
+      - ep: "ep07"
+        beat: "季高潮前奏"
+        note: "{高潮铺垫}"
+      - ep: "ep08-09"
+        beat: "季高潮"
+        note: "{本季最大高潮}"
+      - ep: "ep10"
+        beat: "季末钩子"
+        note: "{悬念/伏笔/新威胁}"
+
+    # 新角色引入
+    new_characters:
+      - name: "{角色名}"
+        role: "{在本季的角色定位}"
+        first_episode: "ep01"
+
+    # 新场景引入
+    new_locations:
+      - name: "{场景名}"
+        first_episode: "ep01"
+
+    # 与上一季的衔接
+    continuation_from: null  # 第一季无衔接
+    unresolved_threads: []   # 本季留给下一季的悬念
+
+  - id: "season-02"
+    name: "{季名}"
+    episodes: "ep11-ep20"
+    episode_count: 10
+    core_conflict: "{本季核心冲突}"
+    character_arc: "{主角成长弧}"
+    continuation_from: "season-01"
+    unresolved_threads:
+      - "{从上一季继承的悬念}"

@@ -1,0 +1,30 @@
+# 风格注册表
+# 每个项目在创建时绑定一个风格，visual-agent / asset-factory / gate-agent 统一读取
+
+version: "1.0"
+
+# 默认风格（新项目未指定时使用）
+default_style: "realistic-oriental"
+
+# 已注册风格
+styles:
+  realistic-oriental:
+    file: "config/styles/realistic-oriental.yaml"
+    description: "写实东方 — 伦勃朗光 + 胶片质感 + 东方美学，适合修仙/武侠/古装题材"
+
+  anime-fantasy:
+    file: "config/styles/anime-fantasy.yaml"
+    description: "动漫玄幻 — 赛璐璐风 + 高饱和 + 特效华丽，适合热血/异世界题材"
+
+  ink-wash:
+    file: "config/styles/ink-wash.yaml"
+    description: "水墨国风 — 留白 + 淡墨渲染 + 禅意空间，适合仙侠/文艺/慢节奏题材"
+
+  cyberpunk-noir:
+    file: "config/styles/cyberpunk-noir.yaml"
+    description: "赛博朋克 — 霓虹 + 雨夜 + 高对比，适合科幻/都市/悬疑题材"
+
+# 项目绑定（运行时由 ~scriptwriter 或 ~start 写入）
+# 格式：project_name: style_id
+project_bindings:
+  qyccan: "realistic-oriental"
