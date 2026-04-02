@@ -32,11 +32,7 @@ character_entry:
     - must_preserve    # 必须保留的特征列表
 
   optional_fields:
-    - current_state    # 当前状态快照
-      - emotion
-      - location
-      - knowledge
-      - props_in_possession
+    - current_state    # 当前状态快照（含子字段：emotion, location, knowledge, props_in_possession）
 
 background_entry:
   required_fields:
