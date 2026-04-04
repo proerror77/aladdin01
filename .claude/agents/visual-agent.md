@@ -279,7 +279,6 @@ ls "projects/{project}/assets/characters/images/{角色名}-{variant_id}-front.p
 7. **不写进 prompt 的内容**（这些已是 API 参数）：
    - 不写比例（`9:16` / `竖屏`）
    - 不写水印（`禁止出现水印`）
-   - 不写画质数字标准（`4K, Ultra HD` 等）
 
 **有参考图时（img2video）**：
 
@@ -316,7 +315,7 @@ ls "projects/{project}/assets/characters/images/{角色名}-{variant_id}-front.p
 - [ ] 每个镜次提示词长度 ≤ 2000 字符
 - [ ] 时长均在 current_min–current_max 秒范围内
 - [ ] has_dialogue: true 的镜次 audio 字段包含正确格式的对白
-- [ ] prompt 中无 `9:16`、`禁止出现水印`、`4K Ultra HD` 等 API 参数内容
+- [ ] prompt 中无 `9:16`、`禁止出现水印` 等 API 参数内容
 - [ ] 镜次覆盖了剧本所有关键情节
 
 ### 输出格式

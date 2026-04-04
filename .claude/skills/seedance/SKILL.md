@@ -45,18 +45,20 @@ version: 2.0.0
 - 有参考视频时生成消耗更多
 - 视频延长时，选择的生成时长应为"新增部分"的时长（例如延长5秒，生成长度也选5秒）
 
-### 核心规则（来自 ARQ Studio 生产验证）
+### 核心规则（来自 ARQ Studio 生产验证，适用于 Seedance 1.x）
 
-**5-Block Prompt 结构**（每个 prompt 必须包含）：
+> ⚠️ **Seedance 2.0 说明**：以下规则来自 Seedance 1.x 实战经验。Seedance 2.0 自然语言理解更强，官方案例（EvoLink awesome-seedance-2-guide）已证明更长的自然语言 prompt 同样有效。**以官方案例为准，ARQ 规则作为参考**。
+
+**5-Block Prompt 结构**（text2video 参考框架）：
 1. **SUBJECT**：谁/什么在画面中，服装、场景、情绪。具体物理化描述
 2. **ACTION**：**一个动词，一个动作**。多个动词会让模型混乱，严格遵守
 3. **CAMERA**：构图、运镜、镜头感
 4. **STYLE**：单一美学锚点 + 灯光 + 色彩（不要只写"cinematic"）
-5. **QUALITY SUFFIX**（每个 prompt 末尾必加）："4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture"
+5. **QUALITY SUFFIX**（可选）："4K, Ultra HD, Rich details, Sharp clarity, Cinematic texture, Natural colors, Stable picture"
 
-**Prompt 长度限制**：
-- text-to-video：120-280 词（<30 太随机，>280 模型开始丢指令）
-- image-to-video：50-80 词最大（长 prompt 会覆盖参考图的身份信息）
+**Prompt 长度参考**（Seedance 2.0 实测更宽松）：
+- text-to-video：120-280 词为佳（<30 太随机，>280 可能丢指令）
+- image-to-video：官方案例 100-400 字符均有效；有参考图时尽量让图片承载外貌信息，prompt 聚焦动作和场景
 
 **禁止事项**：
 - 不要用 negative prompts（"no blur, no shaking"），改用正面描述（"sharp clarity, stable picture"）

@@ -60,8 +60,9 @@ image_style:
 # ─── Seedance 视频风格 ───
 
 video_style:
-  # 质量后缀（5-block 的第 5 段）
-  quality_suffix: "4K超清，电影级画质，细腻光影，高清细节"
+  # 质量后缀（可选，Seedance 2.0 官方案例不强制追加）
+  # 如需追加可设为非空字符串，visual-agent 会在 prompt 末尾附加
+  quality_suffix: ""
 
   # 风格段（5-block 的第 4 段）
   style_block:
