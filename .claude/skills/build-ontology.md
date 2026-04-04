@@ -36,11 +36,11 @@ fi
 echo "✓ 剧本文件存在: script/${ep}.md"
 
 # 检查角色档案
-character_count=$(find assets/characters/profiles -name "*.yaml" -type f 2>/dev/null | wc -l || echo "0")
+character_count=$(find projects/{project}/assets/characters/profiles -name "*.yaml" -type f 2>/dev/null | wc -l || echo "0")
 echo "✓ 角色档案: ${character_count} 个"
 
 # 检查场景档案
-scene_count=$(find assets/scenes/profiles -name "*.yaml" -type f 2>/dev/null | wc -l || echo "0")
+scene_count=$(find projects/{project}/assets/scenes/profiles -name "*.yaml" -type f 2>/dev/null | wc -l || echo "0")
 echo "✓ 场景档案: ${scene_count} 个"
 
 # 2. 生成 session_id 和 trace_file
@@ -64,8 +64,8 @@ echo "正在构建世界本体模型..."
 # )
 
 # 4. 验证输出
-if [[ ! -f "state/ontology/${ep}-world-model.json" ]]; then
-  echo "ERROR: 世界模型文件未生成: state/ontology/${ep}-world-model.json" >&2
+if [[ ! -f "projects/{project}/state/ontology/${ep}-world-model.json" ]]; then
+  echo "ERROR: 世界模型文件未生成: projects/{project}/state/ontology/${ep}-world-model.json" >&2
   exit 1
 fi
 
@@ -76,14 +76,14 @@ fi
 
 # 5. 输出摘要
 echo ""
-echo "✓ 世界本体模型已生成: state/ontology/${ep}-world-model.json"
+echo "✓ 世界本体模型已生成: projects/{project}/state/ontology/${ep}-world-model.json"
 echo ""
 
 # 读取统计信息
-character_count=$(jq '.entities.characters | length' "state/ontology/${ep}-world-model.json")
-location_count=$(jq '.entities.locations | length' "state/ontology/${ep}-world-model.json")
-prop_count=$(jq '.entities.props | length' "state/ontology/${ep}-world-model.json")
-relationship_count=$(jq '.relationships | length' "state/ontology/${ep}-world-model.json")
+character_count=$(jq '.entities.characters | length' "projects/{project}/state/ontology/${ep}-world-model.json")
+location_count=$(jq '.entities.locations | length' "projects/{project}/state/ontology/${ep}-world-model.json")
+prop_count=$(jq '.entities.props | length' "projects/{project}/state/ontology/${ep}-world-model.json")
+relationship_count=$(jq '.relationships | length' "projects/{project}/state/ontology/${ep}-world-model.json")
 
 echo "实体统计:"
 echo "  - 角色: ${character_count}"
@@ -95,9 +95,9 @@ echo "  - 总数: ${relationship_count}"
 echo ""
 
 # 显示叙事约束（如果有）
-if jq -e '.narrative_constraints.character_evolution | length > 0' "state/ontology/${ep}-world-model.json" > /dev/null 2>&1; then
+if jq -e '.narrative_constraints.character_evolution | length > 0' "projects/{project}/state/ontology/${ep}-world-model.json" > /dev/null 2>&1; then
   echo "叙事约束:"
-  jq -r '.narrative_constraints.character_evolution[] | "  - \(.character): \(.from) → \(.to) (触发: \(.trigger))"' "state/ontology/${ep}-world-model.json"
+  jq -r '.narrative_constraints.character_evolution[] | "  - \(.character): \(.from) → \(.to) (触发: \(.trigger))"' "projects/{project}/state/ontology/${ep}-world-model.json"
   echo ""
 fi
 
@@ -148,11 +148,11 @@ total_relationships=0
 for script_file in $scripts; do
   ep=$(basename "$script_file" .md)
   
-  if [[ -f "state/ontology/${ep}-world-model.json" ]]; then
-    character_count=$(jq '.entities.characters | length' "state/ontology/${ep}-world-model.json")
-    location_count=$(jq '.entities.locations | length' "state/ontology/${ep}-world-model.json")
-    prop_count=$(jq '.entities.props | length' "state/ontology/${ep}-world-model.json")
-    relationship_count=$(jq '.relationships | length' "state/ontology/${ep}-world-model.json")
+  if [[ -f "projects/{project}/state/ontology/${ep}-world-model.json" ]]; then
+    character_count=$(jq '.entities.characters | length' "projects/{project}/state/ontology/${ep}-world-model.json")
+    location_count=$(jq '.entities.locations | length' "projects/{project}/state/ontology/${ep}-world-model.json")
+    prop_count=$(jq '.entities.props | length' "projects/{project}/state/ontology/${ep}-world-model.json")
+    relationship_count=$(jq '.relationships | length' "projects/{project}/state/ontology/${ep}-world-model.json")
     
     total_characters=$((total_characters + character_count))
     total_locations=$((total_locations + location_count))
@@ -177,19 +177,19 @@ set -euo pipefail
 ep="$1"
 
 # 1. 读取现有 world-model.json
-if [[ ! -f "state/ontology/${ep}-world-model.json" ]]; then
-  echo "ERROR: 世界模型文件不存在: state/ontology/${ep}-world-model.json" >&2
+if [[ ! -f "projects/{project}/state/ontology/${ep}-world-model.json" ]]; then
+  echo "ERROR: 世界模型文件不存在: projects/{project}/state/ontology/${ep}-world-model.json" >&2
   exit 1
 fi
 
-echo "正在验证: state/ontology/${ep}-world-model.json"
+echo "正在验证: projects/{project}/state/ontology/${ep}-world-model.json"
 echo ""
 
 # 2. 验证 Schema 完整性
 required_fields=("world_id" "episode" "created_at" "entities" "relationships" "physics")
 
 for field in "${required_fields[@]}"; do
-  if ! jq -e ".${field}" "state/ontology/${ep}-world-model.json" > /dev/null 2>&1; then
+  if ! jq -e ".${field}" "projects/{project}/state/ontology/${ep}-world-model.json" > /dev/null 2>&1; then
     echo "❌ 缺少必需字段: ${field}"
   else
     echo "✓ 字段存在: ${field}"
@@ -202,25 +202,25 @@ echo ""
 echo "验证逻辑一致性..."
 
 # 检查关系中的实体是否存在
-relationship_count=$(jq '.relationships | length' "state/ontology/${ep}-world-model.json")
+relationship_count=$(jq '.relationships | length' "projects/{project}/state/ontology/${ep}-world-model.json")
 invalid_count=0
 
 for i in $(seq 0 $((relationship_count - 1))); do
-  from=$(jq -r ".relationships[$i].from" "state/ontology/${ep}-world-model.json")
-  to=$(jq -r ".relationships[$i].to" "state/ontology/${ep}-world-model.json")
+  from=$(jq -r ".relationships[$i].from" "projects/{project}/state/ontology/${ep}-world-model.json")
+  to=$(jq -r ".relationships[$i].to" "projects/{project}/state/ontology/${ep}-world-model.json")
   
   # 检查 from 实体
-  if ! jq -e ".entities.characters[] | select(.name == \"$from\")" "state/ontology/${ep}-world-model.json" > /dev/null 2>&1 && \
-     ! jq -e ".entities.locations[] | select(.name == \"$from\")" "state/ontology/${ep}-world-model.json" > /dev/null 2>&1 && \
-     ! jq -e ".entities.props[] | select(.name == \"$from\")" "state/ontology/${ep}-world-model.json" > /dev/null 2>&1; then
+  if ! jq -e ".entities.characters[] | select(.name == \"$from\")" "projects/{project}/state/ontology/${ep}-world-model.json" > /dev/null 2>&1 && \
+     ! jq -e ".entities.locations[] | select(.name == \"$from\")" "projects/{project}/state/ontology/${ep}-world-model.json" > /dev/null 2>&1 && \
+     ! jq -e ".entities.props[] | select(.name == \"$from\")" "projects/{project}/state/ontology/${ep}-world-model.json" > /dev/null 2>&1; then
     echo "⚠️ 关系 #$i: 实体 $from 不存在"
     invalid_count=$((invalid_count + 1))
   fi
   
   # 检查 to 实体
-  if ! jq -e ".entities.characters[] | select(.name == \"$to\")" "state/ontology/${ep}-world-model.json" > /dev/null 2>&1 && \
-     ! jq -e ".entities.locations[] | select(.name == \"$to\")" "state/ontology/${ep}-world-model.json" > /dev/null 2>&1 && \
-     ! jq -e ".entities.props[] | select(.name == \"$to\")" "state/ontology/${ep}-world-model.json" > /dev/null 2>&1; then
+  if ! jq -e ".entities.characters[] | select(.name == \"$to\")" "projects/{project}/state/ontology/${ep}-world-model.json" > /dev/null 2>&1 && \
+     ! jq -e ".entities.locations[] | select(.name == \"$to\")" "projects/{project}/state/ontology/${ep}-world-model.json" > /dev/null 2>&1 && \
+     ! jq -e ".entities.props[] | select(.name == \"$to\")" "projects/{project}/state/ontology/${ep}-world-model.json" > /dev/null 2>&1; then
     echo "⚠️ 关系 #$i: 实体 $to 不存在"
     invalid_count=$((invalid_count + 1))
   fi
@@ -240,9 +240,9 @@ echo "验证完成"
 
 ## 输出
 
-- `state/ontology/{ep}-world-model.json` — 世界本体模型
-- `state/{ep}-phase0.json` — Phase 0 状态文件
-- `state/ontology/{ep}-conflicts.txt` — 冲突报告（如有）
+- `projects/{project}/state/ontology/{ep}-world-model.json` — 世界本体模型
+- `projects/{project}/state/{ep}-phase0.json` — Phase 0 状态文件
+- `projects/{project}/state/ontology/{ep}-conflicts.txt` — 冲突报告（如有）
 
 ## 依赖
 

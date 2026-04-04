@@ -19,16 +19,16 @@ tools:
 
 ## 输入
 
-- `outputs/{ep}/visual-direction.yaml` — 包含每个镜次的角色引用（含 variant_id）和场景引用（含 time_of_day）
-- `state/design-lock.json` — 已锁定的参考图清单
-- `assets/characters/images/` — 角色参考图
-- `assets/scenes/images/` — 场景参考图
+- `projects/{project}/outputs/{ep}/visual-direction.yaml` — 包含每个镜次的角色引用（含 variant_id）和场景引用（含 time_of_day）
+- `projects/{project}/state/design-lock.json` — 已锁定的参考图清单
+- `projects/{project}/assets/characters/images/` — 角色参考图
+- `projects/{project}/assets/scenes/images/` — 场景参考图
 - `session_id` — Trace session 标识（由 team-lead 传入）
 - `trace_file` — Trace 文件名，如 `ep01-phase3-trace`（由 team-lead 传入）
 
 ## 输出
 
-- `outputs/{ep}/art-direction-review.md` — 美术校验审核文档（引用清单）
+- `projects/{project}/outputs/{ep}/art-direction-review.md` — 美术校验审核文档（引用清单）
 
 ## 执行流程
 
@@ -40,11 +40,11 @@ tools:
 
 ### Step 2: 逐一检查文件是否存在
 
-读取 `state/design-lock.json` 获取已锁定的参考图路径，逐一检查对应文件是否存在：
+读取 `projects/{project}/state/design-lock.json` 获取已锁定的参考图路径，逐一检查对应文件是否存在：
 
-- `assets/characters/images/{角色名}-{variant_id}-front.png`（多变体）
-- `assets/characters/images/{角色名}-front.png`（单变体 / default）
-- `assets/scenes/images/{场景名}-{time_of_day}.png`
+- `projects/{project}/assets/characters/images/{角色名}-{variant_id}-front.png`（多变体）
+- `projects/{project}/assets/characters/images/{角色名}-front.png`（单变体 / default）
+- `projects/{project}/assets/scenes/images/{场景名}-{time_of_day}.png`
 
 ### Step 3: 判定结果
 
@@ -69,14 +69,14 @@ design-agent 发现 {N} 个缺失的参考图：
 
 | 角色 | 变体 | 参考图 | 状态 |
 |------|------|--------|------|
-| 凌霄 | default | assets/characters/images/凌霄-front.png | 已锁定 |
-| 判官 | 膨胀 | assets/characters/images/判官-膨胀-front.png | 已锁定 |
+| 凌霄 | default | projects/{project}/assets/characters/images/凌霄-front.png | 已锁定 |
+| 判官 | 膨胀 | projects/{project}/assets/characters/images/判官-膨胀-front.png | 已锁定 |
 
 ## 场景参考图引用
 
 | 场景 | 时间 | 参考图 | 状态 |
 |------|------|--------|------|
-| 清风酒吧 | night | assets/scenes/images/清风酒吧-night.png | 已锁定 |
+| 清风酒吧 | night | projects/{project}/assets/scenes/images/清风酒吧-night.png | 已锁定 |
 
 ## 校验结果
 
@@ -87,7 +87,7 @@ design-agent 发现 {N} 个缺失的参考图：
 
 向 team-lead 发送消息：`design-agent 完成，{N} 个角色引用 + {M} 个场景引用全部就绪`
 
-写入 `state/{ep}-phase3.json`：
+写入 `projects/{project}/state/{ep}-phase3.json`：
 ```json
 {
   "episode": "{ep}",
@@ -115,7 +115,7 @@ design-agent 发现 {N} 个缺失的参考图：
 
 ```bash
 # 读取输入
-./scripts/trace.sh {session_id} {trace_file} read_input '{"visual_direction":"outputs/{ep}/visual-direction.yaml","design_lock":"state/design-lock.json"}'
+./scripts/trace.sh {session_id} {trace_file} read_input '{"visual_direction":"projects/{project}/outputs/{ep}/visual-direction.yaml","design_lock":"projects/{project}/state/design-lock.json"}'
 
 # 角色图校验
 ./scripts/trace.sh {session_id} {trace_file} check_characters '{"total":{N},"found":{N},"missing":[]}'

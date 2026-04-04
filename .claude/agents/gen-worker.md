@@ -38,8 +38,8 @@ tools:
 
 ## 输出
 
-- `outputs/{ep}/videos/shot-{N}{output_suffix}.mp4` — 生成的视频文件（output_suffix 默认为空）
-- `state/{ep}-shot-{N}{output_suffix}.json` — 镜次状态文件（output_suffix 默认为空）
+- `projects/{project}/outputs/{ep}/videos/shot-{N}{output_suffix}.mp4` — 生成的视频文件（output_suffix 默认为空）
+- `projects/{project}/state/{ep}-shot-{N}{output_suffix}.json` — 镜次状态文件（output_suffix 默认为空）
 
 ## 执行流程
 
@@ -47,7 +47,7 @@ tools:
 
 **Step 1: 检查 shot packet 是否存在**
 
-检查 `state/shot-packets/{shot_id}.json` 是否存在：
+检查 `projects/{project}/state/shot-packets/{shot_id}.json` 是否存在：
 - 如存在 → 使用 shot packet 模式（v2.0 新流程）
 - 如不存在 → 使用旧模式（读取 visual-direction.yaml）
 
@@ -61,11 +61,11 @@ tools:
 
 **Step 3: 创建工作目录**
 
-创建工作目录：`outputs/{ep}/videos/`
+创建工作目录：`projects/{project}/outputs/{ep}/videos/`
 
 **Step 4: 写入初始状态文件**
 
-写入初始状态文件 `state/{ep}-shot-{N}{output_suffix}.json`：
+写入初始状态文件 `projects/{project}/state/{ep}-shot-{N}{output_suffix}.json`：
 ```json
 {
   "episode": "{ep}",
@@ -248,9 +248,9 @@ gen_status=$(echo "$result" | jq -r '.gen_status // empty')
 
 **下载视频**：
 ```bash
-./scripts/api-caller.sh dreamina download {submit_id} outputs/{ep}/videos
+./scripts/api-caller.sh dreamina download {submit_id} projects/{project}/outputs/{ep}/videos
 # dreamina 下载的文件名由 CLI 决定，需要重命名
-mv outputs/{ep}/videos/*.mp4 outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
+mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
 ```
 
 ---
@@ -258,12 +258,12 @@ mv outputs/{ep}/videos/*.mp4 outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
 #### ARK API 后端
 
 **模式判断**：
-- 如果 `state/shot-packets/{shot_id}.json` 存在 → 使用 shot packet 模式
+- 如果 `projects/{project}/state/shot-packets/{shot_id}.json` 存在 → 使用 shot packet 模式
 - 否则 → 使用旧模式（从传入参数构建 payload）
 
 **Shot Packet 模式（v2.0 新增）**：
 
-1. 读取 `state/shot-packets/{shot_id}.json`
+1. 读取 `projects/{project}/state/shot-packets/{shot_id}.json`
 2. 从 `seedance_inputs` 字段提取：
    - `mode`（img2video）
    - `images`（参考图列表）
@@ -385,14 +385,14 @@ PAYLOAD_EOF
 **ARK API 后端**：
 ```bash
 ./scripts/api-caller.sh seedance download {video_url} shot-{N}{output_suffix}.mp4
-mv shot-{N}{output_suffix}.mp4 outputs/{ep}/videos/
+mv shot-{N}{output_suffix}.mp4 projects/{project}/outputs/{ep}/videos/
 ```
 
 **Dreamina CLI 后端**：
 ```bash
-./scripts/api-caller.sh dreamina download {submit_id} outputs/{ep}/videos
+./scripts/api-caller.sh dreamina download {submit_id} projects/{project}/outputs/{ep}/videos
 # 重命名为标准文件名
-mv outputs/{ep}/videos/*.mp4 outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
+mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
 ```
 
 ### rewrite_prompt(prompt, rejection_reason)
@@ -405,7 +405,7 @@ mv outputs/{ep}/videos/*.mp4 outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
 
 ### 成功后
 
-写入状态文件 `state/{ep}-shot-{N}{output_suffix}.json`：
+写入状态文件 `projects/{project}/state/{ep}-shot-{N}{output_suffix}.json`：
 ```json
 {
   "episode": "{ep}",
@@ -414,7 +414,7 @@ mv outputs/{ep}/videos/*.mp4 outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
   "status": "completed",
   "started_at": "{ISO8601}",
   "completed_at": "{ISO8601}",
-  "video_path": "outputs/{ep}/videos/shot-{N}{output_suffix}.mp4",
+  "video_path": "projects/{project}/outputs/{ep}/videos/shot-{N}{output_suffix}.mp4",
   "original_retries": {n},
   "rewrite_rounds": {n},
   "total_api_calls": {n}
@@ -430,7 +430,7 @@ mv outputs/{ep}/videos/*.mp4 outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
 
 ### 失败后
 
-写入状态文件 `state/{ep}-shot-{N}{output_suffix}.json`：
+写入状态文件 `projects/{project}/state/{ep}-shot-{N}{output_suffix}.json`：
 ```json
 {
   "episode": "{ep}",
@@ -480,7 +480,7 @@ mv outputs/{ep}/videos/*.mp4 outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
 ./scripts/trace.sh {session_id} {trace_file} rewrite '{"round":{N},"old_prompt":"...前50字...","new_prompt":"...前50字...","change_reason":"..."}'
 
 # 下载视频
-./scripts/trace.sh {session_id} {trace_file} download '{"video_path":"outputs/{ep}/videos/shot-{N}.mp4"}'
+./scripts/trace.sh {session_id} {trace_file} download '{"video_path":"projects/{project}/outputs/{ep}/videos/shot-{N}.mp4"}'
 
 # 完成 / 失败
 ./scripts/trace.sh {session_id} {trace_file} complete '{"total_api_calls":{N},"original_retries":{N},"rewrite_rounds":{N}}'

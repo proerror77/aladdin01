@@ -16,8 +16,8 @@
 ## 状态文件结构
 
 检查待审核内容时读取以下状态文件：
-- `state/{ep}-phase2.json` — 视觉指导状态（status: awaiting_review）
-- `state/{ep}-phase3.json` — 美术指导状态（status: awaiting_review）
+- `projects/{project}/state/{ep}-phase2.json` — 视觉指导状态（status: awaiting_review）
+- `projects/{project}/state/{ep}-phase3.json` — 美术指导状态（status: awaiting_review）
 
 ## 执行流程
 
@@ -50,8 +50,8 @@ ep02 — outputs/ep02/visual-direction.yaml
 ━━━ 待审核：参考图 (Phase 3) ━━━
 
 ep01 — outputs/ep01/art-direction-review.md
-  角色参考图：assets/characters/images/
-  场景参考图：assets/scenes/images/
+  角色参考图：projects/{project}/assets/characters/images/
+  场景参考图：projects/{project}/assets/scenes/images/
 
 输入 '~review approve' 批准全部
 ```
@@ -59,7 +59,7 @@ ep01 — outputs/ep01/art-direction-review.md
 ### ~review approve（批准）
 
 更新对应状态文件：
-- `state/{ep}-phase{N}.json` 中 `status: awaiting_review` → `status: completed`
+- `projects/{project}/state/{ep}-phase{N}.json` 中 `status: awaiting_review` → `status: completed`
 - `state/progress.json` 中 `{ep}.current_phase` 更新
 
 ```
@@ -89,7 +89,7 @@ ep01 的视觉指导已标记为需修改。
 ```
 
 更新状态文件：
-- `state/{ep}-phase{N}.json` 中 `status: awaiting_review` → `status: needs_revision`
+- `projects/{project}/state/{ep}-phase{N}.json` 中 `status: awaiting_review` → `status: needs_revision`
 
 ### ~review revise {ep}（修改模式）
 
@@ -152,5 +152,5 @@ ep01 单独调整模式：
 
 | 阶段 | 状态文件 | 待审核文件 |
 |------|---------|-----------|
-| Phase 2 视觉指导 | {ep}-phase2.json | outputs/{ep}/visual-direction.yaml |
-| Phase 3 美术指导 | {ep}-phase3.json | outputs/{ep}/art-direction-review.md |
+| Phase 2 视觉指导 | {ep}-phase2.json | projects/{project}/outputs/{ep}/visual-direction.yaml |
+| Phase 3 美术指导 | {ep}-phase3.json | projects/{project}/outputs/{ep}/art-direction-review.md |

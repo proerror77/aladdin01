@@ -43,7 +43,7 @@
    - `batch --mine` 读取 `phase_scope` 后只执行对应阶段，跳过其他 phase
    - 未指定 `--phase` 时 `phase_scope` 为 `null`，表示负责所有 phase
 5. 如果指定了 `--status pending|failed`：
-   - 读取 `state/{ep}-phase*.json` 和 `state/{ep}-shot-*.json`
+   - 读取 `projects/{project}/state/{ep}-phase*.json` 和 `projects/{project}/state/{ep}-shot-*.json`
    - 按 status 筛选匹配的集数
    - 输出筛选结果让用户确认后创建任务：
      ```

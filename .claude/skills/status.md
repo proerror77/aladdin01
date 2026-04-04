@@ -15,8 +15,8 @@
 
 每个 agent 写入独立状态文件，避免并发写入冲突：
 - `state/progress.json` — 索引文件（只读汇总）
-- `state/{ep}-phase{N}.json` — 各阶段状态
-- `state/{ep}-shot-{N}.json` — 各镜次状态
+- `projects/{project}/state/{ep}-phase{N}.json` — 各阶段状态
+- `projects/{project}/state/{ep}-shot-{N}.json` — 各镜次状态
 
 ## 执行流程
 
@@ -26,16 +26,16 @@
 2. 遍历每个剧本，读取其各阶段状态文件
 
 状态文件读取优先级：
-1. `state/{ep}-phase4.json` 存在且完成 → 检查 shot 文件判断 Phase 5 进度
-2. `state/{ep}-phase4.json` → Phase 4 状态
-3. `state/{ep}-phase3.json` → Phase 3 状态
-4. `state/{ep}-phase2.json` → Phase 2 状态
-5. `state/{ep}-phase1.json` → Phase 1 状态
+1. `projects/{project}/state/{ep}-phase4.json` 存在且完成 → 检查 shot 文件判断 Phase 5 进度
+2. `projects/{project}/state/{ep}-phase4.json` → Phase 4 状态
+3. `projects/{project}/state/{ep}-phase3.json` → Phase 3 状态
+4. `projects/{project}/state/{ep}-phase2.json` → Phase 2 状态
+5. `projects/{project}/state/{ep}-phase1.json` → Phase 1 状态
 
-**注意**：Phase 5 没有独立的 `phase5.json`，进度通过汇总 `state/{ep}-shot-*.json` 计算：
+**注意**：Phase 5 没有独立的 `phase5.json`，进度通过汇总 `projects/{project}/state/{ep}-shot-*.json` 计算：
 - 已完成镜次数 / 总镜次数（来自 phase2.json 的 data.shot_count）
 
-**A/B 模式检测**：如果存在 `state/{ep}-shot-*-ab-result.json` 文件，说明本集使用了 A/B 模式。
+**A/B 模式检测**：如果存在 `projects/{project}/state/{ep}-shot-*-ab-result.json` 文件，说明本集使用了 A/B 模式。
 此时 Phase 5 进度改为汇总 `-a.json` 和 `-b.json` 文件（各变体独立计数），并额外显示评分进度：
 ```
 ep01  [████████░░] 80%  Phase 5: A/B 视频生成中 (16/22 变体完成)

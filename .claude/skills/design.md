@@ -19,14 +19,14 @@ user_invocable: true
 
 ### 1. 读取所有角色和场景
 
-- 扫描 `assets/characters/profiles/*.yaml`，按 tier 分组（protagonist / supporting / minor）
-- 扫描 `assets/scenes/profiles/*.yaml`
-- 读取 `state/design-lock.json`（如果存在），跳过已锁定的条目
+- 扫描 `projects/{project}/assets/characters/profiles/*.yaml`，按 tier 分组（protagonist / supporting / minor）
+- 扫描 `projects/{project}/assets/scenes/profiles/*.yaml`
+- 读取 `projects/{project}/state/design-lock.json`（如果存在），跳过已锁定的条目
 - 如果指定了 `--project`，只读取对应项目
 
 ### 2. 按优先级顺序生成
 
-> **幂等性保证**：生成前检查目标图片文件是否已存在（`assets/characters/images/{角色名}-front.png` 或 `assets/scenes/images/{场景名}-{time_of_day}.png`）。文件已存在则跳过生成，直接进入审核步骤。即使 `state/design-lock.json` 不存在或损坏，已生成的图片也不会被覆盖。
+> **幂等性保证**：生成前检查目标图片文件是否已存在（`projects/{project}/assets/characters/images/{角色名}-front.png` 或 `projects/{project}/assets/scenes/images/{场景名}-{time_of_day}.png`）。文件已存在则跳过生成，直接进入审核步骤。即使 `projects/{project}/state/design-lock.json` 不存在或损坏，已生成的图片也不会被覆盖。
 
 所有角色和场景在同一步完成，按以下顺序：
 
@@ -43,9 +43,9 @@ user_invocable: true
 ```
 ━━━ 主角审核：{角色名}（第 {N} 轮）━━━
 
-正面：assets/characters/images/{角色名}-front.png
-侧面：assets/characters/images/{角色名}-side.png
-背面：assets/characters/images/{角色名}-back.png
+正面：projects/{project}/assets/characters/images/{角色名}-front.png
+侧面：projects/{project}/assets/characters/images/{角色名}-side.png
+背面：projects/{project}/assets/characters/images/{角色名}-back.png
 
 当前提示词：{提示词内容}
 
@@ -56,7 +56,7 @@ user_invocable: true
 4. 跳过 — 稍后再处理
 ```
 
-4. 通过 → 锁定，写入 `state/design-lock.json`
+4. 通过 → 锁定，写入 `projects/{project}/state/design-lock.json`
 5. 不满意 → 调整提示词，重新生成（回到 2）
 6. 重新生成 → 同提示词重新调用 API（回到 2）
 
@@ -69,9 +69,9 @@ user_invocable: true
 ```
 ━━━ 配角审核（共 {N} 个）━━━
 
-1. 阴阳师 — assets/characters/images/阴阳师-front.png — 通过 / 修改
-2. 判官（虚影形态）— assets/characters/images/判官-default-front.png — 通过 / 修改
-3. 判官（膨胀形态）— assets/characters/images/判官-膨胀-front.png — 通过 / 修改
+1. 阴阳师 — projects/{project}/assets/characters/images/阴阳师-front.png — 通过 / 修改
+2. 判官（虚影形态）— projects/{project}/assets/characters/images/判官-default-front.png — 通过 / 修改
+3. 判官（膨胀形态）— projects/{project}/assets/characters/images/判官-膨胀-front.png — 通过 / 修改
 ...
 
 输入需要修改的编号（如 "2,5"），或输入 "all" 全部通过：
@@ -95,8 +95,8 @@ user_invocable: true
 从所有角色档案的 `episodes` 推断场景出现的时间段，或从场景档案的 `description` 推断。
 
 为每个「场景 × 时间」组合生成参考图：
-- `assets/scenes/images/{场景名}-night.png`
-- `assets/scenes/images/{场景名}-day.png`
+- `projects/{project}/assets/scenes/images/{场景名}-night.png`
+- `projects/{project}/assets/scenes/images/{场景名}-day.png`
 - 等等
 
 统一展示审核，逻辑同阶段 B。
@@ -105,7 +105,7 @@ user_invocable: true
 
 ### 3. 写入锁定状态
 
-全部完成后，写入 `state/design-lock.json`：
+全部完成后，写入 `projects/{project}/state/design-lock.json`：
 
 ```json
 {
@@ -117,21 +117,21 @@ user_invocable: true
       "status": "locked",
       "rounds": 3,
       "variants": ["default"],
-      "images": ["assets/characters/images/凌霄-front.png", "..."]
+      "images": ["projects/{project}/assets/characters/images/凌霄-front.png", "..."]
     },
     "判官": {
       "tier": "supporting",
       "status": "locked",
       "rounds": 1,
       "variants": ["default", "膨胀"],
-      "images": ["assets/characters/images/判官-default-front.png", "..."]
+      "images": ["projects/{project}/assets/characters/images/判官-default-front.png", "..."]
     }
   },
   "scenes": {
     "清风酒吧": {
       "status": "locked",
       "variants": ["night", "day"],
-      "images": ["assets/scenes/images/清风酒吧-night.png", "assets/scenes/images/清风酒吧-day.png"]
+      "images": ["projects/{project}/assets/scenes/images/清风酒吧-night.png", "projects/{project}/assets/scenes/images/清风酒吧-day.png"]
     }
   }
 }
@@ -149,7 +149,7 @@ user_invocable: true
 | 路人 | 26 个 | 自动通过 |
 | 场景 | 8 个（{N} 个时间变体） | 标准审核 |
 
-所有参考图已锁定到 state/design-lock.json
+所有参考图已锁定到 projects/{project}/state/design-lock.json
 现在可以运行 ~batch
 ```
 
@@ -187,5 +187,5 @@ user_invocable: true
 
 - 主角形象是短剧的「门面」，直接影响流量，务必反复打磨
 - 如果用户对某个角色始终不满意，可以 skip，后续 `~design` 会继续处理未锁定的条目
-- 锁定后如需修改，删除 `state/design-lock.json` 中对应条目后重新运行 `~design`
+- 锁定后如需修改，删除 `projects/{project}/state/design-lock.json` 中对应条目后重新运行 `~design`
 - `~batch` 中的 Phase 3 (design-agent) 只做校验和引用，不再生图

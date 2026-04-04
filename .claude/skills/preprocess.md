@@ -119,6 +119,6 @@ spawn preprocess-agent：
 
 - `raw/` — 放置原始剧本文件（建议）
 - `script/` — 预处理后的分集剧本输出目录
-- `assets/characters/profiles/` — 角色档案
-- `assets/scenes/profiles/` — 场景档案
+- `projects/{project}/assets/characters/profiles/` — 角色档案
+- `projects/{project}/assets/scenes/profiles/` — 场景档案
 - `outputs/preprocess/` — 预处理报告

@@ -14,13 +14,13 @@
 
 ### 1. 扫描待评分镜次
 
-**`~ab-review report {ep}` 子命令**：如果没有任何 `state/{ep}-shot-*-ab-result.json` 文件，输出：
+**`~ab-review report {ep}` 子命令**：如果没有任何 `projects/{project}/state/{ep}-shot-*-ab-result.json` 文件，输出：
 ```
 没有找到 {ep} 的 A/B 测试结果文件。请先运行 ~start --ab {ep}。
 ```
 然后退出，不生成报告。
 
-**评分模式**：扫描 `state/{ep}-shot-*-ab-result.json`，筛选 `scoring.scored == false` 的镜次。
+**评分模式**：扫描 `projects/{project}/state/{ep}-shot-*-ab-result.json`，筛选 `scoring.scored == false` 的镜次。
 
 如果没有待评分镜次：
 ```
@@ -51,8 +51,8 @@ ERROR: 找不到评分配置 config/ab-testing/scoring.yaml。请检查配置文
 ```
 ━━━ Shot {N} / {total} ━━━
 
-变体 A ({variant_a_id}): outputs/{ep}/videos/shot-{N}-a.mp4
-变体 B ({variant_b_id}): outputs/{ep}/videos/shot-{N}-b.mp4
+变体 A ({variant_a_id}): projects/{project}/outputs/{ep}/videos/shot-{N}-a.mp4
+变体 B ({variant_b_id}): projects/{project}/outputs/{ep}/videos/shot-{N}-b.mp4
 
 提示词对比：
   A: {variant_a_prompt 前 100 字符}...
@@ -92,7 +92,7 @@ weighted_b = sum(score_b[dim] * weight[dim])
 
 ### 4. 写入 ab-result.json
 
-更新 `state/{ep}-shot-{N}-ab-result.json` 的 `scoring` 字段：
+更新 `projects/{project}/state/{ep}-shot-{N}-ab-result.json` 的 `scoring` 字段：
 
 ```json
 {
@@ -116,7 +116,7 @@ weighted_b = sum(score_b[dim] * weight[dim])
 
 ### 5. 生成报告
 
-所有镜次评分完成后，生成 `outputs/{ep}/ab-report.md`：
+所有镜次评分完成后，生成 `projects/{project}/outputs/{ep}/ab-report.md`：
 
 ```markdown
 # A/B 测试报告 - {ep}
@@ -170,4 +170,4 @@ weighted_b = sum(score_b[dim] * weight[dim])
 
 - 评分完成后自动生成报告，无需手动触发
 - `~ab-review report {ep}` 可在不重新评分的情况下重新生成报告
-- 评分数据持久化在 `state/{ep}-shot-*-ab-result.json`，可随时重新生成报告
+- 评分数据持久化在 `projects/{project}/state/{ep}-shot-*-ab-result.json`，可随时重新生成报告

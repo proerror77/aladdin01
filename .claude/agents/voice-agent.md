@@ -15,17 +15,17 @@ tools:
 
 ## 输入
 
-- `outputs/{ep}/render-script.md` — 提取有对白的角色
-- `outputs/{ep}/visual-direction.yaml` — 从结构化 audio 字段提取对白信息（更准确）
+- `projects/{project}/outputs/{ep}/render-script.md` — 提取有对白的角色
+- `projects/{project}/outputs/{ep}/visual-direction.yaml` — 从结构化 audio 字段提取对白信息（更准确）
 - `config/voices/` — 预设音色库
-- `assets/characters/voices/` — 已有角色音色（跨集复用）
+- `projects/{project}/assets/characters/voices/` — 已有角色音色（跨集复用）
 - `session_id` — Trace session 标识（由 team-lead 传入）
 - `trace_file` — Trace 文件名，如 `ep01-phase4-trace`（由 team-lead 传入）
 
 ## 输出
 
-- `assets/characters/voices/{角色名}/voice-config.yaml` — 音色配置
-- `outputs/{ep}/voice-assignment.md` — 音色分配报告
+- `projects/{project}/assets/characters/voices/{角色名}/voice-config.yaml` — 音色配置
+- `projects/{project}/outputs/{ep}/voice-assignment.md` — 音色分配报告
 
 ## 执行模式
 
@@ -42,7 +42,7 @@ voice-agent 支持两种模式：
 
 扫描 render_script，找出所有有台词的角色（格式：`角色名: "台词"`）。
 
-对每个角色，读取 `assets/characters/profiles/{角色名}.yaml`（如果存在），获取：
+对每个角色，读取 `projects/{project}/assets/characters/profiles/{角色名}.yaml`（如果存在），获取：
 - `voice_hint` — preprocess 阶段推荐的音色类型（如 `young-male-gentle`）
 - `tier` — 角色层级（protagonist/supporting/minor）
 - `gender`、`age` — 性别和年龄
@@ -51,7 +51,7 @@ voice-agent 支持两种模式：
 
 ### 2. 检查已有音色
 
-对每个角色，检查 `assets/characters/voices/{角色名}/voice-config.yaml` 是否存在。
+对每个角色，检查 `projects/{project}/assets/characters/voices/{角色名}/voice-config.yaml` 是否存在。
 
 **已有音色**：直接复用，记录"复用自 {ep_source}"。
 
@@ -105,7 +105,7 @@ voice-agent 支持两种模式：
 
 **选择用户上传**：
 ```
-请将音频文件放入：assets/characters/voices/{角色名}/reference.wav
+请将音频文件放入：projects/{project}/assets/characters/voices/{角色名}/reference.wav
 放好后输入 'done' 继续
 ```
 
@@ -113,7 +113,7 @@ voice-agent 支持两种模式：
 
 ### 4. 写入音色配置
 
-`assets/characters/voices/{角色名}/voice-config.yaml`：
+`projects/{project}/assets/characters/voices/{角色名}/voice-config.yaml`：
 
 ```yaml
 character: "{角色名}"
@@ -145,7 +145,7 @@ notes: "{角色特征备注}"
 
 向 team-lead 发送消息：`voice-agent 完成，{N} 个角色音色已配置`
 
-写入独立状态文件 `state/{ep}-phase4.json`：
+写入独立状态文件 `projects/{project}/state/{ep}-phase4.json`：
 ```json
 {
   "episode": "{ep}",
@@ -165,7 +165,7 @@ notes: "{角色特征备注}"
 
 ```bash
 # 读取输入
-./scripts/trace.sh {session_id} {trace_file} read_input '{"render_script":"outputs/{ep}/render-script.md","visual_direction":"outputs/{ep}/visual-direction.yaml"}'
+./scripts/trace.sh {session_id} {trace_file} read_input '{"render_script":"projects/{project}/outputs/{ep}/render-script.md","visual_direction":"projects/{project}/outputs/{ep}/visual-direction.yaml"}'
 
 # 提取角色
 ./scripts/trace.sh {session_id} {trace_file} extract_characters '{"count":{N},"characters":["角色1","角色2"]}'
@@ -174,7 +174,7 @@ notes: "{角色特征备注}"
 ./scripts/trace.sh {session_id} {trace_file} match_voices '{"matches":[{"character":"...","voice_source":"auto_match","confidence":"high","preset_id":"..."}]}'
 
 # 写入配置
-./scripts/trace.sh {session_id} {trace_file} write_configs '{"configs":[{"character":"...","path":"assets/characters/voices/.../voice-config.yaml"}]}'
+./scripts/trace.sh {session_id} {trace_file} write_configs '{"configs":[{"character":"...","path":"projects/{project}/assets/characters/voices/.../voice-config.yaml"}]}'
 
 # 写入产出
 ./scripts/trace.sh {session_id} {trace_file} write_output '{"files":["voice-assignment.md","phase4.json"]}'

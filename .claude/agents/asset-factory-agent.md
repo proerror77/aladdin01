@@ -15,19 +15,19 @@ tools:
 
 ## 输入
 
-- `state/ontology/{ep}-world-model.json` — 世界本体模型（v2.1，含 creatures / vfx / costume_variants）
-- `assets/characters/profiles/*.yaml` — 角色档案
-- `assets/scenes/profiles/*.yaml` — 场景档案
+- `projects/{project}/state/ontology/{ep}-world-model.json` — 世界本体模型（v2.1，含 creatures / vfx / costume_variants）
+- `projects/{project}/assets/characters/profiles/*.yaml` — 角色档案
+- `projects/{project}/assets/scenes/profiles/*.yaml` — 场景档案
 - `config/nanobanana/nanobanana-config.yaml` — Nanobanana 配置
 
 ## 输出（6 层实体全覆盖）
 
-- `assets/packs/characters/{角色名}-{variant}-{angle}.png` — 角色定妆包
-- `assets/packs/scenes/{场景名}-{time_of_day}-styleframe.png` — 场景 styleframe
-- `assets/packs/props/{道具名}-{condition}.png` — 道具包（含状态变体）
-- `assets/packs/creatures/{怪物名}-{variant}-{angle}.png` — 怪物/灵兽包 ✨ 新增
-- `assets/packs/vfx/{技能名}-{visual_variant}.png` — 特效参考图 ✨ 新增
-- `assets/packs/asset-manifest.json` — 资产清单
+- `projects/{project}/assets/packs/characters/{角色名}-{variant}-{angle}.png` — 角色定妆包
+- `projects/{project}/assets/packs/scenes/{场景名}-{time_of_day}-styleframe.png` — 场景 styleframe
+- `projects/{project}/assets/packs/props/{道具名}-{condition}.png` — 道具包（含状态变体）
+- `projects/{project}/assets/packs/creatures/{怪物名}-{variant}-{angle}.png` — 怪物/灵兽包 ✨ 新增
+- `projects/{project}/assets/packs/vfx/{技能名}-{visual_variant}.png` — 特效参考图 ✨ 新增
+- `projects/{project}/assets/packs/asset-manifest.json` — 资产清单
 
 ## 执行流程
 
@@ -50,7 +50,7 @@ fi
 
 ```bash
 # 读取角色档案
-for profile in assets/characters/profiles/*.yaml; do
+for profile in projects/{project}/assets/characters/profiles/*.yaml; do
     character_name=$(yq eval '.name' "$profile")
     
     # 检查是否有 variants
@@ -89,7 +89,7 @@ done
 
 ```bash
 # 读取场景档案
-for profile in assets/scenes/profiles/*.yaml; do
+for profile in projects/{project}/assets/scenes/profiles/*.yaml; do
     scene_name=$(yq eval '.name' "$profile")
     description=$(yq eval '.description' "$profile")
     
@@ -122,11 +122,11 @@ done
 
 ```bash
 # 如果有本体模型，从中提取道具
-if [[ -f "state/ontology/${ep}-world-model.json" ]]; then
-    props=$(jq -r '.entities.props | keys[]' "state/ontology/${ep}-world-model.json")
+if [[ -f "projects/{project}/state/ontology/${ep}-world-model.json" ]]; then
+    props=$(jq -r '.entities.props | keys[]' "projects/{project}/state/ontology/${ep}-world-model.json")
     
     for prop_name in $props; do
-        description=$(jq -r ".entities.props.\"${prop_name}\".description" "state/ontology/${ep}-world-model.json")
+        description=$(jq -r ".entities.props.\"${prop_name}\".description" "projects/{project}/state/ontology/${ep}-world-model.json")
         
         # 生成不同状态的道具
         for condition in intact damaged; do
@@ -148,11 +148,11 @@ fi
 从本体模型中提取道具，生成各状态图：
 
 ```bash
-mkdir -p assets/packs/props
+mkdir -p projects/{project}/assets/packs/props
 
-if [[ -f "state/ontology/${ep}-world-model.json" ]]; then
+if [[ -f "projects/{project}/state/ontology/${ep}-world-model.json" ]]; then
     # 读取 props（v2.1：包含 states 字段）
-    props=$(jq -r '.entities.props[]' "state/ontology/${ep}-world-model.json")
+    props=$(jq -r '.entities.props[]' "projects/{project}/state/ontology/${ep}-world-model.json")
 
     echo "$props" | jq -c '.' | while IFS= read -r prop; do
         prop_name=$(echo "$prop" | jq -r '.name')
@@ -163,7 +163,7 @@ if [[ -f "state/ontology/${ep}-world-model.json" ]]; then
 
         # 每个状态生成一张（只生成有视觉意义的状态）
         for condition in intact damaged destroyed; do
-            target="assets/packs/props/${prop_name}-${condition}.png"
+            target="projects/{project}/assets/packs/props/${prop_name}-${condition}.png"
             [[ -f "$target" ]] && continue  # 幂等跳过
 
             # 跳过 destroyed 状态（视觉无意义时）
@@ -189,9 +189,9 @@ fi
 从本体模型的 `entities.creatures` 中提取怪物：
 
 ```bash
-mkdir -p assets/packs/creatures
+mkdir -p projects/{project}/assets/packs/creatures
 
-creatures=$(jq -r '.entities.creatures // []' "state/ontology/${ep}-world-model.json")
+creatures=$(jq -r '.entities.creatures // []' "projects/{project}/state/ontology/${ep}-world-model.json")
 
 echo "$creatures" | jq -c '.[]' 2>/dev/null | while IFS= read -r creature; do
     creature_name=$(echo "$creature" | jq -r '.name')
@@ -206,7 +206,7 @@ echo "$creatures" | jq -c '.[]' 2>/dev/null | while IFS= read -r creature; do
     for variant in $variants; do
         variant_desc=$(echo "$creature" | jq -r ".variants.${variant} // .appearance")
         for angle in front side; do
-            target="assets/packs/creatures/${creature_name}-${variant}-${angle}.png"
+            target="projects/{project}/assets/packs/creatures/${creature_name}-${variant}-${angle}.png"
             [[ -f "$target" ]] && continue
 
             ./scripts/nanobanana-caller.sh creature-pack \
@@ -228,9 +228,9 @@ done
 从本体模型的 `entities.vfx` 中提取技能特效：
 
 ```bash
-mkdir -p assets/packs/vfx
+mkdir -p projects/{project}/assets/packs/vfx
 
-vfx_list=$(jq -r '.entities.vfx // []' "state/ontology/${ep}-world-model.json")
+vfx_list=$(jq -r '.entities.vfx // []' "projects/{project}/state/ontology/${ep}-world-model.json")
 
 echo "$vfx_list" | jq -c '.[]' 2>/dev/null | while IFS= read -r vfx; do
     vfx_name=$(echo "$vfx" | jq -r '.name')
@@ -239,7 +239,7 @@ echo "$vfx_list" | jq -c '.[]' 2>/dev/null | while IFS= read -r vfx; do
     seedance_keywords=$(echo "$vfx" | jq -r '.seedance_keywords // ""')
 
     # 只生成 activated 状态（最常用）
-    target="assets/packs/vfx/${vfx_name}-activated.png"
+    target="projects/{project}/assets/packs/vfx/${vfx_name}-activated.png"
     [[ -f "$target" ]] && continue
 
     ./scripts/nanobanana-caller.sh vfx-pack \
@@ -256,15 +256,15 @@ done
 ### Step 7: 生成资产清单
 
 ```bash
-cat > assets/packs/asset-manifest.json << EOF
+cat > projects/{project}/assets/packs/asset-manifest.json << EOF
 {
   "generated_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
   "schema_version": "2.1",
-  "characters": $(find assets/packs/characters -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
-  "scenes":     $(find assets/packs/scenes     -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
-  "props":      $(find assets/packs/props      -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
-  "creatures":  $(find assets/packs/creatures  -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
-  "vfx":        $(find assets/packs/vfx        -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]')
+  "characters": $(find projects/{project}/assets/packs/characters -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
+  "scenes":     $(find projects/{project}/assets/packs/scenes     -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
+  "props":      $(find projects/{project}/assets/packs/props      -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
+  "creatures":  $(find projects/{project}/assets/packs/creatures  -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]'),
+  "vfx":        $(find projects/{project}/assets/packs/vfx        -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]')
 }
 EOF
 ```
@@ -273,7 +273,7 @@ EOF
 
 ```bash
 if .venv/bin/python -c "import lancedb" 2>/dev/null; then
-    .venv/bin/python scripts/vectordb-manager.py index-assets assets/packs/ 2>/dev/null
+    .venv/bin/python scripts/vectordb-manager.py index-assets projects/{project}/assets/packs/ 2>/dev/null
     echo "✓ LanceDB 资产索引更新完成"
 fi
 ```
@@ -282,11 +282,11 @@ fi
 
 ```bash
 echo "资产生成完成:"
-echo "  角色:   $(find assets/packs/characters -name '*.png' 2>/dev/null | wc -l) 张"
-echo "  场景:   $(find assets/packs/scenes     -name '*.png' 2>/dev/null | wc -l) 张"
-echo "  道具:   $(find assets/packs/props      -name '*.png' 2>/dev/null | wc -l) 张"
-echo "  怪物:   $(find assets/packs/creatures  -name '*.png' 2>/dev/null | wc -l) 张"
-echo "  特效:   $(find assets/packs/vfx        -name '*.png' 2>/dev/null | wc -l) 张"
+echo "  角色:   $(find projects/{project}/assets/packs/characters -name '*.png' 2>/dev/null | wc -l) 张"
+echo "  场景:   $(find projects/{project}/assets/packs/scenes     -name '*.png' 2>/dev/null | wc -l) 张"
+echo "  道具:   $(find projects/{project}/assets/packs/props      -name '*.png' 2>/dev/null | wc -l) 张"
+echo "  怪物:   $(find projects/{project}/assets/packs/creatures  -name '*.png' 2>/dev/null | wc -l) 张"
+echo "  特效:   $(find projects/{project}/assets/packs/vfx        -name '*.png' 2>/dev/null | wc -l) 张"
 ```
 
 ## 完成后

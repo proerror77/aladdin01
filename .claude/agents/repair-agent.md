@@ -48,10 +48,10 @@ MAX_ATTEMPTS="${4:-3}"
 SHOT_NUM=$(echo "$SHOT_ID" | grep -oE '[0-9]+$')
 
 # 路径
-AUDIT_FILE="$PROJECT_ROOT/state/audit/${SHOT_ID}-audit.json"
-SHOT_PACKET="$PROJECT_ROOT/state/shot-packets/${SHOT_ID}.json"
+AUDIT_FILE="$PROJECT_ROOT/projects/{project}/state/audit/${SHOT_ID}-audit.json"
+SHOT_PACKET="$PROJECT_ROOT/projects/{project}/state/shot-packets/${SHOT_ID}.json"
 VIDEO_FILE="$PROJECT_ROOT/outputs/${EP}/videos/shot-${SHOT_NUM}.mp4"
-REPAIR_HISTORY="$PROJECT_ROOT/state/audit/${SHOT_ID}-repair-history.json"
+REPAIR_HISTORY="$PROJECT_ROOT/projects/{project}/state/audit/${SHOT_ID}-repair-history.json"
 
 # 读取审计结果
 if [[ ! -f "$AUDIT_FILE" ]]; then

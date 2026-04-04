@@ -16,15 +16,15 @@ tools:
 ## 输入
 
 - `shot_id` — 镜次 ID（如 `ep01-shot-05`）
-- `outputs/{ep}/visual-direction.yaml` — 视觉指导
-- `state/ontology/{ep}-world-model.json` — 世界本体模型
+- `projects/{project}/outputs/{ep}/visual-direction.yaml` — 视觉指导
+- `projects/{project}/state/ontology/{ep}-world-model.json` — 世界本体模型
 - `state/character-states/{ep}-{character}-states.json` — 角色状态快照（可选）
 - memory-agent 输出的 references
 - `session_id` — Trace session 标识（可选）
 
 ## 输出
 
-- `state/shot-packets/{ep}-shot-{N}.json` — Shot Packet
+- `projects/{project}/state/shot-packets/{ep}-shot-{N}.json` — Shot Packet
 
 ## 执行流程
 
@@ -70,7 +70,7 @@ echo "$shot_yaml" | yq eval '.references.characters[] | @json' - | while IFS= re
   
   # 如果状态不存在，从本体模型创建默认状态
   if [ "$current_state" = "null" ]; then
-    world_model_file="state/ontology/${ep}-world-model.json"
+    world_model_file="projects/{project}/state/ontology/${ep}-world-model.json"
     if [ -f "$world_model_file" ]; then
       current_state=$(jq -n \
         --arg form "$(jq -r ".entities.characters.\"$char_name\".variants[] | select(.variant_id == \"$variant\") | .form // \"default\"" "$world_model_file" 2>/dev/null || echo "default")" \
@@ -148,7 +148,7 @@ characters_json=$(echo "$characters_json" | jq --argjson refs "$references_json"
 从本体模型读取约束：
 
 ```bash
-world_model_file="state/ontology/${ep}-world-model.json"
+world_model_file="projects/{project}/state/ontology/${ep}-world-model.json"
 
 if [ -f "$world_model_file" ]; then
   # 提取物理规则
@@ -332,9 +332,9 @@ fi
 mkdir -p "state/shot-packets"
 
 # 写入文件
-echo "$packet_json" | jq '.' > "state/shot-packets/${shot_id}.json"
+echo "$packet_json" | jq '.' > "projects/{project}/state/shot-packets/${shot_id}.json"
 
-echo "✓ Shot Packet 已生成: state/shot-packets/${shot_id}.json"
+echo "✓ Shot Packet 已生成: projects/{project}/state/shot-packets/${shot_id}.json"
 ```
 
 ## 错误处理
@@ -366,14 +366,14 @@ echo "✓ Shot Packet 已生成: state/shot-packets/${shot_id}.json"
 ./scripts/trace.sh "$session_id" "${ep}-phase3.5-trace" assemble_packet "{\"fields\":$(echo "$packet_json" | jq 'keys | length')}"
 
 # 写入产出
-./scripts/trace.sh "$session_id" "${ep}-phase3.5-trace" write_output "{\"file\":\"state/shot-packets/${shot_id}.json\"}"
+./scripts/trace.sh "$session_id" "${ep}-phase3.5-trace" write_output "{\"file\":\"projects/{project}/state/shot-packets/${shot_id}.json\"}"
 ```
 
 ## 完成后
 
-向 team-lead 发送消息：`shot-compiler-agent 完成，shot packet 已生成: state/shot-packets/${shot_id}.json`
+向 team-lead 发送消息：`shot-compiler-agent 完成，shot packet 已生成: projects/{project}/state/shot-packets/${shot_id}.json`
 
-写入独立状态文件 `state/{ep}-phase3.5.json`（如果是批量处理所有 shots）：
+写入独立状态文件 `projects/{project}/state/{ep}-phase3.5.json`（如果是批量处理所有 shots）：
 
 ```json
 {

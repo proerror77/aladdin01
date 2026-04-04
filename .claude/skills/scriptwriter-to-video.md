@@ -111,8 +111,8 @@
 
 执行：
 1. preprocess-agent 拆分为标准分集剧本
-2. 提取角色档案 → `assets/characters/profiles/`
-3. 提取场景档案 → `assets/scenes/profiles/`
+2. 提取角色档案 → `projects/{project}/assets/characters/profiles/`
+3. 提取场景档案 → `projects/{project}/assets/scenes/profiles/`
 4. 如果多段扫描 → merge-agent 角色融合
 
 完成后输出：
@@ -145,7 +145,7 @@
    - 物理规则（重力、魔法系统）
    - 叙事约束（角色能力、道具状态、知识状态）
 3. 验证逻辑一致性
-4. 写入 `state/ontology/{ep}-world-model.json`
+4. 写入 `projects/{project}/state/ontology/{ep}-world-model.json`
 
 完成后输出：
 ```
@@ -179,7 +179,7 @@
 3. 调用 NanoBanana API 生成多视角资产包：
    - 角色：front/side/back/3quarter 视角
    - 场景：styleframe/wide 视角
-4. 写入 `assets/packs/characters/` 和 `assets/packs/scenes/`
+4. 写入 `projects/{project}/assets/packs/characters/` 和 `projects/{project}/assets/packs/scenes/`
 5. 🔴 **确认点 3**：主角多视角资产确认（Auto-Gate + 异步飞书审核 — 视觉类）
    ```
    spawn gate-agent:
@@ -238,7 +238,7 @@
 - 审计通过：{P}
 - 修复成功：{R}
 
-📁 视频文件：outputs/{ep}/videos/
+📁 视频文件：projects/{project}/outputs/{ep}/videos/
 ```
 
 更新进度：`5_batch: "completed"`
@@ -259,15 +259,15 @@
 ━━━ 产出文件 ━━━
 剧本大纲：outputs/scriptwriter/{project}/outline.md
 分集剧本：script/{project}-ep*.md
-角色档案：assets/characters/profiles/*.yaml
-场景档案：assets/scenes/profiles/*.yaml
-世界模型：state/ontology/{ep}-world-model.json
-角色资产包：assets/packs/characters/
-场景资产包：assets/packs/scenes/
+角色档案：projects/{project}/assets/characters/profiles/*.yaml
+场景档案：projects/{project}/assets/scenes/profiles/*.yaml
+世界模型：projects/{project}/state/ontology/{ep}-world-model.json
+角色资产包：projects/{project}/assets/packs/characters/
+场景资产包：projects/{project}/assets/packs/scenes/
 视频文件：outputs/ep*/videos/
 
 ━━━ 可观测性 ━━━
-Trace 日志：state/traces/{session-id}/
+Trace 日志：projects/{project}/state/traces/{session-id}/
 运行 ~trace 查看完整执行路径
 运行 ~trace --backtrack {ep} shot-{N} 诊断失败镜次
 
@@ -283,7 +283,7 @@ Trace 日志：state/traces/{session-id}/
 | 🔴 确认点 2 | 阶段 1 | text | 飞书卡片按钮 | 否 |
 | 🔴 确认点 3 | 阶段 4 | visual | 飞书链接 → Web 页面 | 否 |
 
-所有确认点走异步飞书通知，session 结束等回调。审核结果（通过/重做/终止）通过 Review Server webhook 写入 `state/reviews/`，Remote Trigger 唤醒新 session 继续。
+所有确认点走异步飞书通知，session 结束等回调。审核结果（通过/重做/终止）通过 Review Server webhook 写入 `projects/{project}/state/reviews/`，Remote Trigger 唤醒新 session 继续。
 
 重做上限：每个确认点最多 5 次（`config/lark/lark-config.yaml` 中 `max_iterations`）。
 

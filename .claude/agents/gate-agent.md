@@ -30,7 +30,7 @@ tools:
 
 ## 输出
 
-- `state/reviews/{review-id}-score.json` — 评分结果
+- `projects/{project}/state/reviews/{review-id}-score.json` — 评分结果
 - 返回决策：`auto_approve` / `human_review` / `auto_reject`
 
 ## 执行流程
@@ -83,7 +83,7 @@ else:
 
 ### 5. 写入评分报告
 
-`state/reviews/{review-id}-score.json`：
+`projects/{project}/state/reviews/{review-id}-score.json`：
 ```json
 {
   "review_id": "{review-id}",

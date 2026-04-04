@@ -13,8 +13,8 @@ tools:
 
 将原始长篇剧本（几千字到几十万字）拆解为：
 1. 按集数分割的标准剧本文件（`script/ep0X.md`）
-2. 角色档案（`assets/characters/profiles/{角色名}.yaml`）
-3. 场景档案（`assets/scenes/profiles/{场景名}.yaml`）
+2. 角色档案（`projects/{project}/assets/characters/profiles/{角色名}.yaml`）
+3. 场景档案（`projects/{project}/assets/scenes/profiles/{场景名}.yaml`）
 
 ## 输入
 
@@ -25,8 +25,8 @@ tools:
 ## 输出
 
 - `script/{project_name}-ep01.md` ... `script/{project_name}-epNN.md` — 分集剧本
-- `assets/characters/profiles/{角色名}.yaml` — 角色档案
-- `assets/scenes/profiles/{场景名}.yaml` — 场景档案
+- `projects/{project}/assets/characters/profiles/{角色名}.yaml` — 角色档案
+- `projects/{project}/assets/scenes/profiles/{场景名}.yaml` — 场景档案
 - `outputs/preprocess/{project_name}-report.md` — 预处理报告
 
 ## 执行流程
@@ -140,7 +140,7 @@ cat preprocess_unpacked/word/document.xml \
 
 对每个有名字且有台词的角色，都写入档案。主角和重要配角写完整档案，单集角色写简化档案。
 
-`assets/characters/profiles/{角色名}.yaml`（完整档案 — 主角/重要配角）：
+`projects/{project}/assets/characters/profiles/{角色名}.yaml`（完整档案 — 主角/重要配角）：
 ```yaml
 name: "{角色名}"
 aliases: ["{别名1}", "{别名2}"]  # 昵称、笔误变体、称呼等
@@ -169,7 +169,7 @@ voice_hint: "{根据性格和年龄推荐的音色类型，如 young-male-gentle
 notes: "{其他备注}"
 ```
 
-`assets/characters/profiles/{角色名}.yaml`（简化档案 — 单集角色）：
+`projects/{project}/assets/characters/profiles/{角色名}.yaml`（简化档案 — 单集角色）：
 ```yaml
 name: "{角色名}"
 aliases: []  # 通常为空
@@ -188,7 +188,7 @@ notes: "{角色身份，如 委托人/保安/站长}"
 
 对每个主要场景，写入：
 
-`assets/scenes/profiles/{场景名}.yaml`：
+`projects/{project}/assets/scenes/profiles/{场景名}.yaml`：
 ```yaml
 name: "{场景名}"
 project: "{project_name}"
@@ -247,19 +247,19 @@ source: "{原始文件名}"
 
 | 角色 | 性别 | 年龄 | 推荐音色 | 出现集数 | 档案路径 |
 |------|------|------|---------|---------|---------|
-| {角色名} | 男/女 | {年龄} | {voice_hint} | ep01-ep80 | assets/characters/profiles/{角色名}.yaml |
+| {角色名} | 男/女 | {年龄} | {voice_hint} | ep01-ep80 | projects/{project}/assets/characters/profiles/{角色名}.yaml |
 
 ### 重要配角（{N2} 个）
 
 | 角色 | 性别 | 年龄 | 推荐音色 | 出现集数 | 档案路径 |
 |------|------|------|---------|---------|---------|
-| {角色名} | 男/女 | {年龄} | {voice_hint} | ep04, ep05 | assets/characters/profiles/{角色名}.yaml |
+| {角色名} | 男/女 | {年龄} | {voice_hint} | ep04, ep05 | projects/{project}/assets/characters/profiles/{角色名}.yaml |
 
 ### 单集角色（{N3} 个）
 
 | 角色 | 性别 | 首次出现 | 推荐音色 | 档案路径 |
 |------|------|---------|---------|---------|
-| {角色名} | 男/女 | ep15 | {voice_hint} | assets/characters/profiles/{角色名}.yaml |
+| {角色名} | 男/女 | ep15 | {voice_hint} | projects/{project}/assets/characters/profiles/{角色名}.yaml |
 
 ## 场景档案
 

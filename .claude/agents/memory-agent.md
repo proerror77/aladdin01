@@ -11,8 +11,8 @@ tools:
 ## 职责
 
 为每个 shot 检索最相关的 references，按优先级排序：
-1. `assets/packs/` （最高优先级，NanoBanana 生成的多视角资产）
-2. `assets/characters/images/` 或 `assets/scenes/images/` （单视角参考图）
+1. `projects/{project}/assets/packs/` （最高优先级，NanoBanana 生成的多视角资产）
+2. `projects/{project}/assets/characters/images/` 或 `projects/{project}/assets/scenes/images/` （单视角参考图）
 3. 前一镜结尾帧（连续性参考）
 
 **检索策略（v2.0）**：
@@ -22,12 +22,12 @@ tools:
 ## 输入
 
 - `shot_id` — 镜次 ID（如 `ep01-shot-05`）
-- `outputs/{ep}/visual-direction.yaml` — 镜次定义
+- `projects/{project}/outputs/{ep}/visual-direction.yaml` — 镜次定义
 - `state/vectordb/lancedb/` — LanceDB 向量库（可选）
-- `assets/packs/` — 多视角资产包
-- `assets/characters/images/` — 角色参考图
-- `assets/scenes/images/` — 场景参考图
-- `outputs/{ep}/videos/` — 已生成的视频（用于提取前一镜结尾帧）
+- `projects/{project}/assets/packs/` — 多视角资产包
+- `projects/{project}/assets/characters/images/` — 角色参考图
+- `projects/{project}/assets/scenes/images/` — 场景参考图
+- `projects/{project}/outputs/{ep}/videos/` — 已生成的视频（用于提取前一镜结尾帧）
 
 ## 输出
 
@@ -160,7 +160,7 @@ if [[ "$USE_VECTOR" == "false" ]]; then
 
         # 优先级 1: packs（多视角）
         for view in front side back 3quarter; do
-            pack_path="assets/packs/characters/${char_name}-${variant}-${view}.png"
+            pack_path="projects/{project}/assets/packs/characters/${char_name}-${variant}-${view}.png"
             if [ -f "$pack_path" ]; then
                 assets=$(echo "$assets" | jq --arg path "$pack_path" \
                     '. += [{"path": $path, "type": "pack", "priority": 1}]')
@@ -170,7 +170,7 @@ if [[ "$USE_VECTOR" == "false" ]]; then
         # 优先级 2: images（如果 packs 为空）
         if [ "$(echo "$assets" | jq 'length')" -eq 0 ]; then
             for suffix in "${variant}-front" "${variant}" "default-front" "front"; do
-                img_path="assets/characters/images/${char_name}-${suffix}.png"
+                img_path="projects/{project}/assets/characters/images/${char_name}-${suffix}.png"
                 if [ -f "$img_path" ]; then
                     assets=$(echo "$assets" | jq --arg path "$img_path" \
                         '. += [{"path": $path, "type": "image", "priority": 2}]')
@@ -187,12 +187,12 @@ if [[ "$USE_VECTOR" == "false" ]]; then
     # 场景检索
     assets="[]"
     for suffix in styleframe wide; do
-        pack_path="assets/packs/scenes/${scene_name}-${time_of_day}-${suffix}.png"
+        pack_path="projects/{project}/assets/packs/scenes/${scene_name}-${time_of_day}-${suffix}.png"
         [ -f "$pack_path" ] && assets=$(echo "$assets" | jq --arg path "$pack_path" \
             '. += [{"path": $path, "type": "pack", "priority": 1}]')
     done
     if [ "$(echo "$assets" | jq 'length')" -eq 0 ]; then
-        img_path="assets/scenes/images/${scene_name}-${time_of_day}.png"
+        img_path="projects/{project}/assets/scenes/images/${scene_name}-${time_of_day}.png"
         [ -f "$img_path" ] && assets=$(echo "$assets" | jq --arg path "$img_path" \
             '. += [{"path": $path, "type": "image", "priority": 2}]')
     fi
@@ -266,11 +266,11 @@ jq -n \
 ## 输入
 
 - `shot_id` — 镜次 ID（如 `ep01-shot-05`）
-- `outputs/{ep}/visual-direction.yaml` — 镜次定义
-- `assets/packs/` — 多视角资产包
-- `assets/characters/images/` — 角色参考图
-- `assets/scenes/images/` — 场景参考图
-- `outputs/{ep}/videos/` — 已生成的视频（用于提取前一镜结尾帧）
+- `projects/{project}/outputs/{ep}/visual-direction.yaml` — 镜次定义
+- `projects/{project}/assets/packs/` — 多视角资产包
+- `projects/{project}/assets/characters/images/` — 角色参考图
+- `projects/{project}/assets/scenes/images/` — 场景参考图
+- `projects/{project}/outputs/{ep}/videos/` — 已生成的视频（用于提取前一镜结尾帧）
 - `session_id` — Trace session 标识（可选）
 
 ## 输出
@@ -287,12 +287,12 @@ JSON 格式的 references 列表，输出到 stdout：
         "variant": "qingyu_silkworm",
         "assets": [
           {
-            "path": "assets/packs/characters/苏夜-qingyu_silkworm-front.png",
+            "path": "projects/{project}/assets/packs/characters/苏夜-qingyu_silkworm-front.png",
             "type": "pack",
             "priority": 1
           },
           {
-            "path": "assets/packs/characters/苏夜-qingyu_silkworm-side.png",
+            "path": "projects/{project}/assets/packs/characters/苏夜-qingyu_silkworm-side.png",
             "type": "pack",
             "priority": 1
           }
@@ -305,7 +305,7 @@ JSON 格式的 references 列表，输出到 stdout：
         "time_of_day": "night",
         "assets": [
           {
-            "path": "assets/packs/scenes/叶红衣闺房-night-styleframe.png",
+            "path": "projects/{project}/assets/packs/scenes/叶红衣闺房-night-styleframe.png",
             "type": "pack",
             "priority": 1
           }
@@ -343,7 +343,7 @@ time_of_day=$(echo "$shot_yaml" | yq eval '.time_of_day' -)
 
 对每个角色，按优先级检索：
 
-**优先级 1: assets/packs/characters/**
+**优先级 1: projects/{project}/assets/packs/characters/**
 
 检查以下文件是否存在：
 - `{角色名}-{variant}-front.png`
@@ -351,7 +351,7 @@ time_of_day=$(echo "$shot_yaml" | yq eval '.time_of_day' -)
 - `{角色名}-{variant}-back.png`
 - `{角色名}-{variant}-3quarter.png`
 
-**优先级 2: assets/characters/images/**
+**优先级 2: projects/{project}/assets/characters/images/**
 
 如果 packs 不存在，检查：
 - `{角色名}-{variant}-front.png`
@@ -377,7 +377,7 @@ echo "$shot_yaml" | yq eval '.references.characters[] | @json' - | while IFS= re
   
   # 优先级 1: packs（多视角）
   for view in front side back 3quarter; do
-    pack_path="assets/packs/characters/${char_name}-${variant}-${view}.png"
+    pack_path="projects/{project}/assets/packs/characters/${char_name}-${variant}-${view}.png"
     if [ -f "$pack_path" ]; then
       assets=$(echo "$assets" | jq --arg path "$pack_path" '. += [{"path": $path, "type": "pack", "priority": 1}]')
     fi
@@ -386,7 +386,7 @@ echo "$shot_yaml" | yq eval '.references.characters[] | @json' - | while IFS= re
   # 优先级 2: images（如果 packs 为空）
   if [ "$(echo "$assets" | jq 'length')" -eq 0 ]; then
     for suffix in "${variant}-front" "${variant}" "default-front" "front"; do
-      img_path="assets/characters/images/${char_name}-${suffix}.png"
+      img_path="projects/{project}/assets/characters/images/${char_name}-${suffix}.png"
       if [ -f "$img_path" ]; then
         assets=$(echo "$assets" | jq --arg path "$img_path" '. += [{"path": $path, "type": "image", "priority": 2}]')
         break
@@ -404,13 +404,13 @@ done
 
 ### 3. 检索场景资产
 
-**优先级 1: assets/packs/scenes/**
+**优先级 1: projects/{project}/assets/packs/scenes/**
 
 检查：
 - `{场景名}-{time_of_day}-styleframe.png`
 - `{场景名}-{time_of_day}-wide.png`
 
-**优先级 2: assets/scenes/images/**
+**优先级 2: projects/{project}/assets/scenes/images/**
 
 检查：
 - `{场景名}-{time_of_day}.png`
@@ -431,7 +431,7 @@ assets="[]"
 
 # 优先级 1: packs
 for suffix in styleframe wide; do
-  pack_path="assets/packs/scenes/${scene_name}-${time_of_day}-${suffix}.png"
+  pack_path="projects/{project}/assets/packs/scenes/${scene_name}-${time_of_day}-${suffix}.png"
   if [ -f "$pack_path" ]; then
     assets=$(echo "$assets" | jq --arg path "$pack_path" '. += [{"path": $path, "type": "pack", "priority": 1}]')
   fi
@@ -439,14 +439,14 @@ done
 
 # 优先级 2: images（如果 packs 为空）
 if [ "$(echo "$assets" | jq 'length')" -eq 0 ]; then
-  img_path="assets/scenes/images/${scene_name}-${time_of_day}.png"
+  img_path="projects/{project}/assets/scenes/images/${scene_name}-${time_of_day}.png"
   if [ -f "$img_path" ]; then
     assets=$(echo "$assets" | jq --arg path "$img_path" '. += [{"path": $path, "type": "image", "priority": 2}]')
   else
     # 降级：尝试其他时段
     for fallback_time in dusk day dawn night; do
       [ "$fallback_time" = "$time_of_day" ] && continue
-      img_path="assets/scenes/images/${scene_name}-${fallback_time}.png"
+      img_path="projects/{project}/assets/scenes/images/${scene_name}-${fallback_time}.png"
       if [ -f "$img_path" ]; then
         assets=$(echo "$assets" | jq --arg path "$img_path" '. += [{"path": $path, "type": "image", "priority": 3}]')
         break

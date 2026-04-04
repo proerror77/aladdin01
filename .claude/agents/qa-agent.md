@@ -23,7 +23,7 @@ tools:
 
 ## 输出
 
-- `state/audit/{ep}-shot-{N}-audit.json` — 审计结果
+- `projects/{project}/state/audit/{ep}-shot-{N}-audit.json` — 审计结果
 
 ## 执行流程
 
@@ -45,9 +45,9 @@ SESSION_ID="${3:-qa-$(date +%Y%m%d-%H%M%S)}"
 SHOT_NUM=$(echo "$SHOT_ID" | grep -oE '[0-9]+$')
 
 # 路径
-SHOT_PACKET="$PROJECT_ROOT/state/shot-packets/${SHOT_ID}.json"
+SHOT_PACKET="$PROJECT_ROOT/projects/{project}/state/shot-packets/${SHOT_ID}.json"
 VIDEO_FILE="$PROJECT_ROOT/outputs/${EP}/videos/shot-${SHOT_NUM}.mp4"
-WORLD_MODEL="$PROJECT_ROOT/state/ontology/${EP}-world-model.json"
+WORLD_MODEL="$PROJECT_ROOT/projects/{project}/state/ontology/${EP}-world-model.json"
 AUDIT_DIR="$PROJECT_ROOT/state/audit"
 AUDIT_FILE="$AUDIT_DIR/${SHOT_ID}-audit.json"
 
@@ -80,7 +80,7 @@ symbolic_qa() {
     # 获取前一镜次的服装
     local prev_shot_num=$((SHOT_NUM - 1))
     if [[ $prev_shot_num -gt 0 ]]; then
-      local prev_packet="$PROJECT_ROOT/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
+      local prev_packet="$PROJECT_ROOT/projects/{project}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
       if [[ -f "$prev_packet" ]]; then
         local prev_costume=$(jq -r \
           ".characters[] | select(.id == \"$char\") | .current_state.costume // \"default\"" \
@@ -100,7 +100,7 @@ symbolic_qa() {
     
     local prev_shot_num=$((SHOT_NUM - 1))
     if [[ $prev_shot_num -gt 0 ]]; then
-      local prev_packet="$PROJECT_ROOT/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
+      local prev_packet="$PROJECT_ROOT/projects/{project}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
       if [[ -f "$prev_packet" ]]; then
         local prev_injury=$(jq -r \
           ".characters[] | select(.id == \"$char\") | .current_state.injury // \"none\"" \
@@ -118,7 +118,7 @@ symbolic_qa() {
   for prop in $props; do
     local prev_shot_num=$((SHOT_NUM - 1))
     if [[ $prev_shot_num -gt 0 ]]; then
-      local prev_packet="$PROJECT_ROOT/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
+      local prev_packet="$PROJECT_ROOT/projects/{project}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
       if [[ -f "$prev_packet" ]]; then
         local had_prop=$(jq -r \
           ".characters[].current_state.props_in_possession[]? | select(. == \"$prop\")" \
@@ -239,7 +239,7 @@ semantic_qa() {
     
     local prev_shot_num=$((SHOT_NUM - 1))
     if [[ $prev_shot_num -gt 0 ]]; then
-      local prev_packet="$PROJECT_ROOT/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
+      local prev_packet="$PROJECT_ROOT/projects/{project}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
       if [[ -f "$prev_packet" ]]; then
         local prev_emotion=$(jq -r \
           ".characters[] | select(.id == \"$char\") | .current_state.emotion // \"neutral\"" \
@@ -347,7 +347,7 @@ echo "$repair_action"
 
 向 team-lead 发送消息：`qa-agent 完成，审计结果: {repair_action}`
 
-写入状态文件 `state/{ep}-phase6.json`：
+写入状态文件 `projects/{project}/state/{ep}-phase6.json`：
 ```json
 {
   "episode": "{ep}",

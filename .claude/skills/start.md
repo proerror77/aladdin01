@@ -5,12 +5,13 @@
 ## 使用方式
 
 ```
-~start
-~start --auto-approve          # 跳过人工审核点，自动通过
-~start --auto-approve --ab     # 自动通过 + A/B 测试
+~start                                    # 交互式选择专案和剧本
+~start qyccan ep01                        # 直接指定专案和集数
+~start --auto-approve                     # 跳过人工审核点，自动通过
+~start --auto-approve --ab               # 自动通过 + A/B 测试
 ```
 
-在 `script/` 目录下放好剧本文件后运行。
+剧本放在 `projects/{project}/script/` 目录下。
 
 ## 前置条件
 
@@ -53,9 +54,27 @@
 请设置后再运行 ~start
 ```
 
-### 1. 检测剧本
+### 1. 选择专案和剧本
 
-扫描 `script/` 目录，列出所有 `.md` 文件。
+**Step 1a: 选择专案**
+
+如果命令行已指定专案（如 `~start qyccan ep01`），直接使用。
+
+否则扫描 `projects/` 目录，列出所有专案：
+```
+发现以下专案：
+1. jiuba（80集）
+2. qyccan（10集）
+请选择专案（输入数字或名称）：
+```
+
+设置 `PROJECT=<选择的专案名>`，后续所有路径均以 `projects/{PROJECT}/` 为根。
+
+**Step 1b: 选择剧本**
+
+扫描 `projects/{PROJECT}/script/` 目录，列出所有 `.md` 文件。
+
+如果命令行已指定集数（如 `ep01`），直接使用。
 
 如果有多个文件，询问用户选择哪个：
 ```
@@ -69,8 +88,8 @@
 
 如果没有文件：
 ```
-script/ 目录下没有找到剧本文件。
-请将剧本放入 script/ 目录（.md 格式），然后重新运行 ~start
+projects/{PROJECT}/script/ 目录下没有找到剧本文件。
+请将剧本放入该目录（.md 格式），然后重新运行 ~start
 ```
 
 ### 2. 交互式配置
@@ -118,7 +137,7 @@ script/ 目录下没有找到剧本文件。
 ### 3. 初始化目录和状态
 
 ```bash
-mkdir -p outputs/{ep}/videos
+mkdir -p projects/{PROJECT}/outputs/{ep}/videos
 ```
 
 生成 session ID（格式：`start-{YYYYMMDD}-{HHMMSS}`）：
@@ -158,8 +177,8 @@ SESSION_ID="start-$(date +%Y%m%d-%H%M%S)"
 ```
 
 检测逻辑：
-1. 读取 `state/{ep}-phase{1-4}.json`，确定已完成的阶段
-2. 统计 `state/{ep}-shot-*.json` 中 `status: completed` 的镜次
+1. 读取 `projects/{project}/state/{ep}-phase{1-4}.json`，确定已完成的阶段
+2. 统计 `projects/{project}/state/{ep}-shot-*.json` 中 `status: completed` 的镜次
 3. 从最早未完成的阶段继续
 
 断点续传跳过规则：
@@ -173,10 +192,10 @@ SESSION_ID="start-$(date +%Y%m%d-%H%M%S)"
 **Phase 1 — 合规预检**
 ```
 spawn comply-agent
-  输入：script/{ep}.md
+  输入：projects/{project}/script/{ep}.md
   session_id: $SESSION_ID
   trace_file: {ep}-phase1-trace
-  输出：outputs/{ep}/render-script.md（合规后的剧本）
+  输出：projects/{project}/outputs/{ep}/render-script.md（合规后的剧本）
   等待完成
 ```
 
@@ -186,7 +205,7 @@ spawn 前写入 trace：`./scripts/trace.sh $SESSION_ID session spawn '{"agent":
 **Phase 2 — 视觉指导**
 ```
 spawn visual-agent
-  输入：outputs/{ep}/render-script.md + 视觉风格 + 目标媒介
+  输入：projects/{project}/outputs/{ep}/render-script.md + 视觉风格 + 目标媒介
   session_id: $SESSION_ID
   trace_file: {ep}-phase2-trace
   等待完成
@@ -198,7 +217,7 @@ spawn visual-agent
 
 否则：
 ```
-视觉指导已完成，请查看：outputs/{ep}/visual-direction.yaml
+视觉指导已完成，请查看：projects/{project}/outputs/{ep}/visual-direction.yaml
 
 共 {N} 个镜次，总时长约 {X} 秒。
 
@@ -210,7 +229,7 @@ spawn visual-agent
 **Phase 3 — 美术校验（纯文件存在性检查）**
 ```
 spawn design-agent
-  输入：visual-direction.yaml + state/design-lock.json（可选）
+  输入：visual-direction.yaml + projects/{project}/state/design-lock.json（可选）
   session_id: $SESSION_ID
   trace_file: {ep}-phase3-trace
   输出：art-direction-review.md（校验报告）
@@ -218,8 +237,8 @@ spawn design-agent
 ```
 
 **重要**：Phase 3 是 **O(1) 级别的文件存在性检查**，不经过 gate-agent，不推飞书审核。design-agent 只检查 visual-direction.yaml 中引用的参考图是否存在：
-- 如果 `state/design-lock.json` 存在：读取已锁定的参考图清单，校验文件是否存在
-- 如果 `state/design-lock.json` 不存在：检查 `assets/characters/images/` 和 `assets/scenes/images/` 中是否有对应的参考图
+- 如果 `projects/{project}/state/design-lock.json` 存在：读取已锁定的参考图清单，校验文件是否存在
+- 如果 `projects/{project}/state/design-lock.json` 不存在：检查 `projects/{project}/assets/characters/images/` 和 `projects/{project}/assets/scenes/images/` 中是否有对应的参考图
 - 如果发现缺失的参考图：提示用户先运行 `~design` 生成参考图，然后再继续
 
 注意：推荐在运行 `~start` 前先运行 `~design` 生成参考图。如果 design-agent 发现缺失的参考图，会提示先运行 `~design`。
@@ -230,10 +249,10 @@ spawn design-agent
 
 否则：
 ```
-参考图已生成，请查看：outputs/{ep}/art-direction-review.md
+参考图已生成，请查看：projects/{project}/outputs/{ep}/art-direction-review.md
 
-角色参考图：assets/characters/images/
-场景参考图：assets/scenes/images/
+角色参考图：projects/{project}/assets/characters/images/
+场景参考图：projects/{project}/assets/scenes/images/
 
 确认后继续音色配置阶段？(yes/no)
 ```
@@ -242,13 +261,13 @@ spawn design-agent
 
 **Phase 3.5 — Shot Packet 编译（v2.0 新增）**
 
-检查是否存在 `state/ontology/{ep}-world-model.json`：
+检查是否存在 `projects/{project}/state/ontology/{ep}-world-model.json`：
 - 如果存在 → 执行 Phase 3.5
 - 如果不存在 → 跳过 Phase 3.5，输出日志 `[skip] Phase 3.5: 未找到 world-model.json，跳过 shot packet 编译`
 
 ```
 # 读取所有 shot_id
-shot_ids=$(yq eval '.shots[].shot_id' outputs/{ep}/visual-direction.yaml)
+shot_ids=$(yq eval '.shots[].shot_id' projects/{project}/outputs/{ep}/visual-direction.yaml)
 
 # 为每个 shot 编译 shot packet
 for shot_id in $shot_ids; do
@@ -256,14 +275,14 @@ for shot_id in $shot_ids; do
     输入：shot_id, visual-direction.yaml, world-model.json
     session_id: $SESSION_ID
     trace_file: {ep}-phase3.5-trace
-    输出：state/shot-packets/{shot_id}.json
+    输出：projects/{project}/state/shot-packets/{shot_id}.json
     等待完成
 done
 ```
 
 shot-compiler-agent 内部会调用 memory-agent 检索参考资产。
 
-完成后写入 `state/{ep}-phase3.5.json`：
+完成后写入 `projects/{project}/state/{ep}-phase3.5.json`：
 ```json
 {
   "episode": "{ep}",
@@ -296,7 +315,7 @@ spawn voice-agent
 
 **backend = "api"（默认，并行）**
 
-1. 读取 `outputs/{ep}/visual-direction.yaml`，提取所有镜次数据
+1. 读取 `projects/{project}/outputs/{ep}/visual-direction.yaml`，提取所有镜次数据
 2. 为每个镜次组装 gen-worker 参数：
 
 | 参数 | 来源 | 说明 |
@@ -309,7 +328,7 @@ spawn voice-agent
 | generation_mode | shots[].generation_mode | `text2video` 或 `img2video` |
 | reference_image_url | shots[].references[0].image_url | 参考图 URL（img2video 时必需；本地图片需先上传至 IMAGE_GEN_API 获取 URL） |
 | dialogue | shots[].audio | 对白内容（唇形同步用） |
-| voice_config_path | `assets/characters/voices/{角色名}/voice-config.yaml` | 音色配置路径（TTS 预留） |
+| voice_config_path | `projects/{project}/assets/characters/voices/{角色名}/voice-config.yaml` | 音色配置路径（TTS 预留） |
 
 3. 并行 spawn gen-workers：
 ```
@@ -322,7 +341,7 @@ spawn gen-worker (shot-N params, session_id=$SESSION_ID, trace_file={ep}-shot-{N
 
 **backend = "browser"（串行，Seedance 2.0 via 即梦 Web UI）**
 
-1. 读取 `outputs/{ep}/visual-direction.yaml`，提取所有镜次数据
+1. 读取 `projects/{project}/outputs/{ep}/visual-direction.yaml`，提取所有镜次数据
 2. 为每个镜次组装 browser-gen-worker 参数：
 
 | 参数 | 来源 | 说明 |
@@ -334,7 +353,7 @@ spawn gen-worker (shot-N params, session_id=$SESSION_ID, trace_file={ep}-shot-{N
 | duration | shots[].duration | 视频时长（4-15 秒） |
 | ratio | 用户选择的宽高比 | 如 `9:16` |
 | reference_image_paths | shots[].references[].local_path | 参考图本地路径（assets/ 下） |
-| audio_paths | `assets/characters/voices/{角色名}/*.mp3` | 音频文件路径 |
+| audio_paths | `projects/{project}/assets/characters/voices/{角色名}/*.mp3` | 音频文件路径 |
 | generate_audio | shots[].has_dialogue | 是否生成音频 |
 | dialogue | shots[].audio | 对白内容 |
 
@@ -375,8 +394,8 @@ concurrency > 1:
       同上，`prompt=variant_b_prompt`, `output_suffix="-b"`,
       `variant=variant_b_id`, `variant_prompt=variant_b_prompt`
 3. 等待所有 2×N 个 gen-workers 完成
-4. 对每个镜次，读取 `state/{ep}-shot-{N}-a.json` 和 `state/{ep}-shot-{N}-b.json`，
-   创建 `state/{ep}-shot-{N}-ab-result.json`：
+4. 对每个镜次，读取 `projects/{project}/state/{ep}-shot-{N}-a.json` 和 `projects/{project}/state/{ep}-shot-{N}-b.json`，
+   创建 `projects/{project}/state/{ep}-shot-{N}-ab-result.json`：
    ```json
    {
      "episode": "{ep}",
@@ -384,13 +403,13 @@ concurrency > 1:
      "shot_index": {N},
      "variant_a": {
        "id": "{variant_a_id}",
-       "video_path": "outputs/{ep}/videos/shot-{N}-a.mp4",
+       "video_path": "projects/{project}/outputs/{ep}/videos/shot-{N}-a.mp4",
        "status": "{从 -a.json 读取}",
        "prompt_used": "{variant_a_prompt}"
      },
      "variant_b": {
        "id": "{variant_b_id}",
-       "video_path": "outputs/{ep}/videos/shot-{N}-b.mp4",
+       "video_path": "projects/{project}/outputs/{ep}/videos/shot-{N}-b.mp4",
        "status": "{从 -b.json 读取}",
        "prompt_used": "{variant_b_prompt}"
      },
@@ -408,18 +427,18 @@ concurrency > 1:
 
 **Phase 6 — Audit & Repair（v2.0 新增）**
 
-检查是否存在 `state/shot-packets/` 目录：
+检查是否存在 `projects/{project}/state/shot-packets/` 目录：
 - 如果存在 → 执行 Phase 6
 - 如果不存在 → 跳过 Phase 6，输出日志 `[skip] Phase 6: 未找到 shot-packets/，跳过审计和修复`
 
 ```
 # 读取所有成功生成的 shot_id
-shot_ids=$(yq eval '.shots[].shot_id' outputs/{ep}/visual-direction.yaml)
+shot_ids=$(yq eval '.shots[].shot_id' projects/{project}/outputs/{ep}/visual-direction.yaml)
 
 # 对每个 shot 执行审计和修复
 for shot_id in $shot_ids; do
   # 检查视频是否存在
-  video_file="outputs/{ep}/videos/${shot_id}.mp4"
+  video_file="projects/{project}/outputs/{ep}/videos/${shot_id}.mp4"
   if [ ! -f "$video_file" ]; then
     echo "[skip] $shot_id: 视频不存在，跳过审计"
     continue
@@ -430,11 +449,11 @@ for shot_id in $shot_ids; do
     输入：shot_id, shot_packet, video_file, world-model.json
     session_id: $SESSION_ID
     trace_file: {ep}-phase6-trace
-    输出：state/audit/{shot_id}-audit.json
+    输出：projects/{project}/state/audit/{shot_id}-audit.json
     等待完成
   
   # Phase 6.2: 读取审计结果
-  audit_result=$(jq '.repair_action' state/audit/${shot_id}-audit.json)
+  audit_result=$(jq '.repair_action' projects/{project}/state/audit/${shot_id}-audit.json)
   
   # Phase 6.3: 根据审计结果执行修复
   if [ "$audit_result" = "pass" ]; then
@@ -458,7 +477,7 @@ for shot_id in $shot_ids; do
 done
 ```
 
-完成后写入 `state/{ep}-phase6.json`：
+完成后写入 `projects/{project}/state/{ep}-phase6.json`：
 ```json
 {
   "episode": "{ep}",
@@ -476,7 +495,7 @@ done
 }
 ```
 
-生成 `outputs/{ep}/audit-report.md`：
+生成 `projects/{project}/outputs/{ep}/audit-report.md`：
 ```markdown
 # 审计和修复报告 - {ep}
 
@@ -506,9 +525,9 @@ done
 
 ### 5. 汇总结果
 
-读取所有 `state/{ep}-shot-*.json` 文件，统计成功/失败镜次。
+读取所有 `projects/{project}/state/{ep}-shot-*.json` 文件，统计成功/失败镜次。
 
-生成 `outputs/{ep}/generation-report.md`：
+生成 `projects/{project}/outputs/{ep}/generation-report.md`：
 
 ```markdown
 # 视频生成报告 - {ep}
@@ -534,7 +553,7 @@ done
 
 ## 输出目录
 
-outputs/{ep}/videos/
+projects/{project}/outputs/{ep}/videos/
 ```
 
 输出最终结果给用户。
@@ -548,11 +567,11 @@ outputs/{ep}/videos/
 
 如果配置了 `DEEPSEEK_API_KEY`，自动生成 LLM 摘要：
 ```bash
-./scripts/api-caller.sh trace-summary state/traces/$SESSION_ID
+./scripts/api-caller.sh trace-summary projects/{project}/state/traces/$SESSION_ID
 ```
 
 输出 trace 信息：
 ```
-📊 Trace 已记录：state/traces/$SESSION_ID/
+📊 Trace 已记录：projects/{project}/state/traces/$SESSION_ID/
 运行 ~trace 查看路径概览和诊断信息
 ```

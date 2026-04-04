@@ -15,14 +15,14 @@ tools:
 
 ## 输入
 
-- `script/{ep}.md` — 剧本
-- `assets/characters/profiles/*.yaml` — 角色档案
-- `assets/scenes/profiles/*.yaml` — 场景档案
+- `projects/{project}/script/{ep}.md` — 剧本
+- `projects/{project}/assets/characters/profiles/*.yaml` — 角色档案
+- `projects/{project}/assets/scenes/profiles/*.yaml` — 场景档案
 - `config/ontology/world-model-schema.yaml` — Schema 定义
 
 ## 输出
 
-- `state/ontology/{ep}-world-model.json` — 世界本体模型
+- `projects/{project}/state/ontology/{ep}-world-model.json` — 世界本体模型
 
 ## 执行流程
 
@@ -47,11 +47,11 @@ fi
 script_content=$(cat "script/${ep}.md")
 
 # 读取所有角色档案
-character_files=$(find assets/characters/profiles -name "*.yaml" -type f 2>/dev/null || echo "")
+character_files=$(find projects/{project}/assets/characters/profiles -name "*.yaml" -type f 2>/dev/null || echo "")
 character_count=$(echo "$character_files" | grep -c . || echo "0")
 
 # 读取所有场景档案
-scene_files=$(find assets/scenes/profiles -name "*.yaml" -type f 2>/dev/null || echo "")
+scene_files=$(find projects/{project}/assets/scenes/profiles -name "*.yaml" -type f 2>/dev/null || echo "")
 scene_count=$(echo "$scene_files" | grep -c . || echo "0")
 
 # 记录 trace
@@ -497,16 +497,16 @@ EOF
 mkdir -p state/ontology
 
 # 写入文件
-cat /tmp/world_model.json | jq '.' > "state/ontology/${ep}-world-model.json"
+cat /tmp/world_model.json | jq '.' > "projects/{project}/state/ontology/${ep}-world-model.json"
 
 # 计算实体总数
 entity_count=$(($(echo "$characters_json" | jq 'length') + $(echo "$locations_json" | jq 'length') + $(echo "$props_json" | jq 'length')))
 
 # 记录 trace
 ./scripts/trace.sh "$session_id" "$trace_file" "write_world_model" \
-  "{\"output\": \"state/ontology/${ep}-world-model.json\", \"entity_count\": ${entity_count}}"
+  "{\"output\": \"projects/{project}/state/ontology/${ep}-world-model.json\", \"entity_count\": ${entity_count}}"
 
-echo "✓ 世界模型已写入: state/ontology/${ep}-world-model.json"
+echo "✓ 世界模型已写入: projects/{project}/state/ontology/${ep}-world-model.json"
 echo "  - 实体总数: ${entity_count}"
 echo "  - 关系总数: ${relationship_count}"
 ```
@@ -524,7 +524,7 @@ if python3 -c "import lancedb" 2>/dev/null; then
     python3 scripts/vectordb-manager.py init 2>/dev/null || true
 
     # 写入世界模型（实体 + 关系）
-    python3 scripts/vectordb-manager.py upsert-world-model "state/ontology/${ep}-world-model.json"
+    python3 scripts/vectordb-manager.py upsert-world-model "projects/{project}/state/ontology/${ep}-world-model.json"
 
     # 顺带索引现有资产（幂等，已存在的不重复写入）
     if [[ -d "assets/" ]]; then
@@ -552,7 +552,7 @@ fi
 
 向 team-lead 发送消息：`ontology-builder-agent 完成，world-model 已生成，实体数：{entity_count}，关系数：{relationship_count}`
 
-写入独立状态文件 `state/{ep}-phase0.json`：
+写入独立状态文件 `projects/{project}/state/{ep}-phase0.json`：
 ```bash
 cat > "state/${ep}-phase0.json" <<EOF
 {

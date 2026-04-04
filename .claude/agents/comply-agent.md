@@ -15,14 +15,14 @@ tools:
 
 ## 输入
 
-- `script/{ep}.md` — 原始剧本
+- `projects/{project}/script/{ep}.md` — 原始剧本
 - `session_id` — Trace session 标识（由 team-lead 传入）
 - `trace_file` — Trace 文件名，如 `ep01-phase1-trace`（由 team-lead 传入）
 
 ## 输出
 
-- `outputs/{ep}/render-script.md` — 合规改写后的剧本（供后续所有阶段使用）
-- `outputs/{ep}/compliance-report.md` — 合规检测报告
+- `projects/{project}/outputs/{ep}/render-script.md` — 合规改写后的剧本（供后续所有阶段使用）
+- `projects/{project}/outputs/{ep}/compliance-report.md` — 合规检测报告
 
 ## 执行流程
 
@@ -50,7 +50,7 @@ tools:
 对**改写后**的 render-script 做最终验证（确保改写结果也通过检测）：
 ```bash
 # 将改写后的 render-script 写入临时文件（避免 shell 注入风险）
-cat outputs/{ep}/render-script.md > /tmp/moderation_input_{ep}.txt
+cat projects/{project}/outputs/{ep}/render-script.md > /tmp/moderation_input_{ep}.txt
 ./scripts/api-caller.sh moderation check-file /tmp/moderation_input_{ep}.txt
 ```
 
@@ -69,7 +69,7 @@ cat outputs/{ep}/render-script.md > /tmp/moderation_input_{ep}.txt
 ```markdown
 # {剧本名} - 合规版本
 
-> 原始剧本：script/{ep}.md
+> 原始剧本：projects/{project}/script/{ep}.md
 > 合规处理时间：{timestamp}
 > 改写点数量：{n}
 
@@ -97,7 +97,7 @@ cat outputs/{ep}/render-script.md > /tmp/moderation_input_{ep}.txt
 
 向 team-lead 发送消息：`comply-agent 完成，render_script 已生成，改写点：{n} 处`
 
-写入独立状态文件 `state/{ep}-phase1.json`（避免并发写入冲突）：
+写入独立状态文件 `projects/{project}/state/{ep}-phase1.json`（避免并发写入冲突）：
 ```json
 {
   "episode": "{ep}",
@@ -118,7 +118,7 @@ cat outputs/{ep}/render-script.md > /tmp/moderation_input_{ep}.txt
 
 ```bash
 # 读取输入
-./scripts/trace.sh {session_id} {trace_file} read_input '{"input":"script/{ep}.md","size":{字数}}'
+./scripts/trace.sh {session_id} {trace_file} read_input '{"input":"projects/{project}/script/{ep}.md","size":{字数}}'
 
 # 第一层扫描
 ./scripts/trace.sh {session_id} {trace_file} layer1_scan '{"paragraphs":{N},"hits":{N},"keywords":[...]}'

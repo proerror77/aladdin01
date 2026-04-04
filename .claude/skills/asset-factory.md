@@ -52,7 +52,7 @@ fi
 
 ```bash
 # 读取所有角色档案
-for profile in assets/characters/profiles/*.yaml; do
+for profile in projects/{project}/assets/characters/profiles/*.yaml; do
     character_name=$(yq eval '.name' "$profile")
     
     # 检查是否有 variants
@@ -81,14 +81,14 @@ done
 ```
 
 **生成内容**：
-- `assets/packs/characters/{角色名}-{variant}-front.png` - 正面视图
-- `assets/packs/characters/{角色名}-{variant}-side.png` - 侧面视图
-- `assets/packs/characters/{角色名}-{variant}-back.png` - 背面视图
-- `assets/packs/characters/{角色名}-{variant}-neutral.png` - 中性表情
-- `assets/packs/characters/{角色名}-{variant}-happy.png` - 开心表情
-- `assets/packs/characters/{角色名}-{variant}-angry.png` - 愤怒表情
-- `assets/packs/characters/{角色名}-{variant}-sad.png` - 悲伤表情
-- `assets/packs/characters/{角色名}-{variant}-surprised.png` - 惊讶表情
+- `projects/{project}/assets/packs/characters/{角色名}-{variant}-front.png` - 正面视图
+- `projects/{project}/assets/packs/characters/{角色名}-{variant}-side.png` - 侧面视图
+- `projects/{project}/assets/packs/characters/{角色名}-{variant}-back.png` - 背面视图
+- `projects/{project}/assets/packs/characters/{角色名}-{variant}-neutral.png` - 中性表情
+- `projects/{project}/assets/packs/characters/{角色名}-{variant}-happy.png` - 开心表情
+- `projects/{project}/assets/packs/characters/{角色名}-{variant}-angry.png` - 愤怒表情
+- `projects/{project}/assets/packs/characters/{角色名}-{variant}-sad.png` - 悲伤表情
+- `projects/{project}/assets/packs/characters/{角色名}-{variant}-surprised.png` - 惊讶表情
 
 ### 3. 生成场景 styleframe
 
@@ -96,7 +96,7 @@ done
 
 ```bash
 # 读取所有场景档案
-for profile in assets/scenes/profiles/*.yaml; do
+for profile in projects/{project}/assets/scenes/profiles/*.yaml; do
     scene_name=$(yq eval '.name' "$profile")
     description=$(yq eval '.description' "$profile")
     
@@ -118,10 +118,10 @@ done
 ```
 
 **生成内容**：
-- `assets/packs/scenes/{场景名}-day-styleframe.png` - 白天
-- `assets/packs/scenes/{场景名}-night-styleframe.png` - 夜晚
-- `assets/packs/scenes/{场景名}-dusk-styleframe.png` - 黄昏
-- `assets/packs/scenes/{场景名}-dawn-styleframe.png` - 清晨
+- `projects/{project}/assets/packs/scenes/{场景名}-day-styleframe.png` - 白天
+- `projects/{project}/assets/packs/scenes/{场景名}-night-styleframe.png` - 夜晚
+- `projects/{project}/assets/packs/scenes/{场景名}-dusk-styleframe.png` - 黄昏
+- `projects/{project}/assets/packs/scenes/{场景名}-dawn-styleframe.png` - 清晨
 
 ### 4. 生成道具包
 
@@ -129,7 +129,7 @@ done
 
 ```bash
 # 如果有本体模型，从中提取道具
-for world_model in state/ontology/*-world-model.json; do
+for world_model in projects/{project}/state/ontology/*-world-model.json; do
     if [[ -f "$world_model" ]]; then
         props=$(jq -r '.entities.props | keys[]' "$world_model" 2>/dev/null || echo "")
         
@@ -149,21 +149,21 @@ done
 ```
 
 **生成内容**：
-- `assets/packs/props/{道具名}-intact.png` - 完好无损
-- `assets/packs/props/{道具名}-damaged.png` - 破损
-- `assets/packs/props/{道具名}-destroyed.png` - 毁坏
+- `projects/{project}/assets/packs/props/{道具名}-intact.png` - 完好无损
+- `projects/{project}/assets/packs/props/{道具名}-damaged.png` - 破损
+- `projects/{project}/assets/packs/props/{道具名}-destroyed.png` - 毁坏
 
 ### 5. 生成资产清单
 
 创建资产清单文件，记录所有生成的资产：
 
 ```bash
-cat > assets/packs/asset-manifest.json << EOF
+cat > projects/{project}/assets/packs/asset-manifest.json << EOF
 {
   "generated_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-  "characters": $(find assets/packs/characters -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]' || echo "[]"),
-  "scenes": $(find assets/packs/scenes -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]' || echo "[]"),
-  "props": $(find assets/packs/props -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]' || echo "[]")
+  "characters": $(find projects/{project}/assets/packs/characters -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]' || echo "[]"),
+  "scenes": $(find projects/{project}/assets/packs/scenes -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]' || echo "[]"),
+  "props": $(find projects/{project}/assets/packs/props -name "*.png" 2>/dev/null | jq -R -s -c 'split("\n")[:-1]' || echo "[]")
 }
 EOF
 ```
@@ -173,9 +173,9 @@ EOF
 统计生成的资产数量：
 
 ```bash
-character_count=$(find assets/packs/characters -name "*.png" 2>/dev/null | wc -l | tr -d ' ')
-scene_count=$(find assets/packs/scenes -name "*.png" 2>/dev/null | wc -l | tr -d ' ')
-prop_count=$(find assets/packs/props -name "*.png" 2>/dev/null | wc -l | tr -d ' ')
+character_count=$(find projects/{project}/assets/packs/characters -name "*.png" 2>/dev/null | wc -l | tr -d ' ')
+scene_count=$(find projects/{project}/assets/packs/scenes -name "*.png" 2>/dev/null | wc -l | tr -d ' ')
+prop_count=$(find projects/{project}/assets/packs/props -name "*.png" 2>/dev/null | wc -l | tr -d ' ')
 
 echo "━━━ 资产生成完成 ━━━"
 echo "角色定妆包: $character_count 张"
@@ -235,7 +235,7 @@ echo "预估成本: $estimated_cost USD"
 | 用途 | 生成参考图（用于视频生成） | 生成资产包（用于 img2video） |
 | 输出格式 | 单张参考图 | 多角度定妆包 + 表情包 |
 | 审核流程 | 主角迭代审核 + 配角标准审核 | 自动生成，无审核 |
-| 存储位置 | `assets/characters/images/` | `assets/packs/characters/` |
+| 存储位置 | `projects/{project}/assets/characters/images/` | `projects/{project}/assets/packs/characters/` |
 | 使用场景 | Phase 3 美术校验 | Phase 3.5 Shot Packet 编译 |
 
 ## 完成后
@@ -253,7 +253,7 @@ echo "预估成本: $estimated_cost USD"
 API 调用次数: 154
 预估成本: $15.40 USD
 
-资产清单: assets/packs/asset-manifest.json
+资产清单: projects/{project}/assets/packs/asset-manifest.json
 ```
 
 写入状态文件 `state/asset-factory-status.json`：

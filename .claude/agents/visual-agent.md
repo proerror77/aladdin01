@@ -15,18 +15,18 @@ tools:
 
 ## 输入
 
-- `outputs/{ep}/render-script.md` — 合规剧本
+- `projects/{project}/outputs/{ep}/render-script.md` — 合规剧本
 - `config/styles/registry.yaml` — 风格注册表（读取项目绑定的风格 ID）
 - `config/styles/{style_id}.yaml` — 绑定的风格文件（读取关键词、构图偏好）
-- `state/ontology/{ep}-world-model.json` — 世界本体模型（可选，v2.0+）
+- `projects/{project}/state/ontology/{ep}-world-model.json` — 世界本体模型（可选，v2.0+）
 - 用户选择的视觉风格和目标媒介（由 team-lead 传入）
 - `session_id` — Trace session 标识（由 team-lead 传入）
 - `trace_file` — Trace 文件名，如 `ep01-phase2-trace`（由 team-lead 传入）
 
 ## 输出
 
-- `outputs/{ep}/visual-direction.yaml` — 结构化镜次数据（YAML 格式，便于程序化解析）
-- `outputs/{ep}/visual-direction.md` — 人类可读的视觉指导报告
+- `projects/{project}/outputs/{ep}/visual-direction.yaml` — 结构化镜次数据（YAML 格式，便于程序化解析）
+- `projects/{project}/outputs/{ep}/visual-direction.md` — 人类可读的视觉指导报告
 
 ## 执行流程
 
@@ -92,7 +92,7 @@ select_style_variant() {
 
 **v2.0 升级：读取 world-model.json（如果存在）**
 
-检查 `state/ontology/{ep}-world-model.json` 是否存在：
+检查 `projects/{project}/state/ontology/{ep}-world-model.json` 是否存在：
 - 如存在，读取角色当前变体（`entities.characters[].current_variant`）
 - 如存在，读取场景时间变体（`entities.scenes[].time_variants`）
 - 如不存在，使用旧逻辑（从角色档案和剧本推断）
@@ -140,16 +140,15 @@ select_style_variant() {
     characters:
       - name: "{角色名}"
         variant_id: "default"  # 该镜次中角色的变体 ID，对应 profile 中的 variants[].variant_id
-        image_path: "assets/characters/images/{角色名}-{variant_id}-front.png"
+        image_path: "projects/{project}/assets/characters/images/{角色名}-{variant_id}-front.png"
     scenes:
       - name: "{场景名}"
         time_of_day: "night"  # 与镜次的 time_of_day 一致
-        image_path: "assets/scenes/images/{场景名}-night.png"
-  # 组装好的提示词（风格段和质量后缀从风格文件读取）
+        image_path: "projects/{project}/assets/scenes/images/{场景名}-night.png"
+  # ⚠️ seedance_prompt 必须使用 Step 4 的官方脚本格式生成，禁止使用流水账描述
+  # 格式：【出镜角色-场景】\n角色：...\n场景：...\n[画面]：...\n镜头N：...\n画面风格: ...
   seedance_prompt: |
-    {subject+action}, {scene}, {camera},
-    {select_style_variant(shot_mood)},
-    {QUALITY_SUFFIX}
+    （由 Step 4 按官方脚本格式组装，见下方）
   prompt_style_source: "config/styles/{style_id}.yaml"  # 标注风格来源
 ```
 
@@ -159,19 +158,37 @@ select_style_variant() {
 
 **优先级 1：从 world-model.json 读取当前变体**
 
-1. 检查 `state/ontology/{ep}-world-model.json` 是否存在
+1. 检查 `projects/{project}/state/ontology/{ep}-world-model.json` 是否存在
 2. 如存在，从 `world_model.entities.characters[].current_variant` 读取角色当前变体
 3. 使用该 `variant_id` 作为镜次的 `references.characters[].variant_id`
 
 **优先级 2：从角色档案推断**
 
-1. 读取 `assets/characters/profiles/{角色名}.yaml`
+1. 读取 `projects/{project}/assets/characters/profiles/{角色名}.yaml`（优先中文文件名，如 `苏夜.yaml`；无则用英文，如 `suye.yaml`）
 2. 如果角色有 `variants` 字段 → 根据剧本上下文选择对应的 `variant_id`
-3. 如果角色没有 `variants` 字段 → 使用 `variant_id: "default"`，`image_path` 不带 variant_id 后缀（即 `{角色名}-front.png`）
+3. 如果角色没有 `variants` 字段 → 使用 `variant_id: "default"`
 
-**兼容性**：如果 world-model.json 不存在，回退到优先级 2（旧逻辑）。
+**参考图路径规则（必须与实际文件名一致）**：
 
-**外貌描述**：`subject` 字段中的外貌描述应使用对应变体的 `appearance`，而非角色的默认 `appearance`
+```
+# 多变体角色（有 variant_id）：
+projects/{project}/assets/characters/images/{角色名}-{variant_id}-front.png
+# 例：苏夜 qingyucan 变体 → projects/{project}/assets/characters/images/苏夜-qingyucan-front.png
+
+# 单变体角色（default）：
+projects/{project}/assets/characters/images/{角色名}-front.png
+# 例：叶红衣 → projects/{project}/assets/characters/images/叶红衣-front.png
+
+# 场景图：
+projects/{project}/assets/scenes/images/{场景名}-{time_of_day}.png
+# 例：黑雾森林白天 → projects/{project}/assets/scenes/images/黑雾森林-day.png
+```
+
+⚠️ **路径校验**：写入 `image_path` 前必须用 Bash 检查文件是否存在：
+```bash
+ls "projects/{project}/assets/characters/images/{角色名}-{variant_id}-front.png" 2>/dev/null || echo "MISSING"
+```
+文件不存在时，`image_path` 设为 `null`，`generation_mode` 降级为 `text2video`。
 
 ### 场景时间推断规则（v2.0 升级）
 
@@ -179,7 +196,7 @@ select_style_variant() {
 
 **优先级 1：从 world-model.json 读取场景时间**
 
-1. 检查 `state/ontology/{ep}-world-model.json` 是否存在
+1. 检查 `projects/{project}/state/ontology/{ep}-world-model.json` 是否存在
 2. 如存在，从 `world_model.entities.scenes[]` 中查找对应场景
 3. 如场景有 `time_variants` 字段，根据剧本上下文选择对应的时段
 4. 使用该时段作为镜次的 `time_of_day`
@@ -195,6 +212,10 @@ select_style_variant() {
 **光线描述**：`lighting_note` 补充具体光线描述，用于提示词中的 `[scene]` 部分
 
 ### 4. 提示词组装
+
+⚠️ **强制要求**：每个镜次的 `seedance_prompt` 必须使用以下官方脚本格式，**禁止使用流水账描述**。不符合格式的 prompt 视为无效，必须重写。
+
+**判断标准**：prompt 必须以 `【出镜角色` 开头，包含 `镜头N：` 结构，结尾包含 `禁止出现字幕`。
 
 使用**即梦官方脚本格式**，每个镜次 prompt 按以下模板生成：
 
@@ -212,13 +233,43 @@ select_style_variant() {
 画面风格: 风格描述；搭配环境音效描述；禁止出现字幕、对话框、背景音乐
 ```
 
+**实际示例（qyccan-ep01 shot-01，无对白，10秒，有参考图）**：
+
+```
+【出镜角色-场景】
+角色：@图片1 作为<苏夜（青玉蚕形态）>
+场景：<黑雾森林-日>
+[画面]：[苏夜]趴在巨大树叶上，肥嘟嘟的身体微微颤动，复眼视角扫视四周。[后景]：黑雾弥漫的古木森林，晨光透过树冠洒落。
+
+画面风格: 玄幻修仙风格，伦勃朗光，强烈明暗对比，低饱和色调。
+镜头1：特写固定镜头，0-4秒[苏夜]趴在树叶上，复眼视角呈现六边形分割画面，懵逼地扫视四周，保持角色外观与参考图一致；5-7秒镜头缓慢拉远，露出[苏夜]拇指大小的全身，肉乎乎的小短腿无力地晃动；8-10秒[苏夜]翻肚朝天，四肢乱蹬，眼神欠揍。
+
+画面风格: 玄幻修仙风格，伦勃朗光，强烈明暗对比，低饱和色调；搭配森林虫鸣声、树叶沙沙声；禁止出现字幕、对话框、背景音乐
+```
+
+**实际示例（qyccan-ep01 shot-03，有对白，12秒，多角色+场景参考图）**：
+
+```
+【出镜角色-场景】
+角色：@图片1 作为<叶红衣>，@图片2 作为<苏夜（青玉蚕形态）>
+场景：<黑雾森林-日>，场景参考@图片3
+[画面]：[叶红衣]捏碎召唤石，鲜血滴落，法阵发光；[苏夜]化作绿光从树梢坠落，落入法阵中央。[后景]：@图片3的黑雾森林，法阵光芒照亮周围树木。
+
+画面风格: 玄幻修仙风格，伦勃朗光，魔法光效，低饱和色调。
+镜头1：全景推镜头，0-5秒[叶红衣]双手捏碎古老召唤石，鲜血滴落，脚下法阵骤然亮起，保持角色外观与参考图一致，[叶红衣]（满怀期待）："出来吧，我的本命灵兽！"；6-9秒一道绿光从树梢坠落，光芒散去，法阵中央趴着一只拇指大小的青玉蚕，保持角色外观与参考图一致；10-12秒特写[叶红衣]脸部，眼神从期待转为震惊，[叶红衣]（震惊崩溃）："青……青玉蚕？是最弱小的凡胎级昆虫？"。
+
+画面风格: 玄幻修仙风格，伦勃朗光，魔法粒子特效，低饱和色调；搭配法阵激活音效、绿光坠落音效；禁止出现字幕、对话框、背景音乐
+```
+
 **格式规则：**
 
 1. **角色标注**：header 中用 `<角色名>` 尖括号，shot 描述中用 `[角色名]` 方括号
 2. **场景标注**：`<场景名-时段>`，时段用日/夜/黄昏/清晨
-3. **对白格式**：
-   - 有口型同步：`开口说道："台词"（语气：情绪描述）`
-   - 旁白/OS：`画外音（角色名内心独白）："台词"（语气：情绪描述）`
+3. **对白格式（两种均可，模型都能理解）**：
+   - 简洁写法（推荐）：`[角色名]（动作/情绪）："台词内容"`
+   - 详细写法：`[角色名]开口说道："台词"（语气：情绪描述）`
+   - 旁白/OS：`[角色名]（内心独白）："台词"` 或 `画外音（角色名内心独白）："台词"`
+   - 方言直接写进台词，模型能理解（四川话、粤语等）
    - 禁止用 `台词（角色名，情绪）：` 旧格式
 4. **镜头格式**：`镜头N：[景别+运镜]，[角色]具体动作`
    - 景别：近景/中景/特写/全景/远景
@@ -234,24 +285,39 @@ select_style_variant() {
 
 在 `角色：` 行改为 `角色：@图片1 作为<角色1>，@图片2 作为<角色2>`，并在镜头描述中加 `保持角色外观与参考图一致`。
 
-**长镜次（13-15 秒）**：在镜头描述内用时间戳分段：
+⚠️ **@引用顺序规则**：
+- `@图片1` 权重最高（40-50% 注意力），最重要的角色/参考图放 slot 1
+- 多角色镜次：主角放 @图片1，配角依次 @图片2、@图片3
+- 场景图放在角色图之后（@图片N 最后）
+- `references` 字段中的 `image_path` 顺序必须与 prompt 中 @图片N 的顺序一致
+
+**长镜次（10秒以上）**：必须使用时间戳分段，精确控制每段画面：
 ```
-镜头1：全景固定镜头，0-3秒[角色]做X，4-8秒[角色]做Y，9-12秒[角色]做Z。
+镜头1：全景固定镜头，0-3秒[角色]做X，4-7秒[角色]做Y，8-10秒[角色]做Z。
 ```
+
+**对白嵌入规则**：
+- 有口型同步：`[角色名]开口说道："台词"（语气：情绪描述）`
+- 旁白/OS：`画外音（角色名内心独白）："台词"（语气：情绪描述）`
+- 对白必须嵌入 prompt 的镜头描述中，不能只放在 `audio` 字段
 
 确保每个镜次的 prompt 字段长度 ≤ 2000 字符。
 
 ### 5. 自审检查
 
-完成所有镜次后，自审：
+完成所有镜次后，自审（**每一项都必须通过，否则重写对应镜次**）：
+- [ ] 每个 `seedance_prompt` 以 `【出镜角色` 开头 ← **最重要，不通过直接重写**
+- [ ] 每个 prompt 包含 `镜头N：景别+运镜` 结构
+- [ ] 每个 prompt 结尾包含 `禁止出现字幕、对话框、背景音乐`
+- [ ] 有对白的镜次：对白已嵌入 prompt 的镜头描述中（不只在 audio 字段）
+- [ ] 有参考图的镜次：prompt 中有 `@图片N 作为<角色名>` 引用
+- [ ] 参考图路径已用 Bash 验证文件存在，不存在的设为 null
+- [ ] 10秒以上镜次使用了时间戳分段（`0-3秒：...`）
 - [ ] 每个镜次提示词长度 ≤ 2000 字符
-- [ ] 时长均在 current_min–current_max 秒范围内（读自 config/platforms/seedance-v2.yaml）
-- [ ] 所有有对白的镜次 has_dialogue: true，无对白的镜次 has_dialogue: false
+- [ ] 时长均在 current_min–current_max 秒范围内
 - [ ] has_dialogue: true 的镜次 audio 字段包含正确格式的对白
 - [ ] prompt 中无 `9:16`、`禁止出现水印`、`4K Ultra HD` 等 API 参数内容
-- [ ] 每个镜次有 `[角色名]` 标注和 `镜头N：景别+运镜` 结构
 - [ ] 镜次覆盖了剧本所有关键情节
-- [ ] 节奏合理（不过于密集或稀疏）
 
 ### 输出格式
 
@@ -312,7 +378,7 @@ shots:
 
 向 team-lead 发送消息：`visual-agent 完成，共 {N} 个镜次，等待人工确认`
 
-写入独立状态文件 `state/{ep}-phase2.json`：
+写入独立状态文件 `projects/{project}/state/{ep}-phase2.json`：
 ```json
 {
   "episode": "{ep}",
@@ -333,7 +399,7 @@ shots:
 
 ```bash
 # 读取输入
-./scripts/trace.sh {session_id} {trace_file} read_input '{"render_script":"outputs/{ep}/render-script.md","platform_config":"config/platforms/seedance-v2.yaml","world_model":"state/ontology/{ep}-world-model.json"}'
+./scripts/trace.sh {session_id} {trace_file} read_input '{"render_script":"projects/{project}/outputs/{ep}/render-script.md","platform_config":"config/platforms/seedance-v2.yaml","world_model":"projects/{project}/state/ontology/{ep}-world-model.json"}'
 
 # 场景分析
 ./scripts/trace.sh {session_id} {trace_file} analyze_scenes '{"scene_count":{N},"scenes":["场景1","场景2"]}'
