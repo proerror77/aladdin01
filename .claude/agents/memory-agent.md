@@ -1,570 +1,332 @@
 ---
 name: memory-agent
-description: 为每个 shot 检索最相关的参考资产（角色图、场景图、前一镜结尾帧），按优先级排序。优先使用 LanceDB 语义检索，降级到文件名精确匹配。
+description: 为每个 shot 检索最相关的参考资产。默认采用“两段检索”：先查实体/状态/关系，再查资产；向量库不可用时降级到文件名精确匹配。
 tools:
   - Read
   - Bash
 ---
 
-# memory-agent — 参考资产检索
+# memory-agent — 两段检索参考规划
 
 ## 职责
 
-为每个 shot 检索最相关的 references，按优先级排序：
-1. `projects/{project}/assets/packs/` （最高优先级，NanoBanana 生成的多视角资产）
-2. `projects/{project}/assets/characters/images/` 或 `projects/{project}/assets/scenes/images/` （单视角参考图）
-3. 前一镜结尾帧（连续性参考）
+为每个 shot 生成可审计的 reference plan，并输出最终参考资产。
 
-**检索策略（v2.0）**：
-- **优先**：LanceDB 语义检索（如果向量库存在）
-- **降级**：文件名精确匹配（向量库不可用时）
+v2.3 起，memory-agent 不再直接“按名字找图”，而是分两段执行：
+
+1. **规划段**：先从 LanceDB 读取实体、关系、上一镜状态，确定本镜真正需要的角色形态、情绪连续性、场景状态和关系重点。
+2. **取图段**：基于规划结果构造更精确的 asset query，再做 `search-assets`。
+
+这样 shot-compiler-agent 拿到的不是裸图片列表，而是一份“为什么选这些图”的 reference plan。
 
 ## 输入
 
-- `shot_id` — 镜次 ID（如 `ep01-shot-05`）
-- `projects/{project}/outputs/{ep}/visual-direction.yaml` — 镜次定义
-- `state/vectordb/lancedb/` — LanceDB 向量库（可选）
-- `projects/{project}/assets/packs/` — 多视角资产包
-- `projects/{project}/assets/characters/images/` — 角色参考图
-- `projects/{project}/assets/scenes/images/` — 场景参考图
-- `projects/{project}/outputs/{ep}/videos/` — 已生成的视频（用于提取前一镜结尾帧）
+- `project` — 项目名
+- `shot_id` — 镜次 ID，例如 `ep01-shot-05`
+- `projects/{project}/outputs/{ep}/visual-direction.yaml`
+- `projects/{project}/state/shot-packets/{shot_id}.json`（可选，若已存在优先使用）
+- `projects/{project}/state/ontology/{ep}-world-model.json`
+- `state/vectordb/lancedb/`（可选）
+- `projects/{project}/assets/packs/`
+- `projects/{project}/assets/characters/images/`
+- `projects/{project}/assets/scenes/images/`
+- `projects/{project}/outputs/{ep}/videos/`
+- `session_id`（可选）
 
 ## 输出
 
-JSON 格式的 references 列表（同 v1.0，接口不变）：
+输出 JSON 到 stdout：
 
 ```json
 {
   "shot_id": "ep01-shot-05",
-  "retrieval_method": "vector",
+  "retrieval_method": "vector_two_stage",
+  "planning": {
+    "characters": [],
+    "scene": {},
+    "previous_state": []
+  },
+  "retrieval_evidence": {
+    "entity_hits": [],
+    "relation_hits": [],
+    "state_hits": []
+  },
   "references": {
-    "characters": [...],
-    "scenes": [...],
-    "previous_shot": {...}
+    "characters": [],
+    "scenes": [],
+    "previous_shot": null
   }
 }
 ```
 
-`retrieval_method` 字段说明检索方式：
-- `"vector"` — LanceDB 语义检索
-- `"exact"` — 文件名精确匹配（降级）
+`references` 保持向后兼容；`planning` 和 `retrieval_evidence` 是新增字段，供 shot-compiler-agent / qa-agent / repair-agent 追溯来源。
+
+## 检索策略
+
+### A. 向量模式（默认）
+
+触发条件：
+
+```bash
+VECTORDB_PATH="${VECTORDB_PATH:-state/vectordb/lancedb}"
+USE_VECTOR=false
+
+if [[ -d "$VECTORDB_PATH" ]] && python3 -c "import lancedb" 2>/dev/null; then
+  USE_VECTOR=true
+fi
+```
+
+### B. 精确匹配模式（降级）
+
+当向量库不存在或查询失败时，退回文件名精确匹配。接口不变，只是 `retrieval_method = "exact"`。
 
 ## 执行流程
 
-### Step 1: 读取 shot 定义
+### Step 0: 读取 shot-state（v2.2 新增）
+
+在做任何检索之前，先读取 `shot-state` 中间层，获取 `selected_views` 和 `continuity` 信息：
 
 ```bash
-shot_id="$1"
+shot_state_file="projects/${project}/state/shot-state/${shot_id}.json"
+
+if [[ -f "$shot_state_file" ]]; then
+  # 从 shot-state 读取 preferred_view，用于规划检索
+  preferred_char_views=$(python3 -c "
+import json, sys
+state = json.load(open('$shot_state_file'))
+for c in state.get('selected_views', {}).get('characters', []):
+    print(c['name'], c['variant_id'], c.get('preferred_view', 'front'))
+")
+  preferred_scene_view=$(python3 -c "
+import json
+state = json.load(open('$shot_state_file'))
+print(state.get('selected_views', {}).get('scene', {}).get('preferred_view', 'day'))
+")
+  previous_shot_id=$(python3 -c "
+import json
+state = json.load(open('$shot_state_file'))
+print(state.get('continuity', {}).get('previous_shot_id') or '')
+")
+  echo "✓ 读取 shot-state: preferred_views 已加载"
+else
+  echo "⚠️ shot-state 不存在，使用默认 preferred_view=front"
+  preferred_char_views=""
+  preferred_scene_view="day"
+  previous_shot_id=""
+fi
+```
+
+**规划原则**：
+- 用 `selected_views.characters[*].preferred_view` 规划角色检索（front/side/back）
+- 用 `selected_views.scene.preferred_view` 规划场景检索（day/night/dusk/dawn）
+- 用 `continuity.previous_shot_id` 规划上一镜状态检索
+
+### Step 1: 读取 shot 上下文
+
+```bash
+project="$1"
+shot_id="$2"
 ep=$(echo "$shot_id" | sed 's/-shot-.*//')
 shot_index=$(echo "$shot_id" | sed 's/.*-shot-//' | sed 's/^0*//')
 
-shot_yaml=$(yq eval ".shots[] | select(.shot_id == \"$shot_id\")" "outputs/${ep}/visual-direction.yaml")
+visual_file="projects/${project}/outputs/${ep}/visual-direction.yaml"
+packet_file="projects/${project}/state/shot-packets/${shot_id}.json"
+world_model="projects/${project}/state/ontology/${ep}-world-model.json"
+
+shot_yaml=$(yq eval ".shots[] | select(.shot_id == \"$shot_id\")" "$visual_file")
 scene_name=$(echo "$shot_yaml" | yq eval '.location.scene_name // .scene_name' -)
 time_of_day=$(echo "$shot_yaml" | yq eval '.location.time_of_day // .time_of_day' -)
 ```
 
-### Step 2: 判断检索策略
+如果 shot packet 已存在，优先读取 packet 中的 `characters[] / background / ontology_constraints`，因为它比 visual-direction 更接近真正下游输入。
+
+### Step 2: 规划段（entities / states / relations）
+
+在向量模式下，先做语义规划，再做资产检索。
+
+#### 2a. 角色规划
+
+对每个角色：
+
+1. 从 visual-direction 或 shot packet 获取 `name / variant_id / must_preserve`
+2. 用 `search-entities` 找到 canonical entity
+3. 用 `get-state` 读取上一镜已索引状态，补 continuity hint
 
 ```bash
-VECTORDB_PATH="state/vectordb/lancedb"
-USE_VECTOR=false
+entity_hits=$(python3 scripts/vectordb-manager.py search-entities \
+  "${char_name} ${variant} 角色 视觉特征" \
+  --type character \
+  --episode "$ep" \
+  --n 3)
 
-if [[ -d "$VECTORDB_PATH" ]] && python3 -c "import lancedb" 2>/dev/null; then
-    USE_VECTOR=true
-    echo "使用 LanceDB 语义检索"
-else
-    echo "降级：使用文件名精确匹配"
-fi
+prev_state=$(python3 scripts/vectordb-manager.py get-state \
+  "${char_id}" "$ep" "${ep}-shot-$(printf '%02d' $((shot_index - 1)))" 2>/dev/null || echo '{"found":false}')
 ```
 
-### Step 3A: LanceDB 语义检索（优先路径）
+规划输出应包含：
 
-```bash
-if [[ "$USE_VECTOR" == "true" ]]; then
+- `canonical_name`
+- `requested_variant`
+- `continuity_variant`
+- `continuity_emotion`
+- `must_preserve`
+- `asset_query`
 
-    characters_json="[]"
+角色 asset query 示例：
 
-    # 为每个角色做语义检索
-    echo "$shot_yaml" | yq eval '.references.characters[] | @json' - | while IFS= read -r char_entry; do
-        char_name=$(echo "$char_entry" | jq -r '.name')
-        variant=$(echo "$char_entry" | jq -r '.variant_id // "default"')
-
-        # 构造语义查询：角色名 + 变体 + 视角关键词
-        query="${char_name} ${variant} 角色参考图"
-
-        # 调用 LanceDB 检索（输出 JSON 数组）
-        results=$(python3 scripts/vectordb-manager.py search-assets "$query" \
-            --type character --n 3)
-
-        # 过滤：优先选 entity_name 精确匹配的结果
-        filtered=$(echo "$results" | jq --arg name "$char_name" \
-            '[.[] | select(.entity_name == $name)]')
-
-        # 如果精确匹配为空，退而使用全部结果
-        if [[ "$(echo "$filtered" | jq 'length')" == "0" ]]; then
-            filtered="$results"
-        fi
-
-        # 转换为 memory-agent 标准格式
-        assets=$(echo "$filtered" | jq '[.[] | {
-            "path": .path,
-            "type": (if .pack_tier == 1 then "pack" else "image" end),
-            "priority": .pack_tier,
-            "score": .score
-        }]')
-
-        characters_json=$(echo "$characters_json" | jq \
-            --arg name "$char_name" \
-            --arg variant "$variant" \
-            --argjson assets "$assets" \
-            '. += [{"name": $name, "variant": $variant, "assets": $assets}]')
-    done
-
-    # 场景语义检索
-    query="${scene_name} ${time_of_day} 场景参考图"
-    scene_results=$(python3 scripts/vectordb-manager.py search-assets "$query" \
-        --type scene --n 3)
-
-    # 过滤场景名匹配
-    scene_filtered=$(echo "$scene_results" | jq --arg name "$scene_name" \
-        '[.[] | select(.entity_name == $name)]')
-    [[ "$(echo "$scene_filtered" | jq 'length')" == "0" ]] && scene_filtered="$scene_results"
-
-    scenes_json=$(echo "$scene_filtered" | jq --arg name "$scene_name" --arg time "$time_of_day" \
-        '[{
-            "name": $name,
-            "time_of_day": $time,
-            "assets": [.[] | {
-                "path": .path,
-                "type": (if .pack_tier == 1 then "pack" else "image" end),
-                "priority": .pack_tier,
-                "score": .score
-            }]
-        }]')
-
-    retrieval_method="vector"
-fi
+```text
+苏夜 qingyucan panicked 拇指大小 复眼 角色参考图 正面 侧面 背面
 ```
 
-### Step 3B: 文件名精确匹配（降级路径）
+#### 2b. 场景规划
+
+先查场景实体，而不是直接按场景名找图：
 
 ```bash
-if [[ "$USE_VECTOR" == "false" ]]; then
+scene_hits=$(python3 scripts/vectordb-manager.py search-entities \
+  "${scene_name} ${time_of_day} 场景 功能性 视觉地标" \
+  --type scene \
+  --episode "$ep" \
+  --n 3)
+```
 
-    characters_json="[]"
+规划输出至少包含：
 
-    echo "$shot_yaml" | yq eval '.references.characters[] | @json' - | while IFS= read -r char_entry; do
-        char_name=$(echo "$char_entry" | jq -r '.name')
-        variant=$(echo "$char_entry" | jq -r '.variant_id // "default"')
-        assets="[]"
+- `canonical_scene`
+- `time_of_day`
+- `visual_landmarks`
+- `scene_restrictions`
+- `asset_query`
 
-        # 优先级 1: packs（多视角）
-        for view in front side back 3quarter; do
-            pack_path="projects/{project}/assets/packs/characters/${char_name}-${variant}-${view}.png"
-            if [ -f "$pack_path" ]; then
-                assets=$(echo "$assets" | jq --arg path "$pack_path" \
-                    '. += [{"path": $path, "type": "pack", "priority": 1}]')
-            fi
-        done
+场景 asset query 示例：
 
-        # 优先级 2: images（如果 packs 为空）
-        if [ "$(echo "$assets" | jq 'length')" -eq 0 ]; then
-            for suffix in "${variant}-front" "${variant}" "default-front" "front"; do
-                img_path="projects/{project}/assets/characters/images/${char_name}-${suffix}.png"
-                if [ -f "$img_path" ]; then
-                    assets=$(echo "$assets" | jq --arg path "$img_path" \
-                        '. += [{"path": $path, "type": "image", "priority": 2}]')
-                    break
-                fi
-            done
-        fi
+```text
+黑雾森林 day 古木 黑雾 丁达尔光 场景参考图 styleframe
+```
 
-        characters_json=$(echo "$characters_json" | jq \
-            --arg name "$char_name" --arg variant "$variant" --argjson assets "$assets" \
-            '. += [{"name": $name, "variant": $variant, "assets": $assets}]')
-    done
+#### 2c. 关系规划（新增）
 
-    # 场景检索
-    assets="[]"
-    for suffix in styleframe wide; do
-        pack_path="projects/{project}/assets/packs/scenes/${scene_name}-${time_of_day}-${suffix}.png"
-        [ -f "$pack_path" ] && assets=$(echo "$assets" | jq --arg path "$pack_path" \
-            '. += [{"path": $path, "type": "pack", "priority": 1}]')
-    done
-    if [ "$(echo "$assets" | jq 'length')" -eq 0 ]; then
-        img_path="projects/{project}/assets/scenes/images/${scene_name}-${time_of_day}.png"
-        [ -f "$img_path" ] && assets=$(echo "$assets" | jq --arg path "$img_path" \
-            '. += [{"path": $path, "type": "image", "priority": 2}]')
-    fi
+如果 shot 中有 2 个及以上角色，补查关系，用于决定谁是主参考、谁需要反应镜头支持：
 
-    scenes_json=$(jq -n --arg name "$scene_name" --arg time "$time_of_day" \
-        --argjson assets "$assets" \
-        '[{"name": $name, "time_of_day": $time, "assets": $assets}]')
+```bash
+relation_hits=$(python3 scripts/vectordb-manager.py search-relations \
+  "${char_a} ${char_b} 关系 权力 契约 对抗" \
+  --episode "$ep" \
+  --n 3)
+```
 
-    retrieval_method="exact"
-fi
+memory-agent 不直接改 prompt，但应把关系证据写入 `retrieval_evidence.relation_hits`，供 narrative-review-agent / shot-compiler-agent 使用。
+
+### Step 3: 取图段（assets）
+
+用规划段产出的 query 检索资产，而不是直接用角色名：
+
+```bash
+char_assets=$(python3 scripts/vectordb-manager.py search-assets "$asset_query" \
+  --type character \
+  --n 5)
+
+scene_assets=$(python3 scripts/vectordb-manager.py search-assets "$scene_asset_query" \
+  --type scene \
+  --n 5)
+```
+
+过滤规则：
+
+1. `entity_name` / canonical name 优先
+2. `pack_tier=1` 优先于单图
+3. 与 continuity variant 一致的结果优先
+4. 不存在的文件丢弃
+5. 每个角色 / 场景最多保留 top-3
+
+结果标准格式：
+
+```json
+{
+  "name": "苏夜",
+  "variant": "qingyucan",
+  "assets": [
+    {
+      "path": "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+      "type": "pack",
+      "priority": 1,
+      "score": 0.93,
+      "selected_because": "variant match + continuity match"
+    }
+  ]
+}
 ```
 
 ### Step 4: 提取前一镜结尾帧
 
-（与 v1.0 相同）
+保留原逻辑，但使用 project-scoped 路径：
 
 ```bash
 prev_shot_json="null"
 
-if [ "$shot_index" -gt 1 ]; then
-    prev_shot_num=$(printf '%02d' $((shot_index - 1)))
-    prev_shot_id="${ep}-shot-${prev_shot_num}"
-    prev_video="outputs/${ep}/videos/shot-${prev_shot_num}.mp4"
+if [[ "$shot_index" -gt 1 ]]; then
+  prev_num=$(printf '%02d' $((shot_index - 1)))
+  prev_shot_id="${ep}-shot-${prev_num}"
+  prev_video="projects/${project}/outputs/${ep}/videos/shot-${prev_num}.mp4"
+  end_frame="projects/${project}/outputs/${ep}/storyboard/${prev_shot_id}-end-frame.png"
 
-    if [ -f "$prev_video" ]; then
-        mkdir -p "outputs/${ep}/storyboard"
-        end_frame="outputs/${ep}/storyboard/${prev_shot_id}-end-frame.png"
-        ffmpeg -sseof -1 -i "$prev_video" -update 1 -q:v 1 "$end_frame" -y 2>/dev/null
-        [ -f "$end_frame" ] && prev_shot_json=$(jq -n \
-            --arg shot_id "$prev_shot_id" --arg frame "$end_frame" \
-            '{"shot_id": $shot_id, "end_frame": $frame}')
-    fi
-fi
-```
-
-### Step 5: 输出 JSON
-
-```bash
-jq -n \
-  --arg shot_id "$shot_id" \
-  --arg method "$retrieval_method" \
-  --argjson characters "$characters_json" \
-  --argjson scenes "$scenes_json" \
-  --argjson prev_shot "$prev_shot_json" \
-  '{
-    shot_id: $shot_id,
-    retrieval_method: $method,
-    references: {
-      characters: $characters,
-      scenes: $scenes,
-      previous_shot: $prev_shot
-    }
-  }'
-```
-
-## 错误处理
-
-- shot_id 不存在 → 退出并报错
-- 所有优先级都找不到资产 → 记录警告，返回空数组
-- ffmpeg 提取失败 → 跳过前一镜结尾帧
-- LanceDB 报错 → 自动降级到文件名精确匹配
-
-## 注意事项
-
-- **向量库不存在时自动降级**：不影响主流程，只是检索质量略低
-- **score 字段**：向量检索结果含相似度分数（0-1），精确匹配无此字段
-- **entity_name 过滤**：优先返回同名实体的资产，避免跨角色污染
-- **前一帧提取**：依赖 ffmpeg，使用 `-sseof -1` 提取结尾帧
-
-
-## 输入
-
-- `shot_id` — 镜次 ID（如 `ep01-shot-05`）
-- `projects/{project}/outputs/{ep}/visual-direction.yaml` — 镜次定义
-- `projects/{project}/assets/packs/` — 多视角资产包
-- `projects/{project}/assets/characters/images/` — 角色参考图
-- `projects/{project}/assets/scenes/images/` — 场景参考图
-- `projects/{project}/outputs/{ep}/videos/` — 已生成的视频（用于提取前一镜结尾帧）
-- `session_id` — Trace session 标识（可选）
-
-## 输出
-
-JSON 格式的 references 列表，输出到 stdout：
-
-```json
-{
-  "shot_id": "ep01-shot-05",
-  "references": {
-    "characters": [
-      {
-        "name": "苏夜",
-        "variant": "qingyu_silkworm",
-        "assets": [
-          {
-            "path": "projects/{project}/assets/packs/characters/苏夜-qingyu_silkworm-front.png",
-            "type": "pack",
-            "priority": 1
-          },
-          {
-            "path": "projects/{project}/assets/packs/characters/苏夜-qingyu_silkworm-side.png",
-            "type": "pack",
-            "priority": 1
-          }
-        ]
-      }
-    ],
-    "scenes": [
-      {
-        "name": "叶红衣闺房",
-        "time_of_day": "night",
-        "assets": [
-          {
-            "path": "projects/{project}/assets/packs/scenes/叶红衣闺房-night-styleframe.png",
-            "type": "pack",
-            "priority": 1
-          }
-        ]
-      }
-    ],
-    "previous_shot": {
-      "shot_id": "ep01-shot-04",
-      "end_frame": "outputs/ep01/storyboard/ep01-shot-04-end-frame.png"
-    }
-  }
-}
-```
-
-## 执行流程
-
-### 1. 读取 shot 定义
-
-从 `visual-direction.yaml` 中读取指定 shot 的定义：
-
-```bash
-shot_id="$1"
-ep=$(echo "$shot_id" | sed 's/-shot-.*//')
-shot_index=$(echo "$shot_id" | sed 's/.*-shot-//' | sed 's/^0*//')
-
-# 读取 shot 数据
-shot_yaml=$(yq eval ".shots[] | select(.shot_id == \"$shot_id\")" "outputs/${ep}/visual-direction.yaml")
-
-# 提取关键字段
-scene_name=$(echo "$shot_yaml" | yq eval '.scene_name' -)
-time_of_day=$(echo "$shot_yaml" | yq eval '.time_of_day' -)
-```
-
-### 2. 检索角色资产
-
-对每个角色，按优先级检索：
-
-**优先级 1: projects/{project}/assets/packs/characters/**
-
-检查以下文件是否存在：
-- `{角色名}-{variant}-front.png`
-- `{角色名}-{variant}-side.png`
-- `{角色名}-{variant}-back.png`
-- `{角色名}-{variant}-3quarter.png`
-
-**优先级 2: projects/{project}/assets/characters/images/**
-
-如果 packs 不存在，检查：
-- `{角色名}-{variant}-front.png`
-- `{角色名}-{variant}.png`（无 variant 后缀）
-
-**降级策略**:
-
-如果指定 variant 不存在，尝试 `default` 变体：
-- `{角色名}-default-front.png`
-- `{角色名}-front.png`
-
-**实现示例**:
-
-```bash
-characters_json="[]"
-
-# 读取角色列表
-echo "$shot_yaml" | yq eval '.references.characters[] | @json' - | while IFS= read -r char_entry; do
-  char_name=$(echo "$char_entry" | jq -r '.name')
-  variant=$(echo "$char_entry" | jq -r '.variant_id')
-  
-  assets="[]"
-  
-  # 优先级 1: packs（多视角）
-  for view in front side back 3quarter; do
-    pack_path="projects/{project}/assets/packs/characters/${char_name}-${variant}-${view}.png"
-    if [ -f "$pack_path" ]; then
-      assets=$(echo "$assets" | jq --arg path "$pack_path" '. += [{"path": $path, "type": "pack", "priority": 1}]')
-    fi
-  done
-  
-  # 优先级 2: images（如果 packs 为空）
-  if [ "$(echo "$assets" | jq 'length')" -eq 0 ]; then
-    for suffix in "${variant}-front" "${variant}" "default-front" "front"; do
-      img_path="projects/{project}/assets/characters/images/${char_name}-${suffix}.png"
-      if [ -f "$img_path" ]; then
-        assets=$(echo "$assets" | jq --arg path "$img_path" '. += [{"path": $path, "type": "image", "priority": 2}]')
-        break
-      fi
-    done
-  fi
-  
-  characters_json=$(echo "$characters_json" | jq \
-    --arg name "$char_name" \
-    --arg variant "$variant" \
-    --argjson assets "$assets" \
-    '. += [{"name": $name, "variant": $variant, "assets": $assets}]')
-done
-```
-
-### 3. 检索场景资产
-
-**优先级 1: projects/{project}/assets/packs/scenes/**
-
-检查：
-- `{场景名}-{time_of_day}-styleframe.png`
-- `{场景名}-{time_of_day}-wide.png`
-
-**优先级 2: projects/{project}/assets/scenes/images/**
-
-检查：
-- `{场景名}-{time_of_day}.png`
-
-**降级策略**:
-
-如果指定时段不存在，尝试其他时段（按相似度排序）：
-- night → dusk → day → dawn
-- day → dawn → dusk → night
-- dusk → night → dawn → day
-- dawn → day → dusk → night
-
-**实现示例**:
-
-```bash
-scenes_json="[]"
-assets="[]"
-
-# 优先级 1: packs
-for suffix in styleframe wide; do
-  pack_path="projects/{project}/assets/packs/scenes/${scene_name}-${time_of_day}-${suffix}.png"
-  if [ -f "$pack_path" ]; then
-    assets=$(echo "$assets" | jq --arg path "$pack_path" '. += [{"path": $path, "type": "pack", "priority": 1}]')
-  fi
-done
-
-# 优先级 2: images（如果 packs 为空）
-if [ "$(echo "$assets" | jq 'length')" -eq 0 ]; then
-  img_path="projects/{project}/assets/scenes/images/${scene_name}-${time_of_day}.png"
-  if [ -f "$img_path" ]; then
-    assets=$(echo "$assets" | jq --arg path "$img_path" '. += [{"path": $path, "type": "image", "priority": 2}]')
-  else
-    # 降级：尝试其他时段
-    for fallback_time in dusk day dawn night; do
-      [ "$fallback_time" = "$time_of_day" ] && continue
-      img_path="projects/{project}/assets/scenes/images/${scene_name}-${fallback_time}.png"
-      if [ -f "$img_path" ]; then
-        assets=$(echo "$assets" | jq --arg path "$img_path" '. += [{"path": $path, "type": "image", "priority": 3}]')
-        break
-      fi
-    done
-  fi
-fi
-
-scenes_json=$(jq -n \
-  --arg name "$scene_name" \
-  --arg time "$time_of_day" \
-  --argjson assets "$assets" \
-  '[{"name": $name, "time_of_day": $time, "assets": $assets}]')
-```
-
-### 4. 提取前一镜结尾帧
-
-如果 shot_index > 1，提取前一镜的最后一帧：
-
-```bash
-prev_shot_json="null"
-
-if [ "$shot_index" -gt 1 ]; then
-  prev_shot_num=$(printf '%02d' $((shot_index - 1)))
-  prev_shot_id="${ep}-shot-${prev_shot_num}"
-  prev_video="outputs/${ep}/videos/shot-${prev_shot_num}.mp4"
-  
-  if [ -f "$prev_video" ]; then
-    mkdir -p "outputs/${ep}/storyboard"
-    end_frame="outputs/${ep}/storyboard/${prev_shot_id}-end-frame.png"
-    
-    # 提取最后一帧（使用 sseof 从结尾倒数）
-    ffmpeg -sseof -1 -i "$prev_video" -update 1 -q:v 1 "$end_frame" -y 2>/dev/null
-    
-    if [ -f "$end_frame" ]; then
-      prev_shot_json=$(jq -n \
-        --arg shot_id "$prev_shot_id" \
-        --arg frame "$end_frame" \
-        '{"shot_id": $shot_id, "end_frame": $frame}')
-    fi
+  if [[ -f "$prev_video" ]]; then
+    mkdir -p "projects/${project}/outputs/${ep}/storyboard"
+    ffmpeg -sseof -1 -i "$prev_video" -update 1 -q:v 1 "$end_frame" -y 2>/dev/null || true
+    [[ -f "$end_frame" ]] && prev_shot_json=$(jq -n \
+      --arg shot_id "$prev_shot_id" \
+      --arg frame "$end_frame" \
+      '{"shot_id": $shot_id, "end_frame": $frame}')
   fi
 fi
 ```
 
-### 5. 排序和过滤
+### Step 5: 降级路径（精确匹配）
 
-按优先级排序：
-1. pack 资产（priority=1）
-2. 单视角资产（priority=2）
-3. 降级资产（priority=3）
+如果向量库不可用：
 
-对于每个角色/场景，最多保留 top-K 个资产（K=3）。
+- 角色：按 `{name}-{variant}-{view}.png`
+- 场景：按 `{scene}-{time}-{styleframe}.png`
+- 前一帧：同 Step 4
 
-```bash
-# 在 jq 中排序和限制数量
-characters_json=$(echo "$characters_json" | jq '[.[] | .assets |= (sort_by(.priority) | .[0:3])]')
-scenes_json=$(echo "$scenes_json" | jq '[.[] | .assets |= (sort_by(.priority) | .[0:3])]')
-```
+但输出结构保持一致，并把 `retrieval_method` 设为 `exact`。
 
-### 6. 输出 JSON
+### Step 6: 写出可审计结果
 
-使用 `jq` 组装最终 JSON 输出：
+最终输出包含：
 
-```bash
-jq -n \
-  --arg shot_id "$shot_id" \
-  --argjson characters "$characters_json" \
-  --argjson scenes "$scenes_json" \
-  --argjson prev_shot "$prev_shot_json" \
-  '{
-    shot_id: $shot_id,
-    references: {
-      characters: $characters,
-      scenes: $scenes,
-      previous_shot: $prev_shot
-    }
-  }'
-```
-
-## 错误处理
-
-- 如果 shot_id 不存在于 visual-direction.yaml → 退出并报错
-- 如果所有优先级都找不到资产 → 记录警告，返回空数组
-- 如果 ffmpeg 提取失败 → 记录警告，跳过前一镜结尾帧
-- 如果 visual-direction.yaml 格式错误 → 退出并报错
+- `planning.characters[]`
+- `planning.scene`
+- `retrieval_evidence.entity_hits`
+- `retrieval_evidence.relation_hits`
+- `retrieval_evidence.state_hits`
+- `references.characters`
+- `references.scenes`
+- `references.previous_shot`
 
 ## Trace 写入
 
-在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志：
-
 ```bash
-# 读取输入
-./scripts/trace.sh "$session_id" "${ep}-memory-trace" read_input "{\"shot_id\":\"$shot_id\"}"
+./scripts/trace.sh "$session_id" "${ep}-memory-trace" read_input \
+  "{\"shot_id\":\"$shot_id\",\"project\":\"$project\"}"
 
-# 检索角色
-./scripts/trace.sh "$session_id" "${ep}-memory-trace" retrieve_characters "{\"count\":$char_count,\"found\":$found_count}"
+./scripts/trace.sh "$session_id" "${ep}-memory-trace" plan_entities \
+  "{\"character_queries\":${char_query_count},\"scene_query\":true}"
 
-# 检索场景
-./scripts/trace.sh "$session_id" "${ep}-memory-trace" retrieve_scene "{\"found\":true}"
+./scripts/trace.sh "$session_id" "${ep}-memory-trace" fetch_states \
+  "{\"state_hits\":${state_hit_count}}"
 
-# 检索前一帧
-./scripts/trace.sh "$session_id" "${ep}-memory-trace" retrieve_prev_frame "{\"found\":true}"
+./scripts/trace.sh "$session_id" "${ep}-memory-trace" fetch_relations \
+  "{\"relation_hits\":${relation_hit_count}}"
 
-# 输出结果
-./scripts/trace.sh "$session_id" "${ep}-memory-trace" output_refs "{\"total_refs\":$total_refs}"
+./scripts/trace.sh "$session_id" "${ep}-memory-trace" retrieve_assets \
+  "{\"characters\":${character_ref_count},\"scenes\":${scene_ref_count},\"method\":\"$retrieval_method\"}"
 ```
-
-## 完成后
-
-输出 JSON 到 stdout，供 shot-compiler-agent 使用。
-
-不需要向 team-lead 发送消息（memory-agent 是内部工具，由 shot-compiler-agent 调用）。
 
 ## 注意事项
 
-- **缓存机制**：相同 shot 的检索结果可缓存（可选优化）
-- **Fallback 策略**：优先使用 packs，不存在则使用 images，最后降级到其他变体/时段
-- **前一帧提取**：需要 ffmpeg 工具，使用 `-sseof -1` 从结尾倒数提取
-- **相关性评分**：通过 priority 字段标记，1=最高，3=降级
-- **Top-K 限制**：每个角色/场景最多保留 3 个资产，避免过多参考图
-
+- 向量库存在时，**必须先规划再取图**，不要跳过规划段。
+- `get-state` 是 continuity hint，不是绝对事实；若上一镜缺失，则退回当前 shot packet / world model。
+- `search-relations` 只用于决定参考优先级和叙事证据，不直接改 prompt。
+- `references` 接口必须稳定，避免影响 shot-compiler-agent。
+- memory-agent 是内部工具，不向 team-lead 发送消息。

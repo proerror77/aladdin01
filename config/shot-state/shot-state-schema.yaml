@@ -1,0 +1,56 @@
+# Shot State Schema
+# 规范化分镜中间层，位于 visual-direction.yaml → shot-packets/ 之间
+# v1.0
+
+version: "1.0"
+
+required_fields:
+  - shot_id
+  - episode
+  - scene_id
+  - source_refs
+  - story_logic
+  - camera
+  - selected_views
+  - continuity
+  - generation_status
+
+schema:
+  shot_id: string                  # ep01-shot-01
+  episode: string                  # ep01
+  scene_id: string                 # ep01-sc01 或 world-model 中的 location.id
+  source_refs:
+    visual_direction_path: string  # visual-direction.yaml 路径
+    world_model_path: string       # world-model.json 路径
+    storyboard_image_path: string  # storyboard/shot-01.png（可 null）
+  story_logic:
+    shot_purpose: string           # establish_space / introduce_subject / reveal_change / land_reaction / land_result
+    dramatic_role: string          # establish / approach / detail / reaction / resolution
+    transition_from_previous: string  # cold_open / gaze_cut / push_in / object_reveal / action_result / emotion_push
+    emotional_target: string       # 希望观众产生的感受
+    information_delta: string      # 本镜新增的信息
+    next_hook: string              # 把观众带向下一镜的钩子
+  camera:
+    raw: string                    # 原始 camera 字段文本
+    shot_size: string              # close_up / medium / wide
+    movement: string               # static / dolly / pan / crane
+    angle: string                  # normal / subjective / high / low
+  selected_views:
+    characters:
+      - id: string                 # 角色 ID
+        name: string               # 角色中文名
+        variant_id: string         # 变体 ID
+        preferred_view: string     # front / side / back
+        selected_path: string      # 实际选中的图片路径
+        fallback_order: list       # 降级顺序
+    scene:
+      name: string                 # 场景名
+      preferred_view: string       # day / night / dusk / dawn
+      selected_path: string        # 实际选中的图片路径
+  continuity:
+    previous_shot_id: string       # 上一镜 ID（第一镜为 null）
+    previous_end_frame_path: string  # 上一镜结尾帧路径（可 null）
+    recovered_from_outputs: bool   # 是否从已有产物恢复
+  generation_status:
+    storyboard: string             # pending / completed
+    video: string                  # pending / completed / recovered / failed

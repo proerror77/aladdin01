@@ -29,6 +29,16 @@ from typing import Any
 
 import yaml
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+try:
+    from asset_view_index import build_asset_view_index, select_character_view, select_scene_view
+    _ASSET_VIEW_INDEX_AVAILABLE = True
+except ImportError:
+    _ASSET_VIEW_INDEX_AVAILABLE = False
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -162,6 +172,92 @@ def first_nonempty_line(text: str, default: str) -> str:
         if stripped:
             return stripped
     return default
+
+
+def infer_dramatic_role(shot: dict[str, Any], shot_index: int, total_shots: int) -> str:
+    explicit = str(shot.get("dramatic_role") or "").strip()
+    if explicit:
+        return explicit
+
+    action_text = f"{shot.get('action') or ''}\n{shot.get('audio') or ''}"
+    if shot_index == 1:
+        return "establish"
+    if shot_index >= total_shots:
+        return "resolution"
+    if any(token in action_text for token in ("特写", "细节", "契约", "道具")):
+        return "detail"
+    if any(token in action_text for token in ("震惊", "崩溃", "反应", "沉默")):
+        return "reaction"
+    return "approach"
+
+
+def infer_shot_purpose(shot: dict[str, Any], dramatic_role: str) -> str:
+    explicit = str(shot.get("shot_purpose") or "").strip()
+    if explicit:
+        return explicit
+
+    mapping = {
+        "establish": "establish_space",
+        "approach": "introduce_subject",
+        "detail": "reveal_change",
+        "reaction": "land_reaction",
+        "resolution": "land_result",
+    }
+    return mapping.get(dramatic_role, "advance_story")
+
+
+def infer_transition_from_previous(shot: dict[str, Any], shot_index: int) -> str:
+    explicit = str(shot.get("transition_from_previous") or "").strip()
+    if explicit:
+        return explicit
+
+    transition = str(shot.get("transition") or "").strip()
+    camera = str(shot.get("camera") or "")
+    if shot_index == 1:
+        return "cold_open"
+    if any(token in transition for token in ("叠化", "淡入", "淡出")):
+        return "dissolve"
+    if "看向" in camera or "视线" in camera:
+        return "gaze_cut"
+    if any(token in camera for token in ("推镜头", "缓慢推近", "急速推近")):
+        return "push_in"
+    if any(token in camera for token in ("拉镜头", "拉远")):
+        return "pull_back"
+    return "action_result"
+
+
+def infer_emotional_target_text(shot: dict[str, Any]) -> str:
+    explicit = str(shot.get("emotional_target") or "").strip()
+    if explicit:
+        return explicit
+
+    mapping = {
+        "panicked": "惊恐和失控",
+        "angry": "威胁和怒意",
+        "despair": "绝望和下坠",
+        "shocked": "震惊和停顿",
+        "hopeful": "期待和拉升",
+        "triumphant": "反差和得意",
+        "calm": "压抑中的冷静",
+        "neutral": "维持叙事推进",
+    }
+    return mapping.get(infer_emotion(shot), "维持叙事推进")
+
+
+def infer_information_delta(shot: dict[str, Any]) -> str:
+    explicit = str(shot.get("information_delta") or "").strip()
+    if explicit:
+        return explicit
+    return first_nonempty_line(str(shot.get("action") or ""), "推进剧情信息")
+
+
+def infer_next_hook(shot: dict[str, Any], shot_index: int, total_shots: int) -> str:
+    explicit = str(shot.get("next_hook") or "").strip()
+    if explicit:
+        return explicit
+    if shot_index >= total_shots:
+        return "情绪收束"
+    return "推动观众进入下一镜"
 
 
 def collect_world_rules(world_model: dict[str, Any]) -> list[str]:
@@ -361,6 +457,7 @@ def compile_shot_packets(
     episode: str,
     visual_data: dict[str, Any],
     world_model: dict[str, Any],
+    view_index: dict | None = None,
 ) -> int:
     shots = visual_data.get("shots") or []
     shot_packets_dir = project_root / "projects" / project / "state" / "shot-packets"
@@ -384,6 +481,7 @@ def compile_shot_packets(
     world_rules = collect_world_rules(world_model)
 
     count = 0
+    total_shots = len(shots)
     for shot in shots:
         shot_id = str(shot["shot_id"])
         shot_index = int(shot["shot_index"])
@@ -460,6 +558,12 @@ def compile_shot_packets(
         prompt = str(shot.get("seedance_prompt") or "")
         generation_mode = str(shot.get("generation_mode") or "text2video")
         audio_lines = [line.strip() for line in str(shot.get("audio") or "").splitlines() if line.strip()]
+        dramatic_role = infer_dramatic_role(shot, shot_index, total_shots)
+        shot_purpose = infer_shot_purpose(shot, dramatic_role)
+        transition_from_previous = infer_transition_from_previous(shot, shot_index)
+        emotional_target = infer_emotional_target_text(shot)
+        information_delta = infer_information_delta(shot)
+        next_hook = infer_next_hook(shot, shot_index, total_shots)
 
         matching_skills = []
         if world_skills:
@@ -476,6 +580,24 @@ def compile_shot_packets(
             "scene_goal": scene_goal,
             "duration_sec": int(shot.get("duration") or 0),
             "dialogue_mode": "external_dub" if shot.get("has_dialogue") else "none",
+            "source_refs": {
+                "visual_direction_path": str(project_root / "projects" / project / "outputs" / episode / "visual-direction.yaml"),
+                "world_model_path": str(project_root / "projects" / project / "state" / "ontology" / f"{episode}-world-model.json"),
+                "storyboard_image_path": shot.get("storyboard_image_path"),
+            },
+            "story_logic": {
+                "shot_purpose": shot_purpose,
+                "dramatic_role": dramatic_role,
+                "transition_from_previous": transition_from_previous,
+                "emotional_target": emotional_target,
+                "information_delta": information_delta,
+                "next_hook": next_hook,
+            },
+            "selected_views": build_selected_views(project_root, shot, view_index or {}),
+            "continuity_inputs": {
+                "previous_shot_id": shots[shot_index - 2]["shot_id"] if shot_index > 1 else None,
+                "previous_end_frame_path": extract_previous_end_frame(project_root, project, episode, shot_index),
+            },
             "characters": characters,
             "background": {
                 "location": scene_name,
@@ -801,6 +923,191 @@ def sync_vectordb(project_root: Path, project: str, episode: str) -> None:
         run([python_bin, "scripts/vectordb-manager.py", "upsert-state", relpath(project_root, packet)], cwd=project_root)
 
 
+# ──────────────────────────────────────────────
+# Task 1+2+3+5: shot-state / asset-view-index / packet enrichment / recovery
+# ──────────────────────────────────────────────
+
+def parse_camera_angle(camera_text: str) -> str:
+    line = (camera_text or "").splitlines()[0].lower()
+    if any(t in line for t in ("主观", "第一人称", "pov")):
+        return "subjective"
+    if any(t in line for t in ("仰拍", "仰视", "低角度")):
+        return "low"
+    if any(t in line for t in ("俯拍", "俯视", "高角度", "鸟瞰")):
+        return "high"
+    return "normal"
+
+
+def build_selected_views(
+    project_root: Path,
+    shot: dict[str, Any],
+    view_index: dict,
+) -> dict[str, Any]:
+    """从 asset-view-index 为本镜选择最合适的角色/场景参考图。"""
+    selected: dict[str, Any] = {"characters": [], "scene": {}}
+
+    references = shot.get("references") or {}
+    for ref in references.get("characters") or []:
+        name = str(ref.get("name") or "")
+        variant_id = str(ref.get("variant_id") or "default")
+        if _ASSET_VIEW_INDEX_AVAILABLE:
+            selected_path, actual_view = select_character_view(view_index, name, variant_id, "front")
+        else:
+            image_path = ref.get("image_path")
+            selected_path = str(image_path) if image_path and (project_root / str(image_path)).exists() else None
+            actual_view = "front"
+        selected["characters"].append({
+            "id": re.sub(r"[^a-z0-9]+", "_", name.lower()) or name,
+            "name": name,
+            "variant_id": variant_id,
+            "preferred_view": actual_view or "front",
+            "selected_path": selected_path or str(ref.get("image_path") or ""),
+            "fallback_order": ["front", "side", "back"],
+        })
+
+    for ref in references.get("scenes") or []:
+        scene_name = str(ref.get("name") or "")
+        time_of_day = str(shot.get("time_of_day") or ref.get("time_of_day") or "day")
+        if _ASSET_VIEW_INDEX_AVAILABLE:
+            selected_path = select_scene_view(view_index, scene_name, time_of_day)
+        else:
+            image_path = ref.get("image_path")
+            selected_path = str(image_path) if image_path and (project_root / str(image_path)).exists() else None
+        selected["scene"] = {
+            "name": scene_name,
+            "preferred_view": time_of_day,
+            "selected_path": selected_path or str(ref.get("image_path") or ""),
+        }
+        break  # 每镜只取第一个场景
+
+    return selected
+
+
+def build_shot_state(
+    episode: str,
+    shot: dict[str, Any],
+    visual_direction_path: Path,
+    world_model_path: Path,
+    selected_views: dict[str, Any],
+    previous_shot_id: str | None,
+    previous_end_frame_path: str | None,
+    total_shots: int,
+) -> dict[str, Any]:
+    shot_index = int(shot["shot_index"])
+    camera_text = str(shot.get("camera") or "")
+    camera_parsed = parse_camera_block(camera_text)
+
+    return {
+        "shot_id": str(shot["shot_id"]),
+        "episode": episode,
+        "scene_id": str(shot.get("scene_name") or f"{episode}-sc{shot_index:02d}"),
+        "source_refs": {
+            "visual_direction_path": str(visual_direction_path),
+            "world_model_path": str(world_model_path),
+            "storyboard_image_path": shot.get("storyboard_image_path"),
+        },
+        "story_logic": {
+            "shot_purpose": infer_shot_purpose(shot, infer_dramatic_role(shot, shot_index, total_shots)),
+            "dramatic_role": infer_dramatic_role(shot, shot_index, total_shots),
+            "transition_from_previous": infer_transition_from_previous(shot, shot_index),
+            "emotional_target": infer_emotional_target_text(shot),
+            "information_delta": infer_information_delta(shot),
+            "next_hook": infer_next_hook(shot, shot_index, total_shots),
+        },
+        "camera": {
+            "raw": camera_text.strip(),
+            "shot_size": camera_parsed["shot_size"],
+            "movement": camera_parsed["movement"],
+            "angle": parse_camera_angle(camera_text),
+        },
+        "selected_views": selected_views,
+        "continuity": {
+            "previous_shot_id": previous_shot_id,
+            "previous_end_frame_path": previous_end_frame_path,
+            "recovered_from_outputs": False,
+        },
+        "generation_status": {
+            "storyboard": "completed" if shot.get("storyboard_image_path") else "pending",
+            "video": "pending",
+        },
+    }
+
+
+def recover_stale_shot_states(
+    project_root: Path,
+    project: str,
+    episode: str,
+    valid_shot_ids: set[str],
+) -> None:
+    """扫描 state/shot-state/ 中已有的 JSON，若对应视频存在则标记为 recovered。"""
+    shot_state_dir = project_root / "projects" / project / "state" / "shot-state"
+    if not shot_state_dir.exists():
+        return
+    videos_dir = project_root / "projects" / project / "outputs" / episode / "videos"
+
+    for path in sorted(shot_state_dir.glob(f"{episode}-shot-*.json")):
+        try:
+            data = read_json(path)
+        except Exception:
+            continue
+        shot_id = str(data.get("shot_id") or path.stem)
+        if shot_id in valid_shot_ids:
+            continue  # 会被正常重写，跳过
+        # 孤立的 stale shot-state：检查视频是否存在
+        shot_index_match = re.search(r"-shot-(\d+)$", path.stem)
+        if not shot_index_match:
+            continue
+        shot_index = int(shot_index_match.group(1))
+        video_path = videos_dir / f"shot-{shot_index:02d}.mp4"
+        if video_path.exists():
+            data.setdefault("generation_status", {})["video"] = "recovered"
+            data.setdefault("continuity", {})["recovered_from_outputs"] = True
+            write_json(path, data)
+
+
+def emit_shot_states(
+    project_root: Path,
+    project: str,
+    episode: str,
+    visual_data: dict[str, Any],
+    visual_path: Path,
+    world_model_path: Path,
+    view_index: dict,
+) -> None:
+    shots = visual_data.get("shots") or []
+    shot_state_dir = project_root / "projects" / project / "state" / "shot-state"
+    shot_state_dir.mkdir(parents=True, exist_ok=True)
+    total_shots = len(shots)
+    valid_shot_ids = {str(s["shot_id"]) for s in shots}
+
+    # 先处理 stale（孤立的旧 shot-state）
+    recover_stale_shot_states(project_root, project, episode, valid_shot_ids)
+
+    previous_shot_id: str | None = None
+    for shot in shots:
+        shot_index = int(shot["shot_index"])
+        shot_id = str(shot["shot_id"])
+        prev_frame = extract_previous_end_frame(project_root, project, episode, shot_index)
+        selected_views = build_selected_views(project_root, shot, view_index)
+        state = build_shot_state(
+            episode, shot, visual_path, world_model_path,
+            selected_views, previous_shot_id, prev_frame, total_shots,
+        )
+        write_json(shot_state_dir / f"{shot_id}.json", state)
+        previous_shot_id = shot_id
+
+
+def emit_asset_view_index(
+    project_root: Path,
+    project: str,
+    episode: str,
+    view_index: dict,
+) -> None:
+    asset_views_dir = project_root / "projects" / project / "state" / "asset-views"
+    asset_views_dir.mkdir(parents=True, exist_ok=True)
+    write_json(asset_views_dir / f"{episode}-view-index.json", view_index)
+
+
 def resolve_episodes(project_root: Path, project: str, episode: str | None, all_output_episodes: bool) -> list[str]:
     if episode:
         return [episode]
@@ -826,10 +1133,20 @@ def process_episode(project_root: Path, project: str, episode: str, do_vectordb:
     visual_data = read_yaml(visual_path)
     world_model = read_json(world_model_path)
 
+    # Build asset view index (Task 2)
+    if _ASSET_VIEW_INDEX_AVAILABLE:
+        view_index = build_asset_view_index(project_root, project)
+    else:
+        view_index = {"characters": {}, "scenes": {}, "props": {}}
+    emit_asset_view_index(project_root, project, episode, view_index)
+
     generated_storyboards, updated_prompts = ensure_storyboards(project_root, project, episode, visual_data)
     write_yaml(visual_path, visual_data)
 
-    shot_packets_count = compile_shot_packets(project_root, project, episode, visual_data, world_model)
+    # Emit shot-state intermediate artifacts (Task 1 + 5)
+    emit_shot_states(project_root, project, episode, visual_data, visual_path, world_model_path, view_index)
+
+    shot_packets_count = compile_shot_packets(project_root, project, episode, visual_data, world_model, view_index)
     completed_shots, total_shots = sync_shot_states(project_root, project, episode, visual_data)
     sync_phase_files(project_root, project, episode, visual_data, shot_packets_count, completed_shots, total_shots)
     write_generation_report(project_root, project, episode, visual_data)

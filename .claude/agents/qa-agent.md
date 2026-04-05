@@ -17,6 +17,7 @@ tools:
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
+| `project` | string | 项目名，如 `qyccan` |
 | `ep` | string | 剧本 ID（如 ep01） |
 | `shot_id` | string | 镜次 ID（如 ep01-shot-05） |
 | `session_id` | string | Trace session 标识 |
@@ -37,22 +38,49 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 参数
-EP="$1"
-SHOT_ID="$2"
-SESSION_ID="${3:-qa-$(date +%Y%m%d-%H%M%S)}"
+PROJECT="$1"
+EP="$2"
+SHOT_ID="$3"
+SESSION_ID="${4:-qa-$(date +%Y%m%d-%H%M%S)}"
 
 # 提取 shot 序号
 SHOT_NUM=$(echo "$SHOT_ID" | grep -oE '[0-9]+$')
 
 # 路径
-SHOT_PACKET="$PROJECT_ROOT/projects/{project}/state/shot-packets/${SHOT_ID}.json"
-VIDEO_FILE="$PROJECT_ROOT/outputs/${EP}/videos/shot-${SHOT_NUM}.mp4"
-WORLD_MODEL="$PROJECT_ROOT/projects/{project}/state/ontology/${EP}-world-model.json"
-AUDIT_DIR="$PROJECT_ROOT/state/audit"
+SHOT_PACKET="$PROJECT_ROOT/projects/${PROJECT}/state/shot-packets/${SHOT_ID}.json"
+VIDEO_FILE="$PROJECT_ROOT/projects/${PROJECT}/outputs/${EP}/videos/shot-${SHOT_NUM}.mp4"
+WORLD_MODEL="$PROJECT_ROOT/projects/${PROJECT}/state/ontology/${EP}-world-model.json"
+AUDIT_DIR="$PROJECT_ROOT/projects/${PROJECT}/state/audit"
 AUDIT_FILE="$AUDIT_DIR/${SHOT_ID}-audit.json"
 
 mkdir -p "$AUDIT_DIR"
-mkdir -p "$PROJECT_ROOT/outputs/${EP}/audit"
+mkdir -p "$PROJECT_ROOT/projects/${PROJECT}/outputs/${EP}/audit"
+
+# v2.2: 读取 shot-state，校验 selected_views 路径真实存在
+SHOT_STATE="$PROJECT_ROOT/projects/${PROJECT}/state/shot-state/${SHOT_ID}.json"
+if [[ -f "$SHOT_STATE" ]]; then
+  # 校验 selected_views 中的 selected_path 是否真实存在
+  python3 - <<'PY' "$SHOT_STATE" "$PROJECT_ROOT"
+import json, sys
+from pathlib import Path
+state = json.load(open(sys.argv[1]))
+project_root = Path(sys.argv[2])
+issues = []
+for c in state.get("selected_views", {}).get("characters", []):
+    p = c.get("selected_path")
+    if p and not Path(p).exists() and not (project_root / p).exists():
+        issues.append(f"WARN: selected_path 不存在: {p} (角色 {c.get('name')})")
+scene_path = state.get("selected_views", {}).get("scene", {}).get("selected_path")
+if scene_path and not Path(scene_path).exists() and not (project_root / scene_path).exists():
+    issues.append(f"WARN: scene selected_path 不存在: {scene_path}")
+# 校验 continuity_inputs.previous_end_frame_path 与前一镜产出一致
+prev_frame = state.get("continuity", {}).get("previous_end_frame_path")
+if prev_frame and not Path(prev_frame).exists() and not (project_root / prev_frame).exists():
+    issues.append(f"WARN: previous_end_frame_path 不存在: {prev_frame}")
+for issue in issues:
+    print(issue)
+PY
+fi
 
 # Trace 写入
 ./scripts/trace.sh "$SESSION_ID" "${EP}-phase6-trace" "read_input" \
@@ -80,7 +108,7 @@ symbolic_qa() {
     # 获取前一镜次的服装
     local prev_shot_num=$((SHOT_NUM - 1))
     if [[ $prev_shot_num -gt 0 ]]; then
-      local prev_packet="$PROJECT_ROOT/projects/{project}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
+      local prev_packet="$PROJECT_ROOT/projects/${PROJECT}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
       if [[ -f "$prev_packet" ]]; then
         local prev_costume=$(jq -r \
           ".characters[] | select(.id == \"$char\") | .current_state.costume // \"default\"" \
@@ -100,7 +128,7 @@ symbolic_qa() {
     
     local prev_shot_num=$((SHOT_NUM - 1))
     if [[ $prev_shot_num -gt 0 ]]; then
-      local prev_packet="$PROJECT_ROOT/projects/{project}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
+      local prev_packet="$PROJECT_ROOT/projects/${PROJECT}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
       if [[ -f "$prev_packet" ]]; then
         local prev_injury=$(jq -r \
           ".characters[] | select(.id == \"$char\") | .current_state.injury // \"none\"" \
@@ -118,7 +146,7 @@ symbolic_qa() {
   for prop in $props; do
     local prev_shot_num=$((SHOT_NUM - 1))
     if [[ $prev_shot_num -gt 0 ]]; then
-      local prev_packet="$PROJECT_ROOT/projects/{project}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
+      local prev_packet="$PROJECT_ROOT/projects/${PROJECT}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
       if [[ -f "$prev_packet" ]]; then
         local had_prop=$(jq -r \
           ".characters[].current_state.props_in_possession[]? | select(. == \"$prop\")" \
@@ -149,7 +177,7 @@ visual_qa() {
   local issues=()
   
   # 提取关键帧（首帧、中间帧、尾帧）
-  local frame_dir="$PROJECT_ROOT/outputs/${EP}/audit"
+  local frame_dir="$PROJECT_ROOT/projects/${PROJECT}/outputs/${EP}/audit"
   
   # 获取视频总帧数
   local total_frames=$(ffprobe -v error -count_frames -select_streams v:0 \
@@ -222,7 +250,7 @@ visual_qa() {
 
 ### Step 4: Semantic QA（戏剧检查）
 
-检查戏剧合理性（使用 LLM）：
+检查戏剧合理性（优先使用向量库，其次回退到本地 packet / world-model）：
 
 ```bash
 semantic_qa() {
@@ -231,7 +259,7 @@ semantic_qa() {
   local shot_packet=$(cat "$SHOT_PACKET")
   local world_model=$(cat "$WORLD_MODEL")
   
-  # 1. 检查情绪转换
+  # 1. 检查情绪转换（优先读取 LanceDB 中已索引的上一镜状态）
   local characters=$(echo "$shot_packet" | jq -r '.characters[].id')
   for char in $characters; do
     local current_emotion=$(echo "$shot_packet" | jq -r \
@@ -239,26 +267,44 @@ semantic_qa() {
     
     local prev_shot_num=$((SHOT_NUM - 1))
     if [[ $prev_shot_num -gt 0 ]]; then
-      local prev_packet="$PROJECT_ROOT/projects/{project}/state/shot-packets/${EP}-shot-$(printf "%02d" $prev_shot_num).json"
-      if [[ -f "$prev_packet" ]]; then
-        local prev_emotion=$(jq -r \
-          ".characters[] | select(.id == \"$char\") | .current_state.emotion // \"neutral\"" \
-          "$prev_packet" 2>/dev/null || echo "neutral")
-        
-        # 检查情绪跳变（简化版）
-        if [[ "$prev_emotion" == "calm" && "$current_emotion" == "angry" ]]; then
-          issues+=("{\"type\":\"emotion_jump\",\"character\":\"$char\",\"from\":\"$prev_emotion\",\"to\":\"$current_emotion\",\"severity\":\"low\"}")
+      local prev_shot_id="${EP}-shot-$(printf "%02d" $prev_shot_num)"
+      local prev_state=$(python3 scripts/vectordb-manager.py get-state "$char" "$EP" "$prev_shot_id" 2>/dev/null || echo '{"found":false}')
+      local prev_emotion=$(echo "$prev_state" | jq -r '.emotion // empty')
+
+      if [[ -z "$prev_emotion" || "$prev_emotion" == "null" ]]; then
+        local prev_packet="$PROJECT_ROOT/projects/${PROJECT}/state/shot-packets/${prev_shot_id}.json"
+        if [[ -f "$prev_packet" ]]; then
+          prev_emotion=$(jq -r \
+            ".characters[] | select(.id == \"$char\") | .current_state.emotion // \"neutral\"" \
+            "$prev_packet" 2>/dev/null || echo "neutral")
+        else
+          prev_emotion="neutral"
         fi
+      fi
+
+      # 优先使用 emotional_arcs 中的 forbidden_transitions
+      local forbidden=$(echo "$world_model" | jq -c --arg char "$char" --arg from "$prev_emotion" --arg to "$current_emotion" '
+        .narrative_constraints.emotional_arcs[]?
+        | select(.character == $char)
+        | .forbidden_transitions[]?
+        | select(.from == $from and .to == $to)
+      ' | head -1)
+
+      if [[ -n "$forbidden" ]]; then
+        issues+=("{\"type\":\"emotion_jump\",\"character\":\"$char\",\"from\":\"$prev_emotion\",\"to\":\"$current_emotion\",\"severity\":\"medium\",\"reason\":$(echo "$forbidden" | jq '.reason')}")
+      elif [[ "$prev_emotion" == "calm" && "$current_emotion" == "angry" ]]; then
+        issues+=("{\"type\":\"emotion_jump\",\"character\":\"$char\",\"from\":\"$prev_emotion\",\"to\":\"$current_emotion\",\"severity\":\"low\"}")
       fi
     fi
   done
   
-  # 2. 检查对白口吻（使用 LLM）
+  # 2. 检查对白口吻（结合人物实体与关系检索）
   local dialogue=$(echo "$shot_packet" | jq -r '.audio // empty')
   if [[ -n "$dialogue" ]]; then
     for char in $characters; do
-      local personality=$(echo "$world_model" | jq -r \
-        ".entities.characters.\"${char}\".personality // empty")
+      local entity_hit=$(python3 scripts/vectordb-manager.py search-entities "$char 人设 性格 对白" \
+        --type character --episode "$EP" --n 1 2>/dev/null || echo '[]')
+      local personality=$(echo "$entity_hit" | jq -r '.[0].metadata.personality // empty')
       
       if [[ -n "$personality" ]]; then
         # 简化版：假设对白口吻检查通过
@@ -270,6 +316,22 @@ semantic_qa() {
         fi
       fi
     done
+  fi
+
+  # 3. 检查多角色关系是否与当前戏剧冲突
+  local char_count=$(echo "$shot_packet" | jq '.characters | length')
+  if [[ "$char_count" -ge 2 ]]; then
+    local pair_query=$(echo "$shot_packet" | jq -r '
+      [.characters[].id] as $chars
+      | if ($chars | length) >= 2 then "\($chars[0]) \($chars[1]) 关系 冲突 契约" else "" end
+    ')
+    if [[ -n "$pair_query" ]]; then
+      local relation_hits=$(python3 scripts/vectordb-manager.py search-relations "$pair_query" --episode "$EP" --n 2 2>/dev/null || echo '[]')
+      local rel_count=$(echo "$relation_hits" | jq 'length')
+      if [[ "$rel_count" -eq 0 ]]; then
+        issues+=("{\"type\":\"relation_context_missing\",\"severity\":\"low\"}")
+      fi
+    fi
   fi
   
   # 输出结果
@@ -339,6 +401,11 @@ EOF
 ./scripts/trace.sh "$SESSION_ID" "${EP}-phase6-trace" "write_output" \
   "{\"file\":\"$AUDIT_FILE\",\"repair_action\":\"$repair_action\"}"
 
+# 在线状态同步：Phase 6 不再依赖 workflow-sync 事后回填
+python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+./scripts/trace.sh "$SESSION_ID" "${EP}-phase6-trace" "online_state_sync" \
+  "{\"shot_id\":\"$SHOT_ID\",\"repair_action\":\"$repair_action\"}"
+
 echo "✓ 审计完成: $SHOT_ID → $repair_action"
 echo "$repair_action"
 ```
@@ -369,4 +436,5 @@ echo "$repair_action"
 - **LLM 辅助**：Visual QA 和 Semantic QA 可使用 LLM 辅助判断
 - **性能优化**：Visual QA 可并行处理多个 shots
 - **误报处理**：允许人工覆盖审计结果
+- **在线状态写入**：每次审计结束都同步一次 `upsert-state`，不要依赖批处理回填
 - **简化实现**：当前实现为简化版，实际生产环境应集成完整的图像相似度算法和 LLM 判断

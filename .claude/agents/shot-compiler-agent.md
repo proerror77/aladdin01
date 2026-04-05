@@ -13,6 +13,15 @@ tools:
 
 将剧本、本体模型、角色状态和资产引用编译成完整的 shot packet，供 gen-worker 使用。
 
+v2.3 起，shot packet 还必须携带导演逻辑字段，避免下游只有“怎么拍”，没有“为什么这样切”：
+
+- `shot_purpose`
+- `dramatic_role`
+- `transition_from_previous`
+- `emotional_target`
+- `information_delta`
+- `next_hook`
+
 ## 输入
 
 - `shot_id` — 镜次 ID（如 `ep01-shot-05`）
@@ -46,6 +55,24 @@ time_of_day=$(echo "$shot_yaml" | yq eval '.time_of_day' -)
 duration=$(echo "$shot_yaml" | yq eval '.duration' -)
 has_dialogue=$(echo "$shot_yaml" | yq eval '.has_dialogue' -)
 prompt=$(echo "$shot_yaml" | yq eval '.seedance_prompt' -)
+shot_purpose=$(echo "$shot_yaml" | yq eval '.shot_purpose // "advance_story"' -)
+dramatic_role=$(echo "$shot_yaml" | yq eval '.dramatic_role // "approach"' -)
+transition_from_previous=$(echo "$shot_yaml" | yq eval '.transition_from_previous // "action_result"' -)
+emotional_target=$(echo "$shot_yaml" | yq eval '.emotional_target // "维持叙事推进"' -)
+information_delta=$(echo "$shot_yaml" | yq eval '.information_delta // "推进剧情信息"' -)
+next_hook=$(echo "$shot_yaml" | yq eval '.next_hook // "推动观众进入下一镜"' -)
+
+# v2.2: 从 shot-state 读取 selected_views 和 continuity_inputs
+shot_state_file="projects/${project}/state/shot-state/${shot_id}.json"
+if [[ -f "$shot_state_file" ]]; then
+  selected_views=$(jq '.selected_views' "$shot_state_file")
+  continuity_inputs=$(jq '{previous_shot_id: .continuity.previous_shot_id, previous_end_frame_path: .continuity.previous_end_frame_path}' "$shot_state_file")
+  source_refs=$(jq '.source_refs' "$shot_state_file")
+else
+  selected_views='{"characters":[],"scene":{}}'
+  continuity_inputs='{"previous_shot_id":null,"previous_end_frame_path":null}'
+  source_refs='{}'
+fi
 ```
 
 ### 2. 读取角色状态快照
@@ -249,6 +276,12 @@ packet_json=$(jq -n \
   --arg scene_id "${ep}-sc$(echo "$shot_index" | awk '{printf "%02d", int($1/10)+1}')" \
   --argjson shot_number "$shot_index" \
   --arg scene_goal "$(echo "$shot_yaml" | yq eval '.scene_goal // "推进剧情"' -)" \
+  --arg shot_purpose "$shot_purpose" \
+  --arg dramatic_role "$dramatic_role" \
+  --arg transition_from_previous "$transition_from_previous" \
+  --arg emotional_target "$emotional_target" \
+  --arg information_delta "$information_delta" \
+  --arg next_hook "$next_hook" \
   --argjson duration "$duration" \
   --arg dialogue_mode "$dialogue_mode" \
   --argjson characters "$characters_json" \
@@ -260,6 +293,9 @@ packet_json=$(jq -n \
   --argjson forbidden_changes "$forbidden_changes" \
   --argjson world_rules "$world_rules" \
   --argjson character_abilities "$character_abilities" \
+  --argjson selected_views "$selected_views" \
+  --argjson continuity_inputs "$continuity_inputs" \
+  --argjson source_refs "$source_refs" \
   '{
     shot_id: $shot_id,
     episode: $episode,
@@ -268,6 +304,17 @@ packet_json=$(jq -n \
     scene_goal: $scene_goal,
     duration_sec: $duration,
     dialogue_mode: $dialogue_mode,
+    source_refs: $source_refs,
+    story_logic: {
+      shot_purpose: $shot_purpose,
+      dramatic_role: $dramatic_role,
+      transition_from_previous: $transition_from_previous,
+      emotional_target: $emotional_target,
+      information_delta: $information_delta,
+      next_hook: $next_hook
+    },
+    selected_views: $selected_views,
+    continuity_inputs: $continuity_inputs,
     characters: $characters,
     background: {
       location: $location,

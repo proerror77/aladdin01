@@ -14,6 +14,7 @@ mkdir -p "$FIXTURE_ROOT/projects/demo/assets/characters/images"
 mkdir -p "$FIXTURE_ROOT/projects/demo/assets/scenes/images"
 
 cp "$ROOT_DIR/scripts/workflow-sync.py" "$FIXTURE_ROOT/scripts-workflow-sync.py"
+cp "$ROOT_DIR/scripts/asset_view_index.py" "$FIXTURE_ROOT/asset_view_index.py"
 
 cat > "$FIXTURE_ROOT/projects/demo/outputs/ep01/visual-direction.yaml" <<'EOF'
 episode: ep01
@@ -22,6 +23,12 @@ shots:
   - shot_id: ep01-shot-01
     shot_index: 1
     duration: 12
+    shot_purpose: establish_space
+    dramatic_role: establish
+    transition_from_previous: cold_open
+    emotional_target: 压迫和惊恐
+    information_delta: 苏夜发现自己变成了蚕
+    next_hook: 为什么会变成蚕
     scene_name: 黑雾森林
     time_of_day: day
     generation_mode: img2video
@@ -45,6 +52,12 @@ shots:
   - shot_id: ep01-shot-02
     shot_index: 2
     duration: 12
+    shot_purpose: reveal_change
+    dramatic_role: reaction
+    transition_from_previous: emotion_push
+    emotional_target: 冷静中带一丝不安
+    information_delta: 苏夜开始接受当前处境
+    next_hook: 下一步行动是什么
     scene_name: 黑雾森林
     time_of_day: day
     generation_mode: img2video
@@ -122,6 +135,17 @@ touch "$FIXTURE_ROOT/projects/demo/assets/scenes/images/黑雾森林-day.png"
 touch "$FIXTURE_ROOT/projects/demo/outputs/ep01/videos/shot-01.mp4"
 touch "$FIXTURE_ROOT/projects/demo/outputs/ep01/videos/shot-02.mp4"
 
+# Task 5: stale recovery fixture — shot-03 has video on disk but state says pending
+mkdir -p "$FIXTURE_ROOT/projects/demo/state/shot-state"
+cat > "$FIXTURE_ROOT/projects/demo/state/shot-state/ep01-shot-03.json" <<'EOF'
+{
+  "shot_id": "ep01-shot-03",
+  "generation_status": { "storyboard": "completed", "video": "pending" },
+  "continuity": { "previous_shot_id": "ep01-shot-02", "previous_end_frame_path": null, "recovered_from_outputs": false }
+}
+EOF
+touch "$FIXTURE_ROOT/projects/demo/outputs/ep01/videos/shot-03.mp4"
+
 cat > "$FIXTURE_ROOT/projects/demo/state/ep01-shot-03.json" <<'EOF'
 {
   "episode": "ep01",
@@ -162,9 +186,42 @@ packet = json.loads((root / "projects/demo/state/shot-packets/ep01-shot-01.json"
 assert packet["seedance_inputs"]["prompt"], packet
 assert packet["seedance_inputs"]["images"], packet
 assert any("storyboard/shot-01.png" in item for item in packet["seedance_inputs"]["images"]), packet
+assert packet["story_logic"]["shot_purpose"] == "establish_space", packet
+assert packet["story_logic"]["dramatic_role"] == "establish", packet
+assert packet["story_logic"]["transition_from_previous"] == "cold_open", packet
+assert packet["story_logic"]["emotional_target"] == "压迫和惊恐", packet
+assert packet["story_logic"]["information_delta"] == "苏夜发现自己变成了蚕", packet
+assert packet["story_logic"]["next_hook"] == "为什么会变成蚕", packet
 
 archived = root / "projects/demo/state/archive/ep01/ep01-shot-03.json"
 assert archived.exists(), archived
+
+# Task 1: shot-state 中间层
+shot_state = json.loads((root / "projects/demo/state/shot-state/ep01-shot-01.json").read_text())
+assert shot_state["shot_id"] == "ep01-shot-01", shot_state
+assert shot_state["story_logic"]["shot_purpose"] == "establish_space", shot_state
+assert shot_state["camera"]["shot_size"] == "close_up", shot_state
+assert shot_state["selected_views"]["characters"][0]["preferred_view"] == "front", shot_state
+assert shot_state["continuity"]["previous_shot_id"] is None, shot_state
+assert shot_state["generation_status"]["storyboard"] == "completed", shot_state
+
+# Task 2: asset-view-index
+view_index = json.loads((root / "projects/demo/state/asset-views/ep01-view-index.json").read_text())
+assert view_index["characters"]["苏夜"]["qingyucan"]["front"].endswith("苏夜-qingyucan-front.png"), view_index
+assert view_index["characters"]["苏夜"]["qingyucan"]["side"].endswith("苏夜-qingyucan-side.png"), view_index
+assert view_index["scenes"]["黑雾森林"]["day"].endswith("黑雾森林-day.png"), view_index
+
+# Task 3: shot packet 新增字段
+packet = json.loads((root / "projects/demo/state/shot-packets/ep01-shot-01.json").read_text())
+assert packet["selected_views"]["characters"][0]["selected_path"].endswith("苏夜-qingyucan-front.png"), packet
+assert packet["selected_views"]["scene"]["selected_path"].endswith("黑雾森林-day.png"), packet
+assert packet["continuity_inputs"]["previous_shot_id"] is None, packet
+assert packet["source_refs"]["storyboard_image_path"].endswith("storyboard/shot-01.png"), packet
+
+# Task 5: stale recovery
+recovered = json.loads((root / "projects/demo/state/shot-state/ep01-shot-03.json").read_text())
+assert recovered["generation_status"]["video"] == "recovered", recovered
+assert recovered["continuity"]["recovered_from_outputs"] is True, recovered
 PY
 
 echo "PASS: workflow-sync"
