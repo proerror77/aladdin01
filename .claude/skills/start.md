@@ -211,13 +211,25 @@ spawn visual-agent
   等待完成
 ```
 
+**Phase 2.3 — 分镜图生成（新增）**
+```
+spawn storyboard-agent
+  输入：projects/{project}/outputs/{ep}/visual-direction.yaml
+  session_id: $SESSION_ID
+  trace_file: {ep}-phase2.3-trace
+  输出：projects/{project}/outputs/{ep}/storyboard/shot-{N}.png
+  等待完成
+```
+
 🔴 **人工确认点 1**（`--auto-approve` 时跳过）
 
-如果 `--auto-approve` 启用：直接继续 Phase 3，输出日志 `[auto-approve] 视觉指导自动通过`。
+如果 `--auto-approve` 启用：直接继续 Phase 3，输出日志 `[auto-approve] 视觉指导/分镜图自动通过`。
 
 否则：
 ```
-视觉指导已完成，请查看：projects/{project}/outputs/{ep}/visual-direction.yaml
+视觉指导和分镜图已完成，请查看：
+- projects/{project}/outputs/{ep}/visual-direction.yaml
+- projects/{project}/outputs/{ep}/storyboard-preview.md
 
 共 {N} 个镜次，总时长约 {X} 秒。
 
@@ -323,10 +335,10 @@ spawn voice-agent
 | ep | 用户选择 | 剧本 ID |
 | shot_id | shots[].shot_id | 镜次完整 ID |
 | shot_index | shots[].shot_index | 镜次序号 |
-| prompt | shots[].prompt | 组装好的 Seedance 提示词 |
+| prompt | shots[].seedance_prompt | 组装好的 Seedance 提示词 |
 | duration | shots[].duration | 视频时长（秒） |
 | generation_mode | shots[].generation_mode | `text2video` 或 `img2video` |
-| reference_image_url | shots[].references[0].image_url | 参考图 URL（img2video 时必需；本地图片需先上传至 IMAGE_GEN_API 获取 URL） |
+| reference_images | shot-packets/{shot_id}.json → seedance_inputs.images | 角色图 + 场景图 + 分镜图 + 前一镜结尾帧 |
 | dialogue | shots[].audio | 对白内容（唇形同步用） |
 | voice_config_path | `projects/{project}/assets/characters/voices/{角色名}/voice-config.yaml` | 音色配置路径（TTS 预留） |
 
@@ -349,7 +361,7 @@ spawn gen-worker (shot-N params, session_id=$SESSION_ID, trace_file={ep}-shot-{N
 | ep | 用户选择 | 剧本 ID |
 | shot_id | shots[].shot_id | 镜次完整 ID |
 | shot_index | shots[].shot_index | 镜次序号 |
-| prompt | shots[].prompt | Seedance 提示词（browser-gen-worker 内部转换为 script_text） |
+| prompt | shots[].seedance_prompt | Seedance 提示词（browser-gen-worker 内部转换为 script_text） |
 | duration | shots[].duration | 视频时长（4-15 秒） |
 | ratio | 用户选择的宽高比 | 如 `9:16` |
 | reference_image_paths | shots[].references[].local_path | 参考图本地路径（assets/ 下） |
@@ -380,7 +392,7 @@ concurrency > 1:
 
 1. 读取变体 A（`config/ab-testing/variants/{variant_a_id}.yaml`）和变体 B 的配置
 2. 对每个镜次 shot：
-   a. 获取原始 prompt = `shot.prompt`
+   a. 获取原始 prompt = `shot.seedance_prompt`
    b. 生成 `variant_a_prompt`：
       - `transform_type: passthrough` → 直接使用原始 prompt
       - `transform_type: llm_rewrite` → 将 `rewrite_instruction`（替换 `{original_prompt}` 占位符）发给 LLM 改写

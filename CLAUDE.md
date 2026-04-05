@@ -242,18 +242,20 @@ team-lead
 | 阶段 | Agent | 输入 | 输出 |
 |------|-------|------|------|
 | Phase 1 合规预检 | comply-agent | projects/{name}/script/{ep}.md | render-script.md, compliance-report.md |
-| Phase 2 视觉指导 | visual-agent | render-script.md | visual-direction.yaml（含 variant_id + time_of_day） |
+| Phase 2 视觉指导 | visual-agent | render-script.md | visual-direction.yaml（含 variant_id + time_of_day，storyboard_image_path=null） |
+| Phase 2.3 分镜图生成 | storyboard-agent | visual-direction.yaml | storyboard/shot-{N}.png + 更新 storyboard_image_path + storyboard-preview.md |
 | Phase 3 美术校验 | design-agent | visual-direction.yaml + design-lock.json | art-direction-review.md（纯文件存在性检查，不经过 gate-agent） |
 | Phase 4 音色配置 | voice-agent | render-script + visual-direction.yaml | voice-config.yaml × N, voice-assignment.md |
-| Phase 5 视频生成 | gen-worker × N | prompt, duration, reference_image, voice_config | shot-{N}.mp4 |
+| Phase 5 视频生成 | gen-worker × N | prompt, duration, reference_image, storyboard_image, voice_config | shot-{N}.mp4 |
 
 **v2.0 流程（img2video，可选）**：
 
 | 阶段 | Agent | 输入 | 输出 |
 |------|-------|------|------|
-| Phase 0 本体论构建 | ontology-builder-agent | projects/{name}/script/{ep}.md + 角色/场景档案 | {ep}-world-model.json |
+| Phase 0 本体论构建 | ontology-builder-agent | projects/{name}/script/{ep}.md + 角色/场景档案 | {ep}-world-model.json（v2.2：含 skills + functional + visual_signature + emotional_arcs） |
 | Phase 1 合规预检 | comply-agent | projects/{name}/script/{ep}.md | render-script.md, compliance-report.md |
-| Phase 2 视觉指导 | visual-agent | render-script.md + world-model.json | visual-direction.yaml（含 variant_id + time_of_day） |
+| Phase 2 视觉指导 | visual-agent | render-script.md + world-model.json | visual-direction.yaml（含 variant_id + time_of_day，storyboard_image_path=null） |
+| Phase 2.3 分镜图生成 | storyboard-agent | visual-direction.yaml | storyboard/shot-{N}.png + 更新 storyboard_image_path + storyboard-preview.md |
 | Phase 2.5 资产工厂 | asset-factory-agent | 角色/场景档案 + world-model.json | 角色定妆包 + 场景 styleframe + 道具包 |
 | Phase 3 美术校验 | design-agent | visual-direction.yaml + design-lock.json | art-direction-review.md |
 | Phase 3.5 记忆检索 | memory-agent | visual-direction.yaml + projects/{name}/assets/packs/ | references 列表 |

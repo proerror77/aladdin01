@@ -1,0 +1,199 @@
+{
+  "world_id": "qyccan-ep01",
+  "episode": "ep01",
+  "created_at": "2026-04-03T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "qingyucan",
+        "variants": [
+          {
+            "variant_id": "qingyucan",
+            "variant_label": "青玉蚕（初始形态）",
+            "appearance": "通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，眼神极其欠揍，樱桃般的小嘴。视野呈现复眼效果。",
+            "tags": ["凡胎级", "昆虫", "萌系"]
+          }
+        ],
+        "physical": {
+          "species": "beast",
+          "form": "青玉蚕（凡胎级昆虫）",
+          "size": "拇指大小"
+        },
+        "abilities": ["吞天口（一级）", "无限吞噬进化系统"],
+        "evolution_level": "凡胎级",
+        "evolution_points": 10,
+        "constraints": ["无法开口说话（蚕形态）", "体型极小", "无法独立行动"],
+        "status": {
+          "location": "黑雾森林→叶家府邸",
+          "bound_to": "叶红衣",
+          "notes": "刚完成契约绑定，系统激活，吞噬家仆甲获得进化点+10"
+        }
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "variants": [
+          {
+            "variant_id": "default",
+            "variant_label": "常态",
+            "appearance": "红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨。",
+            "tags": ["高冷", "御姐", "红衣"]
+          }
+        ],
+        "physical": {
+          "species": "human",
+          "form": "人族少女",
+          "size": "正常人类"
+        },
+        "abilities": ["软剑术", "残余灵力"],
+        "evolution_level": "人族（灵根受损）",
+        "constraints": ["灵根受损，灵力微弱", "被家族抛弃", "被逼婚赵无极"],
+        "status": {
+          "location": "黑雾森林→叶家府邸",
+          "bound_to": "苏夜",
+          "notes": "耗尽精血召唤苏夜，完成契约。红衣破损，发髻散乱。"
+        }
+      },
+      {
+        "id": "zhaowuji",
+        "name": "赵无极",
+        "tier": "supporting",
+        "current_variant": "default",
+        "variants": [
+          {
+            "variant_id": "default",
+            "variant_label": "常态",
+            "appearance": "衣着华丽，一脸戏谑，摇扇子。",
+            "tags": ["纨绔", "反派"]
+          }
+        ],
+        "physical": {
+          "species": "human",
+          "form": "人族少爷",
+          "size": "正常人类"
+        },
+        "abilities": ["召唤灵兽（烈火犬，二阶）"],
+        "constraints": ["智商欠费", "嚣张跋扈"],
+        "status": {
+          "location": "叶家府邸",
+          "notes": "逼婚叶红衣，派家仆追杀"
+        }
+      }
+    ],
+    "locations": [
+      {
+        "id": "heiwu_forest",
+        "name": "黑雾森林",
+        "spatial": {
+          "type": "outdoor",
+          "size": "large",
+          "layout": "黑雾弥漫的古木森林，低级怪聚集地"
+        },
+        "temporal_variants": ["day", "night"],
+        "lighting_rules": {
+          "day": "黑雾弥漫，光线昏暗，古木参天",
+          "night": "漆黑一片，黑雾更浓"
+        },
+        "atmosphere": "神秘、危险、低级怪聚集地"
+      },
+      {
+        "id": "ye_mansion",
+        "name": "叶家府邸",
+        "spatial": {
+          "type": "mixed",
+          "size": "large",
+          "layout": "古风建筑，大门及府邸，围观群众常聚集处"
+        },
+        "temporal_variants": ["day", "night"],
+        "lighting_rules": {
+          "day": "古风日光，权贵气息",
+          "night": "灯笼照明，压抑氛围"
+        },
+        "atmosphere": "古风、权贵、压抑"
+      }
+    ],
+    "props": [
+      {
+        "id": "shengshouzhaohuan_shi",
+        "name": "圣兽召唤石",
+        "description": "叶家千年传承至宝，用精血激活可召唤本命灵兽",
+        "owner": "叶红衣",
+        "condition": "destroyed",
+        "significance": "触发苏夜与叶红衣的契约绑定，ep01使用后碎裂"
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "type": "social",
+      "from": "苏夜",
+      "to": "叶红衣",
+      "relation": "契约灵兽与契约主",
+      "properties": {
+        "strength": "strong",
+        "established_at": "黑雾森林"
+      }
+    },
+    {
+      "type": "social",
+      "from": "赵无极",
+      "to": "叶红衣",
+      "relation": "逼婚关系（敌对）",
+      "properties": {
+        "strength": "strong",
+        "established_at": "ep01"
+      }
+    },
+    {
+      "type": "causal",
+      "from": "苏夜",
+      "to": "家仆甲",
+      "relation": "吞噬击杀",
+      "properties": {
+        "strength": "strong",
+        "established_at": "黑雾森林"
+      }
+    }
+  ],
+  "physics_rules": {
+    "gravity": "normal",
+    "magic_system": "cultivation",
+    "power_scaling": "strict",
+    "beast_tiers": ["凡胎", "灵智", "地煞", "天罡", "君王", "帝皇", "神话"],
+    "notes": "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。"
+  },
+  "narrative_constraints": {
+    "character_evolution": [
+      {
+        "character": "苏夜",
+        "from": "无（前世人类）",
+        "to": "青玉蚕（凡胎级）",
+        "trigger": "重生穿越，ep01开始"
+      }
+    ],
+    "ability_unlocks": [
+      {
+        "character": "苏夜",
+        "ability": "吞天口（一级）",
+        "condition": "系统激活，检测到宿主遭遇生死危机且完成契约绑定"
+      },
+      {
+        "character": "苏夜",
+        "ability": "无限吞噬进化系统",
+        "condition": "契约绑定完成后正式激活"
+      }
+    ],
+    "world_rules": [
+      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+      "人族通过觉醒魂宫契约灵兽",
+      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+      "契约绑定需要精血激活召唤石",
+      "苏夜前世为龙国特种部队队长，代号修罗"
+    ]
+  }
+}

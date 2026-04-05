@@ -1,0 +1,148 @@
+{
+  "shot_id": "ep01-shot-07",
+  "episode": "ep01",
+  "scene_id": "ep01-sc07",
+  "shot_number": 7,
+  "scene_goal": "0-4秒：镜头缓慢拉远，从中景拉至大全景，苏夜和叶红衣的体型反差在大环境中格外突出",
+  "duration_sec": 10,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "suye",
+      "name": "苏夜",
+      "state_ref": "suye@ep01-shot-07",
+      "variant": "qingyucan",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png"
+      ],
+      "must_preserve": [
+        "form",
+        "size",
+        "color",
+        "costume"
+      ],
+      "current_state": {
+        "form": "通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，眼神极其欠揍，樱桃般的小嘴。视野呈现复眼效果。",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "triumphant",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "yehongyi",
+      "name": "叶红衣",
+      "state_ref": "yehongyi@ep01-shot-07",
+      "variant": "default",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "projects/qyccan/assets/characters/images/叶红衣-side.png",
+        "projects/qyccan/assets/characters/images/叶红衣-back.png"
+      ],
+      "must_preserve": [
+        "form",
+        "size",
+        "color",
+        "costume"
+      ],
+      "current_state": {
+        "form": "红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨。",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "triumphant",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "黑雾森林外围（收尾全景）",
+    "time_of_day": "day",
+    "ref_assets": [
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    ],
+    "lighting_note": "黑雾弥漫，古木参天，拉远全景，苏夜和叶红衣的体型反差在大环境中格外突出",
+    "functional": {}
+  },
+  "camera": {
+    "shot_size": "medium",
+    "movement": "dolly",
+    "lens_style": "cinematic",
+    "raw": "0-4秒：拉镜头，从中景缓慢拉至大全景，升降镜头辅助，展示环境\n5-7秒：大全景固定镜头，苏夜和叶红衣的体型反差\n8-10秒：大远景拉镜头，继续拉远，黑雾弥漫的森林"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
+      "projects/qyccan/assets/characters/images/叶红衣-front.png",
+      "projects/qyccan/assets/characters/images/叶红衣-side.png",
+      "projects/qyccan/assets/characters/images/叶红衣-back.png",
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
+      "projects/qyccan/outputs/ep01/storyboard/shot-07.png",
+      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-06-end-frame.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-4秒：拉镜头配合升降镜头，从中景缓慢拉远至大全景，[苏夜]拇指大小趴在地上摆Pose，[叶红衣]高挑红衣破损彻底石化俯视[苏夜]，两人体型反差在黑雾弥漫的古木森林背景下格外突出，地面焦痕清晰可见\n5-7秒：大全景固定镜头，[苏夜]扭腰摆Pose自信满满，[叶红衣]石化俯视，[家仆乙]在远处吓傻，三人形成强烈喜剧反差，画外音（苏夜，OS，得意）：\"吞天口……嗝……这穿越，好像还不错嘛！\"\n8-10秒：大远景拉镜头继续拉远，黑雾弥漫的古木森林将两人逐渐淹没，镜头淡出\n\n音效：轻松喜剧收尾音效、黑雾森林环境音渐弱\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+  },
+  "forbidden_changes": [
+    "保持苏夜的当前形态（qingyucan）",
+    "不要让苏夜说话",
+    "保持苏夜的体型比例",
+    "保持叶红衣的当前形态（default）"
+  ],
+  "repair_policy": {
+    "max_retries": 2,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "gravity=normal",
+      "magic_system=cultivation",
+      "power_scaling=strict",
+      "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。",
+      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+      "人族通过觉醒魂宫契约灵兽",
+      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+      "契约绑定需要精血激活召唤石",
+      "苏夜前世为龙国特种部队队长，代号修罗"
+    ],
+    "character_abilities": {
+      "suye": {
+        "abilities": [
+          "吞天口（一级）",
+          "无限吞噬进化系统"
+        ],
+        "constraints": [
+          "无法开口说话（蚕形态）",
+          "体型极小",
+          "无法独立行动"
+        ],
+        "camera_preference": {}
+      },
+      "yehongyi": {
+        "abilities": [
+          "软剑术",
+          "残余灵力"
+        ],
+        "constraints": [
+          "灵根受损，灵力微弱",
+          "被家族抛弃",
+          "被逼婚赵无极"
+        ],
+        "camera_preference": {}
+      }
+    },
+    "scene_restrictions": {},
+    "skills": [],
+    "emotional_arcs": []
+  },
+  "audio": [
+    "苏夜（OS，得意）：\"吞天口……嗝……这穿越，好像还不错嘛！\""
+  ]
+}

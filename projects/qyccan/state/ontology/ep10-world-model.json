@@ -1,0 +1,271 @@
+{
+  "world_id": "qyccan-ep10",
+  "episode": "ep10",
+  "created_at": "2026-04-03T00:00:00Z",
+  "entities": {
+    "characters": [
+      {
+        "id": "suye",
+        "name": "苏夜",
+        "tier": "protagonist",
+        "current_variant": "xuanmingmang",
+        "variants": [
+          {
+            "variant_id": "xuanmingmang",
+            "variant_label": "玄冥蟒（完整形态）",
+            "appearance": "长达三米的巨蟒，通体漆黑，鳞片泛着冷光，头顶有两个明显鼓包（龙角雏形），金色瞳孔，散发龙威气息。",
+            "tags": ["地煞级", "玄蟒", "霸气", "龙威"]
+          },
+          {
+            "variant_id": "xuanmingmang_small",
+            "variant_label": "玄冥蟒（缩小版，日常携带）",
+            "appearance": "缩小后盘在叶红衣身后，通体漆黑，金色瞳孔。",
+            "tags": ["地煞级", "玄蟒", "缩小", "日常"]
+          }
+        ],
+        "physical": {
+          "species": "beast",
+          "form": "玄冥蟒（地煞级）",
+          "size": "三米（完整），缩小版如项圈"
+        },
+        "abilities": ["吞天口（一级）", "无限吞噬进化系统", "剧毒獠牙", "闪电突袭", "百毒不侵", "毒雾喷吐", "大小如意", "龙威", "绞杀", "开口说话", "吞噬天命气运", "魔气吞噬（正式解锁）"],
+        "evolution_level": "地煞级",
+        "evolution_points": 150,
+        "constraints": ["化形需要君王级以上"],
+        "status": {
+          "location": "天风学院聚灵阁",
+          "bound_to": "叶红衣",
+          "notes": "抢占聚灵阁，用魔气吞噬吸干多只地煞级灵兽灵力，抢夺萧凡机缘（灵器）。盘在聚灵阁门口如门神。"
+        }
+      },
+      {
+        "id": "yehongyi",
+        "name": "叶红衣",
+        "tier": "protagonist",
+        "current_variant": "default",
+        "variants": [
+          {
+            "variant_id": "default",
+            "variant_label": "常态",
+            "appearance": "红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨。",
+            "tags": ["高冷", "御姐", "红衣"]
+          }
+        ],
+        "physical": {
+          "species": "human",
+          "form": "人族少女",
+          "size": "正常人类"
+        },
+        "abilities": ["软剑术", "残余灵力", "战斗技巧提升"],
+        "evolution_level": "人族（灵根受损，修炼中）",
+        "constraints": ["灵根受损，灵力微弱"],
+        "status": {
+          "location": "天风学院聚灵阁",
+          "bound_to": "苏夜",
+          "notes": "入住聚灵阁，对苏夜的行事风格感到无奈"
+        }
+      },
+      {
+        "id": "xiaofan",
+        "name": "萧凡",
+        "tier": "supporting",
+        "current_variant": "default",
+        "variants": [
+          {
+            "variant_id": "default",
+            "variant_label": "常态",
+            "appearance": "英俊，气宇轩昂，自带光环，布衣少年，眼神坚毅。",
+            "tags": ["气运之子", "对立角色"]
+          }
+        ],
+        "physical": {
+          "species": "human",
+          "form": "人族少年",
+          "size": "正常人类"
+        },
+        "abilities": ["气运之子天赋", "戒指老爷爷辅助", "正道之光"],
+        "constraints": ["自以为是天命之子", "被戒指老爷爷警告不可与苏夜正面冲突"],
+        "status": {
+          "location": "天风学院宿舍区",
+          "notes": "聚灵阁机缘被苏夜抢走，灵器被苏夜吞噬。拳头攥紧，指甲嵌入肉里，发誓铲除叶红衣和苏夜。"
+        }
+      },
+      {
+        "id": "qinger",
+        "name": "青儿",
+        "tier": "supporting",
+        "current_variant": "default",
+        "variants": [
+          {
+            "variant_id": "default",
+            "variant_label": "常态",
+            "appearance": "气质清冷，容貌绝世，温柔注视萧凡。",
+            "tags": ["神秘少女", "萧凡伴侣"]
+          }
+        ],
+        "physical": {
+          "species": "human",
+          "form": "人族少女",
+          "size": "正常人类"
+        },
+        "abilities": ["身世神秘"],
+        "constraints": ["依附萧凡"],
+        "status": {
+          "location": "天风学院宿舍区",
+          "notes": "被萧凡拉住，愤怒但被制止"
+        }
+      },
+      {
+        "id": "wangpangzi",
+        "name": "王胖子",
+        "tier": "supporting",
+        "current_variant": "default",
+        "variants": [
+          {
+            "variant_id": "default",
+            "variant_label": "常态",
+            "appearance": "圆滚滚，憨厚。",
+            "tags": ["配角", "捧哏"]
+          }
+        ],
+        "physical": {
+          "species": "human",
+          "form": "人族少年",
+          "size": "圆滚滚"
+        },
+        "abilities": ["契约铁甲龟"],
+        "constraints": ["负责震惊和捧哏"],
+        "status": {
+          "location": "天风学院聚灵阁",
+          "notes": "跟随叶红衣，为苏夜大发神威而震惊"
+        }
+      }
+    ],
+    "locations": [
+      {
+        "id": "jujuling_ge",
+        "name": "聚灵阁",
+        "spatial": {
+          "type": "indoor",
+          "size": "medium",
+          "layout": "储存灵石、丹药、法宝的阁楼，下有灵泉眼，灵气最浓"
+        },
+        "temporal_variants": ["day", "night"],
+        "lighting_rules": {
+          "day": "灵气充沛，神秘光芒",
+          "night": "灵泉发光，神秘氛围"
+        },
+        "atmosphere": "神秘、灵气充沛"
+      },
+      {
+        "id": "sushe_qu",
+        "name": "宿舍区",
+        "spatial": {
+          "type": "outdoor",
+          "size": "large",
+          "layout": "天风学院宿舍区，靠抢占，聚灵阁是最好的宿舍"
+        },
+        "temporal_variants": ["day"],
+        "lighting_rules": {
+          "day": "阳光明媚，竞争激烈"
+        },
+        "atmosphere": "热闹、竞技"
+      }
+    ],
+    "props": [
+      {
+        "id": "lingyuan_yan",
+        "name": "聚灵阁灵泉眼",
+        "description": "聚灵阁下的灵泉眼，灵气最浓，可帮助戒指老爷爷恢复灵魂力",
+        "owner": "叶红衣+苏夜（抢占）",
+        "condition": "intact",
+        "significance": "萧凡的第一个机缘，被苏夜抢走"
+      },
+      {
+        "id": "lingqi_heihou",
+        "name": "黑猩猩脖子上的灵器",
+        "description": "学长的黑猩猩灵兽脖子上的闪光灵器",
+        "owner": "苏夜（已吞噬）",
+        "condition": "destroyed",
+        "significance": "苏夜抢夺萧凡机缘的一部分，进化点+N"
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "type": "social",
+      "from": "苏夜",
+      "to": "叶红衣",
+      "relation": "契约灵兽与契约主（苏夜主动抢占聚灵阁）",
+      "properties": {
+        "strength": "strong",
+        "established_at": "黑雾森林"
+      }
+    },
+    {
+      "type": "social",
+      "from": "苏夜",
+      "to": "萧凡",
+      "relation": "宿命对立（苏夜抢走聚灵阁机缘，萧凡发誓复仇）",
+      "properties": {
+        "strength": "strong",
+        "established_at": "天风学院广场"
+      }
+    },
+    {
+      "type": "social",
+      "from": "王胖子",
+      "to": "叶红衣",
+      "relation": "跟班/朋友",
+      "properties": {
+        "strength": "medium",
+        "established_at": "叶家府邸"
+      }
+    },
+    {
+      "type": "causal",
+      "from": "苏夜",
+      "to": "学长灵兽",
+      "relation": "魔气吞噬，吸干灵力，品阶倒退",
+      "properties": {
+        "strength": "strong",
+        "established_at": "宿舍区"
+      }
+    },
+    {
+      "type": "causal",
+      "from": "苏夜",
+      "to": "萧凡",
+      "relation": "抢走聚灵阁机缘，吞噬灵器",
+      "properties": {
+        "strength": "strong",
+        "established_at": "宿舍区"
+      }
+    }
+  ],
+  "physics_rules": {
+    "gravity": "normal",
+    "magic_system": "cultivation",
+    "power_scaling": "strict",
+    "beast_tiers": ["凡胎", "灵智", "地煞", "天罡", "君王", "帝皇", "神话"],
+    "notes": "万兽天界。苏夜魔气吞噬可吸取灵兽灵力，导致品阶倒退。天风学院宿舍靠抢，聚灵阁灵气最浓。"
+  },
+  "narrative_constraints": {
+    "character_evolution": [],
+    "ability_unlocks": [
+      {
+        "character": "苏夜",
+        "ability": "魔气吞噬（正式解锁）",
+        "condition": "吞噬测灵石天命气运后，魔气形成漩涡，可吸取灵兽体内灵力"
+      }
+    ],
+    "world_rules": [
+      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+      "魔气吞噬：可吸取灵兽体内灵力，导致品阶倒退",
+      "天风学院宿舍规则：靠抢，聚灵阁是最好的宿舍",
+      "萧凡发誓：三十年河东三十年河西，莫欺少年穷，定要铲除叶红衣和苏夜",
+      "苏夜自我定位：反派，走主角的路让主角无路可走"
+    ]
+  }
+}

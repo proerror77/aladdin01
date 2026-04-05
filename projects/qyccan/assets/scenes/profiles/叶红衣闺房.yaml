@@ -1,0 +1,8 @@
+name: 叶红衣闺房
+project: qyccan
+description: 叶红衣的私人房间，古风布置，苏夜的日常栖息地。
+time_variants:
+- day
+- night
+atmosphere: 温馨、私密
+first_episode: qyccan-ep02

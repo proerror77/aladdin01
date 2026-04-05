@@ -25,3 +25,11 @@ raw/
 
 # Git Worktrees
 .worktrees/
+.claude/worktrees/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local vector database
+state/vectordb/

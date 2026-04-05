@@ -26,14 +26,17 @@
 2. 遍历每个剧本，读取其各阶段状态文件
 
 状态文件读取优先级：
-1. `projects/{project}/state/{ep}-phase4.json` 存在且完成 → 检查 shot 文件判断 Phase 5 进度
-2. `projects/{project}/state/{ep}-phase4.json` → Phase 4 状态
-3. `projects/{project}/state/{ep}-phase3.json` → Phase 3 状态
-4. `projects/{project}/state/{ep}-phase2.json` → Phase 2 状态
-5. `projects/{project}/state/{ep}-phase1.json` → Phase 1 状态
+1. `projects/{project}/state/{ep}-phase6.json` → Phase 6 状态
+2. `projects/{project}/state/{ep}-phase5.json` → Phase 5 状态
+3. `projects/{project}/state/{ep}-phase4.json` → Phase 4 状态
+4. `projects/{project}/state/{ep}-phase3.5.json` → Phase 3.5 状态
+5. `projects/{project}/state/{ep}-phase3.json` → Phase 3 状态
+6. `projects/{project}/state/{ep}-phase2.3.json` → Phase 2.3 状态
+7. `projects/{project}/state/{ep}-phase2.json` → Phase 2 状态
+8. `projects/{project}/state/{ep}-phase1.json` → Phase 1 状态
 
-**注意**：Phase 5 没有独立的 `phase5.json`，进度通过汇总 `projects/{project}/state/{ep}-shot-*.json` 计算：
-- 已完成镜次数 / 总镜次数（来自 phase2.json 的 data.shot_count）
+**注意**：Phase 5 仍然以 `projects/{project}/state/{ep}-shot-*.json` 为单镜次 source of truth；
+`phase5.json` 只是汇总缓存，单镜次进度与输出目录必须保持一致。
 
 **A/B 模式检测**：如果存在 `projects/{project}/state/{ep}-shot-*-ab-result.json` 文件，说明本集使用了 A/B 模式。
 此时 Phase 5 进度改为汇总 `-a.json` 和 `-b.json` 文件（各变体独立计数），并额外显示评分进度：
@@ -52,7 +55,7 @@ ep02  [██████░░░░] 60%  Phase 4: 音色配置完成，等待
 ep03  [████░░░░░░] 40%  Phase 3: 美术校验中
 
 阶段说明：
-Phase 1 合规预检 → Phase 2 视觉指导 → Phase 3 美术校验 → Phase 4 音色配置 → Phase 5 视频生成
+Phase 1 合规预检 → Phase 2 视觉指导 → Phase 2.3 分镜图 → Phase 3 美术校验 → Phase 3.5 Shot Packet → Phase 4 音色配置 → Phase 5 视频生成 → Phase 6 审计修复
 ```
 
 ### 按人查看（~status --mine 或 ~status alice）
@@ -109,20 +112,23 @@ shot-04  ⏳ 等待
 ...
 shot-10  ❌ 失败（5次重试 + 3轮改写）
 
-输出目录：outputs/ep01/videos/
+输出目录：projects/{project}/outputs/ep01/videos/
 ```
 
 ## 进度百分比计算
 
 | 阶段完成 | 百分比 |
 |---------|--------|
-| Phase 1 完成 | 20% |
-| Phase 2 完成 | 40% |
-| Phase 3 完成 | 60% |
-| Phase 4 完成 | 80% |
-| Phase 5 完成 | 100% |
+| Phase 1 完成 | 14% |
+| Phase 2 完成 | 28% |
+| Phase 2.3 完成 | 42% |
+| Phase 3 完成 | 56% |
+| Phase 3.5 完成 | 70% |
+| Phase 4 完成 | 84% |
+| Phase 5 完成 | 92% |
+| Phase 6 完成 | 100% |
 
-Phase 5 的细分进度 = 80% + (已完成镜次数 / 总镜次数) × 20%
+Phase 5 的细分进度 = 84% + (已完成镜次数 / 总镜次数) × 8%
 
 ## 阶段状态说明
 
@@ -141,8 +147,12 @@ Phase 5 的细分进度 = 80% + (已完成镜次数 / 总镜次数) × 20%
 |---------|---------|
 | {ep}-phase1.json | data.rewrites_count |
 | {ep}-phase2.json | data.shot_count, data.total_duration |
+| {ep}-phase2.3.json | data.storyboard_count |
 | {ep}-phase3.json | data.new_characters, data.reused_characters, data.scenes |
+| {ep}-phase3.5.json | data.shot_packets_generated |
 | {ep}-phase4.json | data.voice_count |
+| {ep}-phase5.json | data.total_shots, data.completed, data.failed |
+| {ep}-phase6.json | data.audited_shots, data.total_shots |
 | {ep}-shot-{N}.json | status, original_retries, rewrite_rounds |
 
 ## 多人协作模式

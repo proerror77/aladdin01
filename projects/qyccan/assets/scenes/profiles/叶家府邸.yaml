@@ -1,0 +1,8 @@
+name: 叶家府邸
+project: qyccan
+description: 叶家大门及府邸，古风建筑，围观群众常聚集处。
+time_variants:
+- day
+- night
+atmosphere: 古风、权贵、压抑
+first_episode: qyccan-ep01

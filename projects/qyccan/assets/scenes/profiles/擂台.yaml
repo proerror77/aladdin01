@@ -1,0 +1,7 @@
+name: 擂台
+project: qyccan
+description: 家族大比或学院比武的擂台，观众环绕。
+time_variants:
+- day
+atmosphere: 紧张、竞技、热血
+first_episode: qyccan-ep06

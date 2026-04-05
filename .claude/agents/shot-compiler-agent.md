@@ -38,14 +38,14 @@ ep=$(echo "$shot_id" | sed 's/-shot-.*//')
 shot_index=$(echo "$shot_id" | sed 's/.*-shot-//' | sed 's/^0*//')
 
 # 读取 shot 数据
-shot_yaml=$(yq eval ".shots[] | select(.shot_id == \"$shot_id\")" "outputs/${ep}/visual-direction.yaml")
+shot_yaml=$(yq eval ".shots[] | select(.shot_id == \"$shot_id\")" "projects/{project}/outputs/${ep}/visual-direction.yaml")
 
 # 提取关键字段
 scene_name=$(echo "$shot_yaml" | yq eval '.scene_name' -)
 time_of_day=$(echo "$shot_yaml" | yq eval '.time_of_day' -)
 duration=$(echo "$shot_yaml" | yq eval '.duration' -)
 has_dialogue=$(echo "$shot_yaml" | yq eval '.has_dialogue' -)
-prompt=$(echo "$shot_yaml" | yq eval '.prompt' -)
+prompt=$(echo "$shot_yaml" | yq eval '.seedance_prompt' -)
 ```
 
 ### 2. 读取角色状态快照
@@ -122,9 +122,8 @@ done
 # 这里需要实现 memory-agent 的调用逻辑
 # 输出格式见 memory-agent.md
 
-# 临时实现：直接调用 Claude Code agent
-# 实际部署时需要实现为独立脚本
-
+# Canonical fallback：如果 memory-agent 不可直接调用，则使用
+# scripts/workflow-sync.py 生成的 shot packet 作为最终 source of truth。
 references_json=$(memory_agent_call "$shot_id" "$session_id")
 ```
 
@@ -398,4 +397,3 @@ echo "✓ Shot Packet 已生成: projects/{project}/state/shot-packets/${shot_id
 - **Dialogue Mode**：根据 has_dialogue 字段决定，true=external_dub，false=none
 - **Scene ID 生成**：简单规则 `{ep}-sc{N}`，N 为场景编号（shot_index/10+1）
 - **Memory Agent 调用**：需要实现为独立脚本或函数，返回 JSON 格式的 references
-

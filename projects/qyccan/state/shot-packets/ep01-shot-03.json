@@ -1,0 +1,150 @@
+{
+  "shot_id": "ep01-shot-03",
+  "episode": "ep01",
+  "scene_id": "ep01-sc03",
+  "shot_number": 3,
+  "scene_goal": "0-3秒：树梢上苏夜感到屁股底下一阵吸力，被吸走，化作绿光坠落",
+  "duration_sec": 12,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "suye",
+      "name": "苏夜",
+      "state_ref": "suye@ep01-shot-03",
+      "variant": "qingyucan",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png"
+      ],
+      "must_preserve": [
+        "form",
+        "size",
+        "color",
+        "costume"
+      ],
+      "current_state": {
+        "form": "通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，眼神极其欠揍，樱桃般的小嘴。视野呈现复眼效果。",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "panicked",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "yehongyi",
+      "name": "叶红衣",
+      "state_ref": "yehongyi@ep01-shot-03",
+      "variant": "default",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "projects/qyccan/assets/characters/images/叶红衣-side.png",
+        "projects/qyccan/assets/characters/images/叶红衣-back.png"
+      ],
+      "must_preserve": [
+        "form",
+        "size",
+        "color",
+        "costume"
+      ],
+      "current_state": {
+        "form": "红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨。",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "panicked",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "黑雾森林（树梢→树下法阵）",
+    "time_of_day": "day",
+    "ref_assets": [
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    ],
+    "lighting_note": "法阵金色光芒与黑雾形成强烈对比，绿光坠落轨迹，光芒散去后法阵余光",
+    "functional": {}
+  },
+  "camera": {
+    "shot_size": "wide",
+    "movement": "static",
+    "lens_style": "cinematic",
+    "raw": "0-3秒：全景固定镜头，仰拍树梢，苏夜被吸走化作绿光坠落\n4-6秒：全景固定镜头，俯拍法阵，绿光坠入，光芒散去\n7-9秒：近景固定镜头，叶红衣脸部，镜头急速推近至特写，眼神变化\n10-12秒：希区柯克变焦，切换正反打：苏夜大特写仰视→叶红衣特写崩溃"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
+      "projects/qyccan/assets/characters/images/叶红衣-front.png",
+      "projects/qyccan/assets/characters/images/叶红衣-side.png",
+      "projects/qyccan/assets/characters/images/叶红衣-back.png",
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
+      "projects/qyccan/outputs/ep01/storyboard/shot-03.png",
+      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-02-end-frame.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-3秒：全景固定镜头仰拍树梢，[苏夜]趴在树叶上突然感到屁股底下一阵吸力，惊慌挣扎，随即化作一道绿光\"咻\"地坠落，[苏夜]（惊慌）：\"哎？哎哎哎？什么情况？\"\n4-6秒：全景固定镜头俯拍法阵，绿光坠入法阵中央，金色粒子爆散，光芒渐弱，法阵中央趴着拇指大小的[苏夜]，一脸懵逼\n7-9秒：近景固定镜头急速推近至[叶红衣]脸部特写，[叶红衣]满怀期待睁开眼，视线向下，眼神从期待→震惊→崩溃，嘴唇颤抖，[叶红衣]（激动→崩溃）：\"是神兽吗？还是凶兽？……青……青玉蚕？！\"\n10-12秒：正反打硬切，先切至[苏夜]大特写仰视[叶红衣]，一脸懵逼，[苏夜]（懵逼）：\"美女？有何贵干？\"；再切回[叶红衣]特写，彻底崩溃，[叶红衣]（崩溃）：\"我耗尽精血，就召唤了一条肉蚕子？！\"\n\n音效：绿光坠落音效、法阵激活余光音效、震惊音效\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+  },
+  "forbidden_changes": [
+    "保持苏夜的当前形态（qingyucan）",
+    "不要让苏夜说话",
+    "保持苏夜的体型比例",
+    "保持叶红衣的当前形态（default）"
+  ],
+  "repair_policy": {
+    "max_retries": 2,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "gravity=normal",
+      "magic_system=cultivation",
+      "power_scaling=strict",
+      "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。",
+      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+      "人族通过觉醒魂宫契约灵兽",
+      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+      "契约绑定需要精血激活召唤石",
+      "苏夜前世为龙国特种部队队长，代号修罗"
+    ],
+    "character_abilities": {
+      "suye": {
+        "abilities": [
+          "吞天口（一级）",
+          "无限吞噬进化系统"
+        ],
+        "constraints": [
+          "无法开口说话（蚕形态）",
+          "体型极小",
+          "无法独立行动"
+        ],
+        "camera_preference": {}
+      },
+      "yehongyi": {
+        "abilities": [
+          "软剑术",
+          "残余灵力"
+        ],
+        "constraints": [
+          "灵根受损，灵力微弱",
+          "被家族抛弃",
+          "被逼婚赵无极"
+        ],
+        "camera_preference": {}
+      }
+    },
+    "scene_restrictions": {},
+    "skills": [],
+    "emotional_arcs": []
+  },
+  "audio": [
+    "叶红衣（激动）：\"是神兽吗？还是凶兽？\"",
+    "苏夜（懵逼）：\"美女？有何贵干？\"",
+    "叶红衣（瞳孔地震，崩溃）：\"青……青玉蚕？是最废物的凡胎级昆虫？我耗尽精血，就召唤了一条肉蚕子？！\""
+  ]
+}

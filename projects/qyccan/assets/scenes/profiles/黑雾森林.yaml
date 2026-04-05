@@ -1,0 +1,8 @@
+name: 黑雾森林
+project: qyccan
+description: 新手村，全是低级怪。黑雾弥漫的古木森林，苏夜重生地点，叶红衣被追杀的地方。
+time_variants:
+- day
+- night
+atmosphere: 神秘、危险、低级怪聚集地
+first_episode: qyccan-ep01

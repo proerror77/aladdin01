@@ -1,8 +1,8 @@
 # World Model Schema Definition
 # 定义世界本体模型的数据结构规范
-# v2.1 — 新增 creatures / vfx / costume_variants
+# v2.2 — 新增 skills / locations.functional / characters.visual_signature+camera_preference / emotional_arcs
 
-version: "2.1"
+version: "2.2"
 
 world_model:
   required_fields:
@@ -29,11 +29,23 @@ entities:
       - tier           # 层级：protagonist / supporting / minor
       - current_variant  # 当前变体 ID
       - physical       # 物理属性
-      - abilities      # 能力列表
+      - abilities      # 能力 ID 列表（关联 skills 实体）
       - constraints    # 约束列表
     optional_fields:
       - costume_variants  # 服装变体列表（见层 6）
       - current_costume   # 当前服装变体 ID（按集追踪）
+      # v2.2 新增
+      - visual_signature  # 视觉签名（跨 shot 一致性锚点）
+        # color_palette: ["碧绿", "金色瞳孔"]
+        # distinctive_features: ["复眼（蚕形态）", "欠揍的眼神"]
+        # silhouette_keywords: "拇指大小圆滚滚蚕宝宝"
+        # must_preserve_across_shots: ["眼神特征", "体型比例", "通体碧绿色"]
+      - camera_preference  # 镜头偏好（按变体配置）
+        # {variant_id}:
+        #   preferred_shots: ["大特写", "特写"]
+        #   reason: "体型极小，中景以上看不清"
+        #   avoid: ["大远景"]
+        #   power_moment_shot: "仰拍特写（技能释放时）"
 
   # 层 2：场景（地点，持续存在）
   locations:
@@ -44,6 +56,27 @@ entities:
     optional_fields:
       - condition      # 场景损坏状态（intact/damaged/destroyed）
       - condition_timeline  # 状态变化时间线（{ep_shot: condition}）
+      # v2.2 新增
+      - functional     # 场景功能性（行为约束 + 视觉标志物）
+        # affordances: ["修炼", "战斗", "采集灵草"]   # 允许的行为
+        # forbidden_actions: ["大规模爆炸（会引来妖兽）", "飞行（树冠遮蔽）"]
+        # hazards:
+        #   - type: environmental
+        #     description: "黑雾有毒，长时间暴露会中毒"
+        #     visual_cue: "角色咳嗽、面色发白"
+        #   - type: creature
+        #     description: "大规模动静会引来妖兽群"
+        #     trigger: "爆炸/大声喊叫"
+        # visual_landmarks:
+        #   - name: "千年古树"
+        #     description: "树干直径超过5米，树皮呈暗紫色"
+        #     seedance_keywords: "巨大暗紫色古树"   # 直接注入 prompt
+        # scene_states:
+        #   - state: normal
+        #     description: "正常状态"
+        #   - state: battle_aftermath
+        #     description: "战斗后，树木倒塌，地面焦黑"
+        #     trigger: "大规模战斗后（ep_shot: ep03-shot-05）"
 
   # 层 3：道具（物品，有状态，需要资产）
   props:
@@ -96,6 +129,37 @@ entities:
         # activated: "释放阶段的视觉描述"
         # dissipating: "消散阶段的视觉描述"
 
+  # 层 7：技能/能力（v2.2 新增，独立实体，关联 vfx）
+  skills:
+    required_fields:
+      - id             # 技能 ID（拼音/英文）
+      - name           # 技能中文名
+      - owner          # 使用者（角色 ID）
+      - trigger        # 触发方式
+        # type: active / passive / conditional
+        # condition: "触发条件描述"
+        # cooldown_narrative: "叙事层面的冷却（使用后短暂虚弱）"
+    optional_fields:
+      - vfx_id         # 关联的 vfx 实体 ID（技能视觉效果）
+      - unlock_variant # 解锁该技能所需的角色变体 ID
+      - level          # 当前等级
+      - level_scaling  # 等级成长
+        # - level: 1
+        #   description: "吞噬单个目标"
+        #   variant: "qingyucan"
+        # - level: 2
+        #   description: "吞噬多个目标"
+        #   variant: "bilinse"
+      - cost           # 使用代价
+        # resource: "灵力"
+        # side_effect: "使用后打嗝、短暂虚弱"
+        # visual_side_effect: "身体微微发抖，光泽暗淡"  # 下一 shot 必须体现
+      - constraints    # 使用约束（字符串列表）
+        # - "蚕形态下威力减半"
+        # - "密闭空间慎用"
+      - scene_restrictions  # 场景级限制（场景 ID 列表）
+        # - "结界内禁用"
+
   # 层 6：服装变体（独立于形态追踪）
   costume_variants:
     # 嵌入在 characters 内（characters[].costume_variants）
@@ -119,8 +183,9 @@ relationships:
     - spatial        # 空间关系：包含、邻近、可见、隔离
     - causal         # 因果关系：导致、阻止、需要、依赖
     - temporal       # 时间关系：之前、之后、同时
-    - ownership      # 新增：持有关系（角色持有道具/生物）
-    - visual         # 新增：视觉参照关系（特效依附于角色）
+    - ownership      # 持有关系（角色持有道具/生物）
+    - visual         # 视觉参照关系（特效依附于角色）
+    - skill_usage    # v2.2 新增：技能使用关系（技能→场景的适用/限制）
 
 # ──────────────────────────────────────────────
 # 物理规则
@@ -152,6 +217,21 @@ narrative_constraints:
       #   since_shot: "ep02-shot-08"  # 可选，精确到 shot
     - creature_lifecycle   # 怪物生命周期（消亡后不可再出现）
     - costume_continuity   # 服装连续性规则（换装需要合理时机）
+    # v2.2 新增
+    - emotional_arcs       # 情绪弧线（按角色+集数定义）
+      # - character: "角色 ID"
+      #   episode: "ep01"
+      #   arc:
+      #     - shot_range: "shot-01~shot-02"
+      #       emotion: "confused_panicked"
+      #       intensity: 0.8          # 0.0-1.0，影响景别选择
+      #     - shot_range: "shot-03"
+      #       emotion: "curious"
+      #       intensity: 0.5
+      #   forbidden_transitions:
+      #     - from: "panicked"
+      #       to: "calm"
+      #       reason: "不能突然平静，需要过渡镜头"
 
 # ──────────────────────────────────────────────
 # 资产生成映射（供 asset-factory-agent 使用）
@@ -189,3 +269,7 @@ asset_generation:
     visual_variants: ["activated"]  # 默认只生成激活状态
     background: "black"  # 特效图用黑色背景更清晰
     aspect_ratio: "1:1"
+
+  # v2.2 新增：技能实体不生成独立资产，复用 vfx 资产
+  skills:
+    note: "skills 实体不生成独立资产，视觉资产由关联的 vfx_id 对应的 vfx 实体负责"

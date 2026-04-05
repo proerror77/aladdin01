@@ -1,0 +1,151 @@
+{
+  "shot_id": "ep01-shot-04",
+  "episode": "ep01",
+  "scene_id": "ep01-sc04",
+  "shot_number": 4,
+  "scene_goal": "0-3秒：草丛被拨开，两个家仆追上来，嚣张嘲笑叶红衣和苏夜",
+  "duration_sec": 12,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "suye",
+      "name": "苏夜",
+      "state_ref": "suye@ep01-shot-04",
+      "variant": "qingyucan",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png"
+      ],
+      "must_preserve": [
+        "form",
+        "size",
+        "color",
+        "costume"
+      ],
+      "current_state": {
+        "form": "通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，眼神极其欠揍，樱桃般的小嘴。视野呈现复眼效果。",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "angry",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "yehongyi",
+      "name": "叶红衣",
+      "state_ref": "yehongyi@ep01-shot-04",
+      "variant": "default",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "projects/qyccan/assets/characters/images/叶红衣-side.png",
+        "projects/qyccan/assets/characters/images/叶红衣-back.png"
+      ],
+      "must_preserve": [
+        "form",
+        "size",
+        "color",
+        "costume"
+      ],
+      "current_state": {
+        "form": "红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨。",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "angry",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "黑雾森林外围",
+    "time_of_day": "day",
+    "ref_assets": [
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    ],
+    "lighting_note": "黑雾弥漫，草丛被拨开，家仆手持大刀，光线昏暗，威胁感强",
+    "functional": {}
+  },
+  "camera": {
+    "shot_size": "wide",
+    "movement": "static",
+    "lens_style": "cinematic",
+    "raw": "0-3秒：全景固定镜头，草丛被拨开，家仆登场\n4-7秒：中景移镜头，家仆甲逼近，仰拍家仆甲（威胁方），俯拍叶红衣（弱势方）\n8-10秒：近景固定镜头，叶红衣手心，苏夜特写，眼神变化\n11-12秒：大特写固定镜头，苏夜眼神锐利，系统激活特效"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
+      "projects/qyccan/assets/characters/images/叶红衣-front.png",
+      "projects/qyccan/assets/characters/images/叶红衣-side.png",
+      "projects/qyccan/assets/characters/images/叶红衣-back.png",
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
+      "projects/qyccan/outputs/ep01/storyboard/shot-04.png",
+      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-03-end-frame.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "@图片1 作为<叶红衣>，@图片2 作为<苏夜（青玉蚕形态）>，场景参考@图片3\n\n0-3秒：全景固定镜头，草丛被拨开，两个手持大刀的家仆追上来，[家仆甲]（嚣张）：\"嘿嘿，大小姐，跑不动了吧？\"，[家仆乙]瞥见地面法阵痕迹爆笑，[家仆乙]（嘲讽）：\"哈哈哈哈！叶家天才居然契约了一条蚕！\"\n4-7秒：中景移镜头，低角度仰拍[家仆甲]气势汹汹逼近（威胁感），切至俯拍[叶红衣]护住手心里的[苏夜]（弱势感），[叶红衣]（咬牙切齿）：\"闭，闭嘴……我的灵兽轮不到你们嘲笑！\"，[叶红衣]站在画面左侧，[苏夜]趴在她手心（画面中央），[家仆甲]从右侧逼近\n8-10秒：近景固定镜头，聚焦[叶红衣]手心，[苏夜]在手心里蠕动，眼神从懵逼变犀利，画外音（苏夜，怒）：\"敢笑话老子？还敢欺负我的……主人！\"\n11-12秒：大特写固定镜头，[苏夜]眼神锐利，系统激活金色光效浮现，系统提示音炸响\n\n音效：大刀碰撞声、家仆脚步声、系统激活炸响音效\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+  },
+  "forbidden_changes": [
+    "保持苏夜的当前形态（qingyucan）",
+    "不要让苏夜说话",
+    "保持苏夜的体型比例",
+    "保持叶红衣的当前形态（default）"
+  ],
+  "repair_policy": {
+    "max_retries": 2,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "gravity=normal",
+      "magic_system=cultivation",
+      "power_scaling=strict",
+      "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。",
+      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+      "人族通过觉醒魂宫契约灵兽",
+      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+      "契约绑定需要精血激活召唤石",
+      "苏夜前世为龙国特种部队队长，代号修罗"
+    ],
+    "character_abilities": {
+      "suye": {
+        "abilities": [
+          "吞天口（一级）",
+          "无限吞噬进化系统"
+        ],
+        "constraints": [
+          "无法开口说话（蚕形态）",
+          "体型极小",
+          "无法独立行动"
+        ],
+        "camera_preference": {}
+      },
+      "yehongyi": {
+        "abilities": [
+          "软剑术",
+          "残余灵力"
+        ],
+        "constraints": [
+          "灵根受损，灵力微弱",
+          "被家族抛弃",
+          "被逼婚赵无极"
+        ],
+        "camera_preference": {}
+      }
+    },
+    "scene_restrictions": {},
+    "skills": [],
+    "emotional_arcs": []
+  },
+  "audio": [
+    "家仆甲（嚣张）：\"嘿嘿，大小姐，跑不动了吧？\"",
+    "家仆乙（爆笑）：\"哈哈哈哈！叶家天才居然契约了一条蚕！\"",
+    "叶红衣（咬牙切齿）：\"闭，闭嘴……我的灵兽轮不到你们嘲笑！\"",
+    "苏夜（OS，怒）：\"敢笑话老子？还敢欺负我的……主人！\""
+  ]
+}

@@ -53,6 +53,27 @@ TABLE_ASSETS    = "assets"     # 资产文件索引（图片路径）
 TABLE_STATES    = "states"     # 每个 shot 的角色/场景状态快照
 TABLE_RELATIONS = "relations"  # 实体关系
 
+
+def _table_names(db) -> set[str]:
+    """兼容 LanceDB 新旧接口，返回当前所有表名。"""
+    if hasattr(db, "list_tables"):
+        raw_names = db.list_tables()
+    else:
+        raw_names = db.table_names()
+
+    if hasattr(raw_names, "tables"):
+        raw_names = raw_names.tables
+
+    names: set[str] = set()
+    for item in raw_names:
+        if isinstance(item, str):
+            names.add(item)
+        elif isinstance(item, (tuple, list)) and item:
+            names.add(str(item[0]))
+        else:
+            names.add(str(item))
+    return names
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Embedding
 # ──────────────────────────────────────────────────────────────────────────────
@@ -79,7 +100,7 @@ def _entity_schema():
     return pa.schema([
         pa.field("id",          pa.utf8()),          # "suye_ep01"
         pa.field("name",        pa.utf8()),           # "苏夜"
-        pa.field("entity_type", pa.utf8()),           # character / scene / prop
+        pa.field("entity_type", pa.utf8()),           # character / scene / prop / creature / vfx / skill
         pa.field("episode",     pa.utf8()),           # "ep01"
         pa.field("tier",        pa.utf8()),           # protagonist / supporting / minor
         pa.field("variant",     pa.utf8()),           # "default" / "snake_green"
@@ -136,6 +157,7 @@ def _relation_schema():
 def cmd_init(args):
     Path(DB_PATH).mkdir(parents=True, exist_ok=True)
     db = lancedb.connect(DB_PATH)
+    table_names = _table_names(db)
 
     for name, schema in [
         (TABLE_ENTITIES,  _entity_schema()),
@@ -143,9 +165,15 @@ def cmd_init(args):
         (TABLE_STATES,    _state_schema()),
         (TABLE_RELATIONS, _relation_schema()),
     ]:
-        if name not in db.table_names():
-            db.create_table(name, schema=schema)
-            print(f"✓ 创建表: {name}")
+        if name not in table_names:
+            try:
+                db.create_table(name, schema=schema)
+                print(f"✓ 创建表: {name}")
+            except ValueError as exc:
+                if "already exists" in str(exc):
+                    print(f"  跳过（已存在）: {name}")
+                else:
+                    raise
         else:
             print(f"  跳过（已存在）: {name}")
 
@@ -172,12 +200,27 @@ def cmd_upsert_world_model(args):
     entity_rows = []
     for c in characters:
         # 为每个变体都存一行
-        variants = c.get("variants", {"default": {"appearance": c.get("physical", {}).get("form", "")}})
-        for v_id, v_data in variants.items():
+        raw_variants = c.get("variants")
+        if isinstance(raw_variants, dict):
+            variants = list(raw_variants.items())
+        elif isinstance(raw_variants, list) and raw_variants:
+            variants = [
+                (
+                    str(item.get("variant_id", "default")),
+                    item,
+                )
+                for item in raw_variants
+                if isinstance(item, dict)
+            ]
+        else:
+            variants = [("default", {"appearance": c.get("physical", {}).get("form", "")})]
+
+        for v_id, v_data in variants:
             appearance = v_data.get("appearance", "")
             abilities  = ", ".join([a.get("name", "") if isinstance(a, dict) else str(a)
                                     for a in c.get("abilities", [])])
-            desc = f"{c['name']} {v_data.get('label', v_id)} {appearance} {abilities}"
+            variant_label = v_data.get("label") or v_data.get("variant_label") or v_id
+            desc = f"{c['name']} {variant_label} {appearance} {abilities}"
             entity_rows.append({
                 "id":          f"{c['id']}_{episode}_{v_id}",
                 "name":        c["name"],
@@ -258,6 +301,53 @@ def cmd_upsert_world_model(args):
             "variant":     vfx.get("owner", ""),
             "description": desc.strip(),
             "metadata":    json.dumps(vfx, ensure_ascii=False),
+            "vector":      embed(desc),
+        })
+
+    # ── 技能实体（v2.2 新增）────────────────────────────
+    skills = wm.get("entities", {}).get("skills", [])
+    for skill in skills:
+        trigger = skill.get("trigger", {})
+        if isinstance(trigger, dict):
+            trigger_desc = " ".join(
+                str(trigger.get(key, ""))
+                for key in ("type", "condition", "cooldown_narrative")
+                if trigger.get(key)
+            )
+        else:
+            trigger_desc = str(trigger)
+
+        cost = skill.get("cost", {})
+        if isinstance(cost, dict):
+            cost_desc = " ".join(
+                str(cost.get(key, ""))
+                for key in ("resource", "side_effect", "visual_side_effect")
+                if cost.get(key)
+            )
+        else:
+            cost_desc = str(cost)
+
+        constraints = " ".join(str(item) for item in skill.get("constraints", []) if item)
+        scene_restrictions = " ".join(str(item) for item in skill.get("scene_restrictions", []) if item)
+        desc = " ".join(
+            part for part in [
+                str(skill.get("name", "")),
+                str(skill.get("owner", "")),
+                trigger_desc,
+                cost_desc,
+                constraints,
+                scene_restrictions,
+            ] if part
+        )
+        entity_rows.append({
+            "id":          f"{skill['id']}_{episode}",
+            "name":        skill["name"],
+            "entity_type": "skill",
+            "episode":     episode,
+            "tier":        "skill",
+            "variant":     str(skill.get("level", "")),
+            "description": desc.strip(),
+            "metadata":    json.dumps(skill, ensure_ascii=False),
             "vector":      embed(desc),
         })
 
@@ -576,9 +666,10 @@ def cmd_get_state(args):
 
 def cmd_stats(args):
     db = lancedb.connect(DB_PATH)
+    table_names = _table_names(db)
     print("=== LanceDB 统计 ===")
     for tname in [TABLE_ENTITIES, TABLE_ASSETS, TABLE_STATES, TABLE_RELATIONS]:
-        if tname in db.table_names():
+        if tname in table_names:
             count = db.open_table(tname).count_rows()
             print(f"  {tname}: {count} 条")
         else:
@@ -607,12 +698,12 @@ def main():
 
     p_sa = sub.add_parser("search-assets", help="语义检索资产")
     p_sa.add_argument("query", help="查询文本")
-    p_sa.add_argument("--type", choices=["character", "scene", "prop", "creature", "vfx"], default=None)
+    p_sa.add_argument("--type", choices=["character", "scene", "prop", "creature", "vfx", "skill"], default=None)
     p_sa.add_argument("--n", type=int, default=3)
 
     p_se = sub.add_parser("search-entities", help="语义检索实体")
     p_se.add_argument("query", help="查询文本")
-    p_se.add_argument("--type", choices=["character", "scene", "prop", "creature", "vfx"], default=None)
+    p_se.add_argument("--type", choices=["character", "scene", "prop", "creature", "vfx", "skill"], default=None)
     p_se.add_argument("--episode", default=None)
     p_se.add_argument("--n", type=int, default=5)
 

@@ -1,0 +1,10 @@
+{
+  "episode": "ep01",
+  "phase": 4,
+  "status": "completed",
+  "started_at": "2026-04-03T00:08:00Z",
+  "completed_at": "2026-04-05T17:06:26.303170Z",
+  "data": {
+    "voice_count": 5
+  }
+}

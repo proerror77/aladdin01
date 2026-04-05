@@ -1,0 +1,12 @@
+{
+  "episode": "ep01",
+  "phase": 3,
+  "status": "completed",
+  "started_at": "2026-04-03T00:00:00Z",
+  "completed_at": "2026-04-05T17:06:26.302745Z",
+  "data": {
+    "character_refs": 12,
+    "scene_refs": 7,
+    "missing": 0
+  }
+}

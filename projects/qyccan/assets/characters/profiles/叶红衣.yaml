@@ -1,0 +1,18 @@
+name: 叶红衣
+aliases: []
+project: qyccan
+tier: protagonist
+age: 18
+gender: female
+appearance: 红衣似火，高冷御姐脸，眼神中透着倔强和落寞。曾经的天才，因灵根受损被家族排挤，被逼嫁给纨绔少爷。身材高挑，发髻精致（战斗时会散乱）。
+variants:
+- variant_id: default
+  variant_label: 常态
+  appearance: 红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨。
+  tags:
+  - 高冷
+  - 御姐
+  - 红衣
+personality: 高冷、坚韧、倔强、重情重义。起初把苏夜当宠物养，后来发现这宠物是祖宗。
+first_episode: qyccan-ep01
+notes: 女主角，苏夜的契约主。从废材组合一路逆袭。

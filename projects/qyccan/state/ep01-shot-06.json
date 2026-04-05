@@ -1,0 +1,11 @@
+{
+  "episode": "ep01",
+  "shot_id": "ep01-shot-06",
+  "shot_index": 6,
+  "status": "completed",
+  "backend": "dreamina",
+  "started_at": "2026-04-05T05:25:38.879139+00:00",
+  "completed_at": "2026-04-05T05:25:38.879139+00:00",
+  "video_path": "projects/qyccan/outputs/ep01/videos/shot-06.mp4",
+  "submit_id": "815a567a728fa8c8"
+}

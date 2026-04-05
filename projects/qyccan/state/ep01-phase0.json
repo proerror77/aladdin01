@@ -1,0 +1,11 @@
+{
+  "episode": "ep01",
+  "phase": 0,
+  "status": "completed",
+  "started_at": "2026-04-03T00:00:00Z",
+  "completed_at": "2026-04-03T00:00:00Z",
+  "data": {
+    "world_model_path": "projects/qyccan/state/ontology/ep01-world-model.json",
+    "warnings": 0
+  }
+}

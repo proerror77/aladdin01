@@ -1,0 +1,8 @@
+character: "系统"
+episode_first_used: "ep01"
+voice_source: "auto_match"
+preset_id: "young-male-gentle"
+match_confidence: "low"
+reference_audio: ""
+tts_platform: "pending"
+notes: "无限吞噬进化系统，机械电子音效。暂用 young-male-gentle 占位，TTS 平台接入后建议使用专用系统音色（电子合成音）。"

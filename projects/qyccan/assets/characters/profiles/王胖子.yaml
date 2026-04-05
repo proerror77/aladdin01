@@ -1,0 +1,16 @@
+name: 王胖子
+aliases: []
+project: qyccan
+tier: supporting
+gender: male
+appearance: 圆滚滚，讲义气。
+variants:
+- variant_id: default
+  variant_label: 常态
+  appearance: 圆滚滚，憨厚。
+  tags:
+  - 配角
+  - 捧哏
+personality: 讲义气，负责震惊，捧哏。
+first_episode: qyccan-ep02
+notes: 叶红衣的跟班，契约了铁甲龟。

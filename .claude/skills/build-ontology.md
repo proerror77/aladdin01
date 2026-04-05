@@ -28,12 +28,12 @@ set -euo pipefail
 ep="$1"
 
 # 1. 检查输入文件是否存在
-if [[ ! -f "script/${ep}.md" ]]; then
-  echo "ERROR: 剧本文件不存在: script/${ep}.md" >&2
+if [[ ! -f "projects/{project}/script/${ep}.md" ]]; then
+  echo "ERROR: 剧本文件不存在: projects/{project}/script/${ep}.md" >&2
   exit 1
 fi
 
-echo "✓ 剧本文件存在: script/${ep}.md"
+echo "✓ 剧本文件存在: projects/{project}/script/${ep}.md"
 
 # 检查角色档案
 character_count=$(find projects/{project}/assets/characters/profiles -name "*.yaml" -type f 2>/dev/null | wc -l || echo "0")
@@ -69,8 +69,8 @@ if [[ ! -f "projects/{project}/state/ontology/${ep}-world-model.json" ]]; then
   exit 1
 fi
 
-if [[ ! -f "state/${ep}-phase0.json" ]]; then
-  echo "ERROR: 状态文件未生成: state/${ep}-phase0.json" >&2
+if [[ ! -f "projects/{project}/state/${ep}-phase0.json" ]]; then
+  echo "ERROR: 状态文件未生成: projects/{project}/state/${ep}-phase0.json" >&2
   exit 1
 fi
 
@@ -102,7 +102,7 @@ if jq -e '.narrative_constraints.character_evolution | length > 0' "projects/{pr
 fi
 
 # 显示警告（如果有）
-warning_count=$(jq '.data.warnings' "state/${ep}-phase0.json")
+warning_count=$(jq '.data.warnings' "projects/{project}/state/${ep}-phase0.json")
 if [[ "$warning_count" -gt 0 ]]; then
   echo "⚠️ 冲突检测: ${warning_count} 个警告"
 else

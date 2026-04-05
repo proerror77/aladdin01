@@ -1,0 +1,149 @@
+{
+  "shot_id": "ep01-shot-05",
+  "episode": "ep01",
+  "scene_id": "ep01-sc05",
+  "shot_number": 5,
+  "scene_goal": "0-3秒：家仆甲伸手抓向叶红衣，千钧一发",
+  "duration_sec": 12,
+  "dialogue_mode": "external_dub",
+  "characters": [
+    {
+      "id": "suye",
+      "name": "苏夜",
+      "state_ref": "suye@ep01-shot-05",
+      "variant": "qingyucan",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png"
+      ],
+      "must_preserve": [
+        "form",
+        "size",
+        "color",
+        "costume"
+      ],
+      "current_state": {
+        "form": "通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，眼神极其欠揍，樱桃般的小嘴。视野呈现复眼效果。",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "angry",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    },
+    {
+      "id": "yehongyi",
+      "name": "叶红衣",
+      "state_ref": "yehongyi@ep01-shot-05",
+      "variant": "default",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "projects/qyccan/assets/characters/images/叶红衣-side.png",
+        "projects/qyccan/assets/characters/images/叶红衣-back.png"
+      ],
+      "must_preserve": [
+        "form",
+        "size",
+        "color",
+        "costume"
+      ],
+      "current_state": {
+        "form": "红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨。",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "angry",
+        "props_in_possession": [],
+        "knowledge": []
+      }
+    }
+  ],
+  "background": {
+    "location": "黑雾森林外围（吞天口爆发）",
+    "time_of_day": "day",
+    "ref_assets": [
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    ],
+    "lighting_note": "吞天口爆发时漆黑漩涡吞噬周围光线，强烈明暗对比，家仆消失后地面焦痕",
+    "functional": {}
+  },
+  "camera": {
+    "shot_size": "medium",
+    "movement": "static",
+    "lens_style": "cinematic",
+    "raw": "0-3秒：中景固定镜头，家仆甲伸手抓向叶红衣，紧张感\n4-7秒：环绕镜头，快速环绕苏夜，展示吞天口爆发的气势\n8-10秒：全景固定镜头，家仆甲消失，地面焦痕，空气凝固\n11-12秒：近景固定镜头，苏夜打嗝，叶红衣闭眼"
+  },
+  "seedance_inputs": {
+    "mode": "img2video",
+    "images": [
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
+      "projects/qyccan/assets/characters/images/叶红衣-front.png",
+      "projects/qyccan/assets/characters/images/叶红衣-side.png",
+      "projects/qyccan/assets/characters/images/叶红衣-back.png",
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
+      "projects/qyccan/outputs/ep01/storyboard/shot-05.png",
+      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-04-end-frame.png"
+    ],
+    "videos": [],
+    "audios": [],
+    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-3秒：中景固定镜头，[家仆甲]伸手抓向[叶红衣]，千钧一发，[叶红衣]护住手心里的[苏夜]，[苏夜]（怒吼）：\"给爷死！！\"\n4-7秒：快速环绕镜头，[苏夜]那张樱桃般的小嘴瞬间化作一团漆黑漩涡黑洞，迎风暴涨数米，吞噬周围光线，强烈明暗对比，黑洞边缘能量扭曲\n8-10秒：全景固定镜头，[家仆甲]被吸入黑洞，发出沉闷消失声，随即消失无踪，地面留下一道焦痕，空气瞬间安静\n11-12秒：近景固定镜头，吞天口收缩消失，[苏夜]嘴巴恢复正常大小，打了个饱嗝，[叶红衣]猛地闭上眼睛\n\n音效：吞天口爆发轰鸣声、家仆消失的沉闷声、地面焦痕余音\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+  },
+  "forbidden_changes": [
+    "保持苏夜的当前形态（qingyucan）",
+    "不要让苏夜说话",
+    "保持苏夜的体型比例",
+    "保持叶红衣的当前形态（default）"
+  ],
+  "repair_policy": {
+    "max_retries": 2,
+    "prefer_local_edit": true
+  },
+  "ontology_constraints": {
+    "world_rules": [
+      "gravity=normal",
+      "magic_system=cultivation",
+      "power_scaling=strict",
+      "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。",
+      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+      "人族通过觉醒魂宫契约灵兽",
+      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+      "契约绑定需要精血激活召唤石",
+      "苏夜前世为龙国特种部队队长，代号修罗"
+    ],
+    "character_abilities": {
+      "suye": {
+        "abilities": [
+          "吞天口（一级）",
+          "无限吞噬进化系统"
+        ],
+        "constraints": [
+          "无法开口说话（蚕形态）",
+          "体型极小",
+          "无法独立行动"
+        ],
+        "camera_preference": {}
+      },
+      "yehongyi": {
+        "abilities": [
+          "软剑术",
+          "残余灵力"
+        ],
+        "constraints": [
+          "灵根受损，灵力微弱",
+          "被家族抛弃",
+          "被逼婚赵无极"
+        ],
+        "camera_preference": {}
+      }
+    },
+    "scene_restrictions": {},
+    "skills": [],
+    "emotional_arcs": []
+  },
+  "audio": [
+    "苏夜（怒吼/发出蚕叫）：\"给爷死！！\"",
+    "音效：吞天口爆发轰鸣声、家仆消失的沉闷声、地面焦痕音效"
+  ]
+}

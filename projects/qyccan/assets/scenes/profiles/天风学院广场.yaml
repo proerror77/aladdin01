@@ -1,0 +1,7 @@
+name: 天风学院广场
+project: qyccan
+description: 天风学院的主广场，学生聚集、比武切磋的地方。
+time_variants:
+- day
+atmosphere: 热闹、竞技
+first_episode: qyccan-ep06

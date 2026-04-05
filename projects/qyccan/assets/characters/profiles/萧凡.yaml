@@ -1,0 +1,17 @@
+name: 萧凡
+aliases:
+- 萧辰
+project: qyccan
+tier: supporting
+gender: male
+appearance: 气运之子，英俊，自带主角光环。
+variants:
+- variant_id: default
+  variant_label: 常态
+  appearance: 英俊，气宇轩昂，自带光环。
+  tags:
+  - 气运之子
+  - 对立角色
+personality: 自以为是天命之子，实则被苏夜当垫脚石。
+first_episode: qyccan-ep06
+notes: 气运之子，苏夜的对立面。

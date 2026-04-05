@@ -1,0 +1,17 @@
+name: 系统
+aliases:
+- 无限吞噬进化系统
+project: qyccan
+tier: supporting
+gender: none
+appearance: 无实体，声音形式出现，赛博感界面。
+variants:
+- variant_id: interface
+  variant_label: 系统界面
+  appearance: 赛博感蓝色光效界面，数字化提示音。
+  tags:
+  - 系统
+  - 声音
+personality: 莫得感情的提示音，偶尔会吐槽宿主。
+first_episode: qyccan-ep01
+notes: 金手指系统，功能：吃东西涨进化点。

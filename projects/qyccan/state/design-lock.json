@@ -1,0 +1,105 @@
+{
+  "generated_at": "2026-04-03T00:00:00Z",
+  "project": "qyccan",
+  "schema_version": "1.0",
+  "characters": {
+    "苏夜": {
+      "variants": {
+        "qingyucan": {
+          "front": "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+          "side": "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+          "back": "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png"
+        },
+        "bilinse": {
+          "front": "projects/qyccan/assets/characters/images/苏夜-bilinse-front.png",
+          "side": "projects/qyccan/assets/characters/images/苏夜-bilinse-side.png",
+          "back": "projects/qyccan/assets/characters/images/苏夜-bilinse-back.png"
+        },
+        "xuanmingmang": {
+          "front": "projects/qyccan/assets/characters/images/苏夜-xuanmingmang-front.png",
+          "side": "projects/qyccan/assets/characters/images/苏夜-xuanmingmang-side.png",
+          "back": "projects/qyccan/assets/characters/images/苏夜-xuanmingmang-back.png"
+        }
+      }
+    },
+    "叶红衣": {
+      "variants": {
+        "default": {
+          "front": "projects/qyccan/assets/characters/images/叶红衣-front.png",
+          "side": "projects/qyccan/assets/characters/images/叶红衣-side.png",
+          "back": "projects/qyccan/assets/characters/images/叶红衣-back.png"
+        }
+      }
+    },
+    "赵无极": {
+      "variants": {
+        "default": {
+          "front": "projects/qyccan/assets/characters/images/赵无极-front.png"
+        }
+      }
+    },
+    "王胖子": {
+      "variants": {
+        "default": {
+          "front": "projects/qyccan/assets/characters/images/王胖子-front.png"
+        }
+      }
+    },
+    "叶如烟": {
+      "variants": {
+        "default": {
+          "front": "projects/qyccan/assets/characters/images/叶如烟-front.png"
+        }
+      }
+    },
+    "系统": {
+      "variants": {
+        "interface": {
+          "front": "projects/qyccan/assets/characters/images/系统-interface.png"
+        }
+      }
+    }
+  },
+  "scenes": {
+    "黑雾森林": {
+      "day": "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
+      "night": "projects/qyccan/assets/scenes/images/黑雾森林-night.png"
+    },
+    "叶家府邸": {
+      "day": "projects/qyccan/assets/scenes/images/叶家府邸-day.png",
+      "night": "projects/qyccan/assets/scenes/images/叶家府邸-night.png"
+    },
+    "叶家大厅": {
+      "day": "projects/qyccan/assets/scenes/images/叶家大厅-day.png",
+      "night": "projects/qyccan/assets/scenes/images/叶家大厅-night.png"
+    },
+    "叶红衣闺房": {
+      "day": "projects/qyccan/assets/scenes/images/叶红衣闺房-day.png",
+      "night": "projects/qyccan/assets/scenes/images/叶红衣闺房-night.png"
+    },
+    "天风学院广场": {
+      "day": "projects/qyccan/assets/scenes/images/天风学院广场-day.png"
+    },
+    "擂台": {
+      "day": "projects/qyccan/assets/scenes/images/擂台-day.png"
+    },
+    "练武场": {
+      "day": "projects/qyccan/assets/scenes/images/练武场-day.png"
+    },
+    "聚灵阁": {
+      "day": "projects/qyccan/assets/scenes/images/聚灵阁-day.png",
+      "night": "projects/qyccan/assets/scenes/images/聚灵阁-night.png"
+    }
+  },
+  "summary": {
+    "total_generated": 29,
+    "total_skipped": 0,
+    "characters_total": 16,
+    "scenes_total": 13,
+    "model": "dreamina text2image 5.0",
+    "resolution": "2k",
+    "style": "realistic-oriental"
+  },
+  "status": "locked",
+  "locked_at": "2026-04-03T00:00:00Z"
+}

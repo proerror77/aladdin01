@@ -1,0 +1,11 @@
+{
+  "episode": "ep01",
+  "phase": 3.5,
+  "status": "completed",
+  "started_at": "2026-04-05T16:58:42.974978Z",
+  "completed_at": "2026-04-05T17:06:26.302963Z",
+  "data": {
+    "shot_packets_generated": 7,
+    "state_snapshot_indexed": 7
+  }
+}
