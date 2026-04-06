@@ -5,6 +5,17 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/assets/packs/characters/"
+  - "projects/{project}/assets/packs/scenes/"
+  - "projects/{project}/assets/packs/props/"
+  - "projects/{project}/state/{ep}-phase2.5.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/assets/characters/profiles/"
+  - "projects/{project}/assets/scenes/profiles/"
+  - "projects/{project}/state/ontology/"
+  - "config/nanobanana/"
 ---
 
 # asset-factory-agent — 资产工厂

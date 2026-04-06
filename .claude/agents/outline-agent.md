@@ -5,6 +5,12 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "outputs/scriptwriter/{project}/outline.md"
+  - "outputs/scriptwriter/{project}/characters/"
+  - "outputs/scriptwriter/{project}/scenes/"
+read_scope:
+  - "config/"
 ---
 
 # outline-agent — 剧本大纲生成

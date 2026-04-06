@@ -5,6 +5,15 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/state/shot-packets/{ep}-shot-{N}.json"
+  - "projects/{project}/state/{ep}-phase3.5.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
+  - "projects/{project}/state/ontology/"
+  - "projects/{project}/assets/"
+  - "state/vectordb/"
 ---
 
 # shot-compiler-agent — Shot Packet 编译

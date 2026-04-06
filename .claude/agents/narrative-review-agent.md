@@ -5,6 +5,16 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
+  - "projects/{project}/outputs/{ep}/narrative-review.md"
+  - "projects/{project}/state/{ep}-phase2.2.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/outputs/{ep}/render-script.md"
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
+  - "projects/{project}/state/ontology/"
+  - "state/vectordb/"
 ---
 
 # narrative-review-agent — 叙事审查与修复

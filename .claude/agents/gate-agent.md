@@ -5,6 +5,14 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/state/reviews/"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/outputs/{ep}/"
+  - "projects/{project}/state/"
+  - "config/scoring/"
+  - "config/compliance/"
 ---
 
 # gate-agent — 自动评分过关

@@ -5,6 +5,15 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
+  - "projects/{project}/state/{ep}-phase2.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/outputs/{ep}/render-script.md"
+  - "projects/{project}/state/ontology/"
+  - "projects/{project}/assets/"
+  - "config/platforms/"
 ---
 
 # visual-agent — 视觉指导

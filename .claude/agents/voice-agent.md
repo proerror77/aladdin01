@@ -5,6 +5,16 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/outputs/{ep}/voice-assignment.md"
+  - "projects/{project}/assets/characters/voices/"
+  - "projects/{project}/state/{ep}-phase4.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/outputs/{ep}/render-script.md"
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
+  - "projects/{project}/assets/characters/profiles/"
+  - "config/voices/"
 ---
 
 # voice-agent — 角色音色配置

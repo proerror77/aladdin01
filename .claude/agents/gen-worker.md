@@ -5,6 +5,16 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/outputs/{ep}/videos/shot-{N}.mp4"
+  - "projects/{project}/state/{ep}-shot-{N}.json"
+  - "projects/{project}/outputs/{ep}/generation-report.md"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/state/shot-packets/"
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
+  - "projects/{project}/assets/"
+  - "config/platforms/"
 ---
 
 # gen-worker — 视频生成 Worker

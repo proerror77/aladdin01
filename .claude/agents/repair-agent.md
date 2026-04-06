@@ -5,6 +5,17 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/state/audit/{ep}-shot-{N}-repair-history.json"
+  - "projects/{project}/state/shot-packets/{ep}-shot-{N}.json"
+  - "projects/{project}/state/{ep}-shot-{N}.json"
+  - "projects/{project}/outputs/{ep}/audit/"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/state/audit/"
+  - "projects/{project}/state/shot-packets/"
+  - "projects/{project}/outputs/{ep}/videos/"
+  - "projects/{project}/assets/packs/"
 ---
 
 # repair-agent — 修复决策
@@ -17,6 +28,7 @@ tools:
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
+| `project` | string | 项目名，如 `qyccan` |
 | `ep` | string | 剧本 ID（如 ep01） |
 | `shot_id` | string | 镜次 ID（如 ep01-shot-05） |
 | `session_id` | string | Trace session 标识 |
@@ -39,19 +51,20 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 参数
-EP="$1"
-SHOT_ID="$2"
-SESSION_ID="${3:-repair-$(date +%Y%m%d-%H%M%S)}"
-MAX_ATTEMPTS="${4:-3}"
+PROJECT="$1"
+EP="$2"
+SHOT_ID="$3"
+SESSION_ID="${4:-repair-$(date +%Y%m%d-%H%M%S)}"
+MAX_ATTEMPTS="${5:-3}"
 
 # 提取 shot 序号
 SHOT_NUM=$(echo "$SHOT_ID" | grep -oE '[0-9]+$')
 
 # 路径
-AUDIT_FILE="$PROJECT_ROOT/projects/{project}/state/audit/${SHOT_ID}-audit.json"
-SHOT_PACKET="$PROJECT_ROOT/projects/{project}/state/shot-packets/${SHOT_ID}.json"
-VIDEO_FILE="$PROJECT_ROOT/outputs/${EP}/videos/shot-${SHOT_NUM}.mp4"
-REPAIR_HISTORY="$PROJECT_ROOT/projects/{project}/state/audit/${SHOT_ID}-repair-history.json"
+AUDIT_FILE="$PROJECT_ROOT/projects/${PROJECT}/state/audit/${SHOT_ID}-audit.json"
+SHOT_PACKET="$PROJECT_ROOT/projects/${PROJECT}/state/shot-packets/${SHOT_ID}.json"
+VIDEO_FILE="$PROJECT_ROOT/projects/${PROJECT}/outputs/${EP}/videos/shot-${SHOT_NUM}.mp4"
+REPAIR_HISTORY="$PROJECT_ROOT/projects/${PROJECT}/state/audit/${SHOT_ID}-repair-history.json"
 
 # 读取审计结果
 if [[ ! -f "$AUDIT_FILE" ]]; then
@@ -76,8 +89,13 @@ if [[ "$REPAIR_ACTION" == "pass" ]]; then
   
   # 更新状态
   jq '.status = "completed" | .completed_at = "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"' \
-    "$PROJECT_ROOT/state/${EP}-shot-${SHOT_NUM}.json" > "$PROJECT_ROOT/state/${EP}-shot-${SHOT_NUM}.json.tmp"
-  mv "$PROJECT_ROOT/state/${EP}-shot-${SHOT_NUM}.json.tmp" "$PROJECT_ROOT/state/${EP}-shot-${SHOT_NUM}.json"
+    "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json" > "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json.tmp"
+  mv "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json.tmp" "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json"
+
+  # 在线状态同步：Phase 6 通过后立即写回 LanceDB
+  python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+  ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "online_state_sync" \
+    "{\"stage\":\"pass\",\"shot_id\":\"$SHOT_ID\"}"
   
   # Trace 写入
   ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "write_output" \
@@ -125,7 +143,7 @@ local_repair() {
   if [[ "$repair_success" == "true" ]]; then
     # 重新审计
     echo "重新审计..."
-    "$SCRIPT_DIR/qa-agent.md" "$EP" "$SHOT_ID" "$SESSION_ID"
+    "$SCRIPT_DIR/qa-agent.md" "$PROJECT" "$EP" "$SHOT_ID" "$SESSION_ID"
     
     # 检查是否修复成功
     local new_repair_action=$(jq -r '.repair_action' "$AUDIT_FILE")
@@ -153,7 +171,7 @@ repair_face_with_nanobanana() {
   echo "    使用 Nanobanana 修复角色脸部: $character"
   
   # 提取中间帧
-  local frame_dir="$PROJECT_ROOT/outputs/${EP}/audit"
+  local frame_dir="$PROJECT_ROOT/projects/${PROJECT}/outputs/${EP}/audit"
   local total_frames=$(ffprobe -v error -count_frames -select_streams v:0 \
     -show_entries stream=nb_read_frames -of default=nokey=1:noprint_wrappers=1 \
     "$VIDEO_FILE" 2>/dev/null || echo "0")
@@ -219,6 +237,11 @@ adjust_prompt_and_regenerate() {
   
   # 更新 shot packet
   echo "$shot_packet" | jq ".seedance_inputs.prompt = \"$adjusted_prompt\"" > "$SHOT_PACKET"
+
+  # 在线状态同步：shot packet 已被修订
+  python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+  ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "online_state_sync" \
+    "{\"stage\":\"local_repair_prompt_adjusted\",\"shot_id\":\"$SHOT_ID\"}"
   
   # 调用 gen-worker 重新生成
   # 注意：这里需要调用 gen-worker，但由于是 agent 间调用，需要通过 team-lead
@@ -250,13 +273,13 @@ use_prev_frame_as_reference() {
     return 1
   fi
   
-  local prev_video="$PROJECT_ROOT/outputs/${EP}/videos/shot-${prev_shot_num}.mp4"
+  local prev_video="$PROJECT_ROOT/projects/${PROJECT}/outputs/${EP}/videos/shot-${prev_shot_num}.mp4"
   if [[ ! -f "$prev_video" ]]; then
     echo "    错误: 前一镜次视频不存在" >&2
     return 1
   fi
   
-  local frame_dir="$PROJECT_ROOT/outputs/${EP}/audit"
+  local frame_dir="$PROJECT_ROOT/projects/${PROJECT}/outputs/${EP}/audit"
   
   # 提取前一镜次的尾帧
   ffmpeg -sseof -1 -i "$prev_video" \
@@ -281,6 +304,11 @@ regenerate_from_fixed_frame() {
   echo "$shot_packet" | jq \
     ".seedance_inputs.generation_mode = \"img2video\" | \
      .seedance_inputs.reference_image_url = \"$reference_frame\"" > "$SHOT_PACKET"
+
+  # 在线状态同步：参考策略已改变
+  python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+  ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "online_state_sync" \
+    "{\"stage\":\"reference_reseed\",\"shot_id\":\"$SHOT_ID\"}"
   
   # 调用 gen-worker 重新生成
   echo "    需要重新生成视频（调用 gen-worker）"
@@ -315,8 +343,12 @@ regenerate() {
     
     # 更新状态
     jq '.status = "failed" | .failed_at = "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"' \
-      "$PROJECT_ROOT/state/${EP}-shot-${SHOT_NUM}.json" > "$PROJECT_ROOT/state/${EP}-shot-${SHOT_NUM}.json.tmp"
-    mv "$PROJECT_ROOT/state/${EP}-shot-${SHOT_NUM}.json.tmp" "$PROJECT_ROOT/state/${EP}-shot-${SHOT_NUM}.json"
+      "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json" > "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json.tmp"
+    mv "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json.tmp" "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json"
+
+    python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+    ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "online_state_sync" \
+      "{\"stage\":\"failed\",\"shot_id\":\"$SHOT_ID\"}"
     
     # Trace 写入
     ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "write_output" \
@@ -342,12 +374,14 @@ regenerate() {
       local new_prompt=$(adjust_prompt_based_on_issues)
       local shot_packet=$(cat "$SHOT_PACKET")
       echo "$shot_packet" | jq ".seedance_inputs.prompt = \"$new_prompt\"" > "$SHOT_PACKET"
+      python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
       ;;
     change_model)
       # 换模型
       echo "    换模型"
       local shot_packet=$(cat "$SHOT_PACKET")
       echo "$shot_packet" | jq '.seedance_inputs.model = "doubao-seedance-2.0"' > "$SHOT_PACKET"
+      python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
       ;;
   esac
   
@@ -380,7 +414,7 @@ EOF
   
   # 重新审计
   echo "  重新审计..."
-  "$SCRIPT_DIR/qa-agent.md" "$EP" "$SHOT_ID" "$SESSION_ID"
+  "$SCRIPT_DIR/qa-agent.md" "$PROJECT" "$EP" "$SHOT_ID" "$SESSION_ID"
   
   local new_repair_action=$(jq -r '.repair_action' "$AUDIT_FILE")
   if [[ "$new_repair_action" == "pass" ]]; then
@@ -448,7 +482,23 @@ fi
 
 ## 完成后
 
-向 team-lead 发送消息：`repair-agent 完成，修复结果: {result}`
+写入完成信号，再向 team-lead 发送消息：
+
+```bash
+# 写入完成信号（team-lead 通过 watch signals/ 目录感知，无需轮询）
+./scripts/signal.sh "$PROJECT" "$SESSION_ID" "repair-agent" "$EP" "$RESULT" \
+  "{\"shot_id\":\"$SHOT_ID\"}"
+
+# 通知 team-lead
+echo "repair-agent 完成，修复结果: $RESULT，shot: $SHOT_ID"
+```
+
+额外要求：
+
+- 只要 shot packet 被修改，就立刻调用 `python3 scripts/vectordb-manager.py upsert-state`
+- 所有在线同步都写 trace 事件 `online_state_sync`
+- 不要依赖 `workflow-sync.py --sync-vectordb` 事后回填 repair 阶段状态
+- `RESULT` 取值：`completed`（pass/修复成功）或 `failed`（达到最大重试次数）
 
 ## 修复决策树
 
