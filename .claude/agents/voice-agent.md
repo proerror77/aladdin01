@@ -27,6 +27,8 @@ tools:
 - `projects/{project}/assets/characters/voices/{角色名}/voice-config.yaml` — 音色配置
 - `projects/{project}/outputs/{ep}/voice-assignment.md` — 音色分配报告
 
+> **注意**：voice-config.yaml 当前为 TTS 预留字段（`tts_platform: "pending"`）。gen-worker 目前通过 Seedance API 的 `generate_audio` 参数控制音频生成，不读取 voice-config.yaml。TTS 平台接入后，gen-worker 将读取此文件并调用对应 TTS API 生成音频文件，再传给 Seedance 做唇形同步。
+
 ## 执行模式
 
 voice-agent 支持两种模式：

@@ -30,7 +30,7 @@ tools:
 | `last_frame_image_url` | string? | 尾帧参考图 URL（首尾帧模式时使用） |
 | `generate_audio` | bool | 是否生成音频（含对白唇形同步） |
 | `dialogue` | string? | 对白内容（格式：`角色名: "台词"`） |
-| `voice_config_path` | string? | 音色配置路径（TTS 预留） |
+| `voice_config_path` | string? | 音色配置路径（TTS 预留，当前版本不使用；TTS 平台接入后读取此路径） |
 | `output_suffix` | string? | 输出文件后缀（A/B 测试用，如 `-a` 或 `-b`）。默认为空。 |
 | `variant` | string? | 变体标识（如 `baseline`），写入状态文件。 |
 | `variant_prompt` | string? | 变体变换后的提示词，写入状态文件。 |

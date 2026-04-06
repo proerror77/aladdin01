@@ -87,7 +87,12 @@ assert_contains "start Phase 6 检查 world-model" 'world-model' "$ROOT_DIR/.cla
 assert_contains "batch Phase 6 检查 world-model" 'world-model' "$ROOT_DIR/.claude/skills/batch.md"
 
 echo ""
-echo "=== 9. v2.0 Phase 0 + Phase 2.5 接入 ==="
+echo "=== 12. 流程连续性修复 ==="
+assert_contains "start 定义 USE_V2 变量" 'USE_V2' "$ROOT_DIR/.claude/skills/start.md"
+assert_contains "batch 定义 USE_V2 变量" 'USE_V2' "$ROOT_DIR/.claude/skills/batch.md"
+assert_contains "asset-factory 同步到 images 目录" 'assets/characters/images|assets/scenes/images' "$ROOT_DIR/.claude/agents/asset-factory-agent.md"
+assert_contains "shot-compiler 包含分镜图到 images 数组" 'storyboard_image|storyboard_image_path' "$ROOT_DIR/.claude/agents/shot-compiler-agent.md"
+assert_contains "voice-agent 标注 TTS 预留" 'TTS 预留|tts_platform' "$ROOT_DIR/.claude/agents/voice-agent.md"
 assert_contains "start 接入 ontology-builder-agent" 'ontology-builder-agent' "$ROOT_DIR/.claude/skills/start.md"
 assert_contains "start 接入 asset-factory-agent" 'asset-factory-agent' "$ROOT_DIR/.claude/skills/start.md"
 assert_contains "batch 接入 ontology-builder-agent" 'ontology-builder-agent' "$ROOT_DIR/.claude/skills/batch.md"

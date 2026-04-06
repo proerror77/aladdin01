@@ -112,6 +112,28 @@ projects/{PROJECT}/script/ 目录下没有找到剧本文件。
 3. 方形（1:1，Instagram）
 ```
 
+**选择生成模式（v1.0 vs v2.0）**：
+```
+请选择生成模式：
+1. v1.0 — 文生视频（text_to_video，快速，无需资产包）
+2. v2.0 — 图生视频（img2video，高质量，需要先运行 ~design 生成参考图）
+```
+
+根据选择设置：
+```bash
+# v1.0 模式（默认）
+USE_V2="false"
+
+# v2.0 模式
+USE_V2="true"
+```
+
+也可通过命令行参数直接指定：
+```bash
+~start qyccan ep01 --v2    # 启用 v2.0 模式
+~start qyccan ep01         # 默认 v1.0 模式
+```
+
 ### 2.5 A/B 测试模式（可选）
 
 如果用户输入 `~start --ab` 或在交互中回答 yes：

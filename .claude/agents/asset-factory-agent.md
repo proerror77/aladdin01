@@ -289,6 +289,42 @@ echo "  怪物:   $(find projects/{project}/assets/packs/creatures  -name '*.png
 echo "  特效:   $(find projects/{project}/assets/packs/vfx        -name '*.png' 2>/dev/null | wc -l) 张"
 ```
 
+### Step 10: 同步到 images/ 目录（路径统一）
+
+asset-factory 生成到 `assets/packs/`，但 visual-agent、shot-compiler-agent、memory-agent 读取的是 `assets/characters/images/` 和 `assets/scenes/images/`。
+生成完成后，将 packs 中的 front 视图同步到 images 目录，保持路径兼容：
+
+```bash
+# 同步角色 front 视图到 assets/characters/images/
+mkdir -p "projects/{project}/assets/characters/images"
+for pack_file in projects/{project}/assets/packs/characters/*.png; do
+  filename=$(basename "$pack_file")
+  # packs 命名：{角色名}-{variant}-{angle}.png
+  # images 命名：{角色名}-{variant_id}-{view}.png（相同格式，直接复制）
+  target="projects/{project}/assets/characters/images/${filename}"
+  if [[ ! -f "$target" ]]; then
+    cp "$pack_file" "$target"
+    echo "✓ 同步: $filename → assets/characters/images/"
+  fi
+done
+
+# 同步场景 styleframe 到 assets/scenes/images/
+mkdir -p "projects/{project}/assets/scenes/images"
+for pack_file in projects/{project}/assets/packs/scenes/*.png; do
+  filename=$(basename "$pack_file")
+  # packs 命名：{场景名}-{time_of_day}-styleframe.png
+  # images 命名：{场景名}-{time_of_day}.png（去掉 -styleframe 后缀）
+  target_name="${filename/-styleframe/}"
+  target="projects/{project}/assets/scenes/images/${target_name}"
+  if [[ ! -f "$target" ]]; then
+    cp "$pack_file" "$target"
+    echo "✓ 同步: $filename → assets/scenes/images/${target_name}"
+  fi
+done
+
+echo "✓ 路径同步完成"
+```
+
 ## 完成后
 
 向 team-lead 发送消息：`asset-factory-agent 完成，共生成 {N} 个资产`

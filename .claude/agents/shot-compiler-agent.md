@@ -234,12 +234,18 @@ scene_images=$(echo "$references_json" | jq -c '[.references.scenes[].assets[].p
 # 提取前一镜结尾帧
 prev_frame=$(echo "$references_json" | jq -r '.references.previous_shot.end_frame // "null"')
 
-# 合并所有图片
+# 提取分镜图（storyboard_image_path，由 storyboard-agent 在 Phase 2.3 写入）
+storyboard_image=$(yq eval ".shots[] | select(.shot_id == \"$shot_id\") | .storyboard_image_path // \"null\"" \
+  "projects/${project}/outputs/${ep}/visual-direction.yaml")
+
+# 合并所有图片：角色图 + 场景图 + 分镜图 + 前一镜结尾帧
+# 顺序决定 @图片N 的索引，必须与 seedance_prompt 中的引用一致
 all_images=$(jq -n \
   --argjson char "$char_images" \
   --argjson scene "$scene_images" \
+  --arg storyboard "$storyboard_image" \
   --arg prev "$prev_frame" \
-  '$char + $scene + (if $prev != "null" then [$prev] else [] end)')
+  '$char + $scene + (if $storyboard != "null" then [$storyboard] else [] end) + (if $prev != "null" then [$prev] else [] end)')
 
 # 确定 dialogue_mode
 dialogue_mode="none"
