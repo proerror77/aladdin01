@@ -211,6 +211,59 @@ spawn visual-agent
   等待完成
 ```
 
+**Phase 2.2 — 叙事审查（新增）**
+```
+spawn narrative-review-agent
+  输入：projects/{project}/outputs/{ep}/visual-direction.yaml + projects/{project}/outputs/{ep}/render-script.md
+  session_id: $SESSION_ID
+  trace_file: {ep}-phase2.2-trace
+  输出：projects/{project}/outputs/{ep}/narrative-review.md
+  状态：projects/{project}/state/{ep}-phase2.2.json
+  等待完成
+```
+
+读取 `projects/{project}/state/{ep}-phase2.2.json` 的 `decision` 字段：
+
+- **`auto_pass` 或 `fixed_pass`**：继续 Phase 2.3
+- **`reject`**：重新 spawn visual-agent，最多重试 2 次：
+
+```
+NARRATIVE_RETRY=0
+NARRATIVE_MAX_RETRIES=2
+
+while true:
+  读取 {ep}-phase2.2.json 的 decision
+  
+  if decision in ["auto_pass", "fixed_pass"]:
+    break  # 继续 Phase 2.3
+  
+  if decision == "reject":
+    NARRATIVE_RETRY += 1
+    if NARRATIVE_RETRY > NARRATIVE_MAX_RETRIES:
+      # 超过重试上限，人工介入
+      输出：
+        ⚠️ {ep} 叙事审查连续 {NARRATIVE_MAX_RETRIES} 次 reject，需人工介入
+        审查报告：projects/{project}/outputs/{ep}/narrative-review.md
+        请修改剧本或手动调整 visual-direction.yaml 后运行 ~start --resume
+      退出流程
+    
+    # 重新 spawn visual-agent，附带退回原因
+    输出：[retry {NARRATIVE_RETRY}/{NARRATIVE_MAX_RETRIES}] 叙事审查 reject，重新生成视觉指导...
+    
+    spawn visual-agent
+      输入：projects/{project}/outputs/{ep}/render-script.md + 视觉风格 + 目标媒介
+             + 修改指令：projects/{project}/outputs/{ep}/narrative-review.md（退回原因）
+      session_id: $SESSION_ID
+      trace_file: {ep}-phase2-retry{NARRATIVE_RETRY}-trace
+      等待完成
+    
+    spawn narrative-review-agent
+      输入：projects/{project}/outputs/{ep}/visual-direction.yaml + render-script.md
+      session_id: $SESSION_ID
+      trace_file: {ep}-phase2.2-retry{NARRATIVE_RETRY}-trace
+      等待完成
+```
+
 **Phase 2.3 — 分镜图生成（新增）**
 ```
 spawn storyboard-agent
@@ -223,12 +276,13 @@ spawn storyboard-agent
 
 🔴 **人工确认点 1**（`--auto-approve` 时跳过）
 
-如果 `--auto-approve` 启用：直接继续 Phase 3，输出日志 `[auto-approve] 视觉指导/分镜图自动通过`。
+如果 `--auto-approve` 启用：直接继续 Phase 3，输出日志 `[auto-approve] 视觉指导/叙事审查/分镜图自动通过`。
 
 否则：
 ```
-视觉指导和分镜图已完成，请查看：
+视觉指导、叙事审查和分镜图已完成，请查看：
 - projects/{project}/outputs/{ep}/visual-direction.yaml
+- projects/{project}/outputs/{ep}/narrative-review.md
 - projects/{project}/outputs/{ep}/storyboard-preview.md
 
 共 {N} 个镜次，总时长约 {X} 秒。
@@ -281,18 +335,20 @@ spawn design-agent
 # 读取所有 shot_id
 shot_ids=$(yq eval '.shots[].shot_id' projects/{project}/outputs/{ep}/visual-direction.yaml)
 
-# 为每个 shot 编译 shot packet
+# 并行 spawn 所有 shot-compiler-agent（不等待，全部同时启动）
 for shot_id in $shot_ids; do
   spawn shot-compiler-agent
     输入：shot_id, visual-direction.yaml, world-model.json
     session_id: $SESSION_ID
     trace_file: {ep}-phase3.5-trace
     输出：projects/{project}/state/shot-packets/{shot_id}.json
-    等待完成
 done
+
+# 等待所有 shot-compiler-agent 完成
+wait_all
 ```
 
-shot-compiler-agent 内部会调用 memory-agent 检索参考资产。
+shot-compiler-agent 内部会调用 memory-agent 检索参考资产。每个 agent 写入独立文件，无并发冲突。
 
 完成后写入 `projects/{project}/state/{ep}-phase3.5.json`：
 ```json
@@ -439,9 +495,11 @@ concurrency > 1:
 
 **Phase 6 — Audit & Repair（v2.0 新增）**
 
-检查是否存在 `projects/{project}/state/shot-packets/` 目录：
-- 如果存在 → 执行 Phase 6
-- 如果不存在 → 跳过 Phase 6，输出日志 `[skip] Phase 6: 未找到 shot-packets/，跳过审计和修复`
+检查是否同时满足：
+- `projects/{project}/state/ontology/{ep}-world-model.json` 存在
+- `projects/{project}/state/shot-packets/` 目录存在
+
+两个条件都满足 → 执行 Phase 6；否则跳过，输出 `[skip] Phase 6: v2.0 条件不满足，跳过审计和修复`
 
 ```
 # 读取所有成功生成的 shot_id

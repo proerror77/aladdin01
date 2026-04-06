@@ -74,6 +74,23 @@ assert_contains "shot-compiler-agent 写入 selected_views" 'selected_views' "$R
 assert_contains "shot-compiler-agent 写入 continuity_inputs" 'continuity_inputs' "$ROOT_DIR/.claude/agents/shot-compiler-agent.md"
 assert_contains "qa-agent 校验 selected_views" 'selected_views|preferred_view' "$ROOT_DIR/.claude/agents/qa-agent.md"
 
+echo ""
+echo "=== 6. narrative-review reject 路径 ==="
+assert_contains "start 处理 narrative-review reject" 'reject' "$ROOT_DIR/.claude/skills/start.md"
+assert_contains "start 有 reject 重试逻辑" 'NARRATIVE_RETRY|NARRATIVE_MAX_RETRIES' "$ROOT_DIR/.claude/skills/start.md"
+assert_contains "batch 处理 narrative-review reject" 'reject' "$ROOT_DIR/.claude/skills/batch.md"
+assert_contains "batch 有 reject 重试逻辑" 'NARRATIVE_RETRY|NARRATIVE_MAX_RETRIES' "$ROOT_DIR/.claude/skills/batch.md"
+
+echo ""
+echo "=== 7. v2.0 触发条件一致性 ==="
+assert_contains "start Phase 6 检查 world-model" 'world-model' "$ROOT_DIR/.claude/skills/start.md"
+assert_contains "batch Phase 6 检查 world-model" 'world-model' "$ROOT_DIR/.claude/skills/batch.md"
+
+echo ""
+echo "=== 8. Phase 3.5 并行化 ==="
+assert_contains "start Phase 3.5 并行 spawn" 'wait_all|并行' "$ROOT_DIR/.claude/skills/start.md"
+assert_contains "batch Phase 3.5 并行 spawn" 'wait_all|并行' "$ROOT_DIR/.claude/skills/batch.md"
+
 PASS_COUNT=$(grep -c '^P$' "$RESULTS_FILE" 2>/dev/null || true)
 FAIL_COUNT=$(grep -c '^F$' "$RESULTS_FILE" 2>/dev/null || true)
 TOTAL=$((PASS_COUNT + FAIL_COUNT))
