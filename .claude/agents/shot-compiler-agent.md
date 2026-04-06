@@ -152,6 +152,10 @@ done
 # Canonical fallback：如果 memory-agent 不可直接调用，则使用
 # scripts/workflow-sync.py 生成的 shot packet 作为最终 source of truth。
 references_json=$(memory_agent_call "$shot_id" "$session_id")
+
+# 保留 planning 和 retrieval_evidence 到 shot packet（供 qa-agent 追溯）
+planning_json=$(echo "$references_json" | jq -c '.planning // {}')
+retrieval_evidence_json=$(echo "$references_json" | jq -c '.retrieval_evidence // {}')
 ```
 
 ### 4. 合并 references 到角色列表
@@ -302,6 +306,8 @@ packet_json=$(jq -n \
   --argjson selected_views "$selected_views" \
   --argjson continuity_inputs "$continuity_inputs" \
   --argjson source_refs "$source_refs" \
+  --argjson planning "$planning_json" \
+  --argjson retrieval_evidence "$retrieval_evidence_json" \
   '{
     shot_id: $shot_id,
     episode: $episode,
@@ -337,6 +343,10 @@ packet_json=$(jq -n \
     ontology_constraints: {
       world_rules: $world_rules,
       character_abilities: $character_abilities
+    },
+    retrieval_audit: {
+      planning: $planning,
+      retrieval_evidence: $retrieval_evidence
     }
   }')
 ```

@@ -389,7 +389,14 @@ spawn design-agent
 
 检查是否存在 `projects/{project}/state/ontology/{ep}-world-model.json`：
 - 如果存在 → 执行 Phase 3.5
-- 如果不存在 → 跳过 Phase 3.5，输出日志 `[skip] Phase 3.5: 未找到 world-model.json，跳过 shot packet 编译`
+- 如果不存在且 `USE_V2 == "true"` → 输出警告：
+  ```
+  ⚠️ v2.0 模式已启用，但 world-model.json 不存在。
+  可能原因：Phase 0（ontology-builder）未执行或失败。
+  请检查 projects/{project}/state/{ep}-phase0.json 的状态。
+  当前降级为 v1.0 模式（gen-worker 将从 visual-direction.yaml 读取参数）。
+  ```
+- 如果不存在且 `USE_V2 == "false"` → 正常跳过，输出 `[skip] Phase 3.5: v1.0 模式，跳过 shot packet 编译`
 
 ```
 # 读取所有 shot_id

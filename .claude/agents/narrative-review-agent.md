@@ -340,6 +340,11 @@ def style_distance(fp1: dict, fp2: dict) -> float:
 
 修复时直接修改 `visual-direction.yaml` 文件，同时在审查报告中记录每处修改的原因。
 
+**与 reject 重试的协调**：
+- `fixed_pass`（50-84 分）：narrative-review-agent 直接 in-place 修复 visual-direction.yaml，流程继续。visual-agent 不会被重新 spawn，修复结果不会被覆盖。
+- `reject`（<50 分）：narrative-review-agent 不做 in-place 修复（问题太严重，修补无意义）。start/batch 的重试逻辑会重新 spawn visual-agent，visual-agent 读取 narrative-review.md 作为修改指令，从头重新生成 visual-direction.yaml。
+- **关键规则**：reject 时只写审查报告，不改 visual-direction.yaml。这样 visual-agent 重新生成时不会与 narrative-review 的修改冲突。
+
 ## 输出格式
 
 ### 审查报告 `narrative-review.md`
