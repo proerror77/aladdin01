@@ -366,6 +366,34 @@ def generate_storyboard_image(project_root: Path, target: Path) -> None:
     run(cmd, cwd=project_root)
 
 
+def storyboard_image_index(shot: dict[str, Any], project_root: Path) -> int:
+    """计算分镜图在 images 数组中的 1-based 索引。
+    images 顺序：角色图（front/side/back，按实际存在文件数）+ 场景图 + 分镜图
+    """
+    references = shot.get("references") or {}
+    char_image_count = 0
+    for ref in references.get("characters") or []:
+        image_path = ref.get("image_path")
+        if not image_path:
+            continue
+        source = project_root / image_path
+        if not source.exists():
+            continue
+        char_image_count += 1  # front（已验证存在）
+        stem = source.stem
+        suffix = source.suffix
+        if stem.endswith("-front"):
+            prefix = stem[:-6]
+            for extra in ("side", "back"):
+                if source.with_name(f"{prefix}-{extra}{suffix}").exists():
+                    char_image_count += 1
+    scene_image_count = sum(
+        1 for ref in (references.get("scenes") or [])
+        if ref.get("image_path") and (project_root / ref["image_path"]).exists()
+    )
+    return char_image_count + scene_image_count + 1  # 1-based
+
+
 def ensure_storyboards(
     project_root: Path,
     project: str,
@@ -378,7 +406,6 @@ def ensure_storyboards(
 
     generated = 0
     prompt_updates = 0
-    marker = "构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
 
     for shot in shots:
         shot_index = int(shot["shot_index"])
@@ -392,8 +419,20 @@ def ensure_storyboards(
             shot["storyboard_image_path"] = rel_output
 
         prompt = str(shot.get("seedance_prompt") or "").rstrip()
-        if marker not in prompt:
-            prompt = f"{prompt}\n\n{marker}" if prompt else marker
+
+        # 计算分镜图在 images 数组中的正确 @图片N 索引
+        sb_index = storyboard_image_index(shot, project_root)
+        old_marker = "构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+        new_marker = f"构图参考@图片{sb_index}（仅参考景别和角色位置，不复制细节）"
+
+        # 替换旧的 @分镜图 引用（如果存在）
+        if old_marker in prompt:
+            prompt = prompt.replace(old_marker, new_marker)
+            shot["seedance_prompt"] = prompt
+            prompt_updates += 1
+        elif new_marker not in prompt:
+            # 尚未注入，追加
+            prompt = f"{prompt}\n\n{new_marker}" if prompt else new_marker
             shot["seedance_prompt"] = prompt
             prompt_updates += 1
 

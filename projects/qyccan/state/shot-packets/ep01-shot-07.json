@@ -6,6 +6,56 @@
   "scene_goal": "0-4秒：镜头缓慢拉远，从中景拉至大全景，苏夜和叶红衣的体型反差在大环境中格外突出",
   "duration_sec": 10,
   "dialogue_mode": "external_dub",
+  "source_refs": {
+    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-07.png"
+  },
+  "story_logic": {
+    "shot_purpose": "land_result",
+    "dramatic_role": "resolution",
+    "transition_from_previous": "dissolve",
+    "emotional_target": "反差和得意",
+    "information_delta": "0-4秒：镜头缓慢拉远，从中景拉至大全景，苏夜和叶红衣的体型反差在大环境中格外突出",
+    "next_hook": "情绪收束"
+  },
+  "selected_views": {
+    "characters": [
+      {
+        "id": "_",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      },
+      {
+        "id": "_",
+        "name": "叶红衣",
+        "variant_id": "default",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      }
+    ],
+    "scene": {
+      "name": "黑雾森林",
+      "preferred_view": "day",
+      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    }
+  },
+  "continuity_inputs": {
+    "previous_shot_id": "ep01-shot-06",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-06-end-frame.png"
+  },
   "characters": [
     {
       "id": "suye",
@@ -88,7 +138,7 @@
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-4秒：拉镜头配合升降镜头，从中景缓慢拉远至大全景，[苏夜]拇指大小趴在地上摆Pose，[叶红衣]高挑红衣破损彻底石化俯视[苏夜]，两人体型反差在黑雾弥漫的古木森林背景下格外突出，地面焦痕清晰可见\n5-7秒：大全景固定镜头，[苏夜]扭腰摆Pose自信满满，[叶红衣]石化俯视，[家仆乙]在远处吓傻，三人形成强烈喜剧反差，画外音（苏夜，OS，得意）：\"吞天口……嗝……这穿越，好像还不错嘛！\"\n8-10秒：大远景拉镜头继续拉远，黑雾弥漫的古木森林将两人逐渐淹没，镜头淡出\n\n音效：轻松喜剧收尾音效、黑雾森林环境音渐弱\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-4秒：拉镜头配合升降镜头，从中景缓慢拉远至大全景，[苏夜]拇指大小趴在地上摆Pose，[叶红衣]高挑红衣破损彻底石化俯视[苏夜]，两人体型反差在黑雾弥漫的古木森林背景下格外突出，地面焦痕清晰可见\n5-7秒：大全景固定镜头，[苏夜]扭腰摆Pose自信满满，[叶红衣]石化俯视，[家仆乙]在远处吓傻，三人形成强烈喜剧反差，画外音（苏夜，OS，得意）：\"吞天口……嗝……这穿越，好像还不错嘛！\"\n8-10秒：大远景拉镜头继续拉远，黑雾弥漫的古木森林将两人逐渐淹没，镜头淡出\n\n音效：轻松喜剧收尾音效、黑雾森林环境音渐弱\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片8（仅参考景别和角色位置，不复制细节）"
   },
   "forbidden_changes": [
     "保持苏夜的当前形态（qingyucan）",

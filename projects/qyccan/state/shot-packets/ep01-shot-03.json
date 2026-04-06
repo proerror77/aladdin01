@@ -6,6 +6,56 @@
   "scene_goal": "0-3秒：树梢上苏夜感到屁股底下一阵吸力，被吸走，化作绿光坠落",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
+  "source_refs": {
+    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-03.png"
+  },
+  "story_logic": {
+    "shot_purpose": "land_reaction",
+    "dramatic_role": "reaction",
+    "transition_from_previous": "push_in",
+    "emotional_target": "惊恐和失控",
+    "information_delta": "0-3秒：树梢上苏夜感到屁股底下一阵吸力，被吸走，化作绿光坠落",
+    "next_hook": "推动观众进入下一镜"
+  },
+  "selected_views": {
+    "characters": [
+      {
+        "id": "_",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      },
+      {
+        "id": "_",
+        "name": "叶红衣",
+        "variant_id": "default",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      }
+    ],
+    "scene": {
+      "name": "黑雾森林",
+      "preferred_view": "day",
+      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    }
+  },
+  "continuity_inputs": {
+    "previous_shot_id": "ep01-shot-02",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-02-end-frame.png"
+  },
   "characters": [
     {
       "id": "suye",
@@ -88,7 +138,7 @@
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-3秒：全景固定镜头仰拍树梢，[苏夜]趴在树叶上突然感到屁股底下一阵吸力，惊慌挣扎，随即化作一道绿光\"咻\"地坠落，[苏夜]（惊慌）：\"哎？哎哎哎？什么情况？\"\n4-6秒：全景固定镜头俯拍法阵，绿光坠入法阵中央，金色粒子爆散，光芒渐弱，法阵中央趴着拇指大小的[苏夜]，一脸懵逼\n7-9秒：近景固定镜头急速推近至[叶红衣]脸部特写，[叶红衣]满怀期待睁开眼，视线向下，眼神从期待→震惊→崩溃，嘴唇颤抖，[叶红衣]（激动→崩溃）：\"是神兽吗？还是凶兽？……青……青玉蚕？！\"\n10-12秒：正反打硬切，先切至[苏夜]大特写仰视[叶红衣]，一脸懵逼，[苏夜]（懵逼）：\"美女？有何贵干？\"；再切回[叶红衣]特写，彻底崩溃，[叶红衣]（崩溃）：\"我耗尽精血，就召唤了一条肉蚕子？！\"\n\n音效：绿光坠落音效、法阵激活余光音效、震惊音效\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-3秒：全景固定镜头仰拍树梢，[苏夜]趴在树叶上突然感到屁股底下一阵吸力，惊慌挣扎，随即化作一道绿光\"咻\"地坠落，[苏夜]（惊慌）：\"哎？哎哎哎？什么情况？\"\n4-6秒：全景固定镜头俯拍法阵，绿光坠入法阵中央，金色粒子爆散，光芒渐弱，法阵中央趴着拇指大小的[苏夜]，一脸懵逼\n7-9秒：近景固定镜头急速推近至[叶红衣]脸部特写，[叶红衣]满怀期待睁开眼，视线向下，眼神从期待→震惊→崩溃，嘴唇颤抖，[叶红衣]（激动→崩溃）：\"是神兽吗？还是凶兽？……青……青玉蚕？！\"\n10-12秒：正反打硬切，先切至[苏夜]大特写仰视[叶红衣]，一脸懵逼，[苏夜]（懵逼）：\"美女？有何贵干？\"；再切回[叶红衣]特写，彻底崩溃，[叶红衣]（崩溃）：\"我耗尽精血，就召唤了一条肉蚕子？！\"\n\n音效：绿光坠落音效、法阵激活余光音效、震惊音效\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片8（仅参考景别和角色位置，不复制细节）"
   },
   "forbidden_changes": [
     "保持苏夜的当前形态（qingyucan）",

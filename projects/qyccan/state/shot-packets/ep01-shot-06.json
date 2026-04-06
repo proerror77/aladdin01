@@ -6,6 +6,56 @@
   "scene_goal": "0-3秒：叶红衣猛地闭上眼睛，随后听到沉闷消失声，缓缓睁眼",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
+  "source_refs": {
+    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-06.png"
+  },
+  "story_logic": {
+    "shot_purpose": "land_reaction",
+    "dramatic_role": "reaction",
+    "transition_from_previous": "push_in",
+    "emotional_target": "震惊和停顿",
+    "information_delta": "0-3秒：叶红衣猛地闭上眼睛，随后听到沉闷消失声，缓缓睁眼",
+    "next_hook": "推动观众进入下一镜"
+  },
+  "selected_views": {
+    "characters": [
+      {
+        "id": "_",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      },
+      {
+        "id": "_",
+        "name": "叶红衣",
+        "variant_id": "default",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      }
+    ],
+    "scene": {
+      "name": "黑雾森林",
+      "preferred_view": "day",
+      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    }
+  },
+  "continuity_inputs": {
+    "previous_shot_id": "ep01-shot-05",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-05-end-frame.png"
+  },
   "characters": [
     {
       "id": "suye",
@@ -88,7 +138,7 @@
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-3秒：特写固定镜头，浅景深，[叶红衣]猛地闭上眼睛，眉头紧皱，随后听到沉闷消失声，缓缓睁开眼\n4-7秒：近景固定镜头缓慢推近，[叶红衣]睁眼，看到[家仆甲]消失、地面焦痕，眼神从恐惧→震惊→彻底石化，嘴唇微张无法言语，[家仆乙]在远处吓傻，[家仆乙]（吓傻）：\"这……这是什么灵兽？！\"\n8-10秒：全景固定镜头，[叶红衣]缓缓睁开手掌，[苏夜]从手心跳落至地面，摆出自认为很帅的Pose（其实就是扭了扭腰），拍拍肚皮，画外音（苏夜，OS）：\"嗝……味道有点淡。\"，[叶红衣]彻底石化站在一旁\n11-12秒：中景固定镜头，[苏夜]和[叶红衣]大眼瞪小眼，空气凝固，[叶红衣]（震惊）：\"这……\"，两人形成强烈喜剧反差\n\n音效：打嗝声、震惊音效、空气凝固的寂静感\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-3秒：特写固定镜头，浅景深，[叶红衣]猛地闭上眼睛，眉头紧皱，随后听到沉闷消失声，缓缓睁开眼\n4-7秒：近景固定镜头缓慢推近，[叶红衣]睁眼，看到[家仆甲]消失、地面焦痕，眼神从恐惧→震惊→彻底石化，嘴唇微张无法言语，[家仆乙]在远处吓傻，[家仆乙]（吓傻）：\"这……这是什么灵兽？！\"\n8-10秒：全景固定镜头，[叶红衣]缓缓睁开手掌，[苏夜]从手心跳落至地面，摆出自认为很帅的Pose（其实就是扭了扭腰），拍拍肚皮，画外音（苏夜，OS）：\"嗝……味道有点淡。\"，[叶红衣]彻底石化站在一旁\n11-12秒：中景固定镜头，[苏夜]和[叶红衣]大眼瞪小眼，空气凝固，[叶红衣]（震惊）：\"这……\"，两人形成强烈喜剧反差\n\n音效：打嗝声、震惊音效、空气凝固的寂静感\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片8（仅参考景别和角色位置，不复制细节）"
   },
   "forbidden_changes": [
     "保持苏夜的当前形态（qingyucan）",

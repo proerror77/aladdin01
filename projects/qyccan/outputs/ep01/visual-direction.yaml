@@ -79,7 +79,7 @@ shots:
     禁止出现字幕、对话框、水印、Logo
 
 
-    构图参考@分镜图（仅参考景别和角色位置，不复制细节）'
+    构图参考@图片5（仅参考景别和角色位置，不复制细节）'
   prompt_style_source: config/styles/realistic-oriental.yaml
   storyboard_image_path: projects/qyccan/outputs/ep01/storyboard/shot-01.png
 - shot_id: ep01-shot-02
@@ -153,7 +153,7 @@ shots:
     禁止出现字幕、对话框、水印、Logo
 
 
-    构图参考@分镜图（仅参考景别和角色位置，不复制细节）'
+    构图参考@图片5（仅参考景别和角色位置，不复制细节）'
   prompt_style_source: config/styles/realistic-oriental.yaml
   storyboard_image_path: projects/qyccan/outputs/ep01/storyboard/shot-02.png
 - shot_id: ep01-shot-03
@@ -230,7 +230,7 @@ shots:
     禁止出现字幕、对话框、水印、Logo
 
 
-    构图参考@分镜图（仅参考景别和角色位置，不复制细节）'
+    构图参考@图片8（仅参考景别和角色位置，不复制细节）'
   prompt_style_source: config/styles/realistic-oriental.yaml
   storyboard_image_path: projects/qyccan/outputs/ep01/storyboard/shot-03.png
 - shot_id: ep01-shot-04
@@ -313,7 +313,7 @@ shots:
     禁止出现字幕、对话框、水印、Logo
 
 
-    构图参考@分镜图（仅参考景别和角色位置，不复制细节）'
+    构图参考@图片8（仅参考景别和角色位置，不复制细节）'
   prompt_style_source: config/styles/realistic-oriental.yaml
   storyboard_image_path: projects/qyccan/outputs/ep01/storyboard/shot-04.png
 - shot_id: ep01-shot-05
@@ -390,7 +390,7 @@ shots:
     禁止出现字幕、对话框、水印、Logo
 
 
-    构图参考@分镜图（仅参考景别和角色位置，不复制细节）'
+    构图参考@图片8（仅参考景别和角色位置，不复制细节）'
   prompt_style_source: config/styles/realistic-oriental.yaml
   storyboard_image_path: projects/qyccan/outputs/ep01/storyboard/shot-05.png
 - shot_id: ep01-shot-06
@@ -467,7 +467,7 @@ shots:
     禁止出现字幕、对话框、水印、Logo
 
 
-    构图参考@分镜图（仅参考景别和角色位置，不复制细节）'
+    构图参考@图片8（仅参考景别和角色位置，不复制细节）'
   prompt_style_source: config/styles/realistic-oriental.yaml
   storyboard_image_path: projects/qyccan/outputs/ep01/storyboard/shot-06.png
 - shot_id: ep01-shot-07
@@ -534,6 +534,6 @@ shots:
     禁止出现字幕、对话框、水印、Logo
 
 
-    构图参考@分镜图（仅参考景别和角色位置，不复制细节）'
+    构图参考@图片8（仅参考景别和角色位置，不复制细节）'
   prompt_style_source: config/styles/realistic-oriental.yaml
   storyboard_image_path: projects/qyccan/outputs/ep01/storyboard/shot-07.png

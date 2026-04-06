@@ -33,6 +33,8 @@ tools:
 - 角色在画面中的位置和比例
 - 镜头角度（仰拍/俯拍/平视）
 - 关键视觉元素的空间关系
+- 这一镜在故事中的职责（`dramatic_role` / `shot_purpose`）
+- 这一镜如何承接上一镜（`transition_from_previous`）
 
 Seedance 2.0 在 `@图片N` 引用时，会参考图片的构图和色调，但不会完全复制细节。
 
@@ -71,6 +73,10 @@ for i in $(seq 0 $((shot_count - 1))); do
   shot_id=$(yq eval ".shots[${i}].shot_id" "$visual_direction")
   shot_index=$(yq eval ".shots[${i}].shot_index" "$visual_direction")
   duration=$(yq eval ".shots[${i}].duration" "$visual_direction")
+  shot_purpose=$(yq eval ".shots[${i}].shot_purpose // \"advance_story\"" "$visual_direction")
+  dramatic_role=$(yq eval ".shots[${i}].dramatic_role // \"approach\"" "$visual_direction")
+  transition_from_previous=$(yq eval ".shots[${i}].transition_from_previous // \"action_result\"" "$visual_direction")
+  emotional_target=$(yq eval ".shots[${i}].emotional_target // \"维持叙事推进\"" "$visual_direction")
   subject=$(yq eval ".shots[${i}].subject" "$visual_direction")
   scene=$(yq eval ".shots[${i}].scene" "$visual_direction")
   camera=$(yq eval ".shots[${i}].camera" "$visual_direction")
@@ -88,7 +94,7 @@ for i in $(seq 0 $((shot_count - 1))); do
   first_camera=$(echo "$camera" | head -1 | sed 's/0-[0-9]*秒：//')
   
   # 构建分镜图生成 prompt（简洁，专注构图）
-  storyboard_prompt="电影分镜草图，${first_camera}，${subject}，${scene}，${time_of_day}光线，构图参考图，黑白或低饱和度，铅笔素描风格，清晰的空间关系，16:9横屏"
+  storyboard_prompt="电影分镜草图，dramatic_role=${dramatic_role}，shot_purpose=${shot_purpose}，transition=${transition_from_previous}，情绪目标=${emotional_target}，${first_camera}，${subject}，${scene}，${time_of_day}光线，构图参考图，黑白或低饱和度，铅笔素描风格，清晰的空间关系，16:9横屏"
   
   echo "生成分镜图: ${shot_id} → ${storyboard_path}"
   
@@ -125,7 +131,15 @@ done
 
 ### Step 3: 更新 seedance_prompt 引用分镜图
 
-分镜图生成完成后，将其作为构图参考注入 Seedance prompt：
+分镜图生成完成后，计算其在 images 数组中的实际位置，用 `@图片N` 格式注入 Seedance prompt。
+
+**Seedance images 数组顺序**（由 shot-compiler-agent / workflow-sync.py 组装）：
+```
+[0..char_count-1]  角色参考图（front/side/back，每个角色最多3张）
+[char_count..char_count+scene_count-1]  场景参考图
+[char_count+scene_count]  分镜图（storyboard）
+[最后]  前一镜结尾帧（如果存在）
+```
 
 ```bash
 for i in $(seq 0 $((shot_count - 1))); do
@@ -137,20 +151,52 @@ for i in $(seq 0 $((shot_count - 1))); do
     continue
   fi
   
+  # 计算分镜图在 images 数组中的 1-based 索引
+  # 角色参考图数量：每个角色最多 3 张（front/side/back），取实际存在的
+  char_refs=$(yq eval ".shots[${i}].references.characters | length" "$visual_direction")
+  # 每个角色最多 3 张视图（front/side/back）
+  char_image_count=$((char_refs * 3))
+  # 场景参考图数量
+  scene_image_count=$(yq eval ".shots[${i}].references.scenes | length" "$visual_direction")
+  # 分镜图是第 (char_image_count + scene_image_count + 1) 张（1-based）
+  storyboard_index=$((char_image_count + scene_image_count + 1))
+  
   # 检查 prompt 是否已有 @图片 引用
   if echo "$current_prompt" | grep -q "@图片"; then
-    # 已有角色/场景参考图，在末尾追加分镜图引用
+    # 已有角色/场景参考图，在末尾追加分镜图引用（用正确的 @图片N 索引）
     new_prompt="${current_prompt}
-构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+构图参考@图片${storyboard_index}（仅参考景别和角色位置，不复制细节）"
   else
-    # 无其他参考图，在开头加分镜图引用
-    new_prompt="构图参考@分镜图
+    # 无其他参考图，分镜图就是 @图片1
+    new_prompt="构图参考@图片1（仅参考景别和角色位置，不复制细节）
 ${current_prompt}"
   fi
   
   yq eval -i ".shots[${i}].seedance_prompt = \"${new_prompt}\"" "$visual_direction"
-  echo "✓ ${shot_id} prompt 已注入分镜图引用"
+  echo "✓ ${shot_id} prompt 已注入分镜图引用 @图片${storyboard_index}"
 done
+```
+
+**注意**：`char_image_count` 使用 `char_refs * 3` 是保守估计（假设每个角色都有 front/side/back 三张）。如果实际 assets 中某个角色只有 front 一张，`workflow-sync.py` 的 `expand_character_assets()` 会只返回存在的文件，导致实际 images 数组比预期短。
+
+为了精确计算，storyboard-agent 应该在 Step 3 之前先检查实际存在的角色图文件数量：
+
+```bash
+# 精确计算实际角色图数量
+actual_char_image_count=0
+char_count=$(yq eval ".shots[${i}].references.characters | length" "$visual_direction")
+for j in $(seq 0 $((char_count - 1))); do
+  char_name=$(yq eval ".shots[${i}].references.characters[${j}].name" "$visual_direction")
+  variant_id=$(yq eval ".shots[${i}].references.characters[${j}].variant_id" "$visual_direction")
+  char_dir="projects/${project}/assets/characters/images"
+  # 数实际存在的视图文件
+  for view in front side back; do
+    if [[ -f "${char_dir}/${char_name}-${variant_id}-${view}.png" ]]; then
+      actual_char_image_count=$((actual_char_image_count + 1))
+    fi
+  done
+done
+storyboard_index=$((actual_char_image_count + scene_image_count + 1))
 ```
 
 ### Step 4: 生成分镜表预览文档
@@ -178,6 +224,9 @@ for i in $(seq 0 $((shot_count - 1))); do
 ## ${shot_id}（${duration}秒）
 
 **构图参考图**：\`${storyboard_path}\`
+**dramatic_role**：\`$(yq eval ".shots[${i}].dramatic_role // \"（未填写）\"" "$visual_direction")\`
+**shot_purpose**：\`$(yq eval ".shots[${i}].shot_purpose // \"（未填写）\"" "$visual_direction")\`
+**transition_from_previous**：\`$(yq eval ".shots[${i}].transition_from_previous // \"（未填写）\"" "$visual_direction")\`
 
 **Seedance Prompt**：
 \`\`\`
@@ -214,4 +263,5 @@ echo "✓ 分镜表预览已生成: ${preview_file}"
 - **幂等**：已存在的分镜图不重新生成，保护人工调整的构图
 - **分镜图风格**：用低饱和度/素描风格，避免与最终视频风格混淆
 - **Seedance 引用方式**：分镜图作为构图参考，不是角色一致性参考（角色一致性由 `@图片N 作为<角色名>` 负责）
+- **导演职责优先**：生成分镜图时优先读 `dramatic_role` / `shot_purpose` / `transition_from_previous`，不要只根据第一行 camera 机械出图
 - **失败处理**：单张分镜图生成失败不阻断流程，跳过并记录警告

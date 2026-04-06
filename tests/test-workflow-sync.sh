@@ -170,7 +170,9 @@ import yaml
 root = Path(sys.argv[1])
 visual = yaml.safe_load((root / "projects/demo/outputs/ep01/visual-direction.yaml").read_text())
 assert all(shot.get("storyboard_image_path") for shot in visual["shots"])
-assert all("构图参考@分镜图" in shot["seedance_prompt"] for shot in visual["shots"])
+# 分镜图引用现在是 @图片N（正确的 Seedance 索引格式），不再是 @分镜图
+assert all("构图参考@图片" in shot["seedance_prompt"] for shot in visual["shots"]), \
+    [shot["seedance_prompt"][-80:] for shot in visual["shots"]]
 
 phase23 = json.loads((root / "projects/demo/state/ep01-phase2.3.json").read_text())
 phase35 = json.loads((root / "projects/demo/state/ep01-phase3.5.json").read_text())

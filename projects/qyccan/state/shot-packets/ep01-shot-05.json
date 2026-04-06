@@ -6,6 +6,56 @@
   "scene_goal": "0-3秒：家仆甲伸手抓向叶红衣，千钧一发",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
+  "source_refs": {
+    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-05.png"
+  },
+  "story_logic": {
+    "shot_purpose": "introduce_subject",
+    "dramatic_role": "approach",
+    "transition_from_previous": "action_result",
+    "emotional_target": "威胁和怒意",
+    "information_delta": "0-3秒：家仆甲伸手抓向叶红衣，千钧一发",
+    "next_hook": "推动观众进入下一镜"
+  },
+  "selected_views": {
+    "characters": [
+      {
+        "id": "_",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      },
+      {
+        "id": "_",
+        "name": "叶红衣",
+        "variant_id": "default",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      }
+    ],
+    "scene": {
+      "name": "黑雾森林",
+      "preferred_view": "day",
+      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    }
+  },
+  "continuity_inputs": {
+    "previous_shot_id": "ep01-shot-04",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-04-end-frame.png"
+  },
   "characters": [
     {
       "id": "suye",
@@ -88,7 +138,7 @@
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-3秒：中景固定镜头，[家仆甲]伸手抓向[叶红衣]，千钧一发，[叶红衣]护住手心里的[苏夜]，[苏夜]（怒吼）：\"给爷死！！\"\n4-7秒：快速环绕镜头，[苏夜]那张樱桃般的小嘴瞬间化作一团漆黑漩涡黑洞，迎风暴涨数米，吞噬周围光线，强烈明暗对比，黑洞边缘能量扭曲\n8-10秒：全景固定镜头，[家仆甲]被吸入黑洞，发出沉闷消失声，随即消失无踪，地面留下一道焦痕，空气瞬间安静\n11-12秒：近景固定镜头，吞天口收缩消失，[苏夜]嘴巴恢复正常大小，打了个饱嗝，[叶红衣]猛地闭上眼睛\n\n音效：吞天口爆发轰鸣声、家仆消失的沉闷声、地面焦痕余音\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-3秒：中景固定镜头，[家仆甲]伸手抓向[叶红衣]，千钧一发，[叶红衣]护住手心里的[苏夜]，[苏夜]（怒吼）：\"给爷死！！\"\n4-7秒：快速环绕镜头，[苏夜]那张樱桃般的小嘴瞬间化作一团漆黑漩涡黑洞，迎风暴涨数米，吞噬周围光线，强烈明暗对比，黑洞边缘能量扭曲\n8-10秒：全景固定镜头，[家仆甲]被吸入黑洞，发出沉闷消失声，随即消失无踪，地面留下一道焦痕，空气瞬间安静\n11-12秒：近景固定镜头，吞天口收缩消失，[苏夜]嘴巴恢复正常大小，打了个饱嗝，[叶红衣]猛地闭上眼睛\n\n音效：吞天口爆发轰鸣声、家仆消失的沉闷声、地面焦痕余音\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片8（仅参考景别和角色位置，不复制细节）"
   },
   "forbidden_changes": [
     "保持苏夜的当前形态（qingyucan）",

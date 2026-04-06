@@ -6,6 +6,44 @@
   "scene_goal": "0-3秒：复眼主观视角，懵逼扫视四周，内心独白爆发",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
+  "source_refs": {
+    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-01.png"
+  },
+  "story_logic": {
+    "shot_purpose": "establish_space",
+    "dramatic_role": "establish",
+    "transition_from_previous": "cold_open",
+    "emotional_target": "惊恐和失控",
+    "information_delta": "0-3秒：复眼主观视角，懵逼扫视四周，内心独白爆发",
+    "next_hook": "推动观众进入下一镜"
+  },
+  "selected_views": {
+    "characters": [
+      {
+        "id": "_",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      }
+    ],
+    "scene": {
+      "name": "黑雾森林",
+      "preferred_view": "day",
+      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    }
+  },
+  "continuity_inputs": {
+    "previous_shot_id": null,
+    "previous_end_frame_path": null
+  },
   "characters": [
     {
       "id": "suye",
@@ -59,7 +97,7 @@
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，场景参考@图片2\n\n0-3秒：大特写主观视角，复眼效果呈现六边形分割画面，[苏夜]懵逼地扫视四周，黑雾弥漫的古木森林从复眼格子中透出，画外音（苏夜内心独白，惊恐崩溃）：\"这特么是哪？！我怎么变成一条虫了？！\"\n4-7秒：缓慢拉镜头，从大特写拉至全景，露出[苏夜]拇指大小的全身趴在巨大树叶上，肉乎乎的小短腿无力晃动，晨光从树冠缝隙透入形成丁达尔光柱，镜头继续拉远可见树下远处隐约有红色身影奔跑，画外音（苏夜，惊恐）：\"手呢？脚呢？我的八块腹肌呢？！\"\n8-10秒：近景固定镜头，低角度平视，[苏夜]试图站起来，圆滚滚的身体在叶子上滚了一圈，肚皮朝天四肢乱蹬，树叶随之轻微颤动\n11-12秒：大特写固定镜头，仰拍[苏夜]肚皮朝天，四肢无力晃动，画外音（苏夜，绝望）：\"穿越成虫？这也太草率了吧！老天爷，你玩我啊！\"\n\n音效：森林虫鸣声、树叶沙沙声、黑雾低沉环境音\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，场景参考@图片2\n\n0-3秒：大特写主观视角，复眼效果呈现六边形分割画面，[苏夜]懵逼地扫视四周，黑雾弥漫的古木森林从复眼格子中透出，画外音（苏夜内心独白，惊恐崩溃）：\"这特么是哪？！我怎么变成一条虫了？！\"\n4-7秒：缓慢拉镜头，从大特写拉至全景，露出[苏夜]拇指大小的全身趴在巨大树叶上，肉乎乎的小短腿无力晃动，晨光从树冠缝隙透入形成丁达尔光柱，镜头继续拉远可见树下远处隐约有红色身影奔跑，画外音（苏夜，惊恐）：\"手呢？脚呢？我的八块腹肌呢？！\"\n8-10秒：近景固定镜头，低角度平视，[苏夜]试图站起来，圆滚滚的身体在叶子上滚了一圈，肚皮朝天四肢乱蹬，树叶随之轻微颤动\n11-12秒：大特写固定镜头，仰拍[苏夜]肚皮朝天，四肢无力晃动，画外音（苏夜，绝望）：\"穿越成虫？这也太草率了吧！老天爷，你玩我啊！\"\n\n音效：森林虫鸣声、树叶沙沙声、黑雾低沉环境音\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片5（仅参考景别和角色位置，不复制细节）"
   },
   "forbidden_changes": [
     "保持苏夜的当前形态（qingyucan）",

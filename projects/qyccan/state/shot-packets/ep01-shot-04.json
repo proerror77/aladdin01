@@ -6,6 +6,56 @@
   "scene_goal": "0-3秒：草丛被拨开，两个家仆追上来，嚣张嘲笑叶红衣和苏夜",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
+  "source_refs": {
+    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-04.png"
+  },
+  "story_logic": {
+    "shot_purpose": "reveal_change",
+    "dramatic_role": "detail",
+    "transition_from_previous": "action_result",
+    "emotional_target": "威胁和怒意",
+    "information_delta": "0-3秒：草丛被拨开，两个家仆追上来，嚣张嘲笑叶红衣和苏夜",
+    "next_hook": "推动观众进入下一镜"
+  },
+  "selected_views": {
+    "characters": [
+      {
+        "id": "_",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      },
+      {
+        "id": "_",
+        "name": "叶红衣",
+        "variant_id": "default",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      }
+    ],
+    "scene": {
+      "name": "黑雾森林",
+      "preferred_view": "day",
+      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    }
+  },
+  "continuity_inputs": {
+    "previous_shot_id": "ep01-shot-03",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-03-end-frame.png"
+  },
   "characters": [
     {
       "id": "suye",
@@ -88,7 +138,7 @@
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<叶红衣>，@图片2 作为<苏夜（青玉蚕形态）>，场景参考@图片3\n\n0-3秒：全景固定镜头，草丛被拨开，两个手持大刀的家仆追上来，[家仆甲]（嚣张）：\"嘿嘿，大小姐，跑不动了吧？\"，[家仆乙]瞥见地面法阵痕迹爆笑，[家仆乙]（嘲讽）：\"哈哈哈哈！叶家天才居然契约了一条蚕！\"\n4-7秒：中景移镜头，低角度仰拍[家仆甲]气势汹汹逼近（威胁感），切至俯拍[叶红衣]护住手心里的[苏夜]（弱势感），[叶红衣]（咬牙切齿）：\"闭，闭嘴……我的灵兽轮不到你们嘲笑！\"，[叶红衣]站在画面左侧，[苏夜]趴在她手心（画面中央），[家仆甲]从右侧逼近\n8-10秒：近景固定镜头，聚焦[叶红衣]手心，[苏夜]在手心里蠕动，眼神从懵逼变犀利，画外音（苏夜，怒）：\"敢笑话老子？还敢欺负我的……主人！\"\n11-12秒：大特写固定镜头，[苏夜]眼神锐利，系统激活金色光效浮现，系统提示音炸响\n\n音效：大刀碰撞声、家仆脚步声、系统激活炸响音效\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@分镜图（仅参考景别和角色位置，不复制细节）"
+    "prompt": "@图片1 作为<叶红衣>，@图片2 作为<苏夜（青玉蚕形态）>，场景参考@图片3\n\n0-3秒：全景固定镜头，草丛被拨开，两个手持大刀的家仆追上来，[家仆甲]（嚣张）：\"嘿嘿，大小姐，跑不动了吧？\"，[家仆乙]瞥见地面法阵痕迹爆笑，[家仆乙]（嘲讽）：\"哈哈哈哈！叶家天才居然契约了一条蚕！\"\n4-7秒：中景移镜头，低角度仰拍[家仆甲]气势汹汹逼近（威胁感），切至俯拍[叶红衣]护住手心里的[苏夜]（弱势感），[叶红衣]（咬牙切齿）：\"闭，闭嘴……我的灵兽轮不到你们嘲笑！\"，[叶红衣]站在画面左侧，[苏夜]趴在她手心（画面中央），[家仆甲]从右侧逼近\n8-10秒：近景固定镜头，聚焦[叶红衣]手心，[苏夜]在手心里蠕动，眼神从懵逼变犀利，画外音（苏夜，怒）：\"敢笑话老子？还敢欺负我的……主人！\"\n11-12秒：大特写固定镜头，[苏夜]眼神锐利，系统激活金色光效浮现，系统提示音炸响\n\n音效：大刀碰撞声、家仆脚步声、系统激活炸响音效\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片8（仅参考景别和角色位置，不复制细节）"
   },
   "forbidden_changes": [
     "保持苏夜的当前形态（qingyucan）",
