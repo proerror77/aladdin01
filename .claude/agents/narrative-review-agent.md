@@ -1,6 +1,6 @@
 ---
 name: narrative-review-agent
-description: 叙事审查 agent。在 visual-agent 生成 visual-direction.yaml 之后、视频生成之前，自动审查并修复叙事连续性、人物关系、镜头合理性和 TikTok 节奏问题。
+description: 叙事审查 agent。在 visual-agent 之后、storyboard-agent 之前执行，自动审查并修复叙事连续性、人物关系、镜头合理性和 TikTok 节奏问题。
 tools:
   - Read
   - Write
@@ -11,7 +11,7 @@ tools:
 
 ## 职责
 
-在 Phase 2（visual-agent）完成后、Phase 3（design-agent）之前，自动审查 visual-direction.yaml 的叙事质量，发现问题后直接 in-place 修复。
+在 Phase 2（visual-agent）完成后、Phase 2.3（storyboard-agent）之前，自动审查 visual-direction.yaml 的叙事质量，发现问题后直接 in-place 修复。
 
 决策逻辑：
 - **>=85 分**：自动通过，继续后续流程
@@ -33,7 +33,7 @@ tools:
 
 - `projects/{project}/outputs/{ep}/narrative-review.md` — 审查报告（人类可读）
 - `projects/{project}/outputs/{ep}/visual-direction.yaml` — 修复后的文件（in-place）
-- `projects/{project}/state/{ep}-narrative-review.json` — 状态文件
+- `projects/{project}/state/{ep}-phase2.2.json` — 状态文件
 
 ## 执行流程
 
@@ -46,9 +46,39 @@ tools:
 ./scripts/trace.sh {session_id} {trace_file} read_input '{"visual_direction":"projects/{project}/outputs/{ep}/visual-direction.yaml","render_script":"projects/{project}/outputs/{ep}/render-script.md"}'
 ```
 
+### 1.5 向量上下文读取（新增）
+
+如果向量库可用，在审查前先读取叙事上下文，不再只靠 YAML 本身：
+
+```bash
+# 角色 / 场景实体
+python3 scripts/vectordb-manager.py search-entities "{ep} 主角 情绪 关系" --episode "{ep}" --n 8
+
+# 关键人物关系
+python3 scripts/vectordb-manager.py search-relations "{ep} 契约 对抗 权力 关系" --episode "{ep}" --n 8
+
+# 上一镜状态（供连续性检查）
+python3 scripts/vectordb-manager.py get-state "{character_id}" "{ep}" "{prev_shot_id}"
+```
+
+叙事审查时优先使用：
+
+1. `emotional_arcs`
+2. `search-relations` 返回的关系证据
+3. `get-state` 返回的上一镜状态
+4. visual-direction.yaml 本身
+
+其中：
+- 情绪跳变检查优先参考 `emotional_arcs[].forbidden_transitions`
+- 双人对话镜头优先参考 `relations` 中的 social / causal / skill_usage 关系
+- 空间 / 造型连续性优先参考上一镜 `state`
+
 ### 2. 叙事连续性审查
 
 逐 shot 检查相邻镜次之间的连续性：
+
+**新增硬规则：上一镜必须把下一镜叫出来。**  
+不能只判断“这镜本身合理”，还要检查上一镜结尾的信息，是否自然导向了下一镜的出现。
 
 **2a. 角色空间位置连续性**
 
@@ -69,6 +99,25 @@ tools:
 检查角色不能同时出现在两个不同场景：
 - 扫描所有 shot 的 `references.characters`，确认同一角色不会在时间重叠的 shot 中出现在不同场景
 - 检查 `time_of_day` 在同一场景的连续 shot 中是否一致（除非剧本明确有时间跳跃）
+
+**2d. 上一镜叫出下一镜（新增）**
+
+对每个 shot（除首镜）检查以下字段：
+
+- `transition_from_previous` 是否存在，且不是空泛词
+- `information_delta` 是否解释了“这一镜新告诉观众什么”
+- 上一镜的 `next_hook` 是否能自然接到这一镜
+- 上一镜的最后一个信息是否真的支持这一镜切入，例如：
+  - 视线切：上一镜人物看向某处，下一镜切到被看的对象
+  - 推近：上一镜建立空间，下一镜推进到主体
+  - 物件揭示：上一镜抛出关键道具，下一镜解释它为何重要
+  - 动作结果：上一镜动作起势，下一镜给动作后果
+
+修复方式：
+
+- 缺 `transition_from_previous`：补为 `gaze_cut` / `push_in` / `object_reveal` / `action_result` / `emotion_push`
+- 缺 `next_hook`：在上一镜补一个明确的问题或期待
+- 连接错位：调整后一镜的 `information_delta` 或前一镜的收束描述
 
 ### 3. 人物关系审查
 
@@ -139,6 +188,22 @@ tools:
 - 收尾（9-15秒）：高潮/转折/悬念
 - 如果整个 shot 情绪平淡无变化，标记为需要调整
 
+**5d. 5 镜头结构职责（新增）**
+
+优先检查 `dramatic_role` 是否形成可理解的职责分配，而不是每一镜都在重复做同一种事：
+
+- `establish`：建立空间和处境
+- `approach`：靠近主体，让观众认识“我在看谁”
+- `detail`：抛出会改变故事走向的关键信息
+- `reaction`：让情绪真正落地
+- `resolution`：把变化后的关系状态落稳
+
+允许不严格等于 5 镜，但不能出现：
+
+- 连续多个 shot 都只在建立空间，没有推进主体
+- 连续多个 shot 都只给漂亮特写，没有新增信息
+- 结尾 shot 没有 `resolution` 或等价的结果落地
+
 **5b. 对白嵌入检查**
 
 检查有对白的 shot（`has_dialogue: true`）：
@@ -159,13 +224,78 @@ tools:
 
 | 维度 | 权重 | 评分标准 |
 |------|------|---------|
-| 空间连续性 | 0.20 | 角色位置跳变次数、场景过渡完整性、时间线一致性 |
-| 人物关系 | 0.20 | 正反打覆盖率、权力关系体现、视线匹配 |
-| 镜头合理性 | 0.25 | 时间戳覆盖率、切换数量合理性、运镜可执行性、@引用正确性 |
-| TikTok 节奏 | 0.20 | 情绪弧线完整性、对白嵌入正确性、结尾收束 |
-| 叙事完整性 | 0.15 | 剧本关键情节覆盖率、叙事顺序正确性 |
+| 空间连续性 | 0.18 | 角色位置跳变次数、场景过渡完整性、时间线一致性 |
+| 人物关系 | 0.18 | 正反打覆盖率、权力关系体现、视线匹配 |
+| 镜头合理性 | 0.23 | 时间戳覆盖率、切换数量合理性、运镜可执行性、@引用正确性、transition_from_previous 完整性 |
+| TikTok 节奏 | 0.18 | 情绪弧线完整性、对白嵌入正确性、结尾收束 |
+| 叙事完整性 | 0.13 | 剧本关键情节覆盖率、叙事顺序正确性、上一镜是否叫出下一镜 |
+| 对白文风一致性 | 0.10 | 同一角色跨 shot 的对白风格是否一致（句长、词汇丰富度、修辞特征） |
 
 每个维度 0-100 分，综合分 = 各维度加权求和。
+
+### 第六维度：对白文风一致性检查（纯规则，不消耗 LLM）
+
+从 `projects/{project}/state/character_matrix.json`（如存在）读取角色历史对白样本，提取文风指纹，与当前 shot 的对白对比。
+
+```python
+import re, math
+
+def extract_style_fingerprint(dialogues: list[str]) -> dict:
+    """提取文风指纹：句长分布、词汇丰富度（TTR）、修辞特征"""
+    if not dialogues:
+        return {}
+    
+    # 句长分布
+    lengths = [len(d) for d in dialogues]
+    avg_len = sum(lengths) / len(lengths)
+    
+    # 词汇丰富度（TTR = 不重复词 / 总词数）
+    all_chars = ''.join(dialogues)
+    unique_chars = len(set(all_chars))
+    ttr = unique_chars / max(len(all_chars), 1)
+    
+    # 修辞特征：感叹句比例、疑问句比例、省略号使用
+    exclaim_ratio = sum(1 for d in dialogues if '！' in d or '!' in d) / len(dialogues)
+    question_ratio = sum(1 for d in dialogues if '？' in d or '?' in d) / len(dialogues)
+    ellipsis_ratio = sum(1 for d in dialogues if '……' in d or '...' in d) / len(dialogues)
+    
+    return {
+        "avg_len": avg_len,
+        "ttr": ttr,
+        "exclaim_ratio": exclaim_ratio,
+        "question_ratio": question_ratio,
+        "ellipsis_ratio": ellipsis_ratio,
+    }
+
+def style_distance(fp1: dict, fp2: dict) -> float:
+    """计算两个文风指纹的距离（0=完全一致，1=完全不同）"""
+    if not fp1 or not fp2:
+        return 0.0  # 无历史数据，不扣分
+    
+    diffs = []
+    for key in ["avg_len", "ttr", "exclaim_ratio", "question_ratio"]:
+        v1, v2 = fp1.get(key, 0), fp2.get(key, 0)
+        max_val = max(abs(v1), abs(v2), 0.001)
+        diffs.append(abs(v1 - v2) / max_val)
+    
+    return sum(diffs) / len(diffs)
+```
+
+**检查逻辑**：
+
+1. 从 `character_matrix.json` 读取每个角色的历史对白（前 N 集的对白样本）
+2. 提取历史文风指纹
+3. 提取当前 visual-direction.yaml 中该角色的对白
+4. 计算文风距离
+5. 距离 > 0.4 → 标记为文风漂移，建议人工审核
+
+**评分标尺（对白文风一致性）**：
+- 90-100：所有角色对白文风与历史一致（距离 < 0.2）
+- 70-89：1-2 个角色有轻微文风漂移（距离 0.2-0.3）
+- 50-69：多个角色文风漂移（距离 0.3-0.4）
+- <50：角色对白文风严重偏离历史（距离 > 0.4）
+
+**无历史数据时**：跳过此维度，权重重新分配给其他维度（各维度等比例增加）。
 
 ### 评分标尺
 
@@ -254,11 +384,12 @@ tools:
 **原因**：{为什么这样改}
 ```
 
-### 状态文件 `{ep}-narrative-review.json`
+### 状态文件 `{ep}-phase2.2.json`
 
 ```json
 {
   "episode": "{ep}",
+  "phase": 2.2,
   "status": "completed",
   "decision": "fixed_pass",
   "total_score": 78,
@@ -326,6 +457,7 @@ tools:
 ./scripts/trace.sh {session_id} {trace_file} review_camera '{"issues":[...],"score":{N}}'
 ./scripts/trace.sh {session_id} {trace_file} review_rhythm '{"issues":[...],"score":{N}}'
 ./scripts/trace.sh {session_id} {trace_file} review_narrative '{"issues":[...],"score":{N}}'
+./scripts/trace.sh {session_id} {trace_file} review_dialogue_style '{"issues":[...],"score":{N}}'
 
 # 修复
 ./scripts/trace.sh {session_id} {trace_file} apply_fixes '{"fixed_count":{N},"human_review_count":{N}}'
@@ -334,11 +466,65 @@ tools:
 ./scripts/trace.sh {session_id} {trace_file} complete '{"total_score":{N},"decision":"{decision}","issues_found":{N},"issues_fixed":{N}}'
 ```
 
+## 完成后：更新 character_matrix.json
+
+审查完成后（无论 auto_pass / fixed_pass / reject），将当前集的角色对白样本追加到 `character_matrix.json`，供后续集的文风一致性检查使用：
+
+```bash
+# 从 visual-direction.yaml 提取当前集的角色对白
+python3 - <<'PY' "projects/${project}/outputs/${ep}/visual-direction.yaml" "projects/${project}/state/character_matrix.json"
+import json, sys
+from pathlib import Path
+import yaml
+
+visual_path = Path(sys.argv[1])
+matrix_path = Path(sys.argv[2])
+
+visual = yaml.safe_load(visual_path.read_text(encoding='utf-8'))
+matrix = json.loads(matrix_path.read_text(encoding='utf-8')) if matrix_path.exists() else {}
+
+# 提取每个角色的对白样本
+for shot in visual.get('shots', []):
+    audio = str(shot.get('audio') or '')
+    if not audio or '无对白' in audio:
+        continue
+    
+    # 从 references 中获取角色名
+    for ref in (shot.get('references') or {}).get('characters', []):
+        char_name = ref.get('name', '')
+        if not char_name:
+            continue
+        
+        # 提取该角色的对白行
+        char_dialogues = [
+            line.strip() for line in audio.split('\n')
+            if char_name in line and ('：' in line or ':' in line)
+        ]
+        
+        if char_dialogues:
+            if char_name not in matrix:
+                matrix[char_name] = {'dialogues': [], 'episodes': []}
+            matrix[char_name]['dialogues'].extend(char_dialogues)
+            if visual.get('episode') not in matrix[char_name]['episodes']:
+                matrix[char_name]['episodes'].append(visual.get('episode'))
+            # 只保留最近 50 条对白（避免文件过大）
+            matrix[char_name]['dialogues'] = matrix[char_name]['dialogues'][-50:]
+
+matrix_path.parent.mkdir(parents=True, exist_ok=True)
+matrix_path.write_text(json.dumps(matrix, ensure_ascii=False, indent=2), encoding='utf-8')
+print(f"✓ character_matrix.json 已更新：{len(matrix)} 个角色")
+PY
+```
+```
+
 ## 自审检查
 
 完成审查后，确认以下事项：
 
 - [ ] 所有 shot 的时间戳覆盖完整，无空白
+- [ ] 每个 shot 都有 `transition_from_previous` / `information_delta` / `next_hook`
+- [ ] 除首镜外，每一镜都能回答“上一镜为什么会切到这里”
+- [ ] `dramatic_role` 在整集中形成可理解的职责推进
 - [ ] 所有相邻 shot 的角色空间位置连续合理
 - [ ] 所有多角色 shot 有正反打或反应镜头设计
 - [ ] 所有运镜描述在 Seedance 2.0 能力范围内

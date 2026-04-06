@@ -168,6 +168,23 @@ SESSION_ID="batch-$(date +%Y%m%d-%H%M%S)"
 
 ### 4. Phase 1+2 并行（合规 + 视觉）
 
+**Phase 0 — 本体论构建（v2.0，可选，在 Phase 1 之前）**
+
+如果使用 v2.0 模式，先为每个剧本构建本体论（可并行）：
+
+```
+if [[ "$USE_V2" == "true" ]]; then
+  for ep in episodes:
+    if [ ! -f "projects/{project}/state/ontology/${ep}-world-model.json" ]; then
+      spawn ontology-builder-agent（session_id=$SESSION_ID, trace_file=${ep}-phase0-trace）
+    else
+      echo "[skip] ${ep} Phase 0: world-model.json 已存在"
+    fi
+  done
+  等待所有 ontology-builder-agent 完成
+fi
+```
+
 为每个剧本并行 spawn comply-agent 和 visual-agent（comply 完成后才 spawn visual）：
 
 ```
@@ -255,6 +272,23 @@ for ep in episodes:
 [ep01] spawn storyboard-agent（session_id=$SESSION_ID, trace_file=ep01-phase2.3-trace）
 [ep02] spawn storyboard-agent（session_id=$SESSION_ID, trace_file=ep02-phase2.3-trace）
 等待所有 storyboard-agent 完成
+```
+
+### 4.6 Phase 2.5 并行（资产工厂 — v2.0，可选）
+
+如果使用 v2.0 模式，在分镜图生成后、美术校验前，生成资产包（幂等，已存在则跳过）：
+
+```
+if [[ "$USE_V2" == "true" ]]; then
+  for ep in episodes:
+    if [[ ! -d "projects/{project}/assets/packs/characters" || -z "$(ls projects/{project}/assets/packs/characters/*.png 2>/dev/null)" ]]; then
+      spawn asset-factory-agent（session_id=$SESSION_ID, trace_file=${ep}-phase2.5-trace）
+    else
+      echo "[skip] ${ep} Phase 2.5: 资产包已存在"
+    fi
+  done
+  等待所有 asset-factory-agent 完成
+fi
 ```
 
 ### 5. Phase 3 并行（美术校验 — 纯文件存在性检查）

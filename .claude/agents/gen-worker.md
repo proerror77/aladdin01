@@ -17,6 +17,7 @@ tools:
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
+| `project` | string | 项目名，如 `qyccan` |
 | `ep` | string | 剧本 ID（如 ep01） |
 | `shot_id` | string | 镜次 ID（如 ep01-s01-shot01） |
 | `shot_index` | int | 镜次序号（如 1） |
@@ -81,6 +82,15 @@ tools:
 }
 ```
 
+如果 `projects/{project}/state/shot-packets/{shot_id}.json` 存在，**立即在线同步一次状态到 LanceDB**，不要等 `workflow-sync.py` 事后回填：
+
+```bash
+if [[ -f "projects/${project}/state/shot-packets/${shot_id}.json" ]]; then
+  python3 scripts/vectordb-manager.py upsert-state "projects/${project}/state/shot-packets/${shot_id}.json" || true
+  ./scripts/trace.sh {session_id} {trace_file} online_state_sync '{"stage":"generating","shot_id":"{shot_id}"}'
+fi
+```
+
 ### 主循环
 
 重试参数（来自 `config/platforms/seedance-v2.yaml`）：
@@ -106,6 +116,9 @@ LOOP:
     → 成功，退出循环
 
   if result.rejected:
+    # 根据失败原因选择差异化重试策略
+    failure_type = classify_failure(result.rejection_reason)
+    
     if PHASE == "original" and original_retries < 5:
       original_retries += 1
       更新状态文件
@@ -113,11 +126,11 @@ LOOP:
       → 继续 LOOP
 
     else if PHASE == "original":
-      # 原始提示词耗尽重试次数，进入改写阶段
+      # 原始提示词耗尽重试次数，根据失败类型选择改写策略
       PHASE = "rewrite"
       rewrite_rounds = 1
       rewrite_retries = 0
-      current_prompt = rewrite_prompt(current_prompt, result.rejection_reason)
+      current_prompt = rewrite_prompt(current_prompt, result.rejection_reason, failure_type)
       更新状态文件
       → 继续 LOOP
 
@@ -128,10 +141,9 @@ LOOP:
       → 继续 LOOP
 
     else if rewrite_rounds < 3:
-      # 当前改写版本耗尽重试次数，进行新一轮改写
       rewrite_rounds += 1
       rewrite_retries = 0
-      current_prompt = rewrite_prompt(current_prompt, result.rejection_reason)
+      current_prompt = rewrite_prompt(current_prompt, result.rejection_reason, failure_type)
       更新状态文件
       → 继续 LOOP
 
@@ -140,6 +152,119 @@ LOOP:
 ```
 
 **总计最大 API 调用次数**：5（原始）+ 3×3（改写后）= 14 次
+
+### classify_failure(rejection_reason) → failure_type
+
+根据失败原因分类，决定改写策略：
+
+```bash
+classify_failure() {
+  local reason="$1"
+  
+  # API 内容拒绝（prompt 触发安全过滤）
+  if echo "$reason" | grep -qi "content\|policy\|safety\|violation\|inappropriate"; then
+    echo "content_rejected"
+    return
+  fi
+  
+  # 运镜/技术复杂度过高（模型无法执行）
+  if echo "$reason" | grep -qi "complex\|motion\|camera\|movement\|trajectory"; then
+    echo "motion_too_complex"
+    return
+  fi
+  
+  # 超时（prompt 过长或请求超时）
+  if echo "$reason" | grep -qi "timeout\|too long\|length\|token"; then
+    echo "timeout_or_length"
+    return
+  fi
+  
+  # 参考图问题（图片格式/尺寸/内容不符）
+  if echo "$reason" | grep -qi "image\|reference\|format\|size"; then
+    echo "reference_image_issue"
+    return
+  fi
+  
+  echo "unknown"
+}
+```
+
+### rewrite_prompt(prompt, rejection_reason, failure_type) — 差异化改写策略
+
+根据 `failure_type` 选择不同的改写策略，而不是统一调高 temperature：
+
+```bash
+rewrite_prompt() {
+  local prompt="$1"
+  local reason="$2"
+  local failure_type="$3"
+  
+  case "$failure_type" in
+    "content_rejected")
+      # 内容拒绝：移除敏感描述，替换为中性表达
+      # 策略：调用 LLM 按 config/compliance/rewrite-patterns.yaml 改写
+      # temperature: 0.3（保守改写，不改变叙事意图）
+      rewrite_strategy="conservative"
+      ;;
+    
+    "motion_too_complex")
+      # 运镜过复杂：简化运镜描述，减少时间戳分段数量
+      # 策略：合并相邻时间戳，简化运镜词汇（环绕→跟镜头，希区柯克变焦→推镜头）
+      # temperature: 0.5
+      rewrite_strategy="simplify_motion"
+      ;;
+    
+    "timeout_or_length")
+      # 超时/过长：截断 prompt，保留核心描述
+      # 策略：删除音效描述、删除次要角色描述、合并时间戳
+      # temperature: 0.3
+      rewrite_strategy="truncate"
+      ;;
+    
+    "reference_image_issue")
+      # 参考图问题：降级为 text2video 模式，移除 @图片N 引用
+      # 策略：将 generation_mode 改为 text2video，移除所有 @图片N 引用
+      # temperature: 0.5
+      rewrite_strategy="drop_references"
+      ;;
+    
+    *)
+      # 未知原因：通用最小改写（原有逻辑）
+      # temperature: 0.7
+      rewrite_strategy="minimal"
+      ;;
+  esac
+  
+  # 读取改写模板
+  rewrite_instruction=$(yq eval ".strategies.${rewrite_strategy}.instruction" config/compliance/rewrite-patterns.yaml)
+  
+  # 调用 LLM 改写
+  cat > /tmp/rewrite_payload.json <<PAYLOAD
+{
+  "model": "nano-banana-vip",
+  "messages": [
+    {
+      "role": "user",
+      "content": "改写策略：${rewrite_strategy}\n失败原因：${reason}\n\n${rewrite_instruction}\n\n原始 prompt：\n${prompt}"
+    }
+  ],
+  "temperature": $(yq eval ".strategies.${rewrite_strategy}.temperature" config/compliance/rewrite-patterns.yaml)
+}
+PAYLOAD
+  
+  ./scripts/api-caller.sh tuzi chat /tmp/rewrite_payload.json | jq -r '.choices[0].message.content'
+}
+```
+
+**改写策略说明**：
+
+| failure_type | 策略 | temperature | 核心操作 |
+|-------------|------|-------------|---------|
+| content_rejected | conservative | 0.3 | 移除敏感词，替换中性表达 |
+| motion_too_complex | simplify_motion | 0.5 | 合并时间戳，简化运镜词汇 |
+| timeout_or_length | truncate | 0.3 | 删除次要描述，缩短 prompt |
+| reference_image_issue | drop_references | 0.5 | 降级为 text2video，移除 @图片N |
+| unknown | minimal | 0.7 | 通用最小改写（原有逻辑） |
 
 ### submit_to_seedance(prompt) → submit_to_backend(prompt)
 
@@ -428,6 +553,15 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
 
 向 team-lead 发送消息：`shot-{N} 完成，重试 {n} 次，改写 {n} 轮`
 
+如果 shot packet 存在，成功后再次执行在线状态同步：
+
+```bash
+if [[ -f "projects/${project}/state/shot-packets/${shot_id}.json" ]]; then
+  python3 scripts/vectordb-manager.py upsert-state "projects/${project}/state/shot-packets/${shot_id}.json" || true
+  ./scripts/trace.sh {session_id} {trace_file} online_state_sync '{"stage":"completed","shot_id":"{shot_id}","video_path":"projects/{project}/outputs/{ep}/videos/shot-{N}{output_suffix}.mp4"}'
+fi
+```
+
 ### 失败后
 
 写入状态文件 `projects/{project}/state/{ep}-shot-{N}{output_suffix}.json`：
@@ -456,6 +590,15 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
 
 向 team-lead 发送消息：`shot-{N} 失败，已重试 5 次 + 改写 3 轮，需人工处理`
 
+失败时也要保留 continuity 侧的在线状态写入：
+
+```bash
+if [[ -f "projects/${project}/state/shot-packets/${shot_id}.json" ]]; then
+  python3 scripts/vectordb-manager.py upsert-state "projects/${project}/state/shot-packets/${shot_id}.json" || true
+  ./scripts/trace.sh {session_id} {trace_file} online_state_sync '{"stage":"failed","shot_id":"{shot_id}"}'
+fi
+```
+
 ## Trace 写入
 
 在每个关键步骤调用 `./scripts/trace.sh` 记录过程日志（参考 `config/trace-protocol.md`）：
@@ -481,6 +624,9 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
 
 # 下载视频
 ./scripts/trace.sh {session_id} {trace_file} download '{"video_path":"projects/{project}/outputs/{ep}/videos/shot-{N}.mp4"}'
+
+# 在线状态同步
+./scripts/trace.sh {session_id} {trace_file} online_state_sync '{"stage":"completed","shot_id":"{shot_id}"}'
 
 # 完成 / 失败
 ./scripts/trace.sh {session_id} {trace_file} complete '{"total_api_calls":{N},"original_retries":{N},"rewrite_rounds":{N}}'

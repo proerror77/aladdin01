@@ -89,6 +89,8 @@ export TUZI_API_KEY="..."       # 兔子 API Key（参考图生成 + trace摘要
 export IMAGE_GEN_API_URL="..."  # 自定义图像生成端点（可选，不设则自动用 TUZI_API_KEY）
 export IMAGE_GEN_API_KEY="..."  # 自定义图像生成 Key（可选，不设则自动用 TUZI_API_KEY）
 export OPENAI_API_KEY="..."     # 用于 Moderation API（Phase 1 第三层，可选）
+export AIGC_DETECT_API_KEY="..." # 用于 AIGC 检测 API（Phase 1 第四层，可选；支持 GPTZero/Originality/自定义端点）
+export AIGC_DETECT_API_URL="..." # AIGC 检测端点（可选，不设则使用 GPTZero 默认端点）
 export DEEPSEEK_API_KEY="..."   # 用于 Trace 摘要（可选，不设则自动用 TUZI_API_KEY）
 export LARK_APP_ID="..."        # 飞书应用 ID（审核通知，可选）
 export LARK_APP_SECRET="..."    # 飞书应用 Secret（审核通知，可选）
@@ -243,6 +245,7 @@ team-lead
 |------|-------|------|------|
 | Phase 1 合规预检 | comply-agent | projects/{name}/script/{ep}.md | render-script.md, compliance-report.md |
 | Phase 2 视觉指导 | visual-agent | render-script.md | visual-direction.yaml（含 variant_id + time_of_day，storyboard_image_path=null） |
+| Phase 2.2 叙事审查 | narrative-review-agent | visual-direction.yaml + render-script.md + world-model.json | narrative-review.md + {ep}-phase2.2.json |
 | Phase 2.3 分镜图生成 | storyboard-agent | visual-direction.yaml | storyboard/shot-{N}.png + 更新 storyboard_image_path + storyboard-preview.md |
 | Phase 3 美术校验 | design-agent | visual-direction.yaml + design-lock.json | art-direction-review.md（纯文件存在性检查，不经过 gate-agent） |
 | Phase 4 音色配置 | voice-agent | render-script + visual-direction.yaml | voice-config.yaml × N, voice-assignment.md |
@@ -255,15 +258,16 @@ team-lead
 | Phase 0 本体论构建 | ontology-builder-agent | projects/{name}/script/{ep}.md + 角色/场景档案 | {ep}-world-model.json（v2.2：含 skills + functional + visual_signature + emotional_arcs） |
 | Phase 1 合规预检 | comply-agent | projects/{name}/script/{ep}.md | render-script.md, compliance-report.md |
 | Phase 2 视觉指导 | visual-agent | render-script.md + world-model.json | visual-direction.yaml（含 variant_id + time_of_day，storyboard_image_path=null） |
+| Phase 2.2 叙事审查 | narrative-review-agent | visual-direction.yaml + render-script.md + world-model.json + vectordb evidence | narrative-review.md + {ep}-phase2.2.json |
 | Phase 2.3 分镜图生成 | storyboard-agent | visual-direction.yaml | storyboard/shot-{N}.png + 更新 storyboard_image_path + storyboard-preview.md |
 | Phase 2.5 资产工厂 | asset-factory-agent | 角色/场景档案 + world-model.json | 角色定妆包 + 场景 styleframe + 道具包 |
 | Phase 3 美术校验 | design-agent | visual-direction.yaml + design-lock.json | art-direction-review.md |
-| Phase 3.5 记忆检索 | memory-agent | visual-direction.yaml + projects/{name}/assets/packs/ | references 列表 |
+| Phase 3.5 记忆检索 | memory-agent | visual-direction.yaml + world-model.json + projects/{name}/assets/ | 两段检索 references（entities/states/relations → assets） |
 | Phase 3.5 Shot Packet 编译 | shot-compiler-agent | visual-direction.yaml + world-model.json + references | shot-packet.json |
 | Phase 4 音色配置 | voice-agent | render-script + visual-direction.yaml | voice-config.yaml × N, voice-assignment.md |
-| Phase 5 视频生成 | gen-worker × N | shot-packet.json（img2video 模式） | shot-{N}.mp4 |
-| Phase 6 质量审计 | qa-agent | shot-packet.json + shot-{N}.mp4 + world-model.json | qa-report.json |
-| Phase 6 自动修复 | repair-agent | qa-report.json + shot-packet.json | 重新生成失败的 shots |
+| Phase 5 视频生成 | gen-worker × N | shot-packet.json（img2video 模式） | shot-{N}.mp4 + 在线 state 同步 |
+| Phase 6 质量审计 | qa-agent | shot-packet.json + shot-{N}.mp4 + world-model.json | qa-report.json + 在线 state 同步 |
+| Phase 6 自动修复 | repair-agent | qa-report.json + shot-packet.json | 重新生成失败的 shots + 在线 state 同步 |
 
 ## Seedance 2.0 提示词格式
 
@@ -366,10 +370,12 @@ team-lead
 
 ### Phase 3.5: Shot Packet 编译（memory-agent + shot-compiler-agent）
 
-**memory-agent**：为每个 shot 检索最相关的 references，优先级：
-1. `projects/{name}/assets/packs/`（角色定妆包 + 场景 styleframe）
-2. `projects/{name}/assets/characters/images/` 或 `projects/{name}/assets/scenes/images/`（参考图）
-3. 前一镜结尾帧
+**memory-agent**：先做检索规划，再做资产召回：
+1. 用 `search-entities` 找 canonical entity / location / skill
+2. 用 `get-state` 读取上一镜连续性状态
+3. 用 `search-relations` 获取角色关系 / 因果证据
+4. 基于规划结果再做 `search-assets`
+5. 最后回退到前一镜结尾帧
 
 **shot-compiler-agent**：组装完整的 shot packet，包含：
 - 角色状态快照（current_state, variant, ref_assets, must_preserve）
@@ -385,14 +391,15 @@ team-lead
 **qa-agent**：执行 3 种 QA：
 1. **角色一致性 QA**：检查角色外貌、服装、道具是否与 shot packet 一致
 2. **本体约束 QA**：检查是否违反物理规则、叙事约束
-3. **叙事连贯性 QA**：检查镜次间的连贯性（位置、状态、时间）
+3. **叙事连贯性 QA**：优先结合 `get-state` + `search-relations` 检查镜次间连贯性（位置、状态、时间）
 
 **repair-agent**：根据 QA 报告自动修复：
 - 调整 prompt（微调描述）
 - 更换参考图（从 projects/{name}/assets/packs/ 中选择更合适的）
 - 重新生成（最多 3 次）
+- 所有修订一旦落到 shot packet，立即在线执行 `upsert-state`
 
-输出：`projects/{name}/state/qa-reports/{ep}-shot-{N}.json`, `projects/{name}/state/repair-logs/{ep}-shot-{N}.json`
+输出：`projects/{name}/state/audit/{ep}-shot-{N}-audit.json`, `projects/{name}/state/audit/{ep}-shot-{N}-repair-history.json`
 
 ## v2.0 vs v1.0 对比
 
@@ -431,6 +438,8 @@ projects/{name}/state/
 ├── design-lock.json        # 参考图锁定（~design 产出）
 ├── task-board.json         # 任务看板（多人协作模式）
 ├── character-merge-map.json # 跨集角色融合映射（preprocess 产出）
+├── character_matrix.json   # 角色对白文风指纹（narrative-review-agent 读取，跨集累积）
+├── detection_history.json  # AIGC 检测历史（comply-agent 写入，inkos detect --stats 读取）
 ├── ontology/               # v2.0: 世界本体模型
 │   └── {ep}-world-model.json
 ├── shot-packets/           # v2.0: Shot Packet
@@ -729,6 +738,7 @@ python3 -c "import yaml; yaml.safe_load(open('config/compliance/blocklist.yaml')
 | `IMAGE_GEN_API_URL` | `IMAGE_GEN_API_URL` | 图像生成端点 |
 | `IMAGE_GEN_API_KEY` | `IMAGE_GEN_API_KEY` | 图像生成鉴权 |
 | `OPENAI_API_KEY` | `OPENAI_API_KEY` | Moderation API |
+| `AIGC_DETECT_API_KEY` | `AIGC_DETECT_API_KEY` | AIGC 检测 API（可选） |
 
 **规则**：
 - 禁止将任何 API Key 硬编码进脚本或配置文件
@@ -864,7 +874,7 @@ projects/
 │   │   ├── ontology/        # v2.0: 世界本体模型（{ep}-world-model.json）
 │   │   ├── traces/          # Agent Trace Log
 │   │   ├── design-lock.json # 参考图锁定
-│   │   ├── {ep}-phase*.json # 各阶段状态
+│   │   ├── {ep}-phase*.json # 各阶段状态（phase1/2/2.2/2.3/2.5/3/3.5/4/5/6）
 │   │   └── progress.json    # 只读索引（由 ~status 动态汇总）
 │   └── outputs/             # 专案产出
 │       └── {ep}/            # 分集产出

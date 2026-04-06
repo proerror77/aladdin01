@@ -189,6 +189,24 @@ SESSION_ID="start-$(date +%Y%m%d-%H%M%S)"
 
 创建 team，按顺序执行：
 
+**Phase 0 — 本体论构建（v2.0，可选）**
+
+检查是否需要构建本体论（v2.0 模式）：
+
+```
+# 条件：用户选择 v2.0 模式，或 projects/{project}/state/ontology/{ep}-world-model.json 不存在
+if [[ "$USE_V2" == "true" && ! -f "projects/{project}/state/ontology/{ep}-world-model.json" ]]; then
+  spawn ontology-builder-agent
+    输入：projects/{project}/script/{ep}.md + 角色/场景档案
+    session_id: $SESSION_ID
+    trace_file: {ep}-phase0-trace
+    输出：projects/{project}/state/ontology/{ep}-world-model.json
+    等待完成
+else
+  echo "[skip] Phase 0: world-model.json 已存在或非 v2.0 模式，跳过"
+fi
+```
+
 **Phase 1 — 合规预检**
 ```
 spawn comply-agent
@@ -272,6 +290,26 @@ spawn storyboard-agent
   trace_file: {ep}-phase2.3-trace
   输出：projects/{project}/outputs/{ep}/storyboard/shot-{N}.png
   等待完成
+```
+
+**Phase 2.5 — 资产工厂（v2.0，可选）**
+
+检查是否需要生成资产包（v2.0 模式且资产包不完整）：
+
+```
+if [[ "$USE_V2" == "true" ]]; then
+  # 检查资产包是否已存在（幂等：已存在则跳过）
+  if [[ ! -d "projects/{project}/assets/packs/characters" || -z "$(ls projects/{project}/assets/packs/characters/*.png 2>/dev/null)" ]]; then
+    spawn asset-factory-agent
+      输入：角色/场景档案 + projects/{project}/state/ontology/{ep}-world-model.json
+      session_id: $SESSION_ID
+      trace_file: {ep}-phase2.5-trace
+      输出：projects/{project}/assets/packs/characters/ + scenes/ + props/
+      等待完成
+  else
+    echo "[skip] Phase 2.5: 资产包已存在，跳过"
+  fi
+fi
 ```
 
 🔴 **人工确认点 1**（`--auto-approve` 时跳过）

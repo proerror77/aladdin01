@@ -87,9 +87,23 @@ assert_contains "start Phase 6 检查 world-model" 'world-model' "$ROOT_DIR/.cla
 assert_contains "batch Phase 6 检查 world-model" 'world-model' "$ROOT_DIR/.claude/skills/batch.md"
 
 echo ""
-echo "=== 8. Phase 3.5 并行化 ==="
-assert_contains "start Phase 3.5 并行 spawn" 'wait_all|并行' "$ROOT_DIR/.claude/skills/start.md"
-assert_contains "batch Phase 3.5 并行 spawn" 'wait_all|并行' "$ROOT_DIR/.claude/skills/batch.md"
+echo "=== 9. v2.0 Phase 0 + Phase 2.5 接入 ==="
+assert_contains "start 接入 ontology-builder-agent" 'ontology-builder-agent' "$ROOT_DIR/.claude/skills/start.md"
+assert_contains "start 接入 asset-factory-agent" 'asset-factory-agent' "$ROOT_DIR/.claude/skills/start.md"
+assert_contains "batch 接入 ontology-builder-agent" 'ontology-builder-agent' "$ROOT_DIR/.claude/skills/batch.md"
+assert_contains "batch 接入 asset-factory-agent" 'asset-factory-agent' "$ROOT_DIR/.claude/skills/batch.md"
+
+echo ""
+echo "=== 10. AIGC 检测 + 文风指纹 ==="
+assert_contains "comply-agent 第四层 AIGC 检测" 'AIGC|ai_detection_score|layer4_aigc' "$ROOT_DIR/.claude/agents/comply-agent.md"
+assert_contains "narrative-review 第六维度文风一致性" 'dialogue_style_consistency|character_matrix' "$ROOT_DIR/.claude/agents/narrative-review-agent.md"
+assert_contains "narrative-review 写入 character_matrix" 'character_matrix.json' "$ROOT_DIR/.claude/agents/narrative-review-agent.md"
+
+echo ""
+echo "=== 11. gen-worker 差异化重试 ==="
+assert_contains "gen-worker 失败分类" 'classify_failure|failure_type' "$ROOT_DIR/.claude/agents/gen-worker.md"
+assert_contains "gen-worker 差异化改写策略" 'simplify_motion|drop_references|truncate' "$ROOT_DIR/.claude/agents/gen-worker.md"
+assert_contains "rewrite-patterns 包含 strategies" 'strategies' "$ROOT_DIR/config/compliance/rewrite-patterns.yaml"
 
 PASS_COUNT=$(grep -c '^P$' "$RESULTS_FILE" 2>/dev/null || true)
 FAIL_COUNT=$(grep -c '^F$' "$RESULTS_FILE" 2>/dev/null || true)
