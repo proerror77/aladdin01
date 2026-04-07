@@ -116,15 +116,26 @@
 
 ### vectordb-manager.py — VectorDB 管理
 
-LanceDB 语义检索数据库管理，供 `memory-agent` 使用。
+LanceDB 语义检索数据库管理，供 `memory-agent` / `qa-agent` / `repair-agent` 使用。
 
 ```bash
 python3 scripts/vectordb-manager.py init
+python3 scripts/vectordb-manager.py upsert-world-model projects/qyccan/state/ontology/ep01-world-model.json
 python3 scripts/vectordb-manager.py index-assets projects/qyccan/assets
 python3 scripts/vectordb-manager.py search-assets "苏夜 青玉蚕 正面" --type character --n 3
 python3 scripts/vectordb-manager.py search-entities "黑雾森林 夜晚" --type scene --n 3
+python3 scripts/vectordb-manager.py search-relations "suye yehongyi 契约" --episode ep01 --n 3
+python3 scripts/vectordb-manager.py upsert-state projects/qyccan/state/shot-packets/ep01-shot-01.json
 python3 scripts/vectordb-manager.py stats
 ```
+
+**环境变量**：`VECTORDB_PATH` 可覆盖默认数据库目录（默认 `state/vectordb/lancedb`）。
+
+**在线同步约定**：
+- `gen-worker` 在生成开始 / 成功 / 失败时调用 `upsert-state`
+- `qa-agent` 在审计结束时调用 `upsert-state`
+- `repair-agent` 在修订 shot packet 后立即调用 `upsert-state`
+- `search-relations` 用于关系证据检索，支撑 `memory-agent` 两段检索和 `qa-agent` 戏剧一致性检查
 
 ### workflow-sync.py — 工作流修复与状态同步
 

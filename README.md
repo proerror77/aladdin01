@@ -127,9 +127,10 @@ claude  # 启动 Claude Code
 ### v2.0 流程（img2video）
 
 ```
-剧本 → 本体论构建 → 合规预检 → 视觉指导 → 分镜图（Phase 2.3）→ 资产工厂
-     → 美术校验 → 记忆检索 + Shot Packet（Phase 3.5）→ 音色配置
-     → 视频生成 → QA 审计 → 自动修复
+剧本 → 本体论构建 → 合规预检 → 视觉指导 → 叙事审查（Phase 2.2）
+     → 分镜图（Phase 2.3）→ 资产工厂 → 美术校验
+     → 两段记忆检索（entities/states → assets）+ Shot Packet（Phase 3.5）
+     → 音色配置 → 视频生成 → QA 审计 → 自动修复
 ```
 
 详细架构文档：
@@ -163,6 +164,7 @@ claude  # 启动 Claude Code
 | `preprocess-agent` | 长篇剧本拆解 + 角色融合 |
 | `comply-agent` | 三层合规预检 |
 | `visual-agent` | 视觉指导生成 |
+| `narrative-review-agent` | 叙事审查与修复（Phase 2.2） |
 | `storyboard-agent` | 构图分镜图生成（Phase 2.3） |
 | `gate-agent` | 自动评分过关 |
 | `design-agent` | 美术校验（文件存在性检查） |
@@ -171,10 +173,10 @@ claude  # 启动 Claude Code
 | `browser-gen-worker` | 视频生成（浏览器模式） |
 | `ontology-builder-agent` | 世界本体模型构建（v2.0） |
 | `asset-factory-agent` | 资产包生成（v2.0） |
-| `memory-agent` | 参考资产检索（v2.0） |
+| `memory-agent` | 两段记忆检索（entities/states → assets，v2.0） |
 | `shot-compiler-agent` | Shot Packet 编译（v2.0） |
-| `qa-agent` | 质量审计（v2.0） |
-| `repair-agent` | 自动修复（v2.0） |
+| `qa-agent` | 质量审计 + 在线状态同步（v2.0） |
+| `repair-agent` | 自动修复 + 在线状态同步（v2.0） |
 
 ## 目录结构
 

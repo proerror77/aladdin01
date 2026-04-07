@@ -1,0 +1,66 @@
+{
+  "shot_id": "ep01-shot-06",
+  "episode": "ep01",
+  "scene_id": "黑雾森林外围（反应镜头）",
+  "source_refs": {
+    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-06.png"
+  },
+  "story_logic": {
+    "shot_purpose": "land_reaction",
+    "dramatic_role": "reaction",
+    "transition_from_previous": "push_in",
+    "emotional_target": "震惊和停顿",
+    "information_delta": "0-3秒：叶红衣猛地闭上眼睛，随后听到沉闷消失声，缓缓睁眼",
+    "next_hook": "推动观众进入下一镜"
+  },
+  "camera": {
+    "raw": "0-3秒：特写固定镜头，叶红衣闭眼，浅景深\n4-7秒：近景固定镜头，叶红衣睁眼，眼神变化，镜头缓慢推近\n8-10秒：全景固定镜头，苏夜落地摆Pose，叶红衣石化，两人反差\n11-12秒：中景固定镜头，两人大眼瞪小眼，空气凝固",
+    "shot_size": "close_up",
+    "movement": "static",
+    "angle": "normal"
+  },
+  "selected_views": {
+    "characters": [
+      {
+        "id": "_",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      },
+      {
+        "id": "_",
+        "name": "叶红衣",
+        "variant_id": "default",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      }
+    ],
+    "scene": {
+      "name": "黑雾森林",
+      "preferred_view": "day",
+      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    }
+  },
+  "continuity": {
+    "previous_shot_id": "ep01-shot-05",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-05-end-frame.png",
+    "recovered_from_outputs": false
+  },
+  "generation_status": {
+    "storyboard": "completed",
+    "video": "pending"
+  }
+}

@@ -163,7 +163,19 @@ v2.0 的 `memory-agent` 使用 LanceDB 做语义检索。
 ```bash
 pip install lancedb sentence-transformers
 python3 scripts/vectordb-manager.py init
+python3 scripts/vectordb-manager.py stats
 ```
+
+可选环境变量：
+
+```bash
+export VECTORDB_PATH="state/vectordb/lancedb"
+```
+
+说明：
+- `sentence-transformers` 装好后会自动启用本地多语言 embedding
+- `memory-agent` 会先查 entities / states / relations，再查 assets
+- `gen-worker` / `qa-agent` / `repair-agent` 会在线写入 `upsert-state`
 
 ## 目录初始化
 

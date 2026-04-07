@@ -1,43 +1,39 @@
 {
   "shot_id": "ep01-shot-02",
   "episode": "ep01",
-  "scene_id": "ep01-sc02",
+  "scene_id": "ep01-sc01",
   "shot_number": 2,
-  "scene_goal": "0-3秒：叶红衣跌跌撞撞冲出灌木丛，身后传来追兵狞笑声和野兽咆哮",
+  "scene_goal": "苏夜确认自己是蚕，无法站立，彻底绝望",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
   "source_refs": {
-    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
-    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "visual_direction_path": "projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "projects/qyccan/state/ontology/ep01-world-model.json",
     "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-02.png"
   },
   "story_logic": {
-    "shot_purpose": "introduce_subject",
-    "dramatic_role": "approach",
-    "transition_from_previous": "push_in",
-    "emotional_target": "绝望和下坠",
-    "information_delta": "0-3秒：叶红衣跌跌撞撞冲出灌木丛，身后传来追兵狞笑声和野兽咆哮",
-    "next_hook": "推动观众进入下一镜"
+    "shot_purpose": "reveal_change",
+    "dramatic_role": "detail",
+    "transition_from_previous": "上一shot最后一帧：青玉蚕全景趴在树叶上，镜头已拉远→当前shot接续全景，苏夜开始挣扎站起，空间连续，情绪从惊恐推进至绝望",
+    "emotional_target": "绝望与自嘲——观众看着一个硬汉灵魂被困在萌系蚕体内的荒诞感",
+    "information_delta": "苏夜确认自己是蚕，无法站立，彻底绝望",
+    "next_hook": "这条蚕接下来怎么办？"
   },
   "selected_views": {
     "characters": [
       {
         "id": "_",
-        "name": "叶红衣",
-        "variant_id": "default",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
         "preferred_view": "front",
-        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "fallback_order": [
-          "front",
-          "side",
-          "back"
-        ]
+        "selected_path": "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": ["front", "side", "back"]
       }
     ],
     "scene": {
       "name": "黑雾森林",
       "preferred_view": "day",
-      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+      "selected_path": "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     }
   },
   "continuity_inputs": {
@@ -46,62 +42,54 @@
   },
   "characters": [
     {
-      "id": "yehongyi",
-      "name": "叶红衣",
-      "state_ref": "yehongyi@ep01-shot-02",
-      "variant": "default",
+      "id": "苏夜",
+      "state_ref": "苏夜@ep01-shot-02",
+      "variant": "qingyucan",
       "ref_assets": [
-        "projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "projects/qyccan/assets/characters/images/叶红衣-side.png",
-        "projects/qyccan/assets/characters/images/叶红衣-back.png"
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png"
       ],
-      "must_preserve": [
-        "form",
-        "size",
-        "color",
-        "costume"
-      ],
+      "must_preserve": ["form", "size", "color"],
       "current_state": {
-        "form": "红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨。",
+        "form": "青玉蚕（凡胎级）",
         "costume": "default",
         "injury": "none",
-        "emotion": "despair",
+        "emotion": "绝望自嘲",
         "props_in_possession": [],
-        "knowledge": []
+        "knowledge": ["刚穿越，确认自己变成蚕"]
       }
     }
   ],
   "background": {
-    "location": "黑雾森林（树下）",
+    "location": "黑雾森林",
     "time_of_day": "day",
     "ref_assets": [
       "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
-    ],
-    "lighting_note": "黑雾弥漫，光线昏暗，树根处阴影浓重，叶红衣红衣在暗色背景中格外醒目",
-    "functional": {}
+    ]
   },
   "camera": {
-    "shot_size": "medium",
-    "movement": "dolly",
-    "lens_style": "cinematic",
-    "raw": "0-3秒：中景跟镜头，手持跟拍叶红衣奔跑，轻微晃动感\n4-7秒：近景固定镜头，叶红衣靠树，镜头缓慢推近至脸部特写\n8-10秒：特写固定镜头，聚焦叶红衣双手和召唤石，浅景深\n11-12秒：全景固定镜头，叶红衣捏碎召唤石，法阵亮起，金色光芒照亮画面"
+    "raw": "0-3秒：全景固定镜头，俯视角度，拍苏夜在树叶上滚圈；4-7秒：近景固定镜头，平视角度，拍苏夜肚皮朝天四肢乱蹬；8-12秒：大特写固定镜头，推近至苏夜脸部，表情绝望",
+    "shot_size": "wide",
+    "movement": "static",
+    "angle": "overhead"
   },
   "seedance_inputs": {
     "mode": "img2video",
     "images": [
-      "projects/qyccan/assets/characters/images/叶红衣-front.png",
-      "projects/qyccan/assets/characters/images/叶红衣-side.png",
-      "projects/qyccan/assets/characters/images/叶红衣-back.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
       "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
-      "projects/qyccan/outputs/ep01/storyboard/shot-02.png",
-      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-01-end-frame.png"
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
+      "projects/qyccan/outputs/ep01/storyboard/shot-02.png"
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<叶红衣>，场景参考@图片2\n\n0-3秒：中景手持跟镜头，轻微晃动，[叶红衣]红衣破损、发髻散乱，跌跌撞撞冲出灌木丛，身后黑雾中传来追兵狞笑声和野兽咆哮，恐惧与绝望写满脸庞\n4-7秒：近景固定镜头缓慢推近，[叶红衣]靠在巨大树根旁，大口喘息，眼神从绝望逐渐转为决绝，[叶红衣]（喘息，绝望）：\"家族抛弃，未婚夫逼杀……叶红衣，你真的要命丧于此吗？\"随后眼神骤然坚定，[叶红衣]（决绝）：\"不！还有最后的机会！\"\n8-10秒：特写固定镜头，浅景深，聚焦[叶红衣]颤抖的双手，从怀中掏出满是裂纹的古老召唤石，咬破手指，鲜血滴落石上，石头裂纹发出微弱金光\n11-12秒：全景固定镜头，[叶红衣]猛地捏碎召唤石，[叶红衣]（满怀期待）：\"出来吧，我的本命灵兽！\"，脚下法阵骤然亮起，金色粒子爆散，光芒照亮整个画面\n\n音效：追兵脚步声、野兽咆哮声（由远及近）、召唤石碎裂声、法阵激活轰鸣声\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片5（仅参考景别和角色位置，不复制细节）"
+    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，场景参考@图片2\n\n0-3秒：全景固定镜头俯视，[苏夜]通体碧绿肥嘟嘟的蚕宝宝趴在巨大树叶上，试图站起来，圆滚滚的身体在叶子上滚了一圈，古木参天背景，黑雾弥漫，丁达尔光柱\n\n4-7秒：近景固定镜头平视，[苏夜]肚皮朝天，四肢乱蹬无法翻身，叶面露珠在旁滚动，画外音（苏夜，绝望）：\"穿越成虫？这也太草率了吧！老天爷，你玩我啊！\"（语气：绝望自嘲）\n\n8-12秒：大特写固定镜头缓慢推近，[苏夜]停止挣扎，肚皮朝天四肢无力垂下，复眼特写，表情绝望，伦勃朗光，低饱和色调，胶片颗粒感\n\n音效：森林虫鸣声、树叶沙沙声\n\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片5（仅参考景别和角色位置，不复制细节）"
   },
   "forbidden_changes": [
-    "保持叶红衣的当前形态（default）"
+    "保持苏夜的青玉蚕形态（凡胎级，拇指大小，通体碧绿）",
+    "不要让苏夜变大或变形"
   ],
   "repair_policy": {
     "max_retries": 2,
@@ -109,37 +97,27 @@
   },
   "ontology_constraints": {
     "world_rules": [
-      "gravity=normal",
-      "magic_system=cultivation",
-      "power_scaling=strict",
-      "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。",
+      "cultivation",
       "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
-      "人族通过觉醒魂宫契约灵兽",
-      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
-      "契约绑定需要精血激活召唤石",
-      "苏夜前世为龙国特种部队队长，代号修罗"
+      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点"
     ],
     "character_abilities": {
-      "yehongyi": {
-        "abilities": [
-          "软剑术",
-          "残余灵力"
-        ],
-        "constraints": [
-          "灵根受损，灵力微弱",
-          "被家族抛弃",
-          "被逼婚赵无极"
-        ],
-        "camera_preference": {}
-      }
-    },
-    "scene_restrictions": {},
-    "skills": [],
-    "emotional_arcs": []
+      "苏夜": ["吞天口（一级）", "无限吞噬进化系统"],
+      "叶红衣": ["软剑术", "残余灵力"]
+    }
   },
-  "audio": [
-    "叶红衣（喘息）：\"家族抛弃，未婚夫逼杀……叶红衣，你真的要命丧于此吗？\"",
-    "叶红衣（眼神决绝）：\"不！还有最后的机会！\"",
-    "叶红衣（满怀期待）：\"出来吧，我的本命灵兽！\""
-  ]
+  "retrieval_audit": {
+    "planning": {
+      "entities_searched": ["苏夜/qingyucan"],
+      "locations_searched": ["黑雾森林/day"],
+      "assets_source": "design-lock + visual-direction references"
+    },
+    "retrieval_evidence": {
+      "苏夜_qingyucan_front": "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+      "苏夜_qingyucan_side": "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+      "苏夜_qingyucan_back": "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
+      "黑雾森林_day": "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
+      "storyboard": "projects/qyccan/outputs/ep01/storyboard/shot-02.png"
+    }
+  }
 }

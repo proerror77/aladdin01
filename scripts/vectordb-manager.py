@@ -8,6 +8,7 @@ vectordb-manager.py — LanceDB 向量库管理
   python3 scripts/vectordb-manager.py upsert-asset assets/packs/characters/苏夜-default-front.png
   python3 scripts/vectordb-manager.py search-assets "苏夜 青玉蚕 正面" --type character --n 3
   python3 scripts/vectordb-manager.py search-entities "黑雾森林 夜晚" --type scene --n 3
+  python3 scripts/vectordb-manager.py search-relations "苏夜 叶红衣 契约" --episode ep01 --n 3
   python3 scripts/vectordb-manager.py get-state suye ep01 shot-05
   python3 scripts/vectordb-manager.py index-assets assets/packs/
   python3 scripts/vectordb-manager.py stats
@@ -45,7 +46,7 @@ except ImportError:
 # 配置
 # ──────────────────────────────────────────────────────────────────────────────
 
-DB_PATH = "state/vectordb/lancedb"
+DB_PATH = os.environ.get("VECTORDB_PATH", "state/vectordb/lancedb")
 EMBED_DIM = 384  # paraphrase-multilingual-MiniLM-L12-v2 维度
 
 TABLE_ENTITIES  = "entities"   # 角色 / 场景 / 道具 实体
@@ -579,6 +580,42 @@ def cmd_search_entities(args):
 
     print(json.dumps(output, ensure_ascii=False, indent=2))
 
+
+def cmd_search_relations(args):
+    """
+    语义检索关系（人物关系 / 因果 / 空间关系）。
+    """
+    query = args.query
+    n = args.n
+    rel_type = args.type
+    episode = getattr(args, "episode", None)
+
+    db = lancedb.connect(DB_PATH)
+    tbl = db.open_table(TABLE_RELATIONS)
+
+    vec = embed(query)
+    results = tbl.search(vec).limit(n * 3).to_list()
+
+    if rel_type:
+        results = [r for r in results if r["rel_type"] == rel_type]
+    if episode:
+        results = [r for r in results if r["episode"] == episode]
+
+    output = []
+    for r in results[:n]:
+        output.append({
+            "id":          r["id"],
+            "from_entity": r["from_entity"],
+            "to_entity":   r["to_entity"],
+            "rel_type":    r["rel_type"],
+            "relation":    r["relation"],
+            "episode":     r["episode"],
+            "description": r["description"],
+            "score":       round(1 - r.get("_distance", 0), 4),
+        })
+
+    print(json.dumps(output, ensure_ascii=False, indent=2))
+
 # ──────────────────────────────────────────────────────────────────────────────
 # 写入 / 查询 角色状态快照
 # ──────────────────────────────────────────────────────────────────────────────
@@ -622,6 +659,10 @@ def cmd_upsert_state(args):
         })
 
     if rows:
+        try:
+            tbl.delete(f"episode = '{episode}' AND shot_id = '{shot_id}'")
+        except Exception:
+            pass
         tbl.add(rows)
         print(f"✓ 写入状态快照: {len(rows)} 条 (shot={shot_id})")
 
@@ -707,6 +748,12 @@ def main():
     p_se.add_argument("--episode", default=None)
     p_se.add_argument("--n", type=int, default=5)
 
+    p_sr = sub.add_parser("search-relations", help="语义检索关系")
+    p_sr.add_argument("query", help="查询文本")
+    p_sr.add_argument("--type", choices=["social", "spatial", "causal", "temporal", "skill_usage"], default=None)
+    p_sr.add_argument("--episode", default=None)
+    p_sr.add_argument("--n", type=int, default=5)
+
     p_us = sub.add_parser("upsert-state", help="写入 shot 状态快照")
     p_us.add_argument("path", help="shot-packet.json 路径")
 
@@ -726,6 +773,7 @@ def main():
         "index-assets":     cmd_index_assets,
         "search-assets":    cmd_search_assets,
         "search-entities":  cmd_search_entities,
+        "search-relations": cmd_search_relations,
         "upsert-state":     cmd_upsert_state,
         "get-state":        cmd_get_state,
         "stats":            cmd_stats,
