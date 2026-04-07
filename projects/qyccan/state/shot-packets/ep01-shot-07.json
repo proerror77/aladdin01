@@ -1,55 +1,47 @@
 {
   "shot_id": "ep01-shot-07",
   "episode": "ep01",
-  "scene_id": "ep01-sc07",
+  "scene_id": "ep01-sc01",
   "shot_number": 7,
-  "scene_goal": "0-4秒：镜头缓慢拉远，从中景拉至大全景，苏夜和叶红衣的体型反差在大环境中格外突出",
-  "duration_sec": 10,
+  "scene_goal": "家仆甲乙追上，嘲笑叶红衣召唤了废物蚕，叶红衣护住苏夜",
+  "duration_sec": 12,
   "dialogue_mode": "external_dub",
   "source_refs": {
-    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
-    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "visual_direction_path": "projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "projects/qyccan/state/ontology/ep01-world-model.json",
     "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-07.png"
   },
   "story_logic": {
-    "shot_purpose": "land_result",
-    "dramatic_role": "resolution",
-    "transition_from_previous": "dissolve",
-    "emotional_target": "反差和得意",
-    "information_delta": "0-4秒：镜头缓慢拉远，从中景拉至大全景，苏夜和叶红衣的体型反差在大环境中格外突出",
-    "next_hook": "情绪收束"
+    "shot_purpose": "land_reaction",
+    "dramatic_role": "approach",
+    "transition_from_previous": "上一shot最后一帧：叶红衣崩溃特写，法阵余光→当前shot接续，草丛被拨开，家仆追上，空间连续（同一树下），时间连续，冲突从内部（叶红衣崩溃）转向外部（家仆威胁）",
+    "emotional_target": "愤怒与保护欲——叶红衣护住苏夜的动作触发观众的情感共鸣",
+    "information_delta": "家仆甲乙追上，嘲笑叶红衣召唤了废物蚕，叶红衣护住苏夜",
+    "next_hook": "苏夜会怎么反应？"
   },
   "selected_views": {
     "characters": [
       {
         "id": "_",
-        "name": "苏夜",
-        "variant_id": "qingyucan",
-        "preferred_view": "front",
-        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
-        "fallback_order": [
-          "front",
-          "side",
-          "back"
-        ]
-      },
-      {
-        "id": "_",
         "name": "叶红衣",
         "variant_id": "default",
         "preferred_view": "front",
-        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "fallback_order": [
-          "front",
-          "side",
-          "back"
-        ]
+        "selected_path": "projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "fallback_order": ["front", "side", "back"]
+      },
+      {
+        "id": "_",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
+        "preferred_view": "front",
+        "selected_path": "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": ["front", "side", "back"]
       }
     ],
     "scene": {
       "name": "黑雾森林",
       "preferred_view": "day",
-      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+      "selected_path": "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     }
   },
   "continuity_inputs": {
@@ -58,93 +50,72 @@
   },
   "characters": [
     {
-      "id": "suye",
-      "name": "苏夜",
-      "state_ref": "suye@ep01-shot-07",
-      "variant": "qingyucan",
-      "ref_assets": [
-        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
-        "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
-        "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png"
-      ],
-      "must_preserve": [
-        "form",
-        "size",
-        "color",
-        "costume"
-      ],
-      "current_state": {
-        "form": "通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，眼神极其欠揍，樱桃般的小嘴。视野呈现复眼效果。",
-        "costume": "default",
-        "injury": "none",
-        "emotion": "triumphant",
-        "props_in_possession": [],
-        "knowledge": []
-      }
-    },
-    {
-      "id": "yehongyi",
-      "name": "叶红衣",
-      "state_ref": "yehongyi@ep01-shot-07",
+      "id": "叶红衣",
+      "state_ref": "叶红衣@ep01-shot-07",
       "variant": "default",
       "ref_assets": [
         "projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "projects/qyccan/assets/characters/images/叶红衣-side.png",
-        "projects/qyccan/assets/characters/images/叶红衣-back.png"
+        "projects/qyccan/assets/characters/images/叶红衣-side.png"
       ],
-      "must_preserve": [
-        "form",
-        "size",
-        "color",
-        "costume"
-      ],
+      "must_preserve": ["form", "size", "color"],
       "current_state": {
-        "form": "红衣似火，高冷御姐脸，眼神透着倔强和落寞，长发，精致锁骨。",
-        "costume": "default",
+        "form": "人族少女",
+        "costume": "红衣破损，发髻散乱，身上带血迹",
+        "injury": "minor",
+        "emotion": "defiant_protective",
+        "props_in_possession": ["苏夜（护在手心）"],
+        "knowledge": ["已契约苏夜", "圣兽召唤石已碎裂", "家仆追上，处境危险"]
+      }
+    },
+    {
+      "id": "苏夜",
+      "state_ref": "苏夜@ep01-shot-07",
+      "variant": "qingyucan",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png"
+      ],
+      "must_preserve": ["form", "size", "color"],
+      "current_state": {
+        "form": "青玉蚕（凡胎级）",
+        "costume": "通体碧绿蚕体",
         "injury": "none",
-        "emotion": "triumphant",
+        "emotion": "sharpening",
         "props_in_possession": [],
-        "knowledge": []
+        "knowledge": ["被叶红衣护在手心", "感受到威胁", "眼神开始变犀利"]
       }
     }
   ],
   "background": {
-    "location": "黑雾森林外围（收尾全景）",
+    "location": "黑雾森林",
     "time_of_day": "day",
     "ref_assets": [
       "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
-    ],
-    "lighting_note": "黑雾弥漫，古木参天，拉远全景，苏夜和叶红衣的体型反差在大环境中格外突出",
-    "functional": {}
+    ]
   },
   "camera": {
-    "shot_size": "medium",
-    "movement": "dolly",
-    "lens_style": "cinematic",
-    "raw": "0-4秒：拉镜头，从中景缓慢拉至大全景，升降镜头辅助，展示环境\n5-7秒：大全景固定镜头，苏夜和叶红衣的体型反差\n8-10秒：大远景拉镜头，继续拉远，黑雾弥漫的森林"
+    "raw": "0-3秒：全景固定镜头，建立三方空间关系（叶红衣、苏夜、家仆）；4-7秒：中景摇镜头，从家仆乙摇至家仆甲，再摇至叶红衣；8-12秒：近景固定镜头，叶红衣护住苏夜，苏夜在手心蠕动，眼神变犀利",
+    "shot_size": "wide",
+    "movement": "pan",
+    "angle": "normal"
   },
   "seedance_inputs": {
     "mode": "img2video",
     "images": [
-      "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
-      "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
-      "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
       "projects/qyccan/assets/characters/images/叶红衣-front.png",
-      "projects/qyccan/assets/characters/images/叶红衣-side.png",
-      "projects/qyccan/assets/characters/images/叶红衣-back.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
       "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
-      "projects/qyccan/outputs/ep01/storyboard/shot-07.png",
-      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-06-end-frame.png"
+      "projects/qyccan/outputs/ep01/storyboard/shot-07.png"
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-4秒：拉镜头配合升降镜头，从中景缓慢拉远至大全景，[苏夜]拇指大小趴在地上摆Pose，[叶红衣]高挑红衣破损彻底石化俯视[苏夜]，两人体型反差在黑雾弥漫的古木森林背景下格外突出，地面焦痕清晰可见\n5-7秒：大全景固定镜头，[苏夜]扭腰摆Pose自信满满，[叶红衣]石化俯视，[家仆乙]在远处吓傻，三人形成强烈喜剧反差，画外音（苏夜，OS，得意）：\"吞天口……嗝……这穿越，好像还不错嘛！\"\n8-10秒：大远景拉镜头继续拉远，黑雾弥漫的古木森林将两人逐渐淹没，镜头淡出\n\n音效：轻松喜剧收尾音效、黑雾森林环境音渐弱\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片8（仅参考景别和角色位置，不复制细节）"
+    "prompt": "@图片1 作为<叶红衣>，@图片2 作为<苏夜（青玉蚕形态）>，场景参考@图片3\n\n0-3秒：全景固定镜头，建立三方空间关系，[叶红衣]站在画面左侧，[苏夜]在她手心（画面中央），家仆甲乙从右侧草丛冲出，手持大刀，淫邪笑容，家仆甲（淫笑）：\"嘿嘿，大小姐，跑不动了吧？\"，黑雾弥漫，古木参天\n\n4-7秒：中景摇镜头，从家仆乙摇至家仆甲再摇至[叶红衣]，家仆乙（爆笑）：\"哈哈哈哈！叶家天才居然契约了一条蚕！\"，家仆甲气势汹汹走向[叶红衣]：\"把这蚕交出来！\"，伦勃朗光，低饱和色调\n\n8-12秒：近景固定镜头，[叶红衣]咬牙切齿护住手心里的[苏夜]，[叶红衣]（咬牙切齿）：\"闭，闭嘴……我的灵兽轮不到你们嘲笑！\"，[苏夜]在手心里蠕动，复眼眼神开始变犀利，胶片颗粒感\n\n音效：大刀碰撞声、家仆嘲笑声、树叶沙沙声\n\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片4（仅参考景别和角色位置，不复制细节）"
   },
   "forbidden_changes": [
-    "保持苏夜的当前形态（qingyucan）",
-    "不要让苏夜说话",
-    "保持苏夜的体型比例",
-    "保持叶红衣的当前形态（default）"
+    "保持苏夜的青玉蚕形态（通体碧绿、拇指大小），不得变形为其他形态",
+    "不得改变叶红衣的红衣破损状态",
+    "苏夜必须在叶红衣手心中，体型对比必须明显",
+    "苏夜眼神必须在本镜次末尾开始变犀利，为下一镜次铺垫"
   ],
   "repair_policy": {
     "max_retries": 2,
@@ -152,47 +123,31 @@
   },
   "ontology_constraints": {
     "world_rules": [
-      "gravity=normal",
-      "magic_system=cultivation",
-      "power_scaling=strict",
-      "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。",
+      "cultivation",
       "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
-      "人族通过觉醒魂宫契约灵兽",
       "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
-      "契约绑定需要精血激活召唤石",
       "苏夜前世为龙国特种部队队长，代号修罗"
     ],
     "character_abilities": {
-      "suye": {
-        "abilities": [
-          "吞天口（一级）",
-          "无限吞噬进化系统"
-        ],
-        "constraints": [
-          "无法开口说话（蚕形态）",
-          "体型极小",
-          "无法独立行动"
-        ],
-        "camera_preference": {}
-      },
-      "yehongyi": {
-        "abilities": [
-          "软剑术",
-          "残余灵力"
-        ],
-        "constraints": [
-          "灵根受损，灵力微弱",
-          "被家族抛弃",
-          "被逼婚赵无极"
-        ],
-        "camera_preference": {}
-      }
-    },
-    "scene_restrictions": {},
-    "skills": [],
-    "emotional_arcs": []
+      "苏夜": ["吞天口（一级，即将激活）", "无限吞噬进化系统（即将激活）"],
+      "叶红衣": ["软剑术", "残余灵力"]
+    }
   },
-  "audio": [
-    "苏夜（OS，得意）：\"吞天口……嗝……这穿越，好像还不错嘛！\""
-  ]
+  "retrieval_audit": {
+    "planning": {
+      "entities_searched": ["叶红衣", "苏夜", "黑雾森林"],
+      "states_checked": ["ep01-shot-06"],
+      "relations_checked": ["苏夜-叶红衣契约关系", "赵无极-叶红衣逼婚关系（家仆为赵无极派遣）"]
+    },
+    "retrieval_evidence": {
+      "character_assets": {
+        "叶红衣": "design-lock.json → default variant → front+side",
+        "苏夜": "design-lock.json → qingyucan variant → front+side"
+      },
+      "scene_assets": {
+        "黑雾森林": "design-lock.json → day variant"
+      },
+      "continuity": "ep01-shot-06 end-frame referenced for 叶红衣崩溃特写 transition"
+    }
+  }
 }

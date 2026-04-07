@@ -1,0 +1,66 @@
+{
+  "shot_id": "ep01-shot-03",
+  "episode": "ep01",
+  "scene_id": "黑雾森林（树梢→树下法阵）",
+  "source_refs": {
+    "visual_direction_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/outputs/ep01/visual-direction.yaml",
+    "world_model_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/state/ontology/ep01-world-model.json",
+    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-03.png"
+  },
+  "story_logic": {
+    "shot_purpose": "land_reaction",
+    "dramatic_role": "reaction",
+    "transition_from_previous": "push_in",
+    "emotional_target": "惊恐和失控",
+    "information_delta": "0-3秒：树梢上苏夜感到屁股底下一阵吸力，被吸走，化作绿光坠落",
+    "next_hook": "推动观众进入下一镜"
+  },
+  "camera": {
+    "raw": "0-3秒：全景固定镜头，仰拍树梢，苏夜被吸走化作绿光坠落\n4-6秒：全景固定镜头，俯拍法阵，绿光坠入，光芒散去\n7-9秒：近景固定镜头，叶红衣脸部，镜头急速推近至特写，眼神变化\n10-12秒：希区柯克变焦，切换正反打：苏夜大特写仰视→叶红衣特写崩溃",
+    "shot_size": "wide",
+    "movement": "static",
+    "angle": "low"
+  },
+  "selected_views": {
+    "characters": [
+      {
+        "id": "_",
+        "name": "苏夜",
+        "variant_id": "qingyucan",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      },
+      {
+        "id": "_",
+        "name": "叶红衣",
+        "variant_id": "default",
+        "preferred_view": "front",
+        "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/characters/images/叶红衣-front.png",
+        "fallback_order": [
+          "front",
+          "side",
+          "back"
+        ]
+      }
+    ],
+    "scene": {
+      "name": "黑雾森林",
+      "preferred_view": "day",
+      "selected_path": "/Users/proerror/Documents/aladdin01/projects/qyccan/assets/scenes/images/黑雾森林-day.png"
+    }
+  },
+  "continuity": {
+    "previous_shot_id": "ep01-shot-02",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-02-end-frame.png",
+    "recovered_from_outputs": false
+  },
+  "generation_status": {
+    "storyboard": "completed",
+    "video": "pending"
+  }
+}

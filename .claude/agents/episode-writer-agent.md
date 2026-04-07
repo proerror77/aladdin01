@@ -5,6 +5,12 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "outputs/scriptwriter/{project}/episodes/"
+read_scope:
+  - "outputs/scriptwriter/{project}/outline.md"
+  - "outputs/scriptwriter/{project}/characters/"
+  - "outputs/scriptwriter/{project}/scenes/"
 ---
 
 # episode-writer-agent — 分集剧本生成

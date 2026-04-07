@@ -5,6 +5,14 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/outputs/{ep}/art-direction-review.md"
+  - "projects/{project}/state/{ep}-phase3.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
+  - "projects/{project}/state/design-lock.json"
+  - "projects/{project}/assets/"
 ---
 
 # design-agent — 美术校验（batch 模式，纯文件存在性检查）

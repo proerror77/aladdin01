@@ -5,6 +5,16 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/outputs/{ep}/videos/shot-{N}.mp4"
+  - "projects/{project}/state/{ep}-shot-{N}.json"
+  - "projects/{project}/outputs/{ep}/generation-report.md"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/state/shot-packets/"
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
+  - "projects/{project}/assets/"
+  - "config/platforms/"
 ---
 
 # gen-worker — 视频生成 Worker
@@ -292,6 +302,8 @@ elif generation_backend == "dreamina":
 | img2video | ≥2 | multimodal2video | multimodal2video | image2video(首张) |
 | first_last_frame | 2 | frames2video | frames2video | frames2video |
 
+**注意**：如果 `videos` 数组非空（有运镜参考视频），无论图片数量多少，strategy=auto 时强制使用 `multimodal2video`。
+
 **URL → 本地路径转换**：
 
 dreamina CLI 需要本地文件路径，不接受 URL：
@@ -333,6 +345,7 @@ img2video（多图，multimodal2video 旗舰）模式：
   "command": "multimodal2video",
   "prompt": "{current_prompt}",
   "images": ["{ref1_local_path}", "{ref2_local_path}", ...],
+  "videos": ["{video_ref_local_path}", ...],
   "duration": {duration},
   "ratio": "{ratio}",
   "video_resolution": "{dreamina_backend.video_resolution}",
@@ -340,6 +353,8 @@ img2video（多图，multimodal2video 旗舰）模式：
   "poll": {dreamina_backend.poll_timeout}
 }
 ```
+
+**说明**：`videos` 为空数组时省略该字段（dreamina CLI 不传空数组）。有视频参考时，dreamina 会用视频的镜头语言、动作节奏来指导生成。
 
 首尾帧模式：
 ```json
@@ -392,15 +407,17 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
 2. 从 `seedance_inputs` 字段提取：
    - `mode`（img2video）
    - `images`（参考图列表）
+   - `videos`（运镜参考视频列表，可为空数组）
    - `prompt`（组装好的提示词）
    - `duration`
    - `ratio`
    - `resolution`
    - `generate_audio`
 3. 构建 payload（使用 shot packet 中的数据）
-   - 如果 `images` 数组有多张图，按顺序添加到 `content` 数组
+   - 如果 `images` 数组有多张图，按顺序添加到 `content` 数组（`image_url` 类型）
+   - 如果 `videos` 数组非空，按顺序添加到 `content` 数组（`video_url` 类型）
    - 第一张图作为首帧参考，后续图作为额外参考（角色定妆包、场景 styleframe 等）
-   - Seedance API 支持多张参考图，会综合考虑所有参考图的特征
+   - Seedance API 支持多张参考图 + 参考视频，会综合考虑所有输入的特征
 
 **旧模式（向后兼容）**：
 
@@ -408,7 +425,7 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
 
 **Payload 构建**（火山方舟官方格式）：
 
-**Shot Packet 模式 - 多张参考图（v2.0）**：
+**Shot Packet 模式 - 多张参考图 + 运镜参考视频（v2.0）**：
 ```json
 {
   "model": "{default_model from config/platforms/seedance-v2.yaml}",
@@ -416,7 +433,8 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
     { "type": "text", "text": "{prompt}" },
     { "type": "image_url", "image_url": { "url": "{images[0]}" } },
     { "type": "image_url", "image_url": { "url": "{images[1]}" } },
-    { "type": "image_url", "image_url": { "url": "{images[2]}" } }
+    { "type": "image_url", "image_url": { "url": "{images[2]}" } },
+    { "type": "video_url", "video_url": { "url": "{videos[0]}" } }
   ],
   "ratio": "{ratio}",
   "duration": {duration},
@@ -427,10 +445,13 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
 ```
 
 **说明**：
-- `images` 数组中的所有图片都会添加到 `content` 数组
+- `images` 数组中的所有图片都会添加到 `content` 数组（`image_url` 类型）
+- `videos` 数组中的所有视频都会添加到 `content` 数组（`video_url` 类型）
+- `videos` 为空数组时不添加 `video_url` 条目
 - 第一张图通常是角色定妆包的正面视图
 - 后续图可以是场景 styleframe、其他角色、道具等
-- Seedance API 会综合考虑所有参考图的特征
+- 视频参考用于传递镜头语言、动作节奏等运镜信息
+- Seedance API 会综合考虑所有参考图和参考视频的特征
 
 **有参考图（图生视频-首帧）**：
 ```json

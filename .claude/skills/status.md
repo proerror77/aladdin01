@@ -32,8 +32,9 @@
 4. `projects/{project}/state/{ep}-phase3.5.json` → Phase 3.5 状态
 5. `projects/{project}/state/{ep}-phase3.json` → Phase 3 状态
 6. `projects/{project}/state/{ep}-phase2.3.json` → Phase 2.3 状态
-7. `projects/{project}/state/{ep}-phase2.json` → Phase 2 状态
-8. `projects/{project}/state/{ep}-phase1.json` → Phase 1 状态
+7. `projects/{project}/state/{ep}-phase2.2.json` → Phase 2.2 状态
+8. `projects/{project}/state/{ep}-phase2.json` → Phase 2 状态
+9. `projects/{project}/state/{ep}-phase1.json` → Phase 1 状态
 
 **注意**：Phase 5 仍然以 `projects/{project}/state/{ep}-shot-*.json` 为单镜次 source of truth；
 `phase5.json` 只是汇总缓存，单镜次进度与输出目录必须保持一致。
@@ -55,7 +56,7 @@ ep02  [██████░░░░] 60%  Phase 4: 音色配置完成，等待
 ep03  [████░░░░░░] 40%  Phase 3: 美术校验中
 
 阶段说明：
-Phase 1 合规预检 → Phase 2 视觉指导 → Phase 2.3 分镜图 → Phase 3 美术校验 → Phase 3.5 Shot Packet → Phase 4 音色配置 → Phase 5 视频生成 → Phase 6 审计修复
+Phase 1 合规预检 → Phase 2 视觉指导 → Phase 2.2 叙事审查 → Phase 2.3 分镜图 → Phase 3 美术校验 → Phase 3.5 Shot Packet → Phase 4 音色配置 → Phase 5 视频生成 → Phase 6 审计修复
 ```
 
 ### 按人查看（~status --mine 或 ~status alice）
@@ -119,11 +120,12 @@ shot-10  ❌ 失败（5次重试 + 3轮改写）
 
 | 阶段完成 | 百分比 |
 |---------|--------|
-| Phase 1 完成 | 14% |
-| Phase 2 完成 | 28% |
-| Phase 2.3 完成 | 42% |
-| Phase 3 完成 | 56% |
-| Phase 3.5 完成 | 70% |
+| Phase 1 完成 | 12% |
+| Phase 2 完成 | 24% |
+| Phase 2.2 完成 | 36% |
+| Phase 2.3 完成 | 48% |
+| Phase 3 完成 | 60% |
+| Phase 3.5 完成 | 72% |
 | Phase 4 完成 | 84% |
 | Phase 5 完成 | 92% |
 | Phase 6 完成 | 100% |
@@ -147,6 +149,7 @@ Phase 5 的细分进度 = 84% + (已完成镜次数 / 总镜次数) × 8%
 |---------|---------|
 | {ep}-phase1.json | data.rewrites_count |
 | {ep}-phase2.json | data.shot_count, data.total_duration |
+| {ep}-phase2.2.json | decision, issues_found, issues_fixed |
 | {ep}-phase2.3.json | data.storyboard_count |
 | {ep}-phase3.json | data.new_characters, data.reused_characters, data.scenes |
 | {ep}-phase3.5.json | data.shot_packets_generated |

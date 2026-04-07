@@ -5,6 +5,15 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/state/audit/{ep}-shot-{N}-audit.json"
+  - "projects/{project}/state/{ep}-phase6.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/state/shot-packets/"
+  - "projects/{project}/outputs/{ep}/videos/"
+  - "projects/{project}/state/ontology/"
+  - "state/vectordb/"
 ---
 
 # qa-agent — 质量审计

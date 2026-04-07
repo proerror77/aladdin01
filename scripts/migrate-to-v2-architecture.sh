@@ -140,7 +140,7 @@ echo ""
 echo "[7/10] 验证配置文件..."
 CONFIGS=(
     "config/ontology/world-model-schema.yaml"
-    "config/shot-packet-schema.yaml"
+    "config/shot-packet/shot-packet-schema.yaml"
     "config/nanobanana/nanobanana-config.yaml"
 )
 

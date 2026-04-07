@@ -1,76 +1,25 @@
 {
   "episode": "ep01",
   "phase": 2,
-  "status": "completed",
-  "started_at": "2026-04-05T00:00:00Z",
-  "completed_at": "2026-04-05T00:05:00Z",
+  "status": "awaiting_review",
+  "started_at": "2026-04-06T21:52:01Z",
+  "completed_at": "2026-04-06T22:10:00Z",
   "data": {
-    "shot_count": 7,
-    "total_duration": 82,
-    "platform": "doubao-seedance-1-5-pro-251215",
-    "platform_max_duration": 12,
+    "shot_count": 8,
+    "total_duration": 96,
     "generation_mode": "img2video",
-    "style_id": "realistic-oriental",
+    "platform_model": "doubao-seedance-1-5-pro-251215",
+    "platform_max_duration": 12,
     "world_model_used": true,
-    "world_model_path": "projects/qyccan/state/ontology/ep01-world-model.json",
-    "shots": [
-      {
-        "shot_id": "ep01-shot-01",
-        "duration": 12,
-        "has_dialogue": true,
-        "generation_mode": "img2video"
-      },
-      {
-        "shot_id": "ep01-shot-02",
-        "duration": 12,
-        "has_dialogue": true,
-        "generation_mode": "img2video"
-      },
-      {
-        "shot_id": "ep01-shot-03",
-        "duration": 12,
-        "has_dialogue": true,
-        "generation_mode": "img2video"
-      },
-      {
-        "shot_id": "ep01-shot-04",
-        "duration": 12,
-        "has_dialogue": true,
-        "generation_mode": "img2video"
-      },
-      {
-        "shot_id": "ep01-shot-05",
-        "duration": 12,
-        "has_dialogue": true,
-        "generation_mode": "img2video"
-      },
-      {
-        "shot_id": "ep01-shot-06",
-        "duration": 12,
-        "has_dialogue": true,
-        "generation_mode": "img2video"
-      },
-      {
-        "shot_id": "ep01-shot-07",
-        "duration": 10,
-        "has_dialogue": true,
-        "generation_mode": "img2video"
-      }
+    "visual_style": "国风玄幻（写实电影感）",
+    "characters": [
+      {"name": "苏夜", "variant_id": "qingyucan"},
+      {"name": "叶红衣", "variant_id": "default"}
     ],
-    "reference_images_verified": {
-      "苏夜-qingyucan-front.png": true,
-      "叶红衣-front.png": true,
-      "黑雾森林-day.png": true
-    },
-    "checklist": {
-      "shot_count_in_range": true,
-      "all_durations_within_platform_max": true,
-      "all_prompts_under_2000_chars": true,
-      "timestamp_segments_per_shot": "4",
-      "camera_types_count": 8,
-      "multi_character_shots_have_reaction": true,
-      "all_prompts_have_forbidden_declaration": true,
-      "narrative_complete": true
-    }
+    "scenes": [
+      {"name": "黑雾森林", "time_of_day": "day"}
+    ],
+    "validation": "passed"
   }
 }
+

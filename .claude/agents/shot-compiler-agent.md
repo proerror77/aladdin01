@@ -5,6 +5,15 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/state/shot-packets/{ep}-shot-{N}.json"
+  - "projects/{project}/state/{ep}-phase3.5.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
+  - "projects/{project}/state/ontology/"
+  - "projects/{project}/assets/"
+  - "state/vectordb/"
 ---
 
 # shot-compiler-agent — Shot Packet 编译
@@ -142,21 +151,31 @@ done
 
 ### 3. 调用 memory-agent 检索 references
 
-调用 memory-agent 获取参考资产：
+memory-agent 的 `write_scope` 为空，它将检索结果以 JSON 输出到 stdout。
+shot-compiler-agent 通过 `spawn memory-agent` 调用，传入 `project` 和 `shot_id`，
+等待其完成后捕获 stdout 的 JSON 输出。
 
 ```bash
-# 调用 memory-agent（假设它是一个可执行脚本或函数）
-# 这里需要实现 memory-agent 的调用逻辑
-# 输出格式见 memory-agent.md
+# spawn memory-agent，捕获 stdout JSON
+# memory-agent 参数：project, shot_id
+# memory-agent 不写文件（write_scope=[]），结果通过 stdout 返回
+references_json=$(spawn memory-agent "$project" "$shot_id" "$session_id")
 
-# Canonical fallback：如果 memory-agent 不可直接调用，则使用
-# scripts/workflow-sync.py 生成的 shot packet 作为最终 source of truth。
-references_json=$(memory_agent_call "$shot_id" "$session_id")
+# 验证返回的 JSON 有效性
+if ! echo "$references_json" | jq -e '.references' > /dev/null 2>&1; then
+  echo "错误: memory-agent 返回无效 JSON 或缺少 references 字段" >&2
+  exit 1
+fi
 
 # 保留 planning 和 retrieval_evidence 到 shot packet（供 qa-agent 追溯）
 planning_json=$(echo "$references_json" | jq -c '.planning // {}')
 retrieval_evidence_json=$(echo "$references_json" | jq -c '.retrieval_evidence // {}')
 ```
+
+> **调用机制说明**：memory-agent 是无副作用的只读 agent（`write_scope: []`），
+> 它读取 visual-direction.yaml、world-model.json 和 assets/ 目录，
+> 通过向量检索或精确匹配找到参考资产，将完整的 reference plan 输出到 stdout。
+> shot-compiler-agent 直接捕获该 JSON 输出，无需等待文件写入。
 
 ### 4. 合并 references 到角色列表
 
@@ -251,6 +270,45 @@ all_images=$(jq -n \
   --arg prev "$prev_frame" \
   '$char + $scene + (if $storyboard != "null" then [$storyboard] else [] end) + (if $prev != "null" then [$prev] else [] end)')
 
+# 读取运镜参考视频（如有，由 visual-agent 在 visual-direction.yaml 中填写）
+camera_ref_video=$(yq eval ".shots[] | select(.shot_id == \"$shot_id\") | .references.camera_reference_video // \"null\"" \
+  "projects/${project}/outputs/${ep}/visual-direction.yaml")
+
+if [[ "$camera_ref_video" != "null" && -f "$camera_ref_video" ]]; then
+  videos_array="[\"$camera_ref_video\"]"
+  echo "✓ 运镜参考视频: $camera_ref_video"
+else
+  videos_array="[]"
+fi
+
+# 12 文件上限校验（图片 + 视频 + 音频合计，官方限制）
+max_files=$(yq eval '.max_reference_files // 12' "config/platforms/seedance-v2.yaml")
+video_count=$(echo "$videos_array" | jq 'length')
+audio_count=0  # 当前 audios 暂不使用
+image_count=$(echo "$all_images" | jq 'length')
+total_files=$((image_count + video_count + audio_count))
+
+if [[ $total_files -gt $max_files ]]; then
+  max_images=$((max_files - video_count - audio_count))
+  echo "⚠️ 文件数 $total_files 超出上限 $max_files，截断图片至 $max_images 张（优先保留主角正面图和场景图）"
+  all_images=$(echo "$all_images" | jq --argjson max "$max_images" '.[:$max]')
+fi
+
+# 如果有运镜参考视频，在 prompt 开头注入 @视频1 引用
+current_prompt="$prompt"
+if [[ "$camera_ref_video" != "null" && -f "$camera_ref_video" ]]; then
+  # 在 @图片N 声明行之后插入视频引用（如果 prompt 已有 @图片 声明）
+  if echo "$current_prompt" | grep -q '@图片'; then
+    # 在第一行（@图片N 声明行）末尾追加视频引用
+    current_prompt=$(echo "$current_prompt" | awk 'NR==1{print $0"，参考@视频1的运镜效果"} NR>1{print}')
+  else
+    # 没有图片声明时，在 prompt 开头加
+    current_prompt="参考@视频1的运镜效果
+
+${current_prompt}"
+  fi
+fi
+
 # 确定 dialogue_mode
 dialogue_mode="none"
 if [ "$has_dialogue" = "true" ]; then
@@ -260,11 +318,12 @@ fi
 seedance_inputs=$(jq -n \
   --arg mode "img2video" \
   --argjson images "$all_images" \
-  --arg prompt "$prompt" \
+  --argjson videos "$videos_array" \
+  --arg prompt "$current_prompt" \
   '{
     mode: $mode,
     images: $images,
-    videos: [],
+    videos: $videos,
     audios: [],
     prompt: $prompt
   }')
@@ -380,6 +439,16 @@ if [ "$images_count" -eq 0 ]; then
   echo "警告: seedance_inputs.images 为空，可能影响生成质量" >&2
 fi
 
+# 检查文件总数不超过上限
+videos_in_packet=$(echo "$packet_json" | jq '.seedance_inputs.videos | length')
+audios_in_packet=$(echo "$packet_json" | jq '.seedance_inputs.audios | length')
+total_in_packet=$((images_count + videos_in_packet + audios_in_packet))
+max_files_check=$(yq eval '.max_reference_files // 12' "config/platforms/seedance-v2.yaml")
+if [ "$total_in_packet" -gt "$max_files_check" ]; then
+  echo "错误: seedance_inputs 文件总数 $total_in_packet 超出上限 $max_files_check" >&2
+  exit 1
+fi
+
 # 检查 characters 不为空
 chars_count=$(echo "$packet_json" | jq '.characters | length')
 if [ "$chars_count" -eq 0 ]; then
@@ -459,4 +528,4 @@ echo "✓ Shot Packet 已生成: projects/{project}/state/shot-packets/${shot_id
 - **Camera 信息**：从 visual-direction.yaml 中提取，如果不存在则使用默认值
 - **Dialogue Mode**：根据 has_dialogue 字段决定，true=external_dub，false=none
 - **Scene ID 生成**：简单规则 `{ep}-sc{N}`，N 为场景编号（shot_index/10+1）
-- **Memory Agent 调用**：需要实现为独立脚本或函数，返回 JSON 格式的 references
+- **Memory Agent 调用**：通过 `spawn memory-agent` 调用，捕获 stdout JSON（write_scope 为空，无文件写入）

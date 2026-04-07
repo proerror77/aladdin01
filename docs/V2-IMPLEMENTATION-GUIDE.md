@@ -14,7 +14,7 @@
 ## 实现清单
 
 ### ✅ 已完成
-- [x] 配置文件（world-model-schema.yaml, shot-packet-schema.yaml, nanobanana-config.yaml）
+- [x] 配置文件（world-model-schema.yaml, shot-packet/shot-packet-schema.yaml, nanobanana-config.yaml）
 - [x] E2E 流程文档（docs/E2E-WORKFLOW-WITH-ONTOLOGY.md）
 
 ### 🔄 待实现

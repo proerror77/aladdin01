@@ -5,6 +5,15 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/outputs/{ep}/render-script.md"
+  - "projects/{project}/outputs/{ep}/compliance-report.md"
+  - "projects/{project}/state/{ep}-phase1.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/script/"
+  - "config/compliance/"
+  - "state/vectordb/"
 ---
 
 # comply-agent — 合规预检

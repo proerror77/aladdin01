@@ -5,6 +5,13 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/script/"
+  - "projects/{project}/assets/characters/profiles/"
+  - "projects/{project}/assets/scenes/profiles/"
+  - "projects/{project}/state/character-merge-map.json"
+read_scope:
+  - "raw/"
 ---
 
 # preprocess-agent — 长篇剧本预处理

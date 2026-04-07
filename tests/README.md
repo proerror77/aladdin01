@@ -5,7 +5,9 @@
 | 文件 | 类型 | 说明 |
 |------|------|------|
 | `test-api-caller.sh` | Shell 单元测试 | api-caller.sh 参数校验、路径安全 |
+| `test-agent-workflow-contracts.sh` | Shell 契约测试 | memory-agent 两段检索、在线 state 同步、Phase 2.2 接线 |
 | `test-compliance.sh` | 配置验证 | 合规配置 YAML 格式和结构 |
+| `test-vectordb-manager.sh` | Shell 集成测试 | relation 检索、skill 实体检索、state 幂等写入 |
 | `test-workflow-sync.sh` | Shell 集成测试 | fallback storyboard、shot packet、phase 状态同步 |
 | `api-caller.bats` | BATS 测试 | api-caller.sh 功能测试 |
 | `concat-episode.bats` | BATS 测试 | 视频拼接功能测试 |
@@ -17,7 +19,9 @@
 ```bash
 # Shell 测试（无需外部 API）
 bash tests/test-api-caller.sh
+bash tests/test-agent-workflow-contracts.sh
 bash tests/test-compliance.sh
+bash tests/test-vectordb-manager.sh
 bash tests/test-workflow-sync.sh
 
 # BATS 测试（需安装 bats）
@@ -29,7 +33,9 @@ bats tests/concat-episode.bats
 
 ```bash
 bash tests/test-api-caller.sh    # api-caller 参数校验
+bash tests/test-agent-workflow-contracts.sh  # Agent/Skill 编排契约
 bash tests/test-compliance.sh    # 合规配置验证
+bash tests/test-vectordb-manager.sh          # VectorDB 行为
 ```
 
 ## 测试说明

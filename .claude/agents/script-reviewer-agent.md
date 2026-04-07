@@ -5,6 +5,12 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "outputs/scriptwriter/{project}/review-report.md"
+read_scope:
+  - "outputs/scriptwriter/{project}/episodes/"
+  - "outputs/scriptwriter/{project}/characters/"
+  - "outputs/scriptwriter/{project}/scenes/"
 ---
 
 # script-reviewer-agent — 剧本质量检查

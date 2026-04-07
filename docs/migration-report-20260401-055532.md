@@ -29,7 +29,7 @@
 
 ### 配置文件
 - [x] config/ontology/world-model-schema.yaml
-- [x] config/shot-packet-schema.yaml
+- [x] config/shot-packet/shot-packet-schema.yaml
 - [x] config/nanobanana/nanobanana-config.yaml
 
 ### 环境变量

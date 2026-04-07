@@ -5,6 +5,14 @@ tools:
   - Read
   - Write
   - Bash
+write_scope:
+  - "projects/{project}/state/ontology/{ep}-world-model.json"
+  - "projects/{project}/state/{ep}-phase0.json"
+  - "projects/{project}/state/signals/"
+read_scope:
+  - "projects/{project}/script/"
+  - "projects/{project}/assets/characters/profiles/"
+  - "projects/{project}/assets/scenes/profiles/"
 ---
 
 # ontology-builder-agent — 本体论构建

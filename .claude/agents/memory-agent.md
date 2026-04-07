@@ -1,9 +1,15 @@
 ---
 name: memory-agent
-description: 为每个 shot 检索最相关的参考资产。默认采用“两段检索”：先查实体/状态/关系，再查资产；向量库不可用时降级到文件名精确匹配。
+description: 为每个 shot 检索最相关的参考资产。默认采用”两段检索”：先查实体/状态/关系，再查资产；向量库不可用时降级到文件名精确匹配。
 tools:
   - Read
   - Bash
+write_scope: []
+read_scope:
+  - “projects/{project}/outputs/{ep}/visual-direction.yaml”
+  - “projects/{project}/state/ontology/”
+  - “projects/{project}/assets/”
+  - “state/vectordb/”
 ---
 
 # memory-agent — 两段检索参考规划
