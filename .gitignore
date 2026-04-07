@@ -33,3 +33,6 @@ __pycache__/
 
 # Local vector database
 state/vectordb/
+
+# Backup files
+*.backup
