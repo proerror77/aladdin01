@@ -521,6 +521,14 @@ def compile_shot_packets(
 
     count = 0
     total_shots = len(shots)
+
+    # 预提取所有需要的 end-frame（避免重复 ffmpeg 进程）
+    end_frames_cache: dict[int, str | None] = {}
+    for shot in shots:
+        si = int(shot["shot_index"])
+        if si > 1 and si not in end_frames_cache:
+            end_frames_cache[si] = extract_previous_end_frame(project_root, project, episode, si)
+
     for shot in shots:
         shot_id = str(shot["shot_id"])
         shot_index = int(shot["shot_index"])
@@ -587,7 +595,7 @@ def compile_shot_packets(
         if storyboard_path and (project_root / storyboard_path).exists():
             all_images.append(str(storyboard_path))
 
-        prev_frame = extract_previous_end_frame(project_root, project, episode, shot_index)
+        prev_frame = end_frames_cache.get(shot_index)
         if prev_frame:
             all_images.append(prev_frame)
 
@@ -635,7 +643,7 @@ def compile_shot_packets(
             "selected_views": build_selected_views(project_root, shot, view_index or {}),
             "continuity_inputs": {
                 "previous_shot_id": shots[shot_index - 2]["shot_id"] if shot_index > 1 else None,
-                "previous_end_frame_path": extract_previous_end_frame(project_root, project, episode, shot_index),
+                "previous_end_frame_path": end_frames_cache.get(shot_index),
             },
             "characters": characters,
             "background": {
@@ -1122,11 +1130,18 @@ def emit_shot_states(
     # 先处理 stale（孤立的旧 shot-state）
     recover_stale_shot_states(project_root, project, episode, valid_shot_ids)
 
+    # 预提取所有需要的 end-frame（避免重复 ffmpeg 进程）
+    end_frames_cache: dict[int, str | None] = {}
+    for shot in shots:
+        si = int(shot["shot_index"])
+        if si > 1 and si not in end_frames_cache:
+            end_frames_cache[si] = extract_previous_end_frame(project_root, project, episode, si)
+
     previous_shot_id: str | None = None
     for shot in shots:
         shot_index = int(shot["shot_index"])
         shot_id = str(shot["shot_id"])
-        prev_frame = extract_previous_end_frame(project_root, project, episode, shot_index)
+        prev_frame = end_frames_cache.get(shot_index)
         selected_views = build_selected_views(project_root, shot, view_index)
         state = build_shot_state(
             episode, shot, visual_path, world_model_path,
