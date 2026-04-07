@@ -82,15 +82,17 @@ read_scope:
   "episode": "{ep}",
   "shot_id": "{shot_id}",
   "shot_index": {N},
-  "status": "generating",
+  "gen_status": "generating",
   "started_at": "{ISO8601}",
   "original_retries": 0,
   "rewrite_rounds": 0,
   "total_api_calls": 0,
-  "mode": "shot_packet",  // 或 "legacy"
-  "backend": "dreamina"   // 或 "api"
+  "mode": "shot_packet",
+  "backend": "dreamina"
 }
 ```
+
+⚠️ **变量命名规则**：状态字段在 JSON 中用 `gen_status`，在 shell 脚本中用 `GEN_STATUS` 或 `SHOT_STATUS`（避免与 zsh 保留变量 `status` 冲突）。
 
 如果 `projects/{project}/state/shot-packets/{shot_id}.json` 存在，**立即在线同步一次状态到 LanceDB**，不要等 `workflow-sync.py` 事后回填：
 
@@ -510,11 +512,49 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
 
 将 payload 写入临时文件（避免 shell 注入）：
 ```bash
-cat > /tmp/seedance_payload_{shot_id}.json << 'PAYLOAD_EOF'
-{payload}
-PAYLOAD_EOF
+# ⚠️ prompt 必须先用 jq 做 JSON 转义，再写入 payload
+# 直接用 heredoc 拼接 prompt 会导致中文引号（："台词"）破坏 JSON 结构，返回 400 Bad Request
+PROMPT_ESCAPED=$(jq -Rs '.' <<< "$current_prompt")  # 输出带双引号的 JSON 字符串
 
-./scripts/api-caller.sh seedance create /tmp/seedance_payload_{shot_id}.json
+# 用 jq 构建完整 payload，避免任何手动字符串拼接
+jq -n \
+  --arg model "$MODEL" \
+  --argjson prompt_str "$PROMPT_ESCAPED" \
+  --arg ratio "$RATIO" \
+  --argjson duration "$DURATION" \
+  --arg resolution "$RESOLUTION" \
+  --argjson generate_audio "$GENERATE_AUDIO" \
+  '{
+    model: $model,
+    content: [{ type: "text", text: ($prompt_str | fromjson) }],
+    ratio: $ratio,
+    duration: $duration,
+    resolution: $resolution,
+    generate_audio: $generate_audio,
+    watermark: false
+  }' > /tmp/seedance_payload_${shot_id}.json
+
+./scripts/api-caller.sh seedance create /tmp/seedance_payload_${shot_id}.json
+```
+
+**Dreamina CLI 后端**同样用 jq 构建 payload，不要用 heredoc 拼接 prompt：
+```bash
+# 用 jq 构建 dreamina payload
+jq -n \
+  --arg command "$DREAMINA_COMMAND" \
+  --arg prompt "$current_prompt" \
+  --argjson images "$IMAGES_JSON" \
+  --argjson duration "$DURATION" \
+  --arg ratio "$RATIO" \
+  '{
+    command: $command,
+    prompt: $prompt,
+    images: $images,
+    duration: $duration,
+    ratio: $ratio
+  }' > /tmp/dreamina_payload_${shot_id}.json
+
+./scripts/api-caller.sh dreamina submit /tmp/dreamina_payload_${shot_id}.json
 ```
 
 轮询任务状态（每 10 秒），任务 ID 格式为 `cgt-2025****`：
@@ -557,7 +597,7 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
   "episode": "{ep}",
   "shot_id": "{shot_id}",
   "shot_index": {N},
-  "status": "completed",
+  "gen_status": "completed",
   "started_at": "{ISO8601}",
   "completed_at": "{ISO8601}",
   "video_path": "projects/{project}/outputs/{ep}/videos/shot-{N}{output_suffix}.mp4",
@@ -591,7 +631,7 @@ fi
   "episode": "{ep}",
   "shot_id": "{shot_id}",
   "shot_index": {N},
-  "status": "failed",
+  "gen_status": "failed",
   "started_at": "{ISO8601}",
   "completed_at": "{ISO8601}",
   "video_path": "",

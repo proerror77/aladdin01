@@ -200,12 +200,12 @@ SESSION_ID="start-$(date +%Y%m%d-%H%M%S)"
 
 检测逻辑：
 1. 读取 `projects/{project}/state/{ep}-phase{1-4}.json`，确定已完成的阶段
-2. 统计 `projects/{project}/state/{ep}-shot-*.json` 中 `status: completed` 的镜次
+2. 统计 `projects/{project}/state/{ep}-shot-*.json` 中 `gen_status: completed` 的镜次
 3. 从最早未完成的阶段继续
 
 断点续传跳过规则：
 - Phase X `status: completed` → 跳过该阶段
-- 镜次 `status: completed` 且视频文件存在 → 跳过该镜次
+- 镜次 `gen_status: completed` 且视频文件存在 → 跳过该镜次
 
 ### 4. 启动 Agent Team
 
