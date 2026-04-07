@@ -8,6 +8,7 @@ tools:
 write_scope:
   - "projects/{project}/outputs/{ep}/storyboard/"
   - "projects/{project}/outputs/{ep}/storyboard-preview.md"
+  - "projects/{project}/outputs/{ep}/visual-direction.yaml"
   - "projects/{project}/state/{ep}-phase2.3.json"
   - "projects/{project}/state/signals/"
 read_scope:

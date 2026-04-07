@@ -36,7 +36,7 @@
 
 #### 配置文件（4 个）
 - [x] `config/ontology/world-model-schema.yaml`
-- [x] `config/shot-packet-schema.yaml`
+- [x] `config/shot-packet/shot-packet-schema.yaml`
 - [x] `config/nanobanana/nanobanana-config.yaml`
 - [x] `config/platforms/seedance-v2.yaml` (已更新)
 
@@ -219,7 +219,7 @@ Phase 6: Audit & Repair ✨
 
 ### 配置文档（4 个）
 - `config/ontology/world-model-schema.yaml`
-- `config/shot-packet-schema.yaml`
+- `config/shot-packet/shot-packet-schema.yaml`
 - `config/nanobanana/nanobanana-config.yaml`
 - `config/platforms/seedance-v2.yaml`
 

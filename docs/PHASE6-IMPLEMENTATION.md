@@ -246,4 +246,4 @@ done
 
 - 实现指南：`docs/V2-IMPLEMENTATION-GUIDE.md` 第 9-10 节
 - E2E 流程：`docs/E2E-WORKFLOW-WITH-ONTOLOGY.md`
-- 配置文件：`config/shot-packet-schema.yaml`
+- 配置文件：`config/shot-packet/shot-packet-schema.yaml`

@@ -20,8 +20,8 @@ progress_index:
         type: string
         enum: [pending, in_progress, awaiting_review, completed, failed, skipped]
       current_phase:
-        type: integer
-        description: "Current phase number (1-5)"
+        type: number
+        description: "Current phase number. Supports integer (1-5) and decimal phases for v2.0 (0, 2.2, 2.3, 2.5, 3.5, 6)"
 
 # 各阶段状态文件：state/{ep}-phase{N}.json
 # 每个 agent 完成后写入自己的阶段文件
@@ -30,8 +30,8 @@ phase_state:
     type: string
     description: "Episode id"
   phase:
-    type: integer
-    description: "Phase number (1-5)"
+    type: number
+    description: "Phase number. Supports integer (1-5) and decimal phases for v2.0 (0, 2.2, 2.3, 2.5, 3.5, 6)"
   status:
     type: string
     enum: [in_progress, awaiting_review, needs_revision, completed, failed]
@@ -162,3 +162,69 @@ ab_result_state:
     variant_b_weighted: { type: number }
     winner: { type: string, enum: [a, b, tie] }
     notes: { type: string }
+
+# ─── v2.0 新增 Phase Data ───
+
+# Phase 0 (ontology-builder-agent) data
+phase0_data:
+  world_model_path:
+    type: string
+    description: "Path to generated world-model.json"
+  entity_count:
+    type: integer
+    description: "Number of entities extracted (characters + scenes + props)"
+  relation_count:
+    type: integer
+    description: "Number of relations extracted"
+
+# Phase 2.2 (narrative-review-agent) data
+phase2_2_data:
+  decision:
+    type: string
+    enum: [auto_pass, fixed_pass, reject]
+    description: "Review decision"
+  total_score:
+    type: number
+    description: "Weighted total score (0-100)"
+  issues_count:
+    type: integer
+    description: "Number of issues found"
+
+# Phase 2.3 (storyboard-agent) data
+phase2_3_data:
+  storyboard_count:
+    type: integer
+    description: "Number of storyboard images generated"
+  preview_path:
+    type: string
+    description: "Path to storyboard-preview.md"
+
+# Phase 2.5 (asset-factory-agent) data
+phase2_5_data:
+  characters_generated:
+    type: integer
+    description: "Number of character asset packs generated"
+  scenes_generated:
+    type: integer
+    description: "Number of scene styleframes generated"
+  props_generated:
+    type: integer
+    description: "Number of prop asset packs generated"
+
+# Phase 3.5 (shot-compiler-agent) data
+phase3_5_data:
+  shot_packets_generated:
+    type: integer
+    description: "Number of shot packets compiled"
+
+# Phase 6 (qa-agent + repair-agent) data
+phase6_data:
+  shots_audited:
+    type: integer
+    description: "Number of shots audited by qa-agent"
+  shots_repaired:
+    type: integer
+    description: "Number of shots successfully repaired"
+  shots_failed:
+    type: integer
+    description: "Number of shots that failed after max repair attempts"

@@ -21,6 +21,9 @@ default_model: "doubao-seedance-1-5-pro-251215"
 
 max_prompt_length: 2000
 
+# 多模态输入上限（图片 + 视频 + 音频合计，官方限制）
+max_reference_files: 12
+
 # 官方 content 数组格式
 # text2video:  content 中只放 text
 # img2video:   content 中放 text + image_url（首帧）

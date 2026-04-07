@@ -86,7 +86,7 @@ config/
 ### ✅ 配置更新
 - `config/platforms/seedance-v2.yaml` - 新增 img2video 模式（默认）
 - `config/ontology/world-model-schema.yaml` - World Model Schema
-- `config/shot-packet-schema.yaml` - Shot Packet Schema
+- `config/shot-packet/shot-packet-schema.yaml` - Shot Packet Schema
 - `config/nanobanana/nanobanana-config.yaml` - Nanobanana 配置
 
 ### ✅ 新增脚本

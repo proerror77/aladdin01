@@ -42,7 +42,7 @@
 ### ✅ Week 3: Shot Packet 编译
 
 **交付物**:
-- [x] `config/shot-packet-schema.yaml` - Shot Packet Schema 定义
+- [x] `config/shot-packet/shot-packet-schema.yaml` - Shot Packet Schema 定义
 - [x] `.claude/agents/memory-agent.md` - Memory Agent
 - [x] `.claude/agents/shot-compiler-agent.md` - Shot Compiler Agent
 - [x] `.claude/skills/compile-shots.md` - ~compile-shots skill
