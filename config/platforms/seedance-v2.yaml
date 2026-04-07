@@ -73,6 +73,10 @@ retry:
   max_rewrite_rounds: 3
   max_rewrite_retries: 3  # 每轮改写后最多重试次数
 
+# gen-worker 全局超时（秒）
+# 防止单个 shot 因 API 超时累积导致 batch 卡住
+max_wall_time_seconds: 600
+
 # 音频配置
 audio:
   enabled: true
