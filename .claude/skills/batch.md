@@ -37,6 +37,11 @@
 请设置后再运行 ~batch
 ```
 
+**design-lock.json 检查**：
+- 检查 `projects/{project}/state/design-lock.json` 是否存在
+- 如果不存在：输出警告 "⚠️ 未找到 design-lock.json，Phase 3 将报告参考图缺失"
+- 询问用户是否继续（yes/no），no 则退出并提示运行 ~design
+
 ### 1. 扫描剧本
 
 扫描 `script/` 目录下所有 `.md` 文件。
@@ -147,6 +152,12 @@ SESSION_ID="batch-$(date +%Y%m%d-%H%M%S)"
 
 检测逻辑：
 1. 对每个剧本，读取 `projects/{project}/state/{ep}-phase{1-4}.json`
+
+**状态文件验证**：读取前先验证 JSON 完整性：
+- 如果文件不存在：正常，从该阶段开始
+- 如果文件存在但 JSON 损坏（jq 解析失败）：删除损坏文件，从该阶段重新开始，并输出警告
+- 如果文件存在且 JSON 合法：正常读取 status 字段
+
 2. Phase 5 进度：统计 `projects/{project}/state/{ep}-shot-*.json` 中 `status: completed` 的数量
 3. 确定每个剧本的起始阶段
 
@@ -261,6 +272,24 @@ for ep in episodes:
         # 超过重试上限，标记该集为 blocked，不阻塞其他集
         输出：⚠️ {ep} 叙事审查连续 {NARRATIVE_MAX_RETRIES} 次 reject，已跳过，需人工介入
         将 {ep} 标记为 blocked，从本次批量任务中排除
+
+**blocked 记录**：写入 `projects/{project}/state/blocked-episodes.json`：
+```json
+{
+  "{ep}": {
+    "reason": "叙事审查连续 {N} 次 reject",
+    "last_review_file": "projects/{project}/outputs/{ep}/narrative-review.md",
+    "blocked_at": "{timestamp}"
+  }
+}
+```
+
+在 batch 最终报告中显示 blocked 列表：
+```
+⚠️ {N} 个剧本被 blocked（需人工介入）：
+  - ep03: 叙事审查连续 2 次 reject → 查看 projects/{project}/outputs/ep03/narrative-review.md
+```
+
         break
       
       输出：[retry {NARRATIVE_RETRY}/{NARRATIVE_MAX_RETRIES}] {ep} 叙事审查 reject，重新生成视觉指导...
@@ -549,6 +578,10 @@ ep03：{S3}/{T3} 成功
 ```
 ⚠️ ep03 Phase 2 失败：视觉指导生成错误
 
+💡 诊断：~trace --backtrack ep03（查看失败链路）
+📄 详情：projects/{project}/outputs/ep03/（查看各阶段输出文件）
+🔄 恢复：修复后运行 ~batch --resume 从断点继续
+
 选择操作：
 1. 跳过 ep03，继续处理其他剧本
 2. 终止整个批量任务
@@ -558,6 +591,10 @@ ep03：{S3}/{T3} 成功
 - 选择 2：立即终止批量任务。已完成的剧本产出保留，未开始的剧本跳过。可运行 `~batch --resume` 从断点继续
 ```
 ep02 在 Phase 1 合规检测失败：剧本格式错误
+
+💡 诊断：~trace --backtrack ep02（查看失败链路）
+📄 详情：projects/{project}/outputs/ep02/（查看各阶段输出文件）
+🔄 恢复：修复后运行 ~batch --resume 从断点继续
 
 选项：
 1. 跳过 ep02，继续处理其他剧本

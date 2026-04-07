@@ -2,6 +2,20 @@
 
 在人工确认点查看和审核当前阶段的产出。
 
+## 模式说明
+
+`~review` 有两种工作模式，取决于是否配置了飞书（Lark）：
+
+**终端模式**（未配置 `LARK_APP_ID`）：
+- `~review` → 显示待审核列表
+- `~review approve` → 批准当前待审核项
+- `~review reject {ep}` → 拒绝并附原因
+
+**Lark 模式**（已配置 `LARK_APP_ID` + `LARK_APP_SECRET`）：
+- 审核通过飞书卡片进行，`~review approve/reject` 在此模式下**无效**
+- `~review` → 只读，显示当前待审核状态和飞书卡片链接
+- 实际审核操作请在飞书中点击卡片按钮完成
+
 ## 使用方式
 
 ```

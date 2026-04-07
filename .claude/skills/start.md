@@ -54,6 +54,12 @@
 请设置后再运行 ~start
 ```
 
+**Scriptwriter 输出检测**：
+- 如果 `outputs/scriptwriter/{project}/` 存在且 `projects/{project}/script/` 为空或不存在
+- 输出：⚠️ 发现 outputs/scriptwriter/{project}/ 中有剧本，但 projects/{project}/script/ 为空
+- 提示：请先运行 ~preprocess 将剧本转换到正确位置，然后再运行 ~start
+- 退出（不继续执行）
+
 ### 1. 选择专案和剧本
 
 **Step 1a: 选择专案**
@@ -200,6 +206,12 @@ SESSION_ID="start-$(date +%Y%m%d-%H%M%S)"
 
 检测逻辑：
 1. 读取 `projects/{project}/state/{ep}-phase{1-4}.json`，确定已完成的阶段
+
+**状态文件验证**：读取前先验证 JSON 完整性：
+- 如果文件不存在：正常，从该阶段开始
+- 如果文件存在但 JSON 损坏（jq 解析失败）：删除损坏文件，从该阶段重新开始，并输出警告
+- 如果文件存在且 JSON 合法：正常读取 status 字段
+
 2. 统计 `projects/{project}/state/{ep}-shot-*.json` 中 `gen_status: completed` 的镜次
 3. 从最早未完成的阶段继续
 
@@ -284,7 +296,9 @@ while true:
       输出：
         ⚠️ {ep} 叙事审查连续 {NARRATIVE_MAX_RETRIES} 次 reject，需人工介入
         审查报告：projects/{project}/outputs/{ep}/narrative-review.md
-        请修改剧本或手动调整 visual-direction.yaml 后运行 ~start --resume
+        💡 诊断：~trace --backtrack {ep}（查看失败链路）
+        📄 详情：projects/{project}/outputs/{ep}/（查看各阶段输出文件）
+        🔄 恢复：修改剧本或手动调整 visual-direction.yaml 后运行 ~start --resume
       退出流程
     
     # 重新 spawn visual-agent，附带退回原因
@@ -687,6 +701,10 @@ done
 | 镜次 | 最后使用的提示词 | 失败原因 |
 |------|-----------------|----------|
 | shot-05 | ... | 3轮改写后仍被拒绝 |
+
+💡 诊断：~trace --backtrack {ep} shot-05（查看失败链路）
+📄 详情：projects/{project}/outputs/{ep}/（查看各阶段输出文件）
+🔄 恢复：修复后运行 ~start {project} {ep} 从断点继续
 
 ## 输出目录
 
