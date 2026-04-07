@@ -529,20 +529,15 @@ def cmd_search_assets(args):
     tbl = db.open_table(TABLE_ASSETS)
 
     vec = embed(query)
-    where_clauses = []
-    # project 过滤（仅当表中有 project 字段时）
-    try:
-        sample = tbl.to_pandas().columns.tolist()
-        if 'project' in sample and args.project != 'default':
-            where_clauses.append(f"project = '{args.project}'")
-    except Exception:
-        pass
+    where_clauses = [f"project = '{args.project}'"]
     if atype:
         where_clauses.append(f"asset_type = '{atype}'")
-    search = tbl.search(vec)
-    if where_clauses:
-        search = search.where(" AND ".join(where_clauses))
-    results = search.limit(n * 3).to_list()
+    results = (
+        tbl.search(vec)
+           .where(" AND ".join(where_clauses))
+           .limit(n)
+           .to_list()
+    )
 
     # 只保留存在的文件
     results = [r for r in results if os.path.exists(r["path"])]
@@ -578,21 +573,12 @@ def cmd_search_entities(args):
     tbl = db.open_table(TABLE_ENTITIES)
 
     vec = embed(query)
-    where_clauses = []
-    try:
-        cols = tbl.to_pandas().columns.tolist()
-        if 'project' in cols and getattr(args, 'project', 'default') != 'default':
-            where_clauses.append(f"project = '{args.project}'")
-    except Exception:
-        pass
+    where_clauses = [f"project = '{args.project}'"]
     if etype:
         where_clauses.append(f"entity_type = '{etype}'")
     if episode:
         where_clauses.append(f"episode = '{episode}'")
-    search = tbl.search(vec)
-    if where_clauses:
-        search = search.where(" AND ".join(where_clauses))
-    results = search.limit(n).to_list()
+    results = tbl.search(vec).where(" AND ".join(where_clauses)).limit(n).to_list()
 
     output = []
     for r in results[:n]:
@@ -623,13 +609,7 @@ def cmd_search_relations(args):
     tbl = db.open_table(TABLE_RELATIONS)
 
     vec = embed(query)
-    where_clauses = []
-    try:
-        cols = tbl.to_pandas().columns.tolist()
-        if 'project' in cols and getattr(args, 'project', 'default') != 'default':
-            where_clauses.append(f"project = '{args.project}'")
-    except Exception:
-        pass
+    where_clauses = [f"project = '{args.project}'"]
     if rel_type:
         where_clauses.append(f"rel_type = '{rel_type}'")
     if episode:
@@ -751,13 +731,7 @@ def _search_entities_inline(db, q: dict, project: str) -> list:
     tbl = db.open_table(TABLE_ENTITIES)
     vec = embed(q.get("query", ""))
     n = q.get("n", 5)
-    where_clauses = []
-    try:
-        cols = tbl.to_pandas().columns.tolist()
-        if 'project' in cols and project != 'default':
-            where_clauses.append(f"project = '{project}'")
-    except Exception:
-        pass
+    where_clauses = [f"project = '{project}'"]
     if q.get("type"):
         where_clauses.append(f"entity_type = '{q['type']}'")
     if q.get("episode"):
@@ -776,13 +750,7 @@ def _search_assets_inline(db, q: dict, project: str) -> list:
     tbl = db.open_table(TABLE_ASSETS)
     vec = embed(q.get("query", ""))
     n = q.get("n", 3)
-    where_clauses = []
-    try:
-        cols = tbl.to_pandas().columns.tolist()
-        if 'project' in cols and project != 'default':
-            where_clauses.append(f"project = '{project}'")
-    except Exception:
-        pass
+    where_clauses = [f"project = '{project}'"]
     if q.get("type"):
         where_clauses.append(f"asset_type = '{q['type']}'")
     results = tbl.search(vec).where(" AND ".join(where_clauses)).limit(n).to_list()
@@ -831,13 +799,7 @@ def _search_relations_inline(db, q: dict, project: str) -> list:
     tbl = db.open_table(TABLE_RELATIONS)
     vec = embed(q.get("query", ""))
     n = q.get("n", 5)
-    where_clauses = []
-    try:
-        cols = tbl.to_pandas().columns.tolist()
-        if 'project' in cols and project != 'default':
-            where_clauses.append(f"project = '{project}'")
-    except Exception:
-        pass
+    where_clauses = [f"project = '{project}'"]
     if q.get("type"):
         where_clauses.append(f"rel_type = '{q['type']}'")
     if q.get("episode"):
