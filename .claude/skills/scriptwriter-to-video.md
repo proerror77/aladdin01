@@ -70,7 +70,11 @@
 4. 生成角色档案和场景档案
 5. spawn episode-writer-agent × N 并行生成分集剧本
 6. spawn script-reviewer-agent 质量检查
-7. 🔴 **确认点 2**：质量报告确认（Auto-Gate + 异步飞书审核）
+7. 🔴 **确认点 1.5**（仅当 episodes > 20 时）：季度规划确认
+   - 触发条件：剧本集数超过 20 集
+   - 内容：outline-agent 生成的季度规划（分季结构、主线/支线分配）
+   - 操作：通过/重做（附修改意见）
+8. 🔴 **确认点 2**：质量报告确认（Auto-Gate + 异步飞书审核）
    ```
    spawn gate-agent:
      checkpoint: "episode_quality"
@@ -113,7 +117,7 @@
 1. preprocess-agent 拆分为标准分集剧本
 2. 提取角色档案 → `projects/{project}/assets/characters/profiles/`
 3. 提取场景档案 → `projects/{project}/assets/scenes/profiles/`
-4. 如果多段扫描 → merge-agent 角色融合
+4. 如果多段扫描 → 角色融合已内联到 preprocess-agent Step 2.5
 
 完成后输出：
 ```
@@ -280,6 +284,7 @@ Trace 日志：projects/{project}/state/traces/{session-id}/
 | 确认点 | 阶段 | 类型 | 审核方式 | 可跳过？ |
 |--------|------|------|---------|---------|
 | 🔴 确认点 1 | 阶段 1 | text | 飞书卡片按钮 | 否 |
+| 🔴 确认点 1.5 | 阶段 1 | text | 飞书卡片按钮 | 是（episodes <= 20 时跳过） |
 | 🔴 确认点 2 | 阶段 1 | text | 飞书卡片按钮 | 否 |
 | 🔴 确认点 3 | 阶段 4 | visual | 飞书链接 → Web 页面 | 否 |
 

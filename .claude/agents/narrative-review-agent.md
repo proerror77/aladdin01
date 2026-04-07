@@ -526,7 +526,39 @@ for shot in visual.get('shots', []):
             matrix[char_name]['dialogues'] = matrix[char_name]['dialogues'][-50:]
 
 matrix_path.parent.mkdir(parents=True, exist_ok=True)
-matrix_path.write_text(json.dumps(matrix, ensure_ascii=False, indent=2), encoding='utf-8')
+
+# 文件锁：防止多 agent 并发写入导致数据丢失
+import fcntl
+lock_path = matrix_path.with_suffix('.lock')
+with open(lock_path, 'w') as _lock_file:
+    fcntl.flock(_lock_file, fcntl.LOCK_EX)
+    try:
+        # 锁内重新读取（可能已被其他 agent 更新）
+        if matrix_path.exists():
+            matrix = json.loads(matrix_path.read_text(encoding='utf-8'))
+        # 重新执行合并逻辑（基于最新数据）
+        for shot in visual.get('shots', []):
+            audio = str(shot.get('audio') or '')
+            if not audio or '无对白' in audio:
+                continue
+            for ref in (shot.get('references') or {}).get('characters', []):
+                char_name = ref.get('name', '')
+                if not char_name:
+                    continue
+                char_dialogues = [
+                    line.strip() for line in audio.split('\n')
+                    if char_name in line and ('：' in line or ':' in line)
+                ]
+                if char_dialogues:
+                    if char_name not in matrix:
+                        matrix[char_name] = {'dialogues': [], 'episodes': []}
+                    matrix[char_name]['dialogues'].extend(char_dialogues)
+                    if visual.get('episode') not in matrix[char_name]['episodes']:
+                        matrix[char_name]['episodes'].append(visual.get('episode'))
+                    matrix[char_name]['dialogues'] = matrix[char_name]['dialogues'][-50:]
+        matrix_path.write_text(json.dumps(matrix, ensure_ascii=False, indent=2), encoding='utf-8')
+    finally:
+        fcntl.flock(_lock_file, fcntl.LOCK_UN)
 print(f"✓ character_matrix.json 已更新：{len(matrix)} 个角色")
 PY
 ```

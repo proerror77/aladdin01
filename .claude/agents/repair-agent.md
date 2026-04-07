@@ -141,12 +141,27 @@ local_repair() {
   done <<< "$issues"
   
   if [[ "$repair_success" == "true" ]]; then
-    # 重新审计
-    echo "重新审计..."
-    "$SCRIPT_DIR/qa-agent.md" "$PROJECT" "$EP" "$SHOT_ID" "$SESSION_ID"
+    # 通过信号文件请求 team-lead 重新调度 qa-agent
+    echo "请求重新审计..."
+    local signal_file="projects/${PROJECT}/state/signals/repair-needs-qa-${EP}-${SHOT_ID}.json"
+    mkdir -p "$(dirname "$signal_file")"
+    echo "{\"ep\": \"${EP}\", \"shot_id\": \"${SHOT_ID}\", \"requested_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$signal_file"
+
+    # 等待 qa-agent 完成审计（最多 300 秒）
+    local audit_file="projects/${PROJECT}/state/audit/${EP}-shot-${SHOT_ID}-audit.json"
+    local wait_count=0
+    while [[ ! -f "$audit_file" ]] && (( wait_count < 60 )); do
+        sleep 5
+        (( wait_count++ ))
+    done
+
+    if [[ ! -f "$audit_file" ]]; then
+        echo "⚠️ qa-agent 未在 300s 内完成审计，跳过验证"
+        return 1
+    fi
     
     # 检查是否修复成功
-    local new_repair_action=$(jq -r '.repair_action' "$AUDIT_FILE")
+    local new_repair_action=$(jq -r '.repair_action' "$audit_file")
     if [[ "$new_repair_action" == "pass" ]]; then
       echo "✓ 修复成功"
       ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "write_output" \
@@ -408,13 +423,34 @@ EOF
   ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "execute_repair" \
     "{\"method\":\"regenerate\",\"attempt\":$((attempt_number + 1)),\"adjustment\":\"$adjustment\"}"
   
-  # 调用 gen-worker 重新生成
-  echo "  调用 gen-worker 重新生成..."
-  # 注意：这里需要通过 team-lead 调用 gen-worker
+  # 通过信号文件请求 team-lead 调度 gen-worker 重新生成
+  echo "  请求 gen-worker 重新生成..."
+  local gen_signal="projects/${PROJECT}/state/signals/repair-needs-gen-${EP}-${SHOT_ID}.json"
+  mkdir -p "$(dirname "$gen_signal")"
+  echo "{\"ep\": \"${EP}\", \"shot_id\": \"${SHOT_ID}\", \"adjustment\": \"$adjustment\", \"requested_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$gen_signal"
   
-  # 重新审计
-  echo "  重新审计..."
-  "$SCRIPT_DIR/qa-agent.md" "$PROJECT" "$EP" "$SHOT_ID" "$SESSION_ID"
+  # 等待 gen-worker 完成（最多 600 秒）
+  local video_file="projects/${PROJECT}/outputs/${EP}/videos/shot-${SHOT_ID}.mp4"
+  local gen_wait=0
+  while [[ -f "$gen_signal" ]] && (( gen_wait < 120 )); do
+    sleep 5; (( gen_wait++ ))
+  done
+  
+  # 通过信号文件请求 team-lead 重新调度 qa-agent
+  echo "  请求重新审计..."
+  local qa_signal="projects/${PROJECT}/state/signals/repair-needs-qa-${EP}-${SHOT_ID}.json"
+  echo "{\"ep\": \"${EP}\", \"shot_id\": \"${SHOT_ID}\", \"requested_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$qa_signal"
+  
+  # 等待 qa-agent 完成审计（最多 300 秒）
+  local qa_wait=0
+  while [[ ! -f "$AUDIT_FILE" ]] && (( qa_wait < 60 )); do
+    sleep 5; (( qa_wait++ ))
+  done
+  
+  if [[ ! -f "$AUDIT_FILE" ]]; then
+    echo "⚠️ qa-agent 未在 300s 内完成审计，跳过验证"
+    return 1
+  fi
   
   local new_repair_action=$(jq -r '.repair_action' "$AUDIT_FILE")
   if [[ "$new_repair_action" == "pass" ]]; then
@@ -533,5 +569,5 @@ audit_result.repair_action
 - **修复成本**：local_repair 成本低于 regenerate
 - **失败分析**：记录失败原因，用于优化策略
 - **人工介入**：严重失败可触发人工审核
-- **Agent 间调用**：repair-agent 需要通过 team-lead 调用 gen-worker 和 qa-agent
+- **Agent 间调用**：repair-agent 通过信号文件（`state/signals/repair-needs-qa-*.json` / `repair-needs-gen-*.json`）请求 team-lead 调度 qa-agent 和 gen-worker，不直接 shell 调用其他 agent
 - **简化实现**：当前实现为简化版，实际生产环境应完善各修复方法的实现

@@ -111,6 +111,9 @@ fi
 - `max_rewrite_retries: 3` — 每轮改写后最大重试次数
 
 ```
+START_TIME = $(date +%s)
+MAX_WALL_TIME = yq '.max_wall_time_seconds // 600' "$PLATFORM_CONFIG" || 600
+
 original_retries = 0
 rewrite_rounds = 0
 rewrite_retries = 0
@@ -119,6 +122,15 @@ PHASE = "original"  # original | rewrite
 total_calls = 0
 
 LOOP:
+  # 全局超时检查
+  ELAPSED = $(date +%s) - START_TIME
+  if ELAPSED > MAX_WALL_TIME:
+    echo "⏰ 超过最大运行时间 ${MAX_WALL_TIME}s（已运行 ${ELAPSED}s），标记为 timeout"
+    jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+       '.gen_status = "timeout" | .error = "wall_time_exceeded" | .updated_at = $ts' \
+       "$SHOT_STATE_FILE" > "${SHOT_STATE_FILE}.tmp" && mv "${SHOT_STATE_FILE}.tmp" "$SHOT_STATE_FILE"
+    → 标记为 timeout，退出循环
+
   total_calls += 1
   result = submit_to_seedance(current_prompt)
   更新状态文件 total_api_calls

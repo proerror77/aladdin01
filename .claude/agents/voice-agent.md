@@ -127,7 +127,21 @@ voice-agent 支持两种模式：
 
 `projects/{project}/assets/characters/voices/{角色名}/voice-config.yaml`：
 
-```yaml
+写入前使用 mkdir 原子锁防止并发写入冲突：
+
+```bash
+VOICE_CONFIG="projects/${project}/assets/characters/voices/${char_name}/voice-config.yaml"
+LOCK_DIR="projects/${project}/assets/characters/voices/${char_name}/.writing.lock"
+
+if [[ -f "$VOICE_CONFIG" ]]; then
+    echo "  复用已有 voice-config.yaml：${char_name}"
+else
+    # 原子锁：用 mkdir 保证只有第一个 agent 写入
+    if mkdir "$LOCK_DIR" 2>/dev/null; then
+        # double-check：锁内再次确认文件不存在
+        if [[ ! -f "$VOICE_CONFIG" ]]; then
+            mkdir -p "$(dirname "$VOICE_CONFIG")"
+            cat > "$VOICE_CONFIG" << EOF
 character: "{角色名}"
 episode_first_used: "{ep}"
 voice_source: "preset"  # 或 "user_upload" 或 "auto_match"
@@ -136,6 +150,21 @@ match_confidence: "high"  # 自动匹配时填入（high/medium/low）
 reference_audio: ""  # 用户上传时填入路径
 tts_platform: "pending"  # TTS 平台启用后更新
 notes: "{角色特征备注}"
+EOF
+            echo "✓ 写入 voice-config.yaml：${char_name}"
+        else
+            echo "  复用已有 voice-config.yaml：${char_name}（并发写入保护）"
+        fi
+        rmdir "$LOCK_DIR"
+    else
+        # 等待其他 agent 完成写入
+        local wait=0
+        while [[ -d "$LOCK_DIR" ]] && (( wait < 30 )); do
+            sleep 1; (( wait++ ))
+        done
+        echo "  复用已有 voice-config.yaml：${char_name}"
+    fi
+fi
 ```
 
 ### 5. 输出分配报告
