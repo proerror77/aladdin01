@@ -101,71 +101,18 @@ export REVIEW_SERVER_URL="..."  # Review Server 地址（默认 http://localhost
 
 即梦官方 AIGC CLI 工具，支持全部生成能力，作为视频/图像生成后端。
 
-### 安装
+**详细文档**：[docs/DREAMINA-CLI.md](docs/DREAMINA-CLI.md)
 
-```bash
-curl -fsSL https://jimeng.jianying.com/cli | bash
-```
-
-### 登录
+### 快速参考
 
 ```bash
 dreamina login                    # 浏览器授权
-dreamina login --headless         # 终端 QR 码（适合远程/agent 环境）
 dreamina user_credit              # 验证登录状态 + 查看余额
+dreamina text2video --prompt "..." --duration 8  # 文生视频
+dreamina image2video --image ./ref.png --prompt "..."  # 图生视频
 ```
 
-### 切换后端
-
-修改 `config/platforms/seedance-v2.yaml`：
-```yaml
-generation_backend: "dreamina"  # 从 "api" 改为 "dreamina"
-```
-
-### 生成能力
-
-| 命令 | 用途 | 关键参数 |
-|------|------|---------|
-| `text2video` | 文生视频 | `--prompt`, `--duration`(4-15), `--ratio`, `--model_version`(seedance2.0/seedance2.0fast) |
-| `image2video` | 图生视频（单图） | `--image`(本地路径), `--prompt`, `--duration`, `--model_version` |
-| `multimodal2video` | 多模态旗舰视频（推荐） | `--image`×9, `--video`×3, `--audio`×3, `--prompt`, Seedance 2.0 |
-| `multiframe2video` | 多帧连贯视频故事 | `--images`(2-20张), `--transition-prompt`, `--transition-duration` |
-| `frames2video` | 首尾帧视频 | `--first`, `--last`, `--prompt`, `--duration` |
-| `text2image` | 文生图 | `--prompt`, `--ratio`, `--resolution_type`(2k/4k), `--model_version`(3.0-5.0) |
-| `image2image` | 图生图 | `--images`, `--prompt`, `--resolution_type` |
-| `image_upscale` | 图片超分 | `--image`, `--resolution_type`(2k/4k/8k) |
-
-### 管理命令
-
-```bash
-dreamina user_credit                              # 查看余额
-dreamina query_result --submit_id=<id>            # 查询异步任务
-dreamina query_result --submit_id=<id> --download_dir=./out  # 查询并下载
-dreamina list_task                                # 查看任务列表
-dreamina list_task --gen_status=success           # 按状态筛选
-dreamina relogin                                  # 重新登录
-dreamina logout                                   # 清除登录
-dreamina import_login_response --file <json>      # 导入登录凭证
-```
-
-### 通过 api-caller.sh 调用
-
-```bash
-./scripts/api-caller.sh dreamina submit <payload.json>   # 提交生成任务
-./scripts/api-caller.sh dreamina query <submit_id>       # 查询任务结果
-./scripts/api-caller.sh dreamina download <submit_id> <dir>  # 下载结果
-./scripts/api-caller.sh dreamina credit                  # 查询余额
-./scripts/api-caller.sh dreamina list                    # 查看任务列表
-./scripts/api-caller.sh dreamina login-check             # 检查登录状态
-```
-
-### 注意事项
-
-- 所有生成命令消耗 credit，提交前确认余额
-- `multimodal2video` 是最强视频模式，支持 Seedance 2.0 + 混合输入
-- 参考图使用本地文件路径（非 URL）
-- 部分模型首次使用需在即梦 Web 端完成授权确认（`AigcComplianceConfirmationRequired`）
-- `--poll=N` 可让 CLI 等待 N 秒后返回结果，超时则返回 `submit_id` 供后续查询
+切换后端：修改 `config/platforms/seedance-v2.yaml` 中 `generation_backend: "dreamina"`
 
 ## Agent Teams 架构
 
@@ -695,159 +642,18 @@ Agent 通过 `scripts/trace.sh` 写入结构化事件：
 
 ## CI/CD 规范
 
-### 流水线概览
+**详细文档**：[docs/CI-CD.md](docs/CI-CD.md)
 
-```
-PR 提交 → lint-validate → security-scan → dry-run-check → ✅ 可合并
-main 合并 → 同上 + compliance-config-test → 通知
-```
-
-### GitHub Actions 触发条件
-
-| 事件 | 触发 Job |
-|------|---------|
-| PR → main | lint, validate-yaml, shellcheck, secret-scan |
-| push → main | 同上 + compliance-config-test |
-| 手动触发 | env-check（需配置 Secrets） |
-
-### 本地预检（推送前必跑）
+### 快速参考
 
 ```bash
-# Shell 脚本语法检查
+# 本地预检（推送前必跑）
 shellcheck scripts/api-caller.sh
-
-# YAML 格式校验
 python3 -m yamllint config/
-
-# 合规配置完整性检查
 ./scripts/api-caller.sh env-check
-
-# 敏感词表格式验证
-python3 -c "import yaml; yaml.safe_load(open('config/compliance/blocklist.yaml'))"
 ```
 
-### Secrets 管理
-
-**本地开发**：通过 `.env`（已加入 `.gitignore`）或 shell profile 设置。
-
-**CI 环境**：在 GitHub → Settings → Secrets and variables → Actions 中配置：
-
-| Secret 名称 | 对应环境变量 | 用途 |
-|------------|------------|------|
-| `ARK_API_KEY` | `ARK_API_KEY` | Seedance 视频生成 |
-| `IMAGE_GEN_API_URL` | `IMAGE_GEN_API_URL` | 图像生成端点 |
-| `IMAGE_GEN_API_KEY` | `IMAGE_GEN_API_KEY` | 图像生成鉴权 |
-| `OPENAI_API_KEY` | `OPENAI_API_KEY` | Moderation API |
-| `AIGC_DETECT_API_KEY` | `AIGC_DETECT_API_KEY` | AIGC 检测 API（可选） |
-
-**规则**：
-- 禁止将任何 API Key 硬编码进脚本或配置文件
-- `config/api-endpoints.yaml` 只存 URL 模板，不存 Key
-- PR diff 中出现疑似 Key 格式（`sk-`、`Bearer ` 后跟长字符串）时 CI 自动阻断
-
-### 分支策略（GitHub Flow）
-
-```
-main           # 唯一长期分支，始终可部署
-feature/*      # 新功能（agent、phase、config 改动）
-fix/*          # 修复
-```
-
-**规则**：
-- `main` 禁止直接 push，**唯一例外：仓库初始化的第一个 commit**
-- 分支从最新 `main` 切出，合并后立即删除
-- PR 需 CI 全绿才可合并，使用 squash merge 保持 main 历史整洁
-
-**分支命名**：
-```
-feature/add-comply-agent
-feature/voice-config-yaml
-fix/gen-worker-retry-logic
-```
-
-### 完整开发流程
-
-**1. 开始新工作（使用 Worktree 隔离）**
-```bash
-git checkout main && git pull origin main
-
-# 创建 worktree，每个 feature 独立目录，互不干扰
-git worktree add .worktrees/your-feature -b feature/your-feature
-cd .worktrees/your-feature
-```
-
-**2. 开发 + atomic commits**
-```bash
-git add <specific-files>
-git commit -m "feat(scope): 描述"
-```
-
-**3. 推送并开 PR**
-```bash
-git push origin feature/your-feature
-gh pr create --title "feat(scope): 描述" --body "## 改动内容\n\n## 测试方式"
-```
-
-**4. PR checklist（合并前确认）**
-- [ ] CI 全绿（lint、shellcheck、secret-scan）
-- [ ] commit message 符合规范，无 WIP/update
-- [ ] 不含 `.mp4`、API Key、`state/*.json`
-- [ ] CLAUDE.md 如有架构变更已同步更新
-
-**5. 合并 + 清理**
-```bash
-# GitHub 上 squash merge 后，回到主目录
-cd /path/to/aladdin01
-git checkout main && git pull origin main
-
-# 删除 worktree（同时删除本地分支）
-git worktree remove .worktrees/your-feature
-git branch -d feature/your-feature
-
-# 批量清理所有已合并的本地分支 + 远端追踪引用
-git branch --merged main | grep -v '^\* main' | xargs git branch -d
-git fetch --prune
-```
-
-**Worktree 常用命令**
-```bash
-git worktree list              # 查看所有 worktree
-git worktree remove <path>     # 删除 worktree（需先 cd 出去）
-git worktree prune             # 清理失效的 worktree 引用
-```
-
-### Atomic Commits
-
-每个 commit 只做一件事，能独立 revert。
-
-**粒度参考**：
-
-| 场景 | 正确拆分 |
-|------|---------|
-| 新增 agent + 更新 CLAUDE.md | 2 个 commit |
-| 修复 retry 逻辑 + 顺手改注释 | 2 个 commit |
-| 新增 phase + 对应 state schema | 2 个 commit |
-| 同一 agent 的多处 bug fix | 1 个 commit（同一关注点） |
-
-**commit message 格式**：`type(scope): 描述`
-
-| type | 用途 |
-|------|------|
-| `feat` | 新 agent、新 phase、新功能 |
-| `fix` | bug 修复 |
-| `config` | 配置文件改动（compliance、platform、voice） |
-| `docs` | CLAUDE.md、注释 |
-| `refactor` | 重构，不改行为 |
-| `ci` | GitHub Actions、脚本 |
-
-**禁止**：`fix stuff`、`WIP`、`update`、一个 commit 跨多个不相关 scope。
-
-### CI 不覆盖的内容
-
-以下需人工验证，CI 不自动执行：
-- 实际视频生成（涉及付费 API）
-- Phase 3/4 人工确认流程
-- 跨集角色资产一致性
+分支策略：`main`（唯一长期分支）← `feature/*` / `fix/*`（squash merge）
 
 ## 目录结构
 

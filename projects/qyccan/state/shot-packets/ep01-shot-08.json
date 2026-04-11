@@ -3,153 +3,129 @@
   "episode": "ep01",
   "scene_id": "ep01-sc01",
   "shot_number": 8,
-  "scene_goal": "系统激活，苏夜获得吞天口技能，张嘴吞噬家仆甲，进化点+10",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
-  "source_refs": {
-    "visual_direction_path": "projects/qyccan/outputs/ep01/visual-direction.yaml",
-    "world_model_path": "projects/qyccan/state/ontology/ep01-world-model.json",
-    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-08.png"
-  },
   "story_logic": {
     "shot_purpose": "reveal_change",
-    "dramatic_role": "resolution",
-    "transition_from_previous": "上一shot最后一帧：苏夜在叶红衣手心眼神变犀利→当前shot接续，系统提示音炸响，苏夜眼神更加犀利，系统激活，情绪从愤怒推进至爆发，空间连续",
-    "emotional_target": "爽感与震撼——系统激活+吞天口爆发，观众感受到逆袭的快感",
-    "information_delta": "系统激活，苏夜获得吞天口技能，张嘴吞噬家仆甲，进化点+10",
-    "next_hook": "这条蚕到底有多强？"
-  },
-  "selected_views": {
-    "characters": [
-      {
-        "id": "_",
-        "name": "苏夜",
-        "variant_id": "qingyucan",
-        "preferred_view": "front",
-        "selected_path": "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
-        "fallback_order": ["front", "side", "back"]
-      },
-      {
-        "id": "_",
-        "name": "叶红衣",
-        "variant_id": "default",
-        "preferred_view": "front",
-        "selected_path": "projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "fallback_order": ["front", "side", "back"]
-      }
-    ],
-    "scene": {
-      "name": "黑雾森林",
-      "preferred_view": "day",
-      "selected_path": "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
-    }
-  },
-  "continuity_inputs": {
-    "previous_shot_id": "ep01-shot-07",
-    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-07-end-frame.png"
+    "dramatic_role": "detail",
+    "transition_from_previous": "object_reveal——苏夜眼神变犀利的环绕镜头硬切至家仆甲伸手抓向叶红衣的全景，从系统激活的内在变化切到外部危机的千钧一发",
+    "emotional_target": "紧张和爽感——千钧一发之际苏夜爆发，吞天口震撼登场",
+    "information_delta": "苏夜的吞天口技能首次发动，樱桃小嘴化作漆黑漩涡黑洞",
+    "next_hook": "家仆甲会怎样？这个技能有多强？"
   },
   "characters": [
     {
       "id": "苏夜",
-      "state_ref": "苏夜@ep01-shot-08",
       "variant": "qingyucan",
       "ref_assets": [
-        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
-        "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png"
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png"
       ],
-      "must_preserve": ["form", "size", "color"],
+      "must_preserve": [
+        "form",
+        "size",
+        "color"
+      ],
       "current_state": {
-        "form": "青玉蚕（凡胎级）",
-        "costume": "通体碧绿蚕体",
+        "form": "default",
+        "costume": "default",
         "injury": "none",
-        "emotion": "furious_then_smug",
-        "props_in_possession": [],
-        "knowledge": ["吞天口（一级）已激活", "无限吞噬进化系统已激活", "已契约叶红衣", "吞噬家仆甲获得进化点+10"]
+        "emotion": "neutral"
       }
     },
     {
       "id": "叶红衣",
-      "state_ref": "叶红衣@ep01-shot-08",
       "variant": "default",
       "ref_assets": [
-        "projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "projects/qyccan/assets/characters/images/叶红衣-side.png"
+        "projects/qyccan/assets/characters/images/叶红衣-front.png"
       ],
-      "must_preserve": ["form", "size", "color"],
+      "must_preserve": [
+        "form",
+        "size",
+        "color"
+      ],
       "current_state": {
-        "form": "人族少女",
-        "costume": "红衣破损，发髻散乱，身上带血迹",
-        "injury": "minor",
-        "emotion": "terrified_then_petrified",
-        "props_in_possession": [],
-        "knowledge": ["已契约苏夜", "圣兽召唤石已碎裂", "目睹苏夜吞噬家仆甲", "彻底石化"]
+        "form": "default",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "neutral"
       }
     }
   ],
   "background": {
-    "location": "黑雾森林",
+    "location": "黑雾森林外围",
     "time_of_day": "day",
     "ref_assets": [
       "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     ]
   },
-  "camera": {
-    "raw": "0-3秒：大特写固定镜头，苏夜复眼特写，眼神变犀利，系统界面光芒；4-7秒：全景固定镜头（广角），家仆甲伸手抓向叶红衣，苏夜求生本能爆发，张嘴，小嘴化作漆黑漩涡黑洞迎风暴涨数米；8-12秒：中景固定镜头，家仆甲消失，叶红衣睁眼石化，苏夜打嗝摆Pose",
-    "shot_size": "close_up",
-    "movement": "static",
-    "angle": "normal"
-  },
+  "camera": "0-3秒 全景固定镜头（家仆甲逼近叶红衣），4-7秒 大特写推镜头急速推近苏夜嘴巴→黑洞爆发，8-10秒 全景固定镜头（黑洞吸入家仆甲），11-12秒 特写固定镜头（黑洞收缩回樱桃小嘴）\n",
   "seedance_inputs": {
     "mode": "img2video",
     "images": [
+      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-07-end-frame.png",
       "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
       "projects/qyccan/assets/characters/images/叶红衣-front.png",
-      "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
-      "projects/qyccan/outputs/ep01/storyboard/shot-08.png"
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n\n0-3秒：大特写固定镜头，[苏夜]复眼特写，眼神变犀利，蓝色系统界面光芒闪现，画外音（苏夜OS）：\"妈的，敢笑话老子？还敢欺负我的……主人！\"，系统提示音炸响，低饱和色调，胶片颗粒感\n\n4-7秒：全景固定镜头（广角），家仆甲伸手抓向[叶红衣]，[苏夜]求生本能爆发，张嘴，樱桃般的小嘴瞬间化作漆黑漩涡黑洞迎风暴涨数米，[苏夜]（怒吼）：\"给爷死！！\"，家仆甲被黑洞吸入消失，周围树木被气流吹动，叶片飞散\n\n8-12秒：中景固定镜头，空气瞬间安静，[叶红衣]睁眼彻底石化，[苏夜]拍拍肚皮落在地上，扭了扭腰摆出自认为很帅的Pose，画外音（苏夜OS）：\"嗝……味道有点淡。\"，家仆乙（吓傻）：\"卧槽？杀人蚕？！\"，伦勃朗光，低饱和色调\n\n音效：系统激活音效（电子炸响）、黑洞吸力音效（低沉嗡鸣）、家仆消失音效、打嗝音效\n\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片4（仅参考景别和角色位置，不复制细节）"
+    "prompt": "照片级写实，真人实拍质感，35毫米胶片，禁止动漫风格，禁止卡通风格，禁止二次元，禁止插画风\n苏夜=纯虫子形态：通体碧绿肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎小短腿，樱桃小嘴，复眼，绝对禁止出现人脸、人头、人类五官、人形特征\n苏夜外貌：通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，樱桃般的小嘴\n叶红衣外貌：18岁红衣少女，红衣似火但破损带血迹，高冷御姐脸，长发散乱\n@图片1 作为<苏夜（青玉蚕形态）>，@图片2 作为<叶红衣>，场景参考@图片3\n0-3秒：全景固定镜头，[家仆甲]伸手抓向[叶红衣]，千钧一发，[叶红衣]双手护住手心里的[苏夜]\n4-7秒：大特写急速推镜头，[苏夜]张嘴，樱桃小嘴瞬间化作一团漆黑的漩涡黑洞，迎风暴涨数米，画外音（苏夜/怒吼/嘶吼/急促）：\"给爷死！！\"\n8-10秒：全景固定镜头，黑洞吸力爆发，[家仆甲]被漆黑漩涡一口吞没，连根毛都没剩下，周围树叶和黑雾被吸力扭曲\n11-12秒：特写固定镜头，黑洞收缩回[苏夜]的樱桃小嘴，恢复肥嘟嘟的蚕宝宝模样\n音效：黑洞漩涡轰鸣声、吸入音效、家仆惨叫声戛然而止、寂静\n禁止出现字幕、对话框、水印、Logo、动漫风格、卡通风格\n"
   },
-  "forbidden_changes": [
-    "保持苏夜的青玉蚕形态（通体碧绿、拇指大小），不得变形为其他形态",
-    "不得改变叶红衣的红衣破损状态",
-    "苏夜体型必须保持拇指大小，吞天口爆发时黑洞效果可以放大但苏夜本体不变",
-    "家仆甲必须被完全吞没消失，不得残留任何痕迹",
-    "系统激活蓝色界面光芒必须出现在0-3秒"
-  ],
+  "forbidden_changes": [],
   "repair_policy": {
     "max_retries": 2,
     "prefer_local_edit": true
   },
   "ontology_constraints": {
-    "world_rules": [
-      "cultivation",
-      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
-      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
-      "苏夜前世为龙国特种部队队长，代号修罗",
-      "吞天口激活条件：系统检测到宿主遭遇生死危机且完成契约绑定"
-    ],
-    "character_abilities": {
-      "苏夜": ["吞天口（一级）", "无限吞噬进化系统"],
-      "叶红衣": ["软剑术", "残余灵力"]
+    "world_rules": {
+      "gravity": "normal",
+      "magic_system": "cultivation",
+      "power_scaling": "strict",
+      "beast_tiers": [
+        "凡胎",
+        "灵智",
+        "地煞",
+        "天罡",
+        "君王",
+        "帝皇",
+        "神话"
+      ],
+      "notes": "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。"
+    },
+    "narrative_constraints": {
+      "character_evolution": [
+        {
+          "character": "苏夜",
+          "from": "无（前世人类）",
+          "to": "青玉蚕（凡胎级）",
+          "trigger": "重生穿越，ep01开始"
+        }
+      ],
+      "ability_unlocks": [
+        {
+          "character": "苏夜",
+          "ability": "吞天口（一级）",
+          "condition": "系统激活，检测到宿主遭遇生死危机且完成契约绑定"
+        },
+        {
+          "character": "苏夜",
+          "ability": "无限吞噬进化系统",
+          "condition": "契约绑定完成后正式激活"
+        }
+      ],
+      "world_rules": [
+        "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+        "人族通过觉醒魂宫契约灵兽",
+        "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+        "契约绑定需要精血激活召唤石",
+        "苏夜前世为龙国特种部队队长，代号修罗"
+      ]
     }
   },
-  "retrieval_audit": {
-    "planning": {
-      "entities_searched": ["苏夜", "叶红衣", "黑雾森林", "圣兽召唤石"],
-      "states_checked": ["ep01-shot-07"],
-      "relations_checked": ["苏夜-叶红衣契约关系", "苏夜-家仆甲吞噬关系（因果）"]
-    },
-    "retrieval_evidence": {
-      "character_assets": {
-        "苏夜": "design-lock.json → qingyucan variant → front+side",
-        "叶红衣": "design-lock.json → default variant → front+side"
-      },
-      "scene_assets": {
-        "黑雾森林": "design-lock.json → day variant"
-      },
-      "continuity": "ep01-shot-07 end-frame referenced for 苏夜眼神变犀利 transition"
-    }
+  "continuity_inputs": {
+    "previous_shot_id": "ep01-shot-07",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-07-end-frame.png"
   }
 }

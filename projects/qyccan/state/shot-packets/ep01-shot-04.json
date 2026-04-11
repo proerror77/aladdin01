@@ -3,121 +3,110 @@
   "episode": "ep01",
   "scene_id": "ep01-sc01",
   "shot_number": 4,
-  "scene_goal": "叶红衣掏出圣兽召唤石，捏碎，鲜血激活，法阵亮起",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
-  "source_refs": {
-    "visual_direction_path": "projects/qyccan/outputs/ep01/visual-direction.yaml",
-    "world_model_path": "projects/qyccan/state/ontology/ep01-world-model.json",
-    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-04.png"
-  },
   "story_logic": {
     "shot_purpose": "reveal_change",
     "dramatic_role": "detail",
-    "transition_from_previous": "上一shot最后一帧：叶红衣靠树喘息绝望近景→当前shot接续近景，叶红衣眼神从绝望转为决绝，情绪转折在同一空间内完成，无空间跳变",
-    "emotional_target": "决绝与仪式感——叶红衣破釜沉舟的悲壮，观众感受到她的孤注一掷",
-    "information_delta": "叶红衣掏出圣兽召唤石，捏碎，鲜血激活，法阵亮起",
-    "next_hook": "召唤出来的会是什么？"
-  },
-  "selected_views": {
-    "characters": [
-      {
-        "id": "_",
-        "name": "叶红衣",
-        "variant_id": "default",
-        "preferred_view": "front",
-        "selected_path": "projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "fallback_order": ["front", "side", "back"]
-      }
-    ],
-    "scene": {
-      "name": "黑雾森林",
-      "preferred_view": "day",
-      "selected_path": "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
-    }
-  },
-  "continuity_inputs": {
-    "previous_shot_id": "ep01-shot-03",
-    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-03-end-frame.png"
+    "transition_from_previous": "object_reveal——法阵光柱冲天的全景仰拍叠化至树梢，苏夜感到屁股底下一阵吸力，光柱与苏夜形成因果连接",
+    "emotional_target": "惊慌和失控——苏夜被不明力量吸走，完全失控",
+    "information_delta": "苏夜被法阵吸力带走，化作绿光坠落到叶红衣面前",
+    "next_hook": "苏夜落到了哪里？叶红衣会看到什么？"
   },
   "characters": [
     {
-      "id": "叶红衣",
-      "state_ref": "叶红衣@ep01-shot-04",
-      "variant": "default",
+      "id": "苏夜",
+      "variant": "qingyucan",
       "ref_assets": [
-        "projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "projects/qyccan/assets/characters/images/叶红衣-side.png",
-        "projects/qyccan/assets/characters/images/叶红衣-back.png"
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png"
       ],
-      "must_preserve": ["form", "size", "color"],
+      "must_preserve": [
+        "form",
+        "size",
+        "color"
+      ],
       "current_state": {
-        "form": "人族少女",
-        "costume": "红衣破损",
-        "injury": "身上带血迹",
-        "emotion": "决绝悲壮",
-        "props_in_possession": ["圣兽召唤石（即将捏碎）"],
-        "knowledge": ["被家族抛弃", "被未婚夫逼杀", "决定使用最后手段"]
+        "form": "default",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "neutral"
       }
     }
   ],
   "background": {
-    "location": "黑雾森林",
+    "location": "黑雾森林（树梢→树下法阵）",
     "time_of_day": "day",
     "ref_assets": [
       "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     ]
   },
-  "camera": {
-    "raw": "0-3秒：近景固定镜头，叶红衣脸部特写，眼神变化从绝望到决绝；4-8秒：大特写固定镜头，手部特写，召唤石被捏碎，鲜血滴落，慢动作；8-12秒：全景升降镜头，从地面法阵亮起向上升至叶红衣全身，金色粒子飘散",
-    "shot_size": "close_up",
-    "movement": "crane_up",
-    "angle": "normal"
-  },
+  "camera": "0-3秒 近景固定镜头（苏夜在树叶上），4-7秒 跟镜头急速下降跟随绿光坠落，8-10秒 全景俯拍绿光坠入法阵，11-12秒 大特写固定镜头法阵中央的苏夜\n",
   "seedance_inputs": {
     "mode": "img2video",
     "images": [
-      "projects/qyccan/assets/characters/images/叶红衣-front.png",
-      "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
-      "projects/qyccan/assets/characters/images/叶红衣-side.png",
-      "projects/qyccan/assets/characters/images/叶红衣-back.png",
-      "projects/qyccan/outputs/ep01/storyboard/shot-04.png"
+      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-03-end-frame.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<叶红衣>，场景参考@图片2\n\n0-3秒：近景固定镜头，[叶红衣]脸部特写，眼神从绝望转为决绝，咬牙，[叶红衣]（眼神决绝）：\"不！还有最后的机会！\"，伦勃朗光，低饱和色调，胶片颗粒感\n\n4-8秒：大特写固定镜头慢动作，[叶红衣]颤抖的手掏出满是裂纹的古老召唤石，猛地捏碎，鲜血滴落，金色粒子爆散，[叶红衣]：\"这是家族千年传承的至宝，圣兽召唤石……出来吧，我的本命灵兽！\"\n\n8-12秒：全景升降镜头从地面向上升，脚下法阵骤然亮起，金色光芒爆散，[叶红衣]满怀期待仰头，古木参天背景，黑雾弥漫，金色粒子在空气中飘散\n\n音效：召唤石碎裂声、法阵激活音效（低沉轰鸣）、金色粒子飘散音效\n\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片5（仅参考景别和角色位置，不复制细节）"
+    "prompt": "照片级写实，真人实拍质感，35毫米胶片，禁止动漫风格，禁止卡通风格，禁止二次元，禁止插画风\n苏夜=纯虫子形态：通体碧绿肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎小短腿，樱桃小嘴，复眼，绝对禁止出现人脸、人头、人类五官、人形特征\n苏夜外貌：通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，眼神极其欠揍，樱桃般的小嘴\n@图片1 作为<苏夜（青玉蚕形态）>，场景参考@图片2\n0-3秒：近景固定镜头，[苏夜]趴在树叶上，突然感到屁股底下一阵吸力，身体开始不受控制地滑动，画外音（苏夜/惊慌/急促）：\"哎？哎哎哎？什么情况？\"\n4-7秒：跟镜头急速下降，[苏夜]化作一道绿光从树梢急速坠落，划过黑雾弥漫的森林，\"咻\"的一声\n8-10秒：全景俯拍，绿光坠入地面金色法阵中央，光芒爆散后渐弱\n11-12秒：大特写固定镜头，法阵中央露出拇指大小的[苏夜]，一脸懵逼地趴着，复眼仰视天空\n音效：吸力嗡鸣声、\"咻\"的坠落声、法阵余光音效\n禁止出现字幕、对话框、水印、Logo、动漫风格、卡通风格\n"
   },
-  "forbidden_changes": [
-    "保持叶红衣红衣破损、发髻散乱的状态",
-    "圣兽召唤石必须在此镜次被捏碎（道具状态：destroyed）"
-  ],
+  "forbidden_changes": [],
   "repair_policy": {
     "max_retries": 2,
     "prefer_local_edit": true
   },
   "ontology_constraints": {
-    "world_rules": [
-      "cultivation",
-      "契约绑定需要精血激活召唤石",
-      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话"
-    ],
-    "character_abilities": {
-      "苏夜": ["吞天口（一级）", "无限吞噬进化系统"],
-      "叶红衣": ["软剑术", "残余灵力"]
+    "world_rules": {
+      "gravity": "normal",
+      "magic_system": "cultivation",
+      "power_scaling": "strict",
+      "beast_tiers": [
+        "凡胎",
+        "灵智",
+        "地煞",
+        "天罡",
+        "君王",
+        "帝皇",
+        "神话"
+      ],
+      "notes": "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。"
+    },
+    "narrative_constraints": {
+      "character_evolution": [
+        {
+          "character": "苏夜",
+          "from": "无（前世人类）",
+          "to": "青玉蚕（凡胎级）",
+          "trigger": "重生穿越，ep01开始"
+        }
+      ],
+      "ability_unlocks": [
+        {
+          "character": "苏夜",
+          "ability": "吞天口（一级）",
+          "condition": "系统激活，检测到宿主遭遇生死危机且完成契约绑定"
+        },
+        {
+          "character": "苏夜",
+          "ability": "无限吞噬进化系统",
+          "condition": "契约绑定完成后正式激活"
+        }
+      ],
+      "world_rules": [
+        "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+        "人族通过觉醒魂宫契约灵兽",
+        "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+        "契约绑定需要精血激活召唤石",
+        "苏夜前世为龙国特种部队队长，代号修罗"
+      ]
     }
   },
-  "retrieval_audit": {
-    "planning": {
-      "entities_searched": ["叶红衣/default", "圣兽召唤石"],
-      "locations_searched": ["黑雾森林/day"],
-      "assets_source": "design-lock + visual-direction references"
-    },
-    "retrieval_evidence": {
-      "叶红衣_front": "projects/qyccan/assets/characters/images/叶红衣-front.png",
-      "叶红衣_side": "projects/qyccan/assets/characters/images/叶红衣-side.png",
-      "叶红衣_back": "projects/qyccan/assets/characters/images/叶红衣-back.png",
-      "黑雾森林_day": "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
-      "storyboard": "projects/qyccan/outputs/ep01/storyboard/shot-04.png"
-    }
+  "continuity_inputs": {
+    "previous_shot_id": "ep01-shot-03",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-03-end-frame.png"
   }
 }

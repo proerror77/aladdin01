@@ -32,8 +32,10 @@
 # Trace 摘要
 ./scripts/api-caller.sh trace-summary <session_dir>
 
-# 即梦 Web UI（浏览器模式）
-./scripts/api-caller.sh jimeng-web setup
+# Dreamina CLI
+./scripts/api-caller.sh dreamina submit <payload.json>
+./scripts/api-caller.sh dreamina query <submit_id>
+./scripts/api-caller.sh dreamina credit
 ```
 
 **环境变量**：`ARK_API_KEY`、`TUZI_API_KEY`、`IMAGE_GEN_API_URL`、`IMAGE_GEN_API_KEY`、`OPENAI_API_KEY`
@@ -53,17 +55,10 @@
 
 **配置**：`config/nanobanana/nanobanana-config.yaml`
 
-### jimeng-web.sh — 即梦 Web UI 浏览器操作
+### ~~jimeng-web.sh~~ — 已废弃
 
-通过 Actionbook CLI + CDP 操作即梦 Web UI 生成视频。
-
-```bash
-./scripts/jimeng-web.sh setup                  # 首次登录
-./scripts/jimeng-web.sh submit <payload.json>  # 提交任务
-./scripts/jimeng-web.sh download <output.mp4>  # 下载视频
-```
-
-**依赖**：`actionbook` (>= 0.6.0)、`jq`、`python3`、`pip: websockets`
+> **注**：即梦 Web UI 模式（jimeng-web.sh）已被 Dreamina CLI 取代。
+> 请使用 `dreamina` 命令进行视频生成，详见 [CLAUDE.md](../CLAUDE.md) 中的 Dreamina CLI 章节。
 
 ### concat-episode.sh — 视频拼接
 
@@ -104,9 +99,9 @@
 
 **依赖**：`lark-cli`、`jq`
 
-### migrate-to-v2-architecture.sh — v2.0 迁移
+### migrate-to-v2-architecture.sh — v2.0 迁移（已归档）
 
-将 v1.0 状态文件和配置迁移到 v2.0 架构。一次性使用。
+已移至 `scripts/archive/`。一次性迁移脚本，v2.0 已是当前架构。
 
 ### design-generate-protagonists.sh — 主角参考图生成
 
@@ -163,20 +158,13 @@ python3 scripts/xlsx-to-script.py input.xlsx output_dir/
 
 角色/场景参考图的相似度对比工具，用于一致性检查。
 
-### design-gen-*.py — 参考图生成系列
+### design-gen-*.py — 参考图生成系列（已归档）
 
-| 脚本 | 用途 |
-|------|------|
-| `design-gen-protagonists.py` | 主角参考图 |
-| `design-gen-supporting.py` | 配角参考图 |
-| `design-gen-scenes.py` | 场景参考图 |
-| `design-gen-turnarounds.py` | 角色三视图（v1） |
-| `design-gen-turnarounds-v2.py` | 角色三视图（v2，增强） |
-| `design-gen-turnarounds-v3.py` | 角色三视图（v3，最新） |
+已移至 `scripts/archive/`，被 `design-generate-all.py` 取代。使用 `~design` skill 替代。
 
-### gen-qyccan-assets.py — 项目资产生成
+### gen-qyccan-assets.py — 项目资产生成（已迁移）
 
-特定项目的资产批量生成脚本。
+已移至 `projects/qyccan/scripts/`。
 
 ### test-phase6.sh — Phase 6 测试
 

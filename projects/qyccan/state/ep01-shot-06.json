@@ -1,12 +1,9 @@
 {
   "episode": "ep01",
   "shot_id": "ep01-shot-06",
-  "shot_index": 6,
-  "status": "generating",
-  "started_at": "2026-04-07T03:31:57Z",
-  "original_retries": 0,
-  "rewrite_rounds": 0,
-  "total_api_calls": 0,
-  "mode": "shot_packet",
-  "backend": "dreamina"
+  "gen_status": "generating",
+  "submit_id": "ccb8334df6318fd4",
+  "model": "seedance2.0",
+  "backend": "dreamina",
+  "version": "v8_end_frame_continuity"
 }

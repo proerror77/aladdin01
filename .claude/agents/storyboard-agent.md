@@ -140,15 +140,23 @@ done
 
 ### Step 3: 更新 seedance_prompt 引用分镜图
 
-分镜图生成完成后，计算其在 images 数组中的实际位置，用 `@图片N` 格式注入 Seedance prompt。
+⚠️ **重要警告：分镜图不得加入 Seedance images 数组**
 
-**Seedance images 数组顺序**（由 shot-compiler-agent / workflow-sync.py 组装）：
+分镜图是黑白素描风格，如果作为 `@图片N` 传给 Seedance，会导致：
+- 生成视频变成黑白/低饱和
+- 视频风格变成素描/铅笔画
+- 覆盖写实参考图的风格
+
+**正确做法**：分镜图**只更新 `storyboard_image_path` 字段**，供人工审核使用，**不注入 seedance_prompt，不加入 images 数组**。
+
+Seedance images 数组只包含：
 ```
 [0..char_count-1]  角色参考图（front/side/back，每个角色最多3张）
 [char_count..char_count+scene_count-1]  场景参考图
-[char_count+scene_count]  分镜图（storyboard）
-[最后]  前一镜结尾帧（如果存在）
+[最后，可选]  前一镜结尾帧（如果存在）
 ```
+
+**分镜图的作用仅限于**：人工审核构图是否合理，不参与视频生成。
 
 ```bash
 for i in $(seq 0 $((shot_count - 1))); do

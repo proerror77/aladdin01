@@ -124,6 +124,47 @@ safe_curl() {
     "$@"
 }
 
+# 带 429 退避的 curl 封装
+safe_curl_with_retry() {
+    local max_time="$1"
+    local max_retries="${CURL_MAX_RETRIES:-3}"
+    shift
+
+    local attempt=1
+    while (( attempt <= max_retries )); do
+        local tmp_file
+        tmp_file=$(mktemp)
+        local http_code
+        http_code=$(curl -sS -w "%{http_code}" -o "$tmp_file" \
+            --connect-timeout "$CONNECT_TIMEOUT" \
+            --max-time "$max_time" \
+            "$@")
+        local body
+        body=$(cat "$tmp_file")
+        rm -f "$tmp_file"
+
+        if [[ "$http_code" == "429" ]]; then
+            local wait=$(( 2 ** attempt + RANDOM % 5 ))
+            echo "[WARN] Rate limited (429), waiting ${wait}s (attempt ${attempt}/${max_retries})" >&2
+            sleep "$wait"
+            (( attempt++ ))
+            continue
+        fi
+
+        if [[ "$http_code" -ge 200 && "$http_code" -lt 300 ]]; then
+            echo "$body"
+            return 0
+        fi
+
+        # 其他错误：直接返回
+        echo "$body" >&2
+        return 1
+    done
+
+    echo "[ERROR] Max retries (${max_retries}) exceeded after rate limiting" >&2
+    return 1
+}
+
 # 环境变量检查
 if [[ "$SERVICE" == "env-check" ]]; then
   missing=0
@@ -152,10 +193,29 @@ if [[ "$SERVICE" == "env-check" ]]; then
   else
     echo "Optional: dreamina CLI not installed (run: curl -fsSL https://jimeng.jianying.com/cli | bash)"
   fi
+  # v2.0 模式依赖检查
+  echo ""
+  echo "=== v2.0 模式依赖（可选，仅 img2video 模式需要）==="
+  if python3 -c "import lancedb" 2>/dev/null; then
+    echo "✅ lancedb 已安装"
+  else
+    echo "⚠️  lancedb 未安装（v2.0 向量数据库必需）"
+    echo "   安装：pip install lancedb pyarrow"
+  fi
+
+  if python3 -c "from sentence_transformers import SentenceTransformer" 2>/dev/null; then
+    echo "✅ sentence-transformers 已安装"
+  else
+    echo "⚠️  sentence-transformers 未安装（v2.0 语义搜索必需）"
+    echo "   安装：pip install sentence-transformers"
+  fi
+
   if [[ $missing -eq 0 ]]; then
+    echo ""
     echo "All required environment variables are set."
     exit 0
   else
+    echo ""
     echo "$missing environment variable(s) missing." >&2
     exit 1
   fi
@@ -178,7 +238,7 @@ case "$SERVICE" in
           echo "ERROR: Payload file not found: $INPUT" >&2
           exit 1
         fi
-        safe_curl "$SEEDANCE_MAX_TIME" -X POST "${BASE_URL}/contents/generations/tasks" \
+        safe_curl_with_retry "$SEEDANCE_MAX_TIME" -X POST "${BASE_URL}/contents/generations/tasks" \
           -H "Authorization: Bearer ${API_KEY}" \
           -H "Content-Type: application/json" \
           -d @"${INPUT}"

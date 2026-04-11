@@ -3,123 +3,129 @@
   "episode": "ep01",
   "scene_id": "ep01-sc01",
   "shot_number": 5,
-  "scene_goal": "苏夜被召唤石吸走，化作绿光坠入法阵，召唤完成",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
-  "source_refs": {
-    "visual_direction_path": "projects/qyccan/outputs/ep01/visual-direction.yaml",
-    "world_model_path": "projects/qyccan/state/ontology/ep01-world-model.json",
-    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-05.png"
-  },
   "story_logic": {
-    "shot_purpose": "reveal_change",
-    "dramatic_role": "approach",
-    "transition_from_previous": "上一shot最后一帧：叶红衣仰头期待，法阵金光爆散→当前shot接续法阵光芒，镜头切至树梢苏夜被吸力带走，因果连接（召唤→被召唤），视觉上形成呼应",
-    "emotional_target": "惊喜与荒诞——苏夜被强行吸走的无奈，观众感受到命运的捉弄",
-    "information_delta": "苏夜被召唤石吸走，化作绿光坠落，召唤完成",
-    "next_hook": "法阵里出现的是什么？"
-  },
-  "selected_views": {
-    "characters": [
-      {
-        "id": "_",
-        "name": "苏夜",
-        "variant_id": "qingyucan",
-        "preferred_view": "front",
-        "selected_path": "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
-        "fallback_order": ["front", "side", "back"]
-      }
-    ],
-    "scene": {
-      "name": "黑雾森林",
-      "preferred_view": "day",
-      "selected_path": "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
-    }
-  },
-  "continuity_inputs": {
-    "previous_shot_id": "ep01-shot-04",
-    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-04-end-frame.png"
+    "shot_purpose": "land_reaction",
+    "dramatic_role": "reaction",
+    "transition_from_previous": "gaze_cut——法阵中央苏夜懵逼仰视的大特写硬切至叶红衣满怀期待睁开眼的近景，接续苏夜仰视的视线方向（苏夜看上去→叶红衣看下来），形成正反打",
+    "emotional_target": "期待→震惊→崩溃——叶红衣的情绪过山车，观众跟着心碎",
+    "information_delta": "叶红衣发现召唤出的是最废物的凡胎级昆虫青玉蚕，不是神兽",
+    "next_hook": "叶红衣会怎么对待这只蚕？苏夜会怎么反应？"
   },
   "characters": [
     {
+      "id": "叶红衣",
+      "variant": "default",
+      "ref_assets": [
+        "projects/qyccan/assets/characters/images/叶红衣-front.png"
+      ],
+      "must_preserve": [
+        "form",
+        "size",
+        "color"
+      ],
+      "current_state": {
+        "form": "default",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "neutral"
+      }
+    },
+    {
       "id": "苏夜",
-      "state_ref": "苏夜@ep01-shot-05",
       "variant": "qingyucan",
       "ref_assets": [
-        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
-        "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png"
+        "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png"
       ],
-      "must_preserve": ["form", "size", "color"],
+      "must_preserve": [
+        "form",
+        "size",
+        "color"
+      ],
       "current_state": {
-        "form": "青玉蚕（凡胎级）",
-        "costume": "通体碧绿蚕体",
+        "form": "default",
+        "costume": "default",
         "injury": "none",
-        "emotion": "confused_panicked",
-        "props_in_possession": [],
-        "knowledge": ["刚穿越成青玉蚕", "尚未契约叶红衣", "不知道发生了什么"]
+        "emotion": "neutral"
       }
     }
   ],
   "background": {
-    "location": "黑雾森林",
+    "location": "黑雾森林（树下法阵）",
     "time_of_day": "day",
     "ref_assets": [
       "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     ]
   },
-  "camera": {
-    "raw": "0-3秒：全景固定镜头，树梢视角，苏夜被吸力带动；4-7秒：跟镜头，跟随绿光从树梢快速坠落至地面法阵；8-12秒：近景固定镜头，法阵中央，光芒散去，青玉蚕趴在地面",
-    "shot_size": "wide",
-    "movement": "follow",
-    "angle": "normal"
-  },
+  "camera": "0-3秒 近景固定镜头（叶红衣脸部），4-6秒 硬切至大特写固定镜头（苏夜仰视），7-10秒 硬切回特写推镜头缓慢推近叶红衣崩溃表情，11-12秒 拉镜头拉远至中景俯拍\n",
   "seedance_inputs": {
     "mode": "img2video",
     "images": [
+      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-04-end-frame.png",
+      "projects/qyccan/assets/characters/images/叶红衣-front.png",
       "projects/qyccan/assets/characters/images/苏夜-qingyucan-front.png",
-      "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
-      "projects/qyccan/outputs/ep01/storyboard/shot-05.png"
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-side.png",
+      "projects/qyccan/assets/characters/images/苏夜-qingyucan-back.png",
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<苏夜（青玉蚕形态）>，场景参考@图片2\n\n0-3秒：全景固定镜头，树梢视角，[苏夜]通体碧绿肥嘟嘟的蚕宝宝趴在树叶上，感到屁股底下一阵吸力，身体开始被拉动，[苏夜]：\"哎？哎哎哎？什么情况？\"，黑雾弥漫，丁达尔光柱\n\n4-7秒：跟镜头快速跟随，[苏夜]化作一道绿光从树梢不受控制地坠落，绿光轨迹清晰，速度感强烈，古木参天背景\n\n8-12秒：近景固定镜头，法阵中央，绿光坠入，光芒散去，[苏夜]拇指大小的青玉蚕趴在地面法阵中央，一脸懵逼，金色法阵光芒渐弱，伦勃朗光，低饱和色调\n\n音效：吸力音效（低沉嗡鸣）、绿光飞行音效、法阵光芒消散音效\n\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片3（仅参考景别和角色位置，不复制细节）"
+    "prompt": "照片级写实，真人实拍质感，35毫米胶片，禁止动漫风格，禁止卡通风格，禁止二次元，禁止插画风\n苏夜=纯虫子形态：通体碧绿肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎小短腿，樱桃小嘴，复眼，绝对禁止出现人脸、人头、人类五官、人形特征\n苏夜外貌：通体碧绿、肥嘟嘟的蚕宝宝，只有拇指大小，肉乎乎的小短腿，眼神极其欠揍，樱桃般的小嘴\n叶红衣外貌：18岁红衣少女，红衣似火但破损带血迹，高冷御姐脸，眼神倔强落寞，长发散乱，精致锁骨\n@图片1 作为<叶红衣>，@图片2 作为<苏夜（青玉蚕形态）>，场景参考@图片3\n0-3秒：近景固定镜头，[叶红衣]满怀期待睁开眼，视线向下看向法阵中央，[叶红衣]（激动/轻声/正常）：\"是神兽吗？还是凶兽？\"\n4-6秒：硬切至大特写固定镜头，[苏夜]拇指大小趴在法阵中央，复眼仰视[叶红衣]，一脸懵逼，画外音（苏夜/懵逼/平静/正常）：\"美女？有何贵干？\"\n7-10秒：硬切回[叶红衣]特写，推镜头缓慢推近，眼神从期待→震惊→崩溃，嘴唇颤抖，[叶红衣]（崩溃/颤抖/断断续续）：\"青……青玉蚕？是最废物的凡胎级昆虫？我耗尽精血，就召唤了一条肉蚕子？！\"\n11-12秒：拉镜头拉远至中景俯拍，两人大眼瞪小眼，法阵光芒渐弱，空气凝固\n音效：法阵余光音效、震惊音效、空气凝固的寂静\n禁止出现字幕、对话框、水印、Logo、动漫风格、卡通风格\n"
   },
-  "forbidden_changes": [
-    "保持苏夜的青玉蚕形态（通体碧绿、拇指大小），不得变形为其他形态",
-    "苏夜体型必须保持拇指大小，不得无故放大",
-    "绿光坠落轨迹必须清晰可见，不得省略"
-  ],
+  "forbidden_changes": [],
   "repair_policy": {
     "max_retries": 2,
     "prefer_local_edit": true
   },
   "ontology_constraints": {
-    "world_rules": [
-      "cultivation",
-      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
-      "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
-      "苏夜前世为龙国特种部队队长，代号修罗",
-      "契约绑定需要精血激活召唤石"
-    ],
-    "character_abilities": {
-      "苏夜": ["吞天口（一级，尚未激活）", "无限吞噬进化系统（尚未激活）"],
-      "叶红衣": ["软剑术", "残余灵力"]
+    "world_rules": {
+      "gravity": "normal",
+      "magic_system": "cultivation",
+      "power_scaling": "strict",
+      "beast_tiers": [
+        "凡胎",
+        "灵智",
+        "地煞",
+        "天罡",
+        "君王",
+        "帝皇",
+        "神话"
+      ],
+      "notes": "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。"
+    },
+    "narrative_constraints": {
+      "character_evolution": [
+        {
+          "character": "苏夜",
+          "from": "无（前世人类）",
+          "to": "青玉蚕（凡胎级）",
+          "trigger": "重生穿越，ep01开始"
+        }
+      ],
+      "ability_unlocks": [
+        {
+          "character": "苏夜",
+          "ability": "吞天口（一级）",
+          "condition": "系统激活，检测到宿主遭遇生死危机且完成契约绑定"
+        },
+        {
+          "character": "苏夜",
+          "ability": "无限吞噬进化系统",
+          "condition": "契约绑定完成后正式激活"
+        }
+      ],
+      "world_rules": [
+        "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+        "人族通过觉醒魂宫契约灵兽",
+        "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+        "契约绑定需要精血激活召唤石",
+        "苏夜前世为龙国特种部队队长，代号修罗"
+      ]
     }
   },
-  "retrieval_audit": {
-    "planning": {
-      "entities_searched": ["苏夜", "黑雾森林"],
-      "states_checked": ["ep01-shot-04"],
-      "relations_checked": ["苏夜-叶红衣召唤关系（因果）"]
-    },
-    "retrieval_evidence": {
-      "character_assets": {
-        "苏夜": "design-lock.json → qingyucan variant → front+side"
-      },
-      "scene_assets": {
-        "黑雾森林": "design-lock.json → day variant"
-      },
-      "continuity": "ep01-shot-04 end-frame referenced for 法阵金光爆散 transition"
-    }
+  "continuity_inputs": {
+    "previous_shot_id": "ep01-shot-04",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-04-end-frame.png"
   }
 }

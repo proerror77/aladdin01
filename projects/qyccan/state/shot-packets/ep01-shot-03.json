@@ -3,121 +3,108 @@
   "episode": "ep01",
   "scene_id": "ep01-sc01",
   "shot_number": 3,
-  "scene_goal": "引入叶红衣，建立她被追杀的危机，家仆甲出现",
   "duration_sec": 12,
   "dialogue_mode": "external_dub",
-  "source_refs": {
-    "visual_direction_path": "projects/qyccan/outputs/ep01/visual-direction.yaml",
-    "world_model_path": "projects/qyccan/state/ontology/ep01-world-model.json",
-    "storyboard_image_path": "projects/qyccan/outputs/ep01/storyboard/shot-03.png"
-  },
   "story_logic": {
-    "shot_purpose": "introduce_subject",
+    "shot_purpose": "reveal_change",
     "dramatic_role": "approach",
-    "transition_from_previous": "上一shot最后一帧：苏夜肚皮朝天绝望大特写，树梢→硬切→树下，镜头急转至叶红衣冲出灌木丛，空间切换但时间连续，形成对比节奏（蚕的静→人的动）",
-    "emotional_target": "紧张与危机感——叶红衣的逃命状态立刻建立威胁",
-    "information_delta": "引入叶红衣，建立她被追杀的危机，家仆甲出现",
-    "next_hook": "叶红衣能逃脱吗？"
-  },
-  "selected_views": {
-    "characters": [
-      {
-        "id": "_",
-        "name": "叶红衣",
-        "variant_id": "default",
-        "preferred_view": "front",
-        "selected_path": "projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "fallback_order": ["front", "side", "back"]
-      }
-    ],
-    "scene": {
-      "name": "黑雾森林",
-      "preferred_view": "day",
-      "selected_path": "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
-    }
-  },
-  "continuity_inputs": {
-    "previous_shot_id": "ep01-shot-02",
-    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-02-end-frame.png"
+    "transition_from_previous": "action_result——叶红衣说出'最后的机会'后，镜头从她脸部特写切到她颤抖的双手，掏出召唤石，情绪从决绝推进到行动",
+    "emotional_target": "悲壮和期待——叶红衣赌上一切，耗尽精血召唤灵兽",
+    "information_delta": "圣兽召唤石是叶家千年至宝，叶红衣用精血激活它",
+    "next_hook": "召唤出来的会是什么？"
   },
   "characters": [
     {
       "id": "叶红衣",
-      "state_ref": "叶红衣@ep01-shot-03",
       "variant": "default",
       "ref_assets": [
-        "projects/qyccan/assets/characters/images/叶红衣-front.png",
-        "projects/qyccan/assets/characters/images/叶红衣-side.png",
-        "projects/qyccan/assets/characters/images/叶红衣-back.png"
+        "projects/qyccan/assets/characters/images/叶红衣-front.png"
       ],
-      "must_preserve": ["form", "size", "color"],
+      "must_preserve": [
+        "form",
+        "size",
+        "color"
+      ],
       "current_state": {
-        "form": "人族少女",
-        "costume": "红衣破损",
-        "injury": "身上带血迹",
-        "emotion": "绝望逃命",
-        "props_in_possession": ["圣兽召唤石"],
-        "knowledge": ["被家族抛弃", "被未婚夫逼杀"]
+        "form": "default",
+        "costume": "default",
+        "injury": "none",
+        "emotion": "neutral"
       }
     }
   ],
   "background": {
-    "location": "黑雾森林",
+    "location": "黑雾森林（树下）",
     "time_of_day": "day",
     "ref_assets": [
       "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     ]
   },
-  "camera": {
-    "raw": "0-3秒：中景手持跟拍，镜头跟随叶红衣奔跑，轻微抖动感；4-7秒：全景摇镜头，从叶红衣摇至背后追兵，建立空间关系；8-12秒：近景固定镜头，叶红衣靠树喘息，镜头缓慢推近至她脸部",
-    "shot_size": "medium",
-    "movement": "handheld",
-    "angle": "normal"
-  },
+  "camera": "0-3秒 特写固定镜头（手部+召唤石），4-7秒 近景推镜头从手部推至叶红衣脸部，8-10秒 中景升降镜头缓慢上升展示法阵全貌，11-12秒 全景仰拍法阵光柱冲天\n",
   "seedance_inputs": {
     "mode": "img2video",
     "images": [
+      "projects/qyccan/outputs/ep01/storyboard/ep01-shot-02-end-frame.png",
       "projects/qyccan/assets/characters/images/叶红衣-front.png",
-      "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
-      "projects/qyccan/assets/characters/images/叶红衣-side.png",
-      "projects/qyccan/assets/characters/images/叶红衣-back.png",
-      "projects/qyccan/outputs/ep01/storyboard/shot-03.png"
+      "projects/qyccan/assets/scenes/images/黑雾森林-day.png"
     ],
     "videos": [],
     "audios": [],
-    "prompt": "@图片1 作为<叶红衣>，场景参考@图片2\n\n0-3秒：中景手持跟拍，镜头跟随[叶红衣]跌跌撞撞冲出灌木丛，红衣破损，发髻散乱，身上带血迹，黑雾弥漫古木森林，逆光剪影，轻微抖动感\n\n4-7秒：全景摇镜头，从[叶红衣]摇至背后追兵，家仆甲带着妖兽从树林中涌出，家仆甲（淫笑）：\"叶红衣小姐，别跑了。我们家少爷说了，乖乖跟我们回去！\"，[叶红衣]加速奔跑\n\n8-12秒：近景固定镜头缓慢推近，[叶红衣]靠在大树下喘息，双手撑膝，胸口起伏，眼神绝望，[叶红衣]（喘息）：\"家族抛弃，未婚夫逼杀……叶红衣，你真的要命丧于此吗？\"，伦勃朗光，低饱和色调\n\n音效：野兽咆哮声、追兵狞笑声、树枝折断声、急促脚步声\n\n禁止出现字幕、对话框、水印、Logo\n\n构图参考@图片5（仅参考景别和角色位置，不复制细节）"
+    "prompt": "照片级写实，真人实拍质感，35毫米胶片，禁止动漫风格，禁止卡通风格，禁止二次元，禁止插画风\n叶红衣外貌：18岁红衣少女，红衣似火但破损带血迹，高冷御姐脸，眼神决绝，长发散乱，精致锁骨\n@图片1 作为<叶红衣>，场景参考@图片2\n0-3秒：特写固定镜头，[叶红衣]颤抖的双手从怀中掏出一块满是裂纹的古老召唤石（鸡蛋大小），指尖沾血\n4-7秒：近景推镜头，[叶红衣]猛地捏碎召唤石，鲜血从指缝滴落，脚下金色法阵骤然亮起，金色粒子爆散，[叶红衣]（悲壮/颤抖/缓慢）：\"不管召唤出什么，我愿奉你为主！\"\n8-10秒：中景升降镜头缓慢上升，法阵金色粒子上升飘散，[叶红衣]闭眼跪地，嘴唇颤抖，[叶红衣]（嘶吼/决绝/急促）：\"出来吧，我的本命灵兽！\"\n11-12秒：全景仰拍，法阵光芒达到最亮，一道金色光柱冲天而起，照亮周围黑雾\n音效：召唤石碎裂声、法阵嗡鸣声、金色粒子音效、风声\n禁止出现字幕、对话框、水印、Logo、动漫风格、卡通风格\n"
   },
-  "forbidden_changes": [
-    "保持叶红衣红衣破损、发髻散乱、身上带血迹的状态",
-    "不要让叶红衣的服装变整洁"
-  ],
+  "forbidden_changes": [],
   "repair_policy": {
     "max_retries": 2,
     "prefer_local_edit": true
   },
   "ontology_constraints": {
-    "world_rules": [
-      "cultivation",
-      "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
-      "人族通过觉醒魂宫契约灵兽"
-    ],
-    "character_abilities": {
-      "苏夜": ["吞天口（一级）", "无限吞噬进化系统"],
-      "叶红衣": ["软剑术", "残余灵力"]
+    "world_rules": {
+      "gravity": "normal",
+      "magic_system": "cultivation",
+      "power_scaling": "strict",
+      "beast_tiers": [
+        "凡胎",
+        "灵智",
+        "地煞",
+        "天罡",
+        "君王",
+        "帝皇",
+        "神话"
+      ],
+      "notes": "万兽天界，人族与御兽共存，通过觉醒魂宫契约灵兽战斗。苏夜拥有无限吞噬进化系统，吃东西涨进化点。"
+    },
+    "narrative_constraints": {
+      "character_evolution": [
+        {
+          "character": "苏夜",
+          "from": "无（前世人类）",
+          "to": "青玉蚕（凡胎级）",
+          "trigger": "重生穿越，ep01开始"
+        }
+      ],
+      "ability_unlocks": [
+        {
+          "character": "苏夜",
+          "ability": "吞天口（一级）",
+          "condition": "系统激活，检测到宿主遭遇生死危机且完成契约绑定"
+        },
+        {
+          "character": "苏夜",
+          "ability": "无限吞噬进化系统",
+          "condition": "契约绑定完成后正式激活"
+        }
+      ],
+      "world_rules": [
+        "灵兽等级：凡胎 < 灵智 < 地煞 < 天罡 < 君王 < 帝皇 < 神话",
+        "人族通过觉醒魂宫契约灵兽",
+        "苏夜的无限吞噬系统：吞噬任何物质可获得进化点",
+        "契约绑定需要精血激活召唤石",
+        "苏夜前世为龙国特种部队队长，代号修罗"
+      ]
     }
   },
-  "retrieval_audit": {
-    "planning": {
-      "entities_searched": ["叶红衣/default"],
-      "locations_searched": ["黑雾森林/day"],
-      "assets_source": "design-lock + visual-direction references"
-    },
-    "retrieval_evidence": {
-      "叶红衣_front": "projects/qyccan/assets/characters/images/叶红衣-front.png",
-      "叶红衣_side": "projects/qyccan/assets/characters/images/叶红衣-side.png",
-      "叶红衣_back": "projects/qyccan/assets/characters/images/叶红衣-back.png",
-      "黑雾森林_day": "projects/qyccan/assets/scenes/images/黑雾森林-day.png",
-      "storyboard": "projects/qyccan/outputs/ep01/storyboard/shot-03.png"
-    }
+  "continuity_inputs": {
+    "previous_shot_id": "ep01-shot-02",
+    "previous_end_frame_path": "projects/qyccan/outputs/ep01/storyboard/ep01-shot-02-end-frame.png"
   }
 }

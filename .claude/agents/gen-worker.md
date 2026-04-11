@@ -111,6 +111,9 @@ fi
 - `max_rewrite_retries: 3` — 每轮改写后最大重试次数
 
 ```
+START_TIME = $(date +%s)
+MAX_WALL_TIME = yq '.max_wall_time_seconds // 600' "$PLATFORM_CONFIG" || 600
+
 original_retries = 0
 rewrite_rounds = 0
 rewrite_retries = 0
@@ -119,6 +122,15 @@ PHASE = "original"  # original | rewrite
 total_calls = 0
 
 LOOP:
+  # 全局超时检查
+  ELAPSED = $(date +%s) - START_TIME
+  if ELAPSED > MAX_WALL_TIME:
+    echo "⏰ 超过最大运行时间 ${MAX_WALL_TIME}s（已运行 ${ELAPSED}s），标记为 timeout"
+    jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+       '.gen_status = "timeout" | .error = "wall_time_exceeded" | .updated_at = $ts' \
+       "$SHOT_STATE_FILE" > "${SHOT_STATE_FILE}.tmp" && mv "${SHOT_STATE_FILE}.tmp" "$SHOT_STATE_FILE"
+    → 标记为 timeout，退出循环
+
   total_calls += 1
   result = submit_to_seedance(current_prompt)
   更新状态文件 total_api_calls
@@ -393,6 +405,44 @@ gen_status=$(echo "$result" | jq -r '.gen_status // empty')
 ./scripts/api-caller.sh dreamina download {submit_id} projects/{project}/outputs/{ep}/videos
 # dreamina 下载的文件名由 CLI 决定，需要重命名
 mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/videos/shot-{N}{output_suffix}.mp4
+```
+
+**下载成功后：提取结尾帧并更新下一镜 shot packet**：
+```bash
+video_path="projects/${project}/outputs/${ep}/videos/shot-${shot_index_padded}.mp4"
+end_frame_path="projects/${project}/outputs/${ep}/storyboard/${ep}-shot-${shot_index_padded}-end-frame.png"
+
+if [[ -f "$video_path" ]]; then
+    mkdir -p "$(dirname "$end_frame_path")"
+    ffmpeg -loglevel error -sseof -0.1 -i "$video_path" -frames:v 1 -y "$end_frame_path" 2>/dev/null
+    
+    if [[ -f "$end_frame_path" ]]; then
+        echo "✓ 结尾帧已提取: $end_frame_path"
+        
+        # 更新下一镜的 shot packet（如果存在）
+        next_index=$(( shot_index + 1 ))
+        next_shot_id="${ep}-shot-$(printf '%02d' $next_index)"
+        next_packet="projects/${project}/state/shot-packets/${next_shot_id}.json"
+        
+        if [[ -f "$next_packet" ]]; then
+            # 更新 continuity_inputs
+            jq --arg prev_id "${ep}-shot-${shot_index_padded}" \
+               --arg prev_frame "$end_frame_path" \
+               '.continuity_inputs.previous_shot_id = $prev_id |
+                .continuity_inputs.previous_end_frame_path = $prev_frame' \
+               "$next_packet" > "${next_packet}.tmp" && mv "${next_packet}.tmp" "$next_packet"
+            
+            # 强制将结尾帧置于下一镜 images 首位（作为首帧约束）
+            # 注意：不做 already_in 检查——重新生成后结尾帧内容已变，必须强制替换
+            # 逻辑：先移除旧的同路径条目（如有），再插入首位
+            jq --arg frame "$end_frame_path" \
+               '.seedance_inputs.images = [$frame] + (.seedance_inputs.images | map(select(. != $frame)))' \
+               "$next_packet" > "${next_packet}.tmp" && mv "${next_packet}.tmp" "$next_packet"
+            
+            echo "✓ 下一镜 ${next_shot_id} packet 已更新（首帧约束）"
+        fi
+    fi
+fi
 ```
 
 ---

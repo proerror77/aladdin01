@@ -107,6 +107,7 @@ def _entity_schema():
         pa.field("variant",     pa.utf8()),           # "default" / "snake_green"
         pa.field("description", pa.utf8()),           # 合并的文本描述
         pa.field("metadata",    pa.utf8()),           # JSON 字符串（原始字段）
+        pa.field("project",     pa.string()),          # 项目隔离
         pa.field("vector",      pa.list_(pa.float32(), EMBED_DIM)),
     ])
 
@@ -121,6 +122,7 @@ def _asset_schema():
         pa.field("time_of_day", pa.utf8()),           # "day" / "night" / "dusk" / "dawn"
         pa.field("pack_tier",   pa.int32()),          # 1=packs 2=images 3=降级
         pa.field("description", pa.utf8()),           # 用于 embed 的文本
+        pa.field("project",     pa.string()),          # 项目隔离
         pa.field("vector",      pa.list_(pa.float32(), EMBED_DIM)),
     ])
 
@@ -136,6 +138,7 @@ def _state_schema():
         pa.field("props",        pa.utf8()),          # 持有道具 JSON 数组
         pa.field("knowledge",    pa.utf8()),          # 知识状态 JSON 数组
         pa.field("description",  pa.utf8()),          # 合并描述
+        pa.field("project",      pa.string()),         # 项目隔离
         pa.field("vector",       pa.list_(pa.float32(), EMBED_DIM)),
     ])
 
@@ -148,6 +151,7 @@ def _relation_schema():
         pa.field("relation",     pa.utf8()),          # "契约"
         pa.field("episode",      pa.utf8()),          # "ep01"
         pa.field("description",  pa.utf8()),
+        pa.field("project",      pa.string()),         # 项目隔离
         pa.field("vector",       pa.list_(pa.float32(), EMBED_DIM)),
     ])
 
@@ -194,6 +198,7 @@ def cmd_upsert_world_model(args):
         wm = json.load(f)
 
     episode = wm.get("episode", "unknown")
+    project = args.project
     db = lancedb.connect(DB_PATH)
 
     # ── 角色实体 ──────────────────────────────────────────
@@ -231,6 +236,7 @@ def cmd_upsert_world_model(args):
                 "variant":     v_id,
                 "description": desc.strip(),
                 "metadata":    json.dumps(c, ensure_ascii=False),
+                "project":     project,
                 "vector":      embed(desc),
             })
 
@@ -250,6 +256,7 @@ def cmd_upsert_world_model(args):
                 "variant":     t,
                 "description": desc.strip(),
                 "metadata":    json.dumps(loc, ensure_ascii=False),
+                "project":     project,
                 "vector":      embed(desc),
             })
 
@@ -266,6 +273,7 @@ def cmd_upsert_world_model(args):
             "variant":     prop.get("condition", "intact"),
             "description": desc.strip(),
             "metadata":    json.dumps(prop, ensure_ascii=False),
+            "project":     project,
             "vector":      embed(desc),
         })
 
@@ -286,6 +294,7 @@ def cmd_upsert_world_model(args):
                 "variant":     v_id,
                 "description": desc.strip(),
                 "metadata":    json.dumps(c, ensure_ascii=False),
+                "project":     project,
                 "vector":      embed(desc),
             })
 
@@ -302,6 +311,7 @@ def cmd_upsert_world_model(args):
             "variant":     vfx.get("owner", ""),
             "description": desc.strip(),
             "metadata":    json.dumps(vfx, ensure_ascii=False),
+            "project":     project,
             "vector":      embed(desc),
         })
 
@@ -349,6 +359,7 @@ def cmd_upsert_world_model(args):
             "variant":     str(skill.get("level", "")),
             "description": desc.strip(),
             "metadata":    json.dumps(skill, ensure_ascii=False),
+            "project":     project,
             "vector":      embed(desc),
         })
 
@@ -385,6 +396,7 @@ def cmd_upsert_world_model(args):
             "relation":    r.get("relation", ""),
             "episode":     episode,
             "description": desc,
+            "project":     project,
             "vector":      embed(desc),
         })
 
@@ -470,6 +482,7 @@ def cmd_upsert_asset(args):
     db  = lancedb.connect(DB_PATH)
     tbl = db.open_table(TABLE_ASSETS)
     row = _parse_asset_path(path)
+    row["project"] = args.project
     try:
         tbl.delete(f"id = '{path}'")
     except Exception:
@@ -487,7 +500,9 @@ def cmd_index_assets(args):
     count = 0
     for ext in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
         for img_path in Path(root).rglob(ext):
-            rows.append(_parse_asset_path(str(img_path)))
+            row = _parse_asset_path(str(img_path))
+            row["project"] = args.project
+            rows.append(row)
             count += 1
             if len(rows) >= 100:   # 批量提交
                 tbl.add(rows)
@@ -514,15 +529,20 @@ def cmd_search_assets(args):
     tbl = db.open_table(TABLE_ASSETS)
 
     vec = embed(query)
-    results = (
-        tbl.search(vec)
-           .limit(n * 3)         # 多取一些，再用 where 过滤
-           .to_list()
-    )
-
-    # 过滤类型
+    where_clauses = []
+    # project 过滤（仅当表中有 project 字段时）
+    try:
+        sample = tbl.to_pandas().columns.tolist()
+        if 'project' in sample and args.project != 'default':
+            where_clauses.append(f"project = '{args.project}'")
+    except Exception:
+        pass
     if atype:
-        results = [r for r in results if r["asset_type"] == atype]
+        where_clauses.append(f"asset_type = '{atype}'")
+    search = tbl.search(vec)
+    if where_clauses:
+        search = search.where(" AND ".join(where_clauses))
+    results = search.limit(n * 3).to_list()
 
     # 只保留存在的文件
     results = [r for r in results if os.path.exists(r["path"])]
@@ -557,13 +577,22 @@ def cmd_search_entities(args):
     db  = lancedb.connect(DB_PATH)
     tbl = db.open_table(TABLE_ENTITIES)
 
-    vec     = embed(query)
-    results = tbl.search(vec).limit(n * 3).to_list()
-
+    vec = embed(query)
+    where_clauses = []
+    try:
+        cols = tbl.to_pandas().columns.tolist()
+        if 'project' in cols and getattr(args, 'project', 'default') != 'default':
+            where_clauses.append(f"project = '{args.project}'")
+    except Exception:
+        pass
     if etype:
-        results = [r for r in results if r["entity_type"] == etype]
+        where_clauses.append(f"entity_type = '{etype}'")
     if episode:
-        results = [r for r in results if r["episode"] == episode]
+        where_clauses.append(f"episode = '{episode}'")
+    search = tbl.search(vec)
+    if where_clauses:
+        search = search.where(" AND ".join(where_clauses))
+    results = search.limit(n).to_list()
 
     output = []
     for r in results[:n]:
@@ -594,12 +623,18 @@ def cmd_search_relations(args):
     tbl = db.open_table(TABLE_RELATIONS)
 
     vec = embed(query)
-    results = tbl.search(vec).limit(n * 3).to_list()
-
+    where_clauses = []
+    try:
+        cols = tbl.to_pandas().columns.tolist()
+        if 'project' in cols and getattr(args, 'project', 'default') != 'default':
+            where_clauses.append(f"project = '{args.project}'")
+    except Exception:
+        pass
     if rel_type:
-        results = [r for r in results if r["rel_type"] == rel_type]
+        where_clauses.append(f"rel_type = '{rel_type}'")
     if episode:
-        results = [r for r in results if r["episode"] == episode]
+        where_clauses.append(f"episode = '{episode}'")
+    results = tbl.search(vec).where(" AND ".join(where_clauses)).limit(n).to_list()
 
     output = []
     for r in results[:n]:
@@ -635,6 +670,7 @@ def cmd_upsert_state(args):
 
     episode  = pkt.get("episode", "unknown")
     shot_id  = pkt.get("shot_id", "unknown")
+    project  = args.project
     db       = lancedb.connect(DB_PATH)
     tbl      = db.open_table(TABLE_STATES)
     rows     = []
@@ -655,6 +691,7 @@ def cmd_upsert_state(args):
             "props":        json.dumps(cs.get("props_in_possession", []), ensure_ascii=False),
             "knowledge":    json.dumps(cs.get("knowledge", []), ensure_ascii=False),
             "description":  desc.strip(),
+            "project":      project,
             "vector":       embed(desc),
         })
 
@@ -675,31 +712,172 @@ def cmd_get_state(args):
     db  = lancedb.connect(DB_PATH)
     tbl = db.open_table(TABLE_STATES)
 
-    row_id = f"{character_id}_{episode}_{shot_id}"
-    results = tbl.search([0.0] * EMBED_DIM).where(
-        f"character_id = '{character_id}' AND episode = '{episode}'"
-    ).limit(50).to_list()
+    df = tbl.to_pandas()
+    filtered = df[
+        (df['character_id'] == character_id) &
+        (df['episode'] == episode) &
+        (df['project'] == args.project)
+    ]
 
-    if not results:
+    if filtered.empty:
         print(json.dumps({"found": False, "character_id": character_id}))
         return
 
     # 找最近的 shot（按 shot 编号倒序取最近的）
-    def shot_num(r):
-        m = re.search(r"shot-?0*(\d+)$", r["shot_id"])
+    def shot_num(sid):
+        m = re.search(r"shot-?0*(\d+)$", str(sid))
         return int(m.group(1)) if m else 0
 
-    target_num = shot_num({"shot_id": shot_id})
-    candidates = [r for r in results if shot_num(r) <= target_num]
-    if not candidates:
-        candidates = results
+    target_num = shot_num(shot_id)
+    filtered = filtered.copy()
+    filtered['_shot_num'] = filtered['shot_id'].apply(shot_num)
+    candidates = filtered[filtered['_shot_num'] <= target_num]
+    if candidates.empty:
+        candidates = filtered
 
-    candidates.sort(key=shot_num, reverse=True)
-    best = candidates[0]
-    best["props"]     = json.loads(best.get("props", "[]"))
-    best["knowledge"] = json.loads(best.get("knowledge", "[]"))
-    best.pop("vector", None)
-    print(json.dumps(best, ensure_ascii=False, indent=2))
+    best = candidates.sort_values('_shot_num', ascending=False).iloc[0]
+    result = best.to_dict()
+    result.pop('vector', None)
+    result.pop('_shot_num', None)
+    result["props"]     = json.loads(result.get("props", "[]"))
+    result["knowledge"] = json.loads(result.get("knowledge", "[]"))
+    print(json.dumps(result, ensure_ascii=False, default=str))
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 批量查询（search-batch）
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _search_entities_inline(db, q: dict, project: str) -> list:
+    tbl = db.open_table(TABLE_ENTITIES)
+    vec = embed(q.get("query", ""))
+    n = q.get("n", 5)
+    where_clauses = []
+    try:
+        cols = tbl.to_pandas().columns.tolist()
+        if 'project' in cols and project != 'default':
+            where_clauses.append(f"project = '{project}'")
+    except Exception:
+        pass
+    if q.get("type"):
+        where_clauses.append(f"entity_type = '{q['type']}'")
+    if q.get("episode"):
+        where_clauses.append(f"episode = '{q['episode']}'")
+    results = tbl.search(vec).where(" AND ".join(where_clauses)).limit(n).to_list()
+    return [{
+        "id": r["id"], "name": r["name"], "entity_type": r["entity_type"],
+        "episode": r["episode"], "variant": r["variant"],
+        "description": r["description"],
+        "score": round(1 - r.get("_distance", 0), 4),
+        "metadata": json.loads(r["metadata"]) if r.get("metadata") else {},
+    } for r in results]
+
+
+def _search_assets_inline(db, q: dict, project: str) -> list:
+    tbl = db.open_table(TABLE_ASSETS)
+    vec = embed(q.get("query", ""))
+    n = q.get("n", 3)
+    where_clauses = []
+    try:
+        cols = tbl.to_pandas().columns.tolist()
+        if 'project' in cols and project != 'default':
+            where_clauses.append(f"project = '{project}'")
+    except Exception:
+        pass
+    if q.get("type"):
+        where_clauses.append(f"asset_type = '{q['type']}'")
+    results = tbl.search(vec).where(" AND ".join(where_clauses)).limit(n).to_list()
+    results = [r for r in results if os.path.exists(r["path"])]
+    results.sort(key=lambda r: (r["pack_tier"], r.get("_distance", 0)))
+    return [{
+        "path": r["path"], "entity_name": r["entity_name"],
+        "asset_type": r["asset_type"], "variant": r["variant"],
+        "angle": r["angle"], "time_of_day": r["time_of_day"],
+        "pack_tier": r["pack_tier"],
+        "score": round(1 - r.get("_distance", 0), 4),
+    } for r in results[:n]]
+
+
+def _get_state_inline(db, q: dict, project: str) -> dict:
+    tbl = db.open_table(TABLE_STATES)
+    df = tbl.to_pandas()
+    filtered = df[
+        (df['character_id'] == q.get("character_id", "")) &
+        (df['episode'] == q.get("episode", "")) &
+        (df['project'] == project)
+    ]
+    if filtered.empty:
+        return {"found": False, "character_id": q.get("character_id", "")}
+
+    def shot_num(sid):
+        m = re.search(r"shot-?0*(\d+)$", str(sid))
+        return int(m.group(1)) if m else 0
+
+    target_num = shot_num(q.get("shot_id", ""))
+    filtered = filtered.copy()
+    filtered['_shot_num'] = filtered['shot_id'].apply(shot_num)
+    candidates = filtered[filtered['_shot_num'] <= target_num]
+    if candidates.empty:
+        candidates = filtered
+    best = candidates.sort_values('_shot_num', ascending=False).iloc[0]
+    result = best.to_dict()
+    result.pop('vector', None)
+    result.pop('_shot_num', None)
+    result["props"] = json.loads(result.get("props", "[]"))
+    result["knowledge"] = json.loads(result.get("knowledge", "[]"))
+    return result
+
+
+def _search_relations_inline(db, q: dict, project: str) -> list:
+    tbl = db.open_table(TABLE_RELATIONS)
+    vec = embed(q.get("query", ""))
+    n = q.get("n", 5)
+    where_clauses = []
+    try:
+        cols = tbl.to_pandas().columns.tolist()
+        if 'project' in cols and project != 'default':
+            where_clauses.append(f"project = '{project}'")
+    except Exception:
+        pass
+    if q.get("type"):
+        where_clauses.append(f"rel_type = '{q['type']}'")
+    if q.get("episode"):
+        where_clauses.append(f"episode = '{q['episode']}'")
+    results = tbl.search(vec).where(" AND ".join(where_clauses)).limit(n).to_list()
+    return [{
+        "id": r["id"], "from_entity": r["from_entity"],
+        "to_entity": r["to_entity"], "rel_type": r["rel_type"],
+        "relation": r["relation"], "episode": r["episode"],
+        "description": r["description"],
+        "score": round(1 - r.get("_distance", 0), 4),
+    } for r in results]
+
+
+def cmd_search_batch(args):
+    """批量查询：一次进程启动，执行多个查询，返回 JSON 数组。"""
+    batch_input = json.loads(args.batch_json)
+    queries = batch_input.get("queries", [])
+    results = []
+
+    db = lancedb.connect(DB_PATH)
+
+    for q in queries:
+        q_type = q.get("type_cmd", q.get("type"))
+        try:
+            if q_type == "search-entities":
+                result = _search_entities_inline(db, q, args.project)
+            elif q_type == "search-assets":
+                result = _search_assets_inline(db, q, args.project)
+            elif q_type == "get-state":
+                result = _get_state_inline(db, q, args.project)
+            elif q_type == "search-relations":
+                result = _search_relations_inline(db, q, args.project)
+            else:
+                result = {"error": f"unknown query type: {q_type}"}
+        except Exception as e:
+            result = {"error": str(e)}
+        results.append({"query": q, "result": result})
+
+    print(json.dumps(results, ensure_ascii=False, default=str))
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 统计
@@ -724,6 +902,8 @@ def cmd_stats(args):
 
 def main():
     p = argparse.ArgumentParser(description="LanceDB 向量库管理")
+    p.add_argument("--project", default=os.environ.get("VECTORDB_PROJECT", "default"),
+                   help="Project name for data isolation")
     sub = p.add_subparsers(dest="cmd")
 
     sub.add_parser("init", help="初始化数据库和表结构")
@@ -764,6 +944,9 @@ def main():
 
     sub.add_parser("stats", help="查看统计信息")
 
+    p_sb = sub.add_parser("search-batch", help="批量查询（一次进程多个查询）")
+    p_sb.add_argument("batch_json", help="JSON string with queries array")
+
     args = p.parse_args()
 
     dispatch = {
@@ -776,6 +959,7 @@ def main():
         "search-relations": cmd_search_relations,
         "upsert-state":     cmd_upsert_state,
         "get-state":        cmd_get_state,
+        "search-batch":     cmd_search_batch,
         "stats":            cmd_stats,
     }
 

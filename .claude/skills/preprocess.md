@@ -65,10 +65,7 @@ spawn preprocess-agent：
 
 1. 检查 `state/char-scan-ep*.md` 是否存在多个扫描结果文件
 2. 如果只有 1 个（小剧本，未分段）→ 跳过融合，直接写档案
-3. 如果有多个 → spawn merge-agent：
-   - `scan_files`: 所有 `state/char-scan-ep*.md` 文件路径
-   - `project_name`: 项目名
-   - 等待完成
+3. 如果有多个 → 内联执行角色融合逻辑（preprocess-agent Step 2.5 已内联处理，无需单独 agent）
 4. 展示融合结果：
 
 ```

@@ -87,7 +87,34 @@ else:
     decision = "human_review"
 ```
 
-**连续自动过关保护**：如果连续 N 次自动过关（读取历史记录），强制 `human_review`。
+**连续自动过关保护**（持久化 streak 计数器）：
+
+```bash
+STREAK_FILE="state/gate-streak.json"
+
+if [[ "$decision" == "auto_approve" ]]; then
+    # 读取并递增 streak 计数器
+    streak=0
+    if [[ -f "$STREAK_FILE" ]]; then
+        streak=$(jq -r '.streak // 0' "$STREAK_FILE")
+    fi
+    streak=$(( streak + 1 ))
+
+    # 检查是否超过阈值
+    MAX_STREAK=$(yq '.max_auto_approve_streak // 10' config/scoring/auto-gate-rules.yaml 2>/dev/null || echo 10)
+    if (( streak >= MAX_STREAK )); then
+        echo "⚠️ 连续自动过关 ${streak} 次，强制人工审核"
+        streak=0
+        decision="human_review"
+    fi
+
+    # 写回 streak 文件
+    echo "{\"streak\": ${streak}, \"last_updated\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$STREAK_FILE"
+elif [[ "$decision" == "human_review" || "$decision" == "auto_reject" ]]; then
+    # 人工审核或自动退回：重置 streak
+    echo "{\"streak\": 0, \"last_updated\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$STREAK_FILE"
+fi
+```
 
 ### 5. 写入评分报告
 

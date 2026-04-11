@@ -17,6 +17,7 @@ Review Server — 审核 UI + Webhook 接收 + Trace 查看
 import json
 import os
 import glob
+import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -64,25 +65,65 @@ def write_review(review_id: str, data: dict):
     review_file.write_text(json.dumps(data, ensure_ascii=False, indent=2))
 
 
-def trigger_resume(project: str):
-    """Trigger Claude Code Remote Trigger to resume the E2E flow."""
+PENDING_TRIGGERS_FILE = STATE_DIR / "pending_triggers.json"
+
+
+async def trigger_resume_with_retry(project: str, max_retries: int = 3):
+    """Fire Remote Trigger with exponential backoff retry."""
     if not CLAUDE_TRIGGER_ID or not CLAUDE_TRIGGER_TOKEN:
         print(f"[WARN] Remote Trigger not configured, skipping resume for {project}")
         return
 
+    for attempt in range(max_retries):
+        try:
+            async with httpx.AsyncClient() as client:
+                resp = await client.post(
+                    f"https://api.claude.ai/v1/code/triggers/{CLAUDE_TRIGGER_ID}/run",
+                    headers={
+                        "Authorization": f"Bearer {CLAUDE_TRIGGER_TOKEN}",
+                        "Content-Type": "application/json",
+                    },
+                    json={"prompt": f"~scriptwriter-to-video --resume {project}"},
+                    timeout=30,
+                )
+                resp.raise_for_status()
+            print(f"[INFO] Remote Trigger fired for {project}: {resp.status_code}")
+            _remove_pending_trigger(project)
+            return
+        except Exception as e:
+            wait = 2 ** attempt  # 1s, 2s, 4s
+            print(f"[WARN] Trigger attempt {attempt+1}/{max_retries} failed for {project}: {e}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(wait)
+
+    print(f"[ERROR] All {max_retries} trigger attempts failed for {project}")
+    _save_pending_trigger(project)
+
+
+def _save_pending_trigger(project: str):
+    pending = {}
+    if PENDING_TRIGGERS_FILE.exists():
+        try:
+            pending = json.loads(PENDING_TRIGGERS_FILE.read_text())
+        except Exception:
+            pending = {}
+    pending[project] = {
+        "failed_at": datetime.now(timezone.utc).isoformat(),
+        "retries_exhausted": 3,
+    }
+    PENDING_TRIGGERS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    PENDING_TRIGGERS_FILE.write_text(json.dumps(pending, indent=2))
+
+
+def _remove_pending_trigger(project: str):
+    if not PENDING_TRIGGERS_FILE.exists():
+        return
     try:
-        resp = httpx.post(
-            f"https://api.claude.ai/v1/code/triggers/{CLAUDE_TRIGGER_ID}/run",
-            headers={
-                "Authorization": f"Bearer {CLAUDE_TRIGGER_TOKEN}",
-                "Content-Type": "application/json",
-            },
-            json={"prompt": f"~scriptwriter-to-video --resume {project}"},
-            timeout=30,
-        )
-        print(f"[INFO] Remote Trigger fired for {project}: {resp.status_code}")
-    except Exception as e:
-        print(f"[ERROR] Remote Trigger failed for {project}: {e}")
+        pending = json.loads(PENDING_TRIGGERS_FILE.read_text())
+        pending.pop(project, None)
+        PENDING_TRIGGERS_FILE.write_text(json.dumps(pending, indent=2))
+    except Exception:
+        pass
 
 
 # --- Review Routes ---
@@ -131,7 +172,7 @@ async def approve_review(review_id: str):
     }
     write_review(review_id, review)
 
-    trigger_resume(review["project"])
+    await trigger_resume_with_retry(review["project"])
     return {"status": "ok", "action": "approve", "review_id": review_id}
 
 
@@ -173,7 +214,7 @@ async def redo_review(review_id: str, request: Request):
     }
     write_review(review_id, review)
 
-    trigger_resume(review["project"])
+    await trigger_resume_with_retry(review["project"])
     return {"status": "ok", "action": "redo", "review_id": review_id, "iteration": review["iteration"]}
 
 
@@ -189,7 +230,7 @@ async def terminate_review(review_id: str):
     }
     write_review(review_id, review)
 
-    trigger_resume(review["project"])
+    await trigger_resume_with_retry(review["project"])
     return {"status": "ok", "action": "terminate", "review_id": review_id}
 
 
@@ -239,7 +280,7 @@ async def lark_webhook(request: Request):
             "iteration": review["iteration"],
         }
         write_review(review_id, review)
-        trigger_resume(review["project"])
+        await trigger_resume_with_retry(review["project"])
         return {"status": "ok", "action": "redo", "review_id": review_id}
     elif action_type == "terminate":
         return await terminate_review(review_id)
@@ -301,6 +342,24 @@ async def trace_overview(request: Request, session_id: str):
 @app.get("/health")
 async def health():
     return {"status": "ok", "project_root": str(PROJECT_ROOT)}
+
+
+@app.post("/admin/retry-triggers")
+async def retry_pending_triggers():
+    """Retry all pending triggers that previously failed."""
+    if not PENDING_TRIGGERS_FILE.exists():
+        return {"message": "no pending triggers", "count": 0}
+    try:
+        pending = json.loads(PENDING_TRIGGERS_FILE.read_text())
+    except Exception:
+        return {"message": "error reading pending triggers", "count": 0}
+
+    retried = []
+    for project in list(pending.keys()):
+        await trigger_resume_with_retry(project)
+        retried.append(project)
+
+    return {"retried": retried, "count": len(retried)}
 
 
 # --- List Reviews ---

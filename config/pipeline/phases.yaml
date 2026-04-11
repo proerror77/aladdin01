@@ -1,0 +1,94 @@
+# Pipeline Phase 定义
+# 供 pipeline-runner.py 读取，定义每个 Phase 的前置条件、产出物、重试策略
+
+phases:
+  - id: 0
+    name: ontology-builder
+    agent: ontology-builder-agent
+    optional: true
+    precondition: use_v2
+    artifact: "projects/{project}/state/ontology/{ep}-world-model.json"
+    state_file: "projects/{project}/state/{ep}-phase0.json"
+
+  - id: 1
+    name: comply
+    agent: comply-agent
+    optional: false
+    precondition: script_exists
+    artifact: "projects/{project}/outputs/{ep}/render-script.md"
+    state_file: "projects/{project}/state/{ep}-phase1.json"
+
+  - id: 2
+    name: visual
+    agent: visual-agent
+    optional: false
+    precondition: phase_1_completed
+    artifact: "projects/{project}/outputs/{ep}/visual-direction.yaml"
+    state_file: "projects/{project}/state/{ep}-phase2.json"
+    retry:
+      max: 2
+      on_failure: gate_rejected
+
+  - id: 2.2
+    name: narrative-review
+    agent: narrative-review-agent
+    optional: false
+    precondition: phase_2_completed
+    artifact: "projects/{project}/outputs/{ep}/narrative-review.md"
+    state_file: "projects/{project}/state/{ep}-phase2.2.json"
+
+  - id: 2.3
+    name: storyboard
+    agent: storyboard-agent
+    optional: false
+    precondition: phase_2.2_completed
+    artifact: "projects/{project}/outputs/{ep}/storyboard-preview.md"
+    state_file: "projects/{project}/state/{ep}-phase2.3.json"
+
+  - id: 2.5
+    name: asset-factory
+    agent: asset-factory-agent
+    optional: true
+    precondition: use_v2
+    artifact: "projects/{project}/state/{ep}-phase2.5.json"
+    state_file: "projects/{project}/state/{ep}-phase2.5.json"
+
+  - id: 3
+    name: design
+    agent: design-agent
+    optional: false
+    precondition: phase_2.3_completed
+    artifact: "projects/{project}/outputs/{ep}/art-direction-review.md"
+    state_file: "projects/{project}/state/{ep}-phase3.json"
+
+  - id: 3.5
+    name: shot-compiler
+    agent: shot-compiler-agent
+    optional: true
+    precondition: use_v2_and_phase_3_completed
+    artifact: "projects/{project}/state/{ep}-phase3.5.json"
+    state_file: "projects/{project}/state/{ep}-phase3.5.json"
+
+  - id: 4
+    name: voice
+    agent: voice-agent
+    optional: false
+    precondition: phase_3_completed
+    artifact: "projects/{project}/outputs/{ep}/voice-assignment.md"
+    state_file: "projects/{project}/state/{ep}-phase4.json"
+
+  - id: 5
+    name: gen-worker
+    agent: gen-worker
+    optional: false
+    precondition: phase_4_completed
+    artifact: "projects/{project}/state/{ep}-phase5.json"
+    state_file: "projects/{project}/state/{ep}-phase5.json"
+
+  - id: 6
+    name: audit-repair
+    agent: qa-agent
+    optional: true
+    precondition: use_v2_and_phase_5_completed
+    artifact: "projects/{project}/state/{ep}-phase6.json"
+    state_file: "projects/{project}/state/{ep}-phase6.json"
