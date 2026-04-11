@@ -153,6 +153,24 @@ python3 scripts/vectordb-manager.py get-state "{character_id}" "{ep}" "{prev_sho
 - 角色看向上方 → 下一镜头应是俯视角度展示被看的对象
 - 修复方式：调整 prompt 中的视线方向描述
 
+**3d. Transition 实现验证（新增）**
+
+对每个 shot（除首镜）检查 `transition_from_previous` 描述是否在 `seedance_prompt` 中有对应的实现语言：
+
+| transition 类型 | prompt 中必须包含的关键词（任一） |
+|---|---|
+| 叠化 / dissolve | 叠化、渐变、fade、渐入、渐出 |
+| 硬切 / cut | 硬切、直切（或无需特殊词，硬切是默认） |
+| 推近 / push_in | 推镜头、推近、zoom in、缓慢推近 |
+| 拉远 / pull_out | 拉镜头、拉远、zoom out、缓慢拉远 |
+| 视线切 / gaze_cut | 视线、看向、目光、望向 |
+| 动作结果 / action_result | 无需特殊词（动作本身即连接） |
+| 情绪推进 / emotion_push | 无需特殊词（情绪描述即连接） |
+
+检查逻辑：
+- 如果 `transition_from_previous` 包含「叠化」但 `seedance_prompt` 中没有叠化相关词 → 标记为 `transition_not_implemented`
+- 修复方式：在 `seedance_prompt` 的开头时间戳段补充对应的过渡描述词
+
 ### 4. 镜头合理性审查
 
 **4a. 时间戳覆盖完整性**

@@ -2,9 +2,12 @@
   "episode": "ep01",
   "phase": "2.3",
   "status": "completed",
+  "started_at": "2026-04-08T21:50:00+08:00",
+  "completed_at": "2026-04-08T21:52:00+08:00",
   "data": {
-    "storyboard_count": 8,
-    "skipped_count": 0,
+    "storyboard_count": 10,
+    "skipped_count": 9,
+    "new_generated": ["shot-10"],
     "preview_file": "projects/qyccan/outputs/ep01/storyboard-preview.md"
   }
 }

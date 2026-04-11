@@ -591,13 +591,13 @@ def compile_shot_packets(
                 scene_refs.append(str(image_path))
                 all_images.append(str(image_path))
 
-        storyboard_path = shot.get("storyboard_image_path")
-        if storyboard_path and (project_root / storyboard_path).exists():
-            all_images.append(str(storyboard_path))
+        # 注意：分镜图（storyboard）不加入 images 数组
+        # 分镜图是黑白素描，会导致 Seedance 生成黑白/素描风格视频
+        # 分镜图仅供人工审核构图使用
 
         prev_frame = end_frames_cache.get(shot_index)
         if prev_frame:
-            all_images.append(prev_frame)
+            all_images.insert(0, prev_frame)  # 首位，作为首帧约束
 
         scene_name = str(shot.get("scene_name") or "")
         scene_model = loc_by_name.get(scene_name)

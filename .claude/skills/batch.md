@@ -51,7 +51,6 @@
 script/ 目录下没有找到剧本文件。
 请将剧本放入 script/ 目录（.md 格式），然后重新运行 ~batch
 ```
-
 列出发现的剧本：
 ```
 发现 {N} 个剧本：
@@ -101,12 +100,12 @@ USE_V2="true"    # v2.0
 ~batch         # 默认 v1.0 模式
 ```
 
-### 3. 初始化所有剧本目录
+### 3. 初始化
 
 ```bash
-mkdir -p outputs/{ep01}/videos
-mkdir -p outputs/{ep02}/videos
-...
+for ep in $EPISODES; do
+  mkdir -p projects/{PROJECT}/outputs/${ep}/videos
+done
 ```
 
 生成 session ID（格式：`batch-{YYYYMMDD}-{HHMMSS}`）：
@@ -116,56 +115,9 @@ SESSION_ID="batch-$(date +%Y%m%d-%H%M%S)"
 
 写入 session 开始事件：
 ```bash
-./scripts/trace.sh $SESSION_ID session session_start '{"type":"batch","episodes":["ep01","ep02",...],"config":{"visual_style":"...","ratio":"...","backend":"..."}}'
+./scripts/trace.sh $SESSION_ID session session_start '{"type":"batch","episodes":[...],"config":{...}}'
 ```
-
-初始化 `state/progress.json`：
-```json
-{
-  "version": "1.0",
-  "batch_start": "{ISO8601}",
-  "episodes": {
-    "ep01": {"status": "pending", "current_phase": 0},
-    "ep02": {"status": "pending", "current_phase": 0}
-  }
-}
-```
-
-### 3.5 断点检测（自动 resume）
-
-在开始 Phase 1 前，检查已有状态文件：
-
-```
-检查断点状态...
-
-[resume] ep01 Phase 1-4 已完成，Phase 5: 8/12 镜次完成
-[resume] ep02 全部完成，跳过
-[start] ep03 从 Phase 1 开始
-[start] ep04 从 Phase 2 开始
-
-摘要：
-- 1 个剧本已全部完成，跳过
-- 1 个剧本从 Phase 5 继续
-- 1 个剧本从 Phase 1 开始
-- 1 个剧本从 Phase 2 开始
-```
-
-检测逻辑：
-1. 对每个剧本，读取 `projects/{project}/state/{ep}-phase{1-4}.json`
-
-**状态文件验证**：读取前先验证 JSON 完整性：
-- 如果文件不存在：正常，从该阶段开始
-- 如果文件存在但 JSON 损坏（jq 解析失败）：删除损坏文件，从该阶段重新开始，并输出警告
-- 如果文件存在且 JSON 合法：正常读取 status 字段
-
-2. Phase 5 进度：统计 `projects/{project}/state/{ep}-shot-*.json` 中 `status: completed` 的数量
-3. 确定每个剧本的起始阶段
-
-断点续传跳过规则：
-- Phase X `status: completed` → 跳过该阶段
-- Phase 5 镜次 `status: completed` 且视频文件存在 → 跳过该镜次
-
-### 3.6 多人协作检测
+### 3.5 多人协作检测
 
 如果使用 `--mine` 或 `--task`：
 
@@ -177,257 +129,142 @@ SESSION_ID="batch-$(date +%Y%m%d-%H%M%S)"
 
 **`--task <id>` 模式**：
 1. 读取 `state/task-board.json`
-2. 查找指定 ID 的任务（如 `task-001`）
-3. 如果任务不存在，输出错误并退出：
-   ```
-   ❌ 任务不存在：task-999
-   可用任务：task-001, task-002, task-003
-   ```
+2. 查找指定 ID 的任务
+3. 如果任务不存在，输出错误并退出
 4. 提取任务包含的集数列表
-5. 只处理这些集数
 
 **冲突检测**（两种模式共用）：
 检查筛选出的集数是否被其他用户锁定：
-   ```
-   ⚠️ 冲突检测：
-   - ep05 已被 alice 锁定（task-002，进行中）
-   - ep06 已被 bob 锁定（task-003，进行中）
-
-   是否继续处理未锁定的剧本？(yes/no)
-   ```
-
-### 4. Phase 1+2 并行（合规 + 视觉）
-
-**Phase 0 — 本体论构建（v2.0，可选，在 Phase 1 之前）**
-
-如果使用 v2.0 模式，先为每个剧本构建本体论（可并行）：
-
 ```
-if [[ "$USE_V2" == "true" ]]; then
-  for ep in episodes:
-    if [ ! -f "projects/{project}/state/ontology/${ep}-world-model.json" ]; then
-      spawn ontology-builder-agent（session_id=$SESSION_ID, trace_file=${ep}-phase0-trace）
-    else
-      echo "[skip] ${ep} Phase 0: world-model.json 已存在"
-    fi
-  done
-  等待所有 ontology-builder-agent 完成
-fi
+⚠️ 冲突检测：
+- ep05 已被 alice 锁定（task-002，进行中）
+
+是否继续处理未锁定的剧本？(yes/no)
 ```
 
-为每个剧本并行 spawn comply-agent 和 visual-agent（comply 完成后才 spawn visual）：
+### 4. 并行处理（状态机驱动）
 
-```
-[ep01] spawn comply-agent（session_id=$SESSION_ID, trace_file=ep01-phase1-trace） → 完成后 spawn visual-agent（session_id=$SESSION_ID, trace_file=ep01-phase2-trace）
-[ep02] spawn comply-agent（session_id=$SESSION_ID, trace_file=ep02-phase1-trace） → 完成后 spawn visual-agent（session_id=$SESSION_ID, trace_file=ep02-phase2-trace）
-[ep03] spawn comply-agent（session_id=$SESSION_ID, trace_file=ep03-phase1-trace） → 完成后 spawn visual-agent（session_id=$SESSION_ID, trace_file=ep03-phase2-trace）
-等待所有剧本的 visual-agent 完成
-```
+Phase 0-4 的流转由 `pipeline-runner.py` 状态机驱动。断点续传自动工作（`next` 跳过已完成 Phase）。
+批量模式默认 `--auto-approve`，无需人工确认。
 
-每个 agent spawn/complete 时写入 session trace：
 ```bash
-./scripts/trace.sh $SESSION_ID session spawn '{"agent":"comply-agent","ep":"{ep}","phase":1}'
-./scripts/trace.sh $SESSION_ID session complete '{"agent":"comply-agent","ep":"{ep}","phase":1,"duration_s":{N},"summary":"..."}'
-```
+USE_V2_FLAG=""
+[[ "$USE_V2" == "true" ]] && USE_V2_FLAG="--use-v2"
 
-每个 agent 完成后写入独立状态文件，避免并发写入冲突。
-
-Phase 2 完成后自动进入叙事审查（批量模式默认 `--auto-approve`），无需人工确认。
-
-输出日志：
-```
-[auto-approve] 所有剧本视觉指导自动通过
-```
-
-### 4.3 Phase 2.2 并行（叙事审查）
-
-在 visual-agent 完成后、storyboard-agent 之前，统一做 narrative review：
-
-```
-[ep01] spawn narrative-review-agent（session_id=$SESSION_ID, trace_file=ep01-phase2.2-trace）
-[ep02] spawn narrative-review-agent（session_id=$SESSION_ID, trace_file=ep02-phase2.2-trace）
-等待所有 narrative-review-agent 完成
-```
-
-narrative-review-agent 输出：
-- `projects/{project}/outputs/{ep}/narrative-review.md`
-- `projects/{project}/state/{ep}-phase2.2.json`
-
-**处理 reject 决策**（批量模式每集独立处理，不阻塞其他集）：
-
-```
-for ep in episodes:
-  NARRATIVE_RETRY = 0
-  NARRATIVE_MAX_RETRIES = 2
-  
-  while true:
-    decision = 读取 projects/{project}/state/{ep}-phase2.2.json 的 decision 字段
-    
-    if decision in ["auto_pass", "fixed_pass"]:
-      break  # 继续该集的 Phase 2.3
-    
-    if decision == "reject":
-      NARRATIVE_RETRY += 1
-      if NARRATIVE_RETRY > NARRATIVE_MAX_RETRIES:
-        # 超过重试上限，标记该集为 blocked，不阻塞其他集
-        输出：⚠️ {ep} 叙事审查连续 {NARRATIVE_MAX_RETRIES} 次 reject，已跳过，需人工介入
-        将 {ep} 标记为 blocked，从本次批量任务中排除
-
-**blocked 记录**：写入 `projects/{project}/state/blocked-episodes.json`：
-```json
-{
-  "{ep}": {
-    "reason": "叙事审查连续 {N} 次 reject",
-    "last_review_file": "projects/{project}/outputs/{ep}/narrative-review.md",
-    "blocked_at": "{timestamp}"
-  }
-}
-```
-
-在 batch 最终报告中显示 blocked 列表：
-```
-⚠️ {N} 个剧本被 blocked（需人工介入）：
-  - ep03: 叙事审查连续 2 次 reject → 查看 projects/{project}/outputs/ep03/narrative-review.md
-```
-
-        break
-      
-      输出：[retry {NARRATIVE_RETRY}/{NARRATIVE_MAX_RETRIES}] {ep} 叙事审查 reject，重新生成视觉指导...
-      
-      spawn visual-agent
-        输入：render-script.md + 视觉风格 + 目标媒介
-               + 修改指令：projects/{project}/outputs/{ep}/narrative-review.md
-        session_id: $SESSION_ID
-        trace_file: {ep}-phase2-retry{NARRATIVE_RETRY}-trace
-        等待完成
-      
-      spawn narrative-review-agent
-        输入：visual-direction.yaml + render-script.md
-        session_id: $SESSION_ID
-        trace_file: {ep}-phase2.2-retry{NARRATIVE_RETRY}-trace
-        等待完成
-```
-
-### 4.5 Phase 2.3 并行（分镜图生成）
-
-在 Phase 2.2 完成后，为每集生成本地 fallback 分镜图或 AI 分镜图，并把 `storyboard_image_path` 注入 `visual-direction.yaml`：
-
-```
-[ep01] spawn storyboard-agent（session_id=$SESSION_ID, trace_file=ep01-phase2.3-trace）
-[ep02] spawn storyboard-agent（session_id=$SESSION_ID, trace_file=ep02-phase2.3-trace）
-等待所有 storyboard-agent 完成
-```
-
-### 4.6 Phase 2.5 并行（资产工厂 — v2.0，可选）
-
-如果使用 v2.0 模式，在分镜图生成后、美术校验前，生成资产包（幂等，已存在则跳过）：
-
-```
-if [[ "$USE_V2" == "true" ]]; then
-  for ep in episodes:
-    if [[ ! -d "projects/{project}/assets/packs/characters" || -z "$(ls projects/{project}/assets/packs/characters/*.png 2>/dev/null)" ]]; then
-      spawn asset-factory-agent（session_id=$SESSION_ID, trace_file=${ep}-phase2.5-trace）
-    else
-      echo "[skip] ${ep} Phase 2.5: 资产包已存在"
-    fi
-  done
-  等待所有 asset-factory-agent 完成
-fi
-```
-
-### 5. Phase 3 并行（美术校验 — 纯文件存在性检查）
-
-所有参考图已由 `~design` 预先生成并锁定到 `projects/{project}/state/design-lock.json`。Phase 3 只做 O(1) 级别的文件存在性检查，不经过 gate-agent，不推飞书审核。
-
-```
-[ep01] spawn design-agent（session_id=$SESSION_ID, trace_file=ep01-phase3-trace）
-[ep02] spawn design-agent（session_id=$SESSION_ID, trace_file=ep02-phase3-trace）
-[ep03] spawn design-agent（session_id=$SESSION_ID, trace_file=ep03-phase3-trace）
-等待所有 design-agent 完成
-```
-
-如有缺失，design-agent 会列出缺失清单并提示：
-```
-design-agent 发现 {N} 个缺失的参考图：
-- 角色「{角色名}」变体「{variant_id}」缺少参考图
-- 场景「{场景名}」时间「{time_of_day}」缺少参考图
-
-请先运行 ~design 补全参考图后再继续。
-```
-
-每个 design-agent 完成后写入 `projects/{project}/state/{ep}-phase3.json`。
-
-Phase 3 完成后自动通过（批量模式默认 `--auto-approve`），无需人工确认。
-
-### 5.5 Phase 3.5 并行（Shot Packet 编译 — v2.0 新增）
-
-检查是否存在 `projects/{project}/state/ontology/` 目录：
-- 如果存在 → 执行 Phase 3.5
-- 如果不存在且 `USE_V2 == "true"` → 输出警告：
-  ```
-  ⚠️ v2.0 模式已启用，但 ontology/ 目录不存在。
-  可能原因：Phase 0（ontology-builder）未执行或失败。
-  当前降级为 v1.0 模式（gen-worker 将从 visual-direction.yaml 读取参数）。
-  ```
-- 如果不存在且 `USE_V2 == "false"` → 正常跳过，输出 `[skip] Phase 3.5: v1.0 模式，跳过 shot packet 编译`
-
-为每个剧本的所有 shots **并行**编译 shot packets（与 Phase 5 gen-worker 相同的并行模式）：
-
-```
-for ep in episodes:
-  # 检查 world-model 是否存在
-  if [ ! -f "projects/{project}/state/ontology/${ep}-world-model.json" ]; then
-    echo "[skip] ${ep}: 未找到 world-model.json，跳过 Phase 3.5"
-    continue
-  fi
-  
-  # 读取所有 shot_id
-  shot_ids=$(yq eval '.shots[].shot_id' projects/{project}/outputs/${ep}/visual-direction.yaml)
-  
-  # 并行 spawn 所有 shot-compiler-agent（不等待，全部同时启动）
-  for shot_id in $shot_ids; do
-    spawn shot-compiler-agent
-      输入：shot_id, visual-direction.yaml, world-model.json
-      session_id: $SESSION_ID
-      trace_file: ${ep}-phase3.5-trace
-      输出：projects/{project}/state/shot-packets/${shot_id}.json
-  done
-  
-  # 等待该剧本所有 shot-compiler-agent 完成
-  wait_all
-  
-  # 写入状态文件
-  echo '{"episode":"'${ep}'","phase":3.5,"status":"completed",...}' > projects/{project}/state/${ep}-phase3.5.json
+# 显示所有 episode 的当前状态
+for ep in $EPISODES; do
+  python3 scripts/pipeline-runner.py status \
+    --project $PROJECT --ep $ep $USE_V2_FLAG
 done
+
+# 并行处理每个 episode
+for ep in $EPISODES; do
+  (
+    SESSION_ID="batch-$(date +%Y%m%d-%H%M%S)-$ep"
+
+    while true; do
+      ACTION=$(python3 scripts/pipeline-runner.py next \
+        --project $PROJECT --ep $ep $USE_V2_FLAG)
+
+      action_type=$(echo "$ACTION" | jq -r '.action')
+      phase=$(echo "$ACTION" | jq -r '.phase')
+      agent=$(echo "$ACTION" | jq -r '.agent')
+      phase_name=$(echo "$ACTION" | jq -r '.phase_name')
+
+      case "$action_type" in
+        "done")
+          echo "[$ep] ✓ 完成"
+          break
+          ;;
+
+        "spawn_agent")
+          echo "[$ep] Phase $phase ($phase_name)..."
+
+          # Phase 5: 并行 gen-worker（见下方 Phase 5 详细逻辑）
+          if [[ "$phase" == "5" ]]; then
+            # → 跳转到 Phase 5 逻辑
+            break
+          fi
+
+          # Phase 6: audit-repair（见下方 Phase 6 详细逻辑）
+          if [[ "$phase" == "6" ]]; then
+            # → 跳转到 Phase 6 逻辑
+            break
+          fi
+          # Phase 2.2 叙事审查：处理 reject 重试（每集独立，不阻塞其他集）
+          if [[ "$phase_name" == "narrative-review" ]]; then
+            NARRATIVE_RETRY=0
+            NARRATIVE_MAX_RETRIES=2
+
+            spawn $agent
+              输入：$(echo "$ACTION" | jq -r '.inputs')
+              session_id: $SESSION_ID
+              等待完成
+
+            while true; do
+              decision=$(jq -r '.decision' projects/$PROJECT/state/${ep}-phase2.2.json)
+
+              if [[ "$decision" == "auto_pass" || "$decision" == "fixed_pass" ]]; then
+                break
+              fi
+
+              if [[ "$decision" == "reject" ]]; then
+                NARRATIVE_RETRY=$((NARRATIVE_RETRY + 1))
+                if [[ $NARRATIVE_RETRY -gt $NARRATIVE_MAX_RETRIES ]]; then
+                  echo "[$ep] ⚠️ 叙事审查连续 ${NARRATIVE_MAX_RETRIES} 次 reject，跳过"
+                  # 写入 blocked-episodes.json
+                  break
+                fi
+
+                echo "[$ep] [retry ${NARRATIVE_RETRY}/${NARRATIVE_MAX_RETRIES}] 重新生成视觉指导..."
+                python3 scripts/pipeline-runner.py reset \
+                  --project $PROJECT --ep $ep --from-phase 2
+
+                spawn visual-agent
+                  输入：render-script.md + 修改指令（narrative-review.md）
+                  session_id: $SESSION_ID
+                  等待完成
+
+                spawn narrative-review-agent
+                  输入：visual-direction.yaml + render-script.md
+                  session_id: $SESSION_ID
+                  等待完成
+              fi
+            done
+
+            python3 scripts/pipeline-runner.py complete \
+              --project $PROJECT --ep $ep --phase $phase
+            continue
+          fi
+
+          # 通用 agent spawn
+          spawn $agent
+            输入：$(echo "$ACTION" | jq -r '.inputs')
+            session_id: $SESSION_ID
+            等待完成
+
+          python3 scripts/pipeline-runner.py complete \
+            --project $PROJECT --ep $ep --phase $phase
+          ;;
+
+        "error")
+          echo "[$ep] ❌ $(echo "$ACTION" | jq -r '.reason')"
+          break
+          ;;
+      esac
+    done
+  ) &
+done
+
+wait
 ```
+**Phase 5 — 视频生成（所有 episode 的镜次统一并行）**
 
-**并行安全保证**：每个 shot-compiler-agent 写入独立的 `shot-packets/{shot_id}.json`，无并发冲突。shot-compiler-agent 内部调用 memory-agent 检索参考资产，memory-agent 只读 LanceDB，也无冲突。
-
-### 6. Phase 4 并行（音色配置）
-
-**批量模式默认启用 `auto_voice_match`，无交互，可安全并行。**
-
-```
-[ep01] spawn voice-agent（auto_voice_match: true, session_id=$SESSION_ID, trace_file=ep01-phase4-trace）
-[ep02] spawn voice-agent（auto_voice_match: true, session_id=$SESSION_ID, trace_file=ep02-phase4-trace）
-[ep03] spawn voice-agent（auto_voice_match: true, session_id=$SESSION_ID, trace_file=ep03-phase4-trace）
-等待所有 voice-agent 完成
-```
-
-并行安全保证：
-- 自动匹配模式无用户交互，不会冲突
-- 每个 voice-agent 读取 `projects/{project}/assets/characters/voices/` 检查已有音色
-- 同一角色的音色由首次遇到的 voice-agent 写入，后续复用
-
-每个 voice-agent 完成后写入 `projects/{project}/state/{ep}-phase4.json`。
-
-### 7. Phase 5 视频生成
-
-首先读取 `config/platforms/seedance-v2.yaml` 的 `generation_backend` 字段。
+首先读取 `config/platforms/seedance-v2.yaml` 的 `generation_backend` 和 `max_concurrent_workers`（默认 30）。
 
 **backend = "api"（默认，并行）**
 
-读取 `config/platforms/seedance-v2.yaml` 的 `max_concurrent_workers`（默认 30）。所有镜次按此上限分批并行，避免触发 API rate limit：
+所有剧本的所有镜次按 `max_concurrent_workers` 上限分批并行：
 
 ```
 for each batch of max_concurrent_workers shots:
@@ -436,95 +273,78 @@ for each batch of max_concurrent_workers shots:
   继续下一批
 ```
 
-所有剧本的所有镜次并行生成：
+每个 gen-worker 写入独立状态文件 `projects/{PROJECT}/state/{ep}-shot-{N}.json`，无并发冲突。
 
-**参数提取**（每个镜次）：
+**backend = "browser"（可配置并行度）**
 
-| 参数 | 来源 | 说明 |
-|------|------|------|
-| ep | 剧本 ID | 当前剧本 |
-| shot_id | shots[].shot_id | 镜次完整 ID |
-| shot_index | shots[].shot_index | 镜次序号 |
-| prompt | shots[].prompt | Seedance 提示词 |
-| duration | shots[].duration | 时长（秒） |
-| generation_mode | shots[].generation_mode | 生成模式 |
-| reference_image_path | shots[].references[0].image_path | 参考图 |
-| dialogue | shots[].audio | 对白内容 |
-| voice_config_path | 角色音色配置 | 音色文件路径 |
-
-```
-[ep01] spawn gen-worker × N1（每个 worker 传入 session_id=$SESSION_ID, trace_file={ep}-shot-{N}-trace）
-[ep02] spawn gen-worker × N2
-[ep03] spawn gen-worker × N3
-等待所有 worker 完成
-```
-
-**backend = "browser"（可配置并行度，Seedance 2.0 via 即梦 Web UI）**
-
-读取 `config/platforms/seedance-v2.yaml` 的 `browser_backend.concurrency` 值（默认 1）：
-
+读取 `browser_backend.concurrency` 值（默认 1）：
 ```
 concurrency = 1（串行）:
-  for each ep in episodes:
-    for each shot in ep.shots:
-      spawn browser-gen-worker (shot params, concurrency=1, session_id=$SESSION_ID, trace_file={ep}-shot-{N}-trace)
-      等待完成
-      等待 wait_between 秒
+  for each shot: spawn browser-gen-worker → 等待完成 → 等待 wait_between 秒
 
 concurrency > 1（多标签页并行）:
-  将所有 shots 分配到 concurrency 个队列
-  spawn browser-gen-worker (所有 shot params, concurrency=N, session_id=$SESSION_ID)
+  spawn browser-gen-worker (所有 shot params, concurrency=N)
   等待完成
 ```
 
-注意：concurrency > 1 需实测即梦是否有 rate limit，建议从 2 开始。
-
-每个 gen-worker / browser-gen-worker 写入独立状态文件 `projects/{project}/state/{ep}-shot-{N}.json`，无并发冲突。
-
-### 7.5 Phase 6 并行（Audit & Repair — v2.0 新增）
-
-检查是否同时满足：
-- `projects/{project}/state/ontology/{ep}-world-model.json` 存在
-- `projects/{project}/state/shot-packets/` 目录存在
-
-两个条件都满足 → 执行 Phase 6；否则跳过，输出 `[skip] Phase 6: v2.0 条件不满足，跳过审计和修复`
-
-为每个剧本的所有成功生成的 shots 执行审计和修复（可并行）：
-
-```
-for ep in episodes:
-  if [ ! -d "projects/{project}/state/shot-packets" ]; then
-    echo "[skip] ${ep}: 未找到 shot-packets/，跳过 Phase 6"
-    continue
-  fi
-  
-  shot_ids=$(yq eval '.shots[].shot_id' projects/{project}/outputs/${ep}/visual-direction.yaml)
-  
-  for shot_id in $shot_ids; do
-    video_file="outputs/${ep}/videos/${shot_id}.mp4"
-    [ ! -f "$video_file" ] && continue
-    
-    spawn qa-agent (shot_id, session_id=$SESSION_ID, trace_file=${ep}-phase6-trace)
-    wait
-    
-    audit_result=$(jq -r '.repair_action' projects/{project}/state/audit/${shot_id}-audit.json)
-    
-    if [ "$audit_result" != "pass" ]; then
-      spawn repair-agent (shot_id, repair_strategy=$audit_result, max_retries=3, session_id=$SESSION_ID)
-    fi
-  done
-  
-  wait
-  
-  # 写入状态文件和生成审计报告
-  write_phase6_state ${ep}
-  generate_audit_report ${ep}
+Phase 5 完成后标记状态：
+```bash
+for ep in $EPISODES; do
+  python3 scripts/pipeline-runner.py complete \
+    --project $PROJECT --ep $ep --phase 5
 done
 ```
 
-### 8. 批量汇总报告
+**Phase 6 — Audit & Repair（v2.0 新增）**
 
-读取所有 `projects/{project}/state/{ep}-shot-*.json` 文件，生成每个剧本的 `generation-report.md`：
+检查是否同时满足：
+- `projects/{PROJECT}/state/ontology/{ep}-world-model.json` 存在
+- `projects/{PROJECT}/state/shot-packets/` 目录存在
+
+两个条件都满足 → 执行 Phase 6；否则跳过。
+
+为每个剧本的所有成功生成的 shots 执行审计和修复：
+
+```
+for ep in $EPISODES:
+  for shot_id in shot_ids:
+    video_file="projects/{PROJECT}/outputs/${ep}/videos/${shot_id}.mp4"
+    [ ! -f "$video_file" ] && continue
+
+    spawn qa-agent (shot_id, session_id=$SESSION_ID)
+    wait
+
+    audit_result=$(jq -r '.repair_action' projects/{PROJECT}/state/audit/${shot_id}-audit.json)
+
+    if [ "$audit_result" != "pass" ]; then
+      # team-lead 直接编排重试循环（最多 3 次）
+      for attempt in 1 2 3; do
+        spawn repair-agent (shot_id, repair_strategy=adjust_packet, attempt=$attempt)
+        wait
+        spawn gen-worker (shot_id)
+        wait
+        spawn qa-agent (shot_id)
+        wait
+        new_result=$(jq -r '.repair_action' ...)
+        [ "$new_result" = "pass" ] && break
+      done
+    fi
+  done
+
+  python3 scripts/pipeline-runner.py complete \
+    --project $PROJECT --ep $ep --phase 6
+done
+```
+### 5. 汇总进度
+
+```bash
+for ep in $EPISODES; do
+  python3 scripts/pipeline-runner.py status \
+    --project $PROJECT --ep $ep $USE_V2_FLAG
+done
+```
+
+读取所有 `projects/{PROJECT}/state/{ep}-shot-*.json` 文件，生成每个剧本的 `generation-report.md`：
 
 ```
 批量处理完成！
@@ -538,12 +358,11 @@ done
 ━━━ 各剧本状态 ━━━
 ep01：{S1}/{T1} 成功
 ep02：{S2}/{T2} 成功
-ep03：{S3}/{T3} 成功
 
 失败镜次详见各剧本的 generation-report.md
 ```
 
-### 9. Session Trace 收尾
+### 6. Session Trace 收尾
 
 写入 session 结束事件：
 ```bash
@@ -552,12 +371,12 @@ ep03：{S3}/{T3} 成功
 
 如果配置了 `DEEPSEEK_API_KEY`，自动生成 LLM 摘要：
 ```bash
-./scripts/api-caller.sh trace-summary projects/{project}/state/traces/$SESSION_ID
+./scripts/api-caller.sh trace-summary projects/{PROJECT}/state/traces/$SESSION_ID
 ```
 
 输出 trace 信息：
 ```
-📊 Trace 已记录：projects/{project}/state/traces/$SESSION_ID/
+📊 Trace 已记录：projects/{PROJECT}/state/traces/$SESSION_ID/
 运行 ~trace 查看路径概览和诊断信息
 ```
 
@@ -565,11 +384,9 @@ ep03：{S3}/{T3} 成功
 
 | 阶段 | 执行方式 | 原因 |
 |------|---------|------|
-| Phase 1 合规 | 并行 | 独立剧本，无共享资源 |
-| Phase 2 视觉 | 并行 | 独立剧本，无共享资源 |
-| Phase 3 美术校验 | **并行** | 纯校验：检查参考图是否存在（所有图由 `~design` 预先生成） |
-| Phase 4 音色 | **并行** | 自动匹配模式无交互，无冲突 |
-| Phase 5 视频 | 并行 | 每个镜次独立状态文件 |
+| Phase 0-4 | 每集并行（状态机驱动） | 独立剧本，无共享资源 |
+| Phase 5 视频 | 所有镜次统一并行（受 max_concurrent_workers 限制） | 每个镜次独立状态文件 |
+| Phase 6 审计 | 每集串行审计 | QA→repair→regen 有依赖 |
 
 ## 单个剧本失败处理
 
@@ -579,7 +396,6 @@ ep03：{S3}/{T3} 成功
 ⚠️ ep03 Phase 2 失败：视觉指导生成错误
 
 💡 诊断：~trace --backtrack ep03（查看失败链路）
-📄 详情：projects/{project}/outputs/ep03/（查看各阶段输出文件）
 🔄 恢复：修复后运行 ~batch --resume 从断点继续
 
 选择操作：
@@ -587,20 +403,5 @@ ep03：{S3}/{T3} 成功
 2. 终止整个批量任务
 ```
 
-- 选择 1：跳过失败的剧本，继续处理剩余剧本。失败的剧本状态文件标记为 `failed`，可稍后手动修复后运行 `~batch --resume`
-- 选择 2：立即终止批量任务。已完成的剧本产出保留，未开始的剧本跳过。可运行 `~batch --resume` 从断点继续
-```
-ep02 在 Phase 1 合规检测失败：剧本格式错误
-
-💡 诊断：~trace --backtrack ep02（查看失败链路）
-📄 详情：projects/{project}/outputs/ep02/（查看各阶段输出文件）
-🔄 恢复：修复后运行 ~batch --resume 从断点继续
-
-选项：
-1. 跳过 ep02，继续处理其他剧本
-2. 终止整个批量任务
-
-请选择：
-```
-
-选择跳过后，最终报告会标记该剧本为 `skipped`。
+- 选择 1：跳过失败的剧本，继续处理剩余剧本
+- 选择 2：立即终止。可运行 `~batch --resume` 从断点继续
