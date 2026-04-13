@@ -162,7 +162,12 @@ EOF
         while [[ -d "$LOCK_DIR" ]] && (( wait < 30 )); do
             sleep 1; (( wait++ ))
         done
-        echo "  复用已有 voice-config.yaml：${char_name}"
+        if [[ -f "$VOICE_CONFIG" ]]; then
+            echo "  复用已有 voice-config.yaml：${char_name}"
+        else
+            echo "  ⚠️ 等待超时且文件不存在：${char_name}，需重试"
+            return 1
+        fi
     fi
 fi
 ```

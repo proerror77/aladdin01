@@ -133,15 +133,37 @@ safe_curl_with_retry() {
     local attempt=1
     while (( attempt <= max_retries )); do
         local tmp_file
+        local tmp_err
         tmp_file=$(mktemp)
+        tmp_err=$(mktemp)
         local http_code
+        local curl_rc=0
+        set +e
         http_code=$(curl -sS -w "%{http_code}" -o "$tmp_file" \
             --connect-timeout "$CONNECT_TIMEOUT" \
             --max-time "$max_time" \
-            "$@")
+            "$@" 2>"$tmp_err")
+        curl_rc=$?
+        set -e
         local body
-        body=$(cat "$tmp_file")
-        rm -f "$tmp_file"
+        body=$(cat "$tmp_file" 2>/dev/null || true)
+        local err_body
+        err_body=$(cat "$tmp_err" 2>/dev/null || true)
+        rm -f "$tmp_file" "$tmp_err"
+
+        if (( curl_rc != 0 )); then
+            if (( attempt == max_retries )); then
+                [[ -n "$err_body" ]] && echo "$err_body" >&2
+                echo "[ERROR] curl transport error after ${max_retries} attempts" >&2
+                return 1
+            fi
+            local wait=$(( 2 ** attempt + RANDOM % 5 ))
+            echo "[WARN] curl transport error, waiting ${wait}s (attempt ${attempt}/${max_retries})" >&2
+            [[ -n "$err_body" ]] && echo "$err_body" >&2
+            sleep "$wait"
+            (( attempt++ ))
+            continue
+        fi
 
         if [[ "$http_code" == "429" ]]; then
             local wait=$(( 2 ** attempt + RANDOM % 5 ))

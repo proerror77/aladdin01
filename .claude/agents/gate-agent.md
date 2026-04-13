@@ -90,7 +90,8 @@ else:
 **连续自动过关保护**（持久化 streak 计数器）：
 
 ```bash
-STREAK_FILE="state/gate-streak.json"
+STREAK_FILE="projects/${PROJECT}/state/gate-streak.json"
+mkdir -p "$(dirname "$STREAK_FILE")"
 
 if [[ "$decision" == "auto_approve" ]]; then
     # 读取并递增 streak 计数器
@@ -102,7 +103,7 @@ if [[ "$decision" == "auto_approve" ]]; then
 
     # 检查是否超过阈值
     MAX_STREAK=$(yq '.max_auto_approve_streak // 10' config/scoring/auto-gate-rules.yaml 2>/dev/null || echo 10)
-    if (( streak >= MAX_STREAK )); then
+    if (( streak > MAX_STREAK )); then
         echo "⚠️ 连续自动过关 ${streak} 次，强制人工审核"
         streak=0
         decision="human_review"

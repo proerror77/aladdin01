@@ -120,14 +120,14 @@
 LanceDB 语义检索数据库管理，供 `memory-agent` / `qa-agent` / `repair-agent` 使用。
 
 ```bash
-python3 scripts/vectordb-manager.py init
-python3 scripts/vectordb-manager.py upsert-world-model projects/qyccan/state/ontology/ep01-world-model.json
-python3 scripts/vectordb-manager.py index-assets projects/qyccan/assets
-python3 scripts/vectordb-manager.py search-assets "苏夜 青玉蚕 正面" --type character --n 3
-python3 scripts/vectordb-manager.py search-entities "黑雾森林 夜晚" --type scene --n 3
-python3 scripts/vectordb-manager.py search-relations "suye yehongyi 契约" --episode ep01 --n 3
-python3 scripts/vectordb-manager.py upsert-state projects/qyccan/state/shot-packets/ep01-shot-01.json
-python3 scripts/vectordb-manager.py stats
+python3 scripts/vectordb-manager.py --project qyccan init
+python3 scripts/vectordb-manager.py --project qyccan upsert-world-model projects/qyccan/state/ontology/ep01-world-model.json
+python3 scripts/vectordb-manager.py --project qyccan index-assets projects/qyccan/assets
+python3 scripts/vectordb-manager.py --project qyccan search-assets "苏夜 青玉蚕 正面" --type character --n 3
+python3 scripts/vectordb-manager.py --project qyccan search-entities "黑雾森林 夜晚" --type scene --n 3
+python3 scripts/vectordb-manager.py --project qyccan search-relations "suye yehongyi 契约" --episode ep01 --n 3
+python3 scripts/vectordb-manager.py --project qyccan upsert-state projects/qyccan/state/shot-packets/ep01-shot-01.json
+python3 scripts/vectordb-manager.py --project qyccan stats
 ```
 
 **环境变量**：`VECTORDB_PATH` 可覆盖默认数据库目录（默认 `state/vectordb/lancedb`）。

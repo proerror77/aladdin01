@@ -1115,13 +1115,13 @@ def sync_vectordb(project_root: Path, project: str, episode: str) -> None:
     assets_root = project_root / "projects" / project / "assets"
     shot_packets_dir = project_root / "projects" / project / "state" / "shot-packets"
 
-    run([python_bin, "scripts/vectordb-manager.py", "init"], cwd=project_root)
+    run([python_bin, "scripts/vectordb-manager.py", "--project", project, "init"], cwd=project_root)
     if world_model.exists():
-        run([python_bin, "scripts/vectordb-manager.py", "upsert-world-model", relpath(project_root, world_model)], cwd=project_root)
+        run([python_bin, "scripts/vectordb-manager.py", "--project", project, "upsert-world-model", relpath(project_root, world_model)], cwd=project_root)
     if assets_root.exists():
-        run([python_bin, "scripts/vectordb-manager.py", "index-assets", relpath(project_root, assets_root)], cwd=project_root)
+        run([python_bin, "scripts/vectordb-manager.py", "--project", project, "index-assets", relpath(project_root, assets_root)], cwd=project_root)
     for packet in sorted(shot_packets_dir.glob(f"{episode}-shot-*.json")):
-        run([python_bin, "scripts/vectordb-manager.py", "upsert-state", relpath(project_root, packet)], cwd=project_root)
+        run([python_bin, "scripts/vectordb-manager.py", "--project", project, "upsert-state", relpath(project_root, packet)], cwd=project_root)
 
 
 # ──────────────────────────────────────────────

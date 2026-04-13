@@ -277,7 +277,7 @@ semantic_qa() {
     local prev_shot_num=$((SHOT_NUM - 1))
     if [[ $prev_shot_num -gt 0 ]]; then
       local prev_shot_id="${EP}-shot-$(printf "%02d" $prev_shot_num)"
-      local prev_state=$(python3 scripts/vectordb-manager.py get-state "$char" "$EP" "$prev_shot_id" 2>/dev/null || echo '{"found":false}')
+      local prev_state=$(python3 scripts/vectordb-manager.py --project "$PROJECT" get-state "$char" "$EP" "$prev_shot_id" 2>/dev/null || echo '{"found":false}')
       local prev_emotion=$(echo "$prev_state" | jq -r '.emotion // empty')
 
       if [[ -z "$prev_emotion" || "$prev_emotion" == "null" ]]; then
@@ -311,7 +311,7 @@ semantic_qa() {
   local dialogue=$(echo "$shot_packet" | jq -r '.audio // empty')
   if [[ -n "$dialogue" ]]; then
     for char in $characters; do
-      local entity_hit=$(python3 scripts/vectordb-manager.py search-entities "$char 人设 性格 对白" \
+      local entity_hit=$(python3 scripts/vectordb-manager.py --project "$PROJECT" search-entities "$char 人设 性格 对白" \
         --type character --episode "$EP" --n 1 2>/dev/null || echo '[]')
       local personality=$(echo "$entity_hit" | jq -r '.[0].metadata.personality // empty')
       
@@ -335,7 +335,7 @@ semantic_qa() {
       | if ($chars | length) >= 2 then "\($chars[0]) \($chars[1]) 关系 冲突 契约" else "" end
     ')
     if [[ -n "$pair_query" ]]; then
-      local relation_hits=$(python3 scripts/vectordb-manager.py search-relations "$pair_query" --episode "$EP" --n 2 2>/dev/null || echo '[]')
+      local relation_hits=$(python3 scripts/vectordb-manager.py --project "$PROJECT" search-relations "$pair_query" --episode "$EP" --n 2 2>/dev/null || echo '[]')
       local rel_count=$(echo "$relation_hits" | jq 'length')
       if [[ "$rel_count" -eq 0 ]]; then
         issues+=("{\"type\":\"relation_context_missing\",\"severity\":\"low\"}")
@@ -411,7 +411,7 @@ EOF
   "{\"file\":\"$AUDIT_FILE\",\"repair_action\":\"$repair_action\"}"
 
 # 在线状态同步：Phase 6 不再依赖 workflow-sync 事后回填
-python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+python3 scripts/vectordb-manager.py --project "$PROJECT" upsert-state "$SHOT_PACKET" || true
 ./scripts/trace.sh "$SESSION_ID" "${EP}-phase6-trace" "online_state_sync" \
   "{\"shot_id\":\"$SHOT_ID\",\"repair_action\":\"$repair_action\"}"
 

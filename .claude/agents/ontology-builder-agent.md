@@ -760,14 +760,14 @@ if python3 -c "import lancedb" 2>/dev/null; then
     echo "写入 LanceDB 向量库..."
 
     # 确保数据库已初始化
-    python3 scripts/vectordb-manager.py init 2>/dev/null || true
+    python3 scripts/vectordb-manager.py --project "{project}" init 2>/dev/null || true
 
     # 写入世界模型（实体 + 关系）
-    python3 scripts/vectordb-manager.py upsert-world-model "projects/{project}/state/ontology/${ep}-world-model.json"
+    python3 scripts/vectordb-manager.py --project "{project}" upsert-world-model "projects/{project}/state/ontology/${ep}-world-model.json"
 
     # 顺带索引现有资产（幂等，已存在的不重复写入）
     if [[ -d "assets/" ]]; then
-        python3 scripts/vectordb-manager.py index-assets assets/
+        python3 scripts/vectordb-manager.py --project "{project}" index-assets assets/
     fi
 
     # 记录 trace

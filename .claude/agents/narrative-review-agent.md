@@ -62,13 +62,13 @@ read_scope:
 
 ```bash
 # 角色 / 场景实体
-python3 scripts/vectordb-manager.py search-entities "{ep} 主角 情绪 关系" --episode "{ep}" --n 8
+python3 scripts/vectordb-manager.py --project "{project}" search-entities "{ep} 主角 情绪 关系" --episode "{ep}" --n 8
 
 # 关键人物关系
-python3 scripts/vectordb-manager.py search-relations "{ep} 契约 对抗 权力 关系" --episode "{ep}" --n 8
+python3 scripts/vectordb-manager.py --project "{project}" search-relations "{ep} 契约 对抗 权力 关系" --episode "{ep}" --n 8
 
 # 上一镜状态（供连续性检查）
-python3 scripts/vectordb-manager.py get-state "{character_id}" "{ep}" "{prev_shot_id}"
+python3 scripts/vectordb-manager.py --project "{project}" get-state "{character_id}" "{ep}" "{prev_shot_id}"
 ```
 
 叙事审查时优先使用：
@@ -498,33 +498,6 @@ matrix_path = Path(sys.argv[2])
 visual = yaml.safe_load(visual_path.read_text(encoding='utf-8'))
 matrix = json.loads(matrix_path.read_text(encoding='utf-8')) if matrix_path.exists() else {}
 
-# 提取每个角色的对白样本
-for shot in visual.get('shots', []):
-    audio = str(shot.get('audio') or '')
-    if not audio or '无对白' in audio:
-        continue
-    
-    # 从 references 中获取角色名
-    for ref in (shot.get('references') or {}).get('characters', []):
-        char_name = ref.get('name', '')
-        if not char_name:
-            continue
-        
-        # 提取该角色的对白行
-        char_dialogues = [
-            line.strip() for line in audio.split('\n')
-            if char_name in line and ('：' in line or ':' in line)
-        ]
-        
-        if char_dialogues:
-            if char_name not in matrix:
-                matrix[char_name] = {'dialogues': [], 'episodes': []}
-            matrix[char_name]['dialogues'].extend(char_dialogues)
-            if visual.get('episode') not in matrix[char_name]['episodes']:
-                matrix[char_name]['episodes'].append(visual.get('episode'))
-            # 只保留最近 50 条对白（避免文件过大）
-            matrix[char_name]['dialogues'] = matrix[char_name]['dialogues'][-50:]
-
 matrix_path.parent.mkdir(parents=True, exist_ok=True)
 
 # 文件锁：防止多 agent 并发写入导致数据丢失
@@ -533,10 +506,8 @@ lock_path = matrix_path.with_suffix('.lock')
 with open(lock_path, 'w') as _lock_file:
     fcntl.flock(_lock_file, fcntl.LOCK_EX)
     try:
-        # 锁内重新读取（可能已被其他 agent 更新）
-        if matrix_path.exists():
-            matrix = json.loads(matrix_path.read_text(encoding='utf-8'))
-        # 重新执行合并逻辑（基于最新数据）
+        # 锁内读取并合并，避免 pre-lock 结果被覆盖
+        matrix = json.loads(matrix_path.read_text(encoding='utf-8')) if matrix_path.exists() else {}
         for shot in visual.get('shots', []):
             audio = str(shot.get('audio') or '')
             if not audio or '无对白' in audio:

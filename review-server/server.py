@@ -18,6 +18,7 @@ import json
 import os
 import glob
 import asyncio
+import fcntl
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -66,13 +67,48 @@ def write_review(review_id: str, data: dict):
 
 
 PENDING_TRIGGERS_FILE = STATE_DIR / "pending_triggers.json"
+PENDING_TRIGGERS_LOCK = STATE_DIR / "pending_triggers.lock"
 
 
-async def trigger_resume_with_retry(project: str, max_retries: int = 3):
+def _read_pending_triggers_unlocked() -> dict[str, dict]:
+    if not PENDING_TRIGGERS_FILE.exists():
+        return {}
+    try:
+        return json.loads(PENDING_TRIGGERS_FILE.read_text())
+    except json.JSONDecodeError:
+        return {}
+
+
+def _write_pending_triggers_unlocked(pending: dict[str, dict]) -> None:
+    PENDING_TRIGGERS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    tmp_file = PENDING_TRIGGERS_FILE.with_suffix(".tmp")
+    if pending:
+        tmp_file.write_text(json.dumps(pending, ensure_ascii=False, indent=2))
+        os.replace(tmp_file, PENDING_TRIGGERS_FILE)
+        return
+
+    if tmp_file.exists():
+        tmp_file.unlink()
+    if PENDING_TRIGGERS_FILE.exists():
+        PENDING_TRIGGERS_FILE.unlink()
+
+
+def _update_pending_triggers(mutator):
+    PENDING_TRIGGERS_LOCK.parent.mkdir(parents=True, exist_ok=True)
+    with open(PENDING_TRIGGERS_LOCK, "w") as lock_file:
+        fcntl.flock(lock_file, fcntl.LOCK_EX)
+        pending = _read_pending_triggers_unlocked()
+        result = mutator(pending)
+        _write_pending_triggers_unlocked(pending)
+        fcntl.flock(lock_file, fcntl.LOCK_UN)
+        return result
+
+
+async def trigger_resume_with_retry(project: str, max_retries: int = 3) -> bool:
     """Fire Remote Trigger with exponential backoff retry."""
     if not CLAUDE_TRIGGER_ID or not CLAUDE_TRIGGER_TOKEN:
         print(f"[WARN] Remote Trigger not configured, skipping resume for {project}")
-        return
+        return False
 
     for attempt in range(max_retries):
         try:
@@ -89,8 +125,8 @@ async def trigger_resume_with_retry(project: str, max_retries: int = 3):
                 resp.raise_for_status()
             print(f"[INFO] Remote Trigger fired for {project}: {resp.status_code}")
             _remove_pending_trigger(project)
-            return
-        except Exception as e:
+            return True
+        except httpx.HTTPError as e:
             wait = 2 ** attempt  # 1s, 2s, 4s
             print(f"[WARN] Trigger attempt {attempt+1}/{max_retries} failed for {project}: {e}")
             if attempt < max_retries - 1:
@@ -98,32 +134,24 @@ async def trigger_resume_with_retry(project: str, max_retries: int = 3):
 
     print(f"[ERROR] All {max_retries} trigger attempts failed for {project}")
     _save_pending_trigger(project)
+    return False
 
 
 def _save_pending_trigger(project: str):
-    pending = {}
-    if PENDING_TRIGGERS_FILE.exists():
-        try:
-            pending = json.loads(PENDING_TRIGGERS_FILE.read_text())
-        except Exception:
-            pending = {}
-    pending[project] = {
-        "failed_at": datetime.now(timezone.utc).isoformat(),
-        "retries_exhausted": 3,
-    }
-    PENDING_TRIGGERS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    PENDING_TRIGGERS_FILE.write_text(json.dumps(pending, indent=2))
+    def mutate(pending: dict[str, dict]):
+        pending[project] = {
+            "failed_at": datetime.now(timezone.utc).isoformat(),
+            "retries_exhausted": 3,
+        }
+
+    _update_pending_triggers(mutate)
 
 
 def _remove_pending_trigger(project: str):
-    if not PENDING_TRIGGERS_FILE.exists():
-        return
-    try:
-        pending = json.loads(PENDING_TRIGGERS_FILE.read_text())
+    def mutate(pending: dict[str, dict]):
         pending.pop(project, None)
-        PENDING_TRIGGERS_FILE.write_text(json.dumps(pending, indent=2))
-    except Exception:
-        pass
+
+    _update_pending_triggers(mutate)
 
 
 # --- Review Routes ---
@@ -347,19 +375,19 @@ async def health():
 @app.post("/admin/retry-triggers")
 async def retry_pending_triggers():
     """Retry all pending triggers that previously failed."""
-    if not PENDING_TRIGGERS_FILE.exists():
+    pending = _read_pending_triggers_unlocked()
+    if not pending:
         return {"message": "no pending triggers", "count": 0}
-    try:
-        pending = json.loads(PENDING_TRIGGERS_FILE.read_text())
-    except Exception:
-        return {"message": "error reading pending triggers", "count": 0}
 
     retried = []
+    failed = []
     for project in list(pending.keys()):
-        await trigger_resume_with_retry(project)
-        retried.append(project)
+        if await trigger_resume_with_retry(project):
+            retried.append(project)
+        else:
+            failed.append(project)
 
-    return {"retried": retried, "count": len(retried)}
+    return {"retried": retried, "failed": failed, "count": len(retried)}
 
 
 # --- List Reviews ---

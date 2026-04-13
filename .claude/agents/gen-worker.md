@@ -98,7 +98,7 @@ read_scope:
 
 ```bash
 if [[ -f "projects/${project}/state/shot-packets/${shot_id}.json" ]]; then
-  python3 scripts/vectordb-manager.py upsert-state "projects/${project}/state/shot-packets/${shot_id}.json" || true
+  python3 scripts/vectordb-manager.py --project "${project}" upsert-state "projects/${project}/state/shot-packets/${shot_id}.json" || true
   ./scripts/trace.sh {session_id} {trace_file} online_state_sync '{"stage":"generating","shot_id":"{shot_id}"}'
 fi
 ```
@@ -630,7 +630,7 @@ mv projects/{project}/outputs/{ep}/videos/*.mp4 projects/{project}/outputs/{ep}/
 
 ```bash
 if [[ -f "projects/${project}/state/shot-packets/${shot_id}.json" ]]; then
-  python3 scripts/vectordb-manager.py upsert-state "projects/${project}/state/shot-packets/${shot_id}.json" || true
+  python3 scripts/vectordb-manager.py --project "${project}" upsert-state "projects/${project}/state/shot-packets/${shot_id}.json" || true
   ./scripts/trace.sh {session_id} {trace_file} online_state_sync '{"stage":"completed","shot_id":"{shot_id}","video_path":"projects/{project}/outputs/{ep}/videos/shot-{N}{output_suffix}.mp4"}'
 fi
 ```
@@ -667,7 +667,7 @@ fi
 
 ```bash
 if [[ -f "projects/${project}/state/shot-packets/${shot_id}.json" ]]; then
-  python3 scripts/vectordb-manager.py upsert-state "projects/${project}/state/shot-packets/${shot_id}.json" || true
+  python3 scripts/vectordb-manager.py --project "${project}" upsert-state "projects/${project}/state/shot-packets/${shot_id}.json" || true
   ./scripts/trace.sh {session_id} {trace_file} online_state_sync '{"stage":"failed","shot_id":"{shot_id}"}'
 fi
 ```

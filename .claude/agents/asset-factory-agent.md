@@ -284,7 +284,7 @@ EOF
 
 ```bash
 if .venv/bin/python -c "import lancedb" 2>/dev/null; then
-    .venv/bin/python scripts/vectordb-manager.py index-assets projects/{project}/assets/packs/ 2>/dev/null
+    .venv/bin/python scripts/vectordb-manager.py --project "{project}" index-assets projects/{project}/assets/packs/ 2>/dev/null
     echo "✓ LanceDB 资产索引更新完成"
 fi
 ```

@@ -19,6 +19,7 @@ teardown() {
   export IMAGE_GEN_API_URL="$_ORIG_IMAGE_URL"
   export IMAGE_GEN_API_KEY="$_ORIG_IMAGE_KEY"
   export OPENAI_API_KEY="$_ORIG_OPENAI"
+  rm -f /tmp/test_payload.json /tmp/api-caller-curl-count
 }
 
 # ── env-check: tuzi fallback ────────────────────────────────────────────────
@@ -88,4 +89,50 @@ teardown() {
   # 确保输出中没有 /v1/v1
   [[ "$output" != */v1/v1* ]]
   rm -f /tmp/test_payload.json
+}
+
+@test "seedance create: transport errors are retried instead of exiting immediately" {
+  export ARK_API_KEY="test-key"
+  export CURL_MAX_RETRIES="3"
+  echo '{"prompt":"test"}' > /tmp/test_payload.json
+
+  local stub_dir
+  stub_dir="$(mktemp -d)"
+  cat > "${stub_dir}/curl" <<'EOF'
+#!/usr/bin/env bash
+COUNT_FILE="/tmp/api-caller-curl-count"
+count=0
+if [[ -f "$COUNT_FILE" ]]; then
+  count=$(cat "$COUNT_FILE")
+fi
+count=$((count + 1))
+echo "$count" > "$COUNT_FILE"
+
+if [[ "$count" -lt 3 ]]; then
+  exit 7
+fi
+
+out=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -o)
+      out="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+printf '{"ok":true}' > "$out"
+printf '200'
+EOF
+  chmod +x "${stub_dir}/curl"
+
+  run env PATH="${stub_dir}:$PATH" bash "$SCRIPT" seedance create /tmp/test_payload.json
+  [ "$status" -eq 0 ]
+  [[ "$output" == *'"ok":true'* ]]
+  [ "$(cat /tmp/api-caller-curl-count)" -eq 3 ]
+
+  rm -rf "$stub_dir"
 }

@@ -93,7 +93,7 @@ if [[ "$REPAIR_ACTION" == "pass" ]]; then
   mv "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json.tmp" "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json"
 
   # 在线状态同步：Phase 6 通过后立即写回 LanceDB
-  python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+  python3 scripts/vectordb-manager.py --project "$PROJECT" upsert-state "$SHOT_PACKET" || true
   ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "online_state_sync" \
     "{\"stage\":\"pass\",\"shot_id\":\"$SHOT_ID\"}"
   
@@ -148,9 +148,16 @@ local_repair() {
     echo "{\"ep\": \"${EP}\", \"shot_id\": \"${SHOT_ID}\", \"requested_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$signal_file"
 
     # 等待 qa-agent 完成审计（最多 300 秒）
-    local audit_file="projects/${PROJECT}/state/audit/${EP}-shot-${SHOT_ID}-audit.json"
+    local audit_file="projects/${PROJECT}/state/audit/${SHOT_ID}-audit.json"
     local wait_count=0
-    while [[ ! -f "$audit_file" ]] && (( wait_count < 60 )); do
+    local signal_ts
+    signal_ts=$(date +%s)
+    while (( wait_count < 60 )); do
+        local audit_mtime
+        audit_mtime=$(stat -f %m "$audit_file" 2>/dev/null || stat -c %Y "$audit_file" 2>/dev/null || echo 0)
+        if [[ -f "$audit_file" ]] && (( audit_mtime >= signal_ts )); then
+            break
+        fi
         sleep 5
         (( wait_count++ ))
     done
@@ -254,7 +261,7 @@ adjust_prompt_and_regenerate() {
   echo "$shot_packet" | jq ".seedance_inputs.prompt = \"$adjusted_prompt\"" > "$SHOT_PACKET"
 
   # 在线状态同步：shot packet 已被修订
-  python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+  python3 scripts/vectordb-manager.py --project "$PROJECT" upsert-state "$SHOT_PACKET" || true
   ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "online_state_sync" \
     "{\"stage\":\"local_repair_prompt_adjusted\",\"shot_id\":\"$SHOT_ID\"}"
   
@@ -321,7 +328,7 @@ regenerate_from_fixed_frame() {
      .seedance_inputs.reference_image_url = \"$reference_frame\"" > "$SHOT_PACKET"
 
   # 在线状态同步：参考策略已改变
-  python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+  python3 scripts/vectordb-manager.py --project "$PROJECT" upsert-state "$SHOT_PACKET" || true
   ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "online_state_sync" \
     "{\"stage\":\"reference_reseed\",\"shot_id\":\"$SHOT_ID\"}"
   
@@ -361,7 +368,7 @@ regenerate() {
       "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json" > "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json.tmp"
     mv "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json.tmp" "$PROJECT_ROOT/projects/${PROJECT}/state/${EP}-shot-${SHOT_NUM}.json"
 
-    python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+    python3 scripts/vectordb-manager.py --project "$PROJECT" upsert-state "$SHOT_PACKET" || true
     ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "online_state_sync" \
       "{\"stage\":\"failed\",\"shot_id\":\"$SHOT_ID\"}"
     
@@ -389,14 +396,14 @@ regenerate() {
       local new_prompt=$(adjust_prompt_based_on_issues)
       local shot_packet=$(cat "$SHOT_PACKET")
       echo "$shot_packet" | jq ".seedance_inputs.prompt = \"$new_prompt\"" > "$SHOT_PACKET"
-      python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+      python3 scripts/vectordb-manager.py --project "$PROJECT" upsert-state "$SHOT_PACKET" || true
       ;;
     change_model)
       # 换模型
       echo "    换模型"
       local shot_packet=$(cat "$SHOT_PACKET")
       echo "$shot_packet" | jq '.seedance_inputs.model = "doubao-seedance-2.0"' > "$SHOT_PACKET"
-      python3 scripts/vectordb-manager.py upsert-state "$SHOT_PACKET" || true
+      python3 scripts/vectordb-manager.py --project "$PROJECT" upsert-state "$SHOT_PACKET" || true
       ;;
   esac
   
@@ -430,9 +437,16 @@ EOF
   echo "{\"ep\": \"${EP}\", \"shot_id\": \"${SHOT_ID}\", \"adjustment\": \"$adjustment\", \"requested_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$gen_signal"
   
   # 等待 gen-worker 完成（最多 600 秒）
-  local video_file="projects/${PROJECT}/outputs/${EP}/videos/shot-${SHOT_ID}.mp4"
+  local video_file="projects/${PROJECT}/outputs/${EP}/videos/shot-${SHOT_NUM}.mp4"
   local gen_wait=0
-  while [[ -f "$gen_signal" ]] && (( gen_wait < 120 )); do
+  local gen_signal_ts
+  gen_signal_ts=$(date +%s)
+  while (( gen_wait < 120 )); do
+    local video_mtime
+    video_mtime=$(stat -f %m "$video_file" 2>/dev/null || stat -c %Y "$video_file" 2>/dev/null || echo 0)
+    if [[ -f "$video_file" ]] && (( video_mtime >= gen_signal_ts )); then
+      break
+    fi
     sleep 5; (( gen_wait++ ))
   done
   
@@ -442,17 +456,25 @@ EOF
   echo "{\"ep\": \"${EP}\", \"shot_id\": \"${SHOT_ID}\", \"requested_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$qa_signal"
   
   # 等待 qa-agent 完成审计（最多 300 秒）
+  local audit_file="$AUDIT_FILE"
   local qa_wait=0
-  while [[ ! -f "$AUDIT_FILE" ]] && (( qa_wait < 60 )); do
+  local qa_signal_ts
+  qa_signal_ts=$(date +%s)
+  while (( qa_wait < 60 )); do
+    local audit_mtime
+    audit_mtime=$(stat -f %m "$audit_file" 2>/dev/null || stat -c %Y "$audit_file" 2>/dev/null || echo 0)
+    if [[ -f "$audit_file" ]] && (( audit_mtime >= qa_signal_ts )); then
+      break
+    fi
     sleep 5; (( qa_wait++ ))
   done
   
-  if [[ ! -f "$AUDIT_FILE" ]]; then
+  if [[ ! -f "$audit_file" ]]; then
     echo "⚠️ qa-agent 未在 300s 内完成审计，跳过验证"
     return 1
   fi
   
-  local new_repair_action=$(jq -r '.repair_action' "$AUDIT_FILE")
+  local new_repair_action=$(jq -r '.repair_action' "$audit_file")
   if [[ "$new_repair_action" == "pass" ]]; then
     echo "✓ 重新生成成功"
     ./scripts/trace.sh "$SESSION_ID" "${EP}-repair-trace" "write_output" \
@@ -531,7 +553,7 @@ echo "repair-agent 完成，修复结果: $RESULT，shot: $SHOT_ID"
 
 额外要求：
 
-- 只要 shot packet 被修改，就立刻调用 `python3 scripts/vectordb-manager.py upsert-state`
+- 只要 shot packet 被修改，就立刻调用 `python3 scripts/vectordb-manager.py --project "$PROJECT" upsert-state`
 - 所有在线同步都写 trace 事件 `online_state_sync`
 - 不要依赖 `workflow-sync.py --sync-vectordb` 事后回填 repair 阶段状态
 - `RESULT` 取值：`completed`（pass/修复成功）或 `failed`（达到最大重试次数）

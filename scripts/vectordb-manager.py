@@ -367,7 +367,7 @@ def cmd_upsert_world_model(args):
         tbl = db.open_table(TABLE_ENTITIES)
         # 删除本集旧数据再插入（幂等）
         try:
-            tbl.delete(f"episode = '{episode}'")
+            tbl.delete(f"project = '{project}' AND episode = '{episode}'")
         except Exception:
             pass
         tbl.add(entity_rows)
@@ -403,7 +403,7 @@ def cmd_upsert_world_model(args):
     if rel_rows:
         tbl = db.open_table(TABLE_RELATIONS)
         try:
-            tbl.delete(f"episode = '{episode}'")
+            tbl.delete(f"project = '{project}' AND episode = '{episode}'")
         except Exception:
             pass
         tbl.add(rel_rows)
@@ -677,7 +677,7 @@ def cmd_upsert_state(args):
 
     if rows:
         try:
-            tbl.delete(f"episode = '{episode}' AND shot_id = '{shot_id}'")
+            tbl.delete(f"project = '{project}' AND episode = '{episode}' AND shot_id = '{shot_id}'")
         except Exception:
             pass
         tbl.add(rows)
@@ -692,14 +692,14 @@ def cmd_get_state(args):
     db  = lancedb.connect(DB_PATH)
     tbl = db.open_table(TABLE_STATES)
 
-    df = tbl.to_pandas()
-    filtered = df[
-        (df['character_id'] == character_id) &
-        (df['episode'] == episode) &
-        (df['project'] == args.project)
+    filtered = [
+        row for row in tbl.to_arrow().to_pylist()
+        if row.get("character_id") == character_id
+        and row.get("episode") == episode
+        and row.get("project") == args.project
     ]
 
-    if filtered.empty:
+    if not filtered:
         print(json.dumps({"found": False, "character_id": character_id}))
         return
 
@@ -709,14 +709,14 @@ def cmd_get_state(args):
         return int(m.group(1)) if m else 0
 
     target_num = shot_num(shot_id)
-    filtered = filtered.copy()
-    filtered['_shot_num'] = filtered['shot_id'].apply(shot_num)
-    candidates = filtered[filtered['_shot_num'] <= target_num]
-    if candidates.empty:
+    for row in filtered:
+        row["_shot_num"] = shot_num(row.get("shot_id", ""))
+    candidates = [row for row in filtered if row["_shot_num"] <= target_num]
+    if not candidates:
         candidates = filtered
 
-    best = candidates.sort_values('_shot_num', ascending=False).iloc[0]
-    result = best.to_dict()
+    best = sorted(candidates, key=lambda row: row["_shot_num"], reverse=True)[0]
+    result = dict(best)
     result.pop('vector', None)
     result.pop('_shot_num', None)
     result["props"]     = json.loads(result.get("props", "[]"))
@@ -767,13 +767,13 @@ def _search_assets_inline(db, q: dict, project: str) -> list:
 
 def _get_state_inline(db, q: dict, project: str) -> dict:
     tbl = db.open_table(TABLE_STATES)
-    df = tbl.to_pandas()
-    filtered = df[
-        (df['character_id'] == q.get("character_id", "")) &
-        (df['episode'] == q.get("episode", "")) &
-        (df['project'] == project)
+    filtered = [
+        row for row in tbl.to_arrow().to_pylist()
+        if row.get("character_id") == q.get("character_id", "")
+        and row.get("episode") == q.get("episode", "")
+        and row.get("project") == project
     ]
-    if filtered.empty:
+    if not filtered:
         return {"found": False, "character_id": q.get("character_id", "")}
 
     def shot_num(sid):
@@ -781,13 +781,13 @@ def _get_state_inline(db, q: dict, project: str) -> dict:
         return int(m.group(1)) if m else 0
 
     target_num = shot_num(q.get("shot_id", ""))
-    filtered = filtered.copy()
-    filtered['_shot_num'] = filtered['shot_id'].apply(shot_num)
-    candidates = filtered[filtered['_shot_num'] <= target_num]
-    if candidates.empty:
+    for row in filtered:
+        row["_shot_num"] = shot_num(row.get("shot_id", ""))
+    candidates = [row for row in filtered if row["_shot_num"] <= target_num]
+    if not candidates:
         candidates = filtered
-    best = candidates.sort_values('_shot_num', ascending=False).iloc[0]
-    result = best.to_dict()
+    best = sorted(candidates, key=lambda row: row["_shot_num"], reverse=True)[0]
+    result = dict(best)
     result.pop('vector', None)
     result.pop('_shot_num', None)
     result["props"] = json.loads(result.get("props", "[]"))
@@ -864,7 +864,7 @@ def cmd_stats(args):
 
 def main():
     p = argparse.ArgumentParser(description="LanceDB 向量库管理")
-    p.add_argument("--project", default=os.environ.get("VECTORDB_PROJECT", "default"),
+    p.add_argument("--project", default=os.environ.get("VECTORDB_PROJECT"),
                    help="Project name for data isolation")
     sub = p.add_subparsers(dest="cmd")
 
@@ -910,6 +910,8 @@ def main():
     p_sb.add_argument("batch_json", help="JSON string with queries array")
 
     args = p.parse_args()
+    if not args.project:
+        p.error("--project is required (or set VECTORDB_PROJECT)")
 
     dispatch = {
         "init":             cmd_init,

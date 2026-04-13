@@ -159,13 +159,13 @@ time_of_day=$(echo "$shot_yaml" | yq eval '.location.time_of_day // .time_of_day
 3. 用 `get-state` 读取上一镜已索引状态，补 continuity hint
 
 ```bash
-entity_hits=$(python3 scripts/vectordb-manager.py search-entities \
+entity_hits=$(python3 scripts/vectordb-manager.py --project "$PROJECT" search-entities \
   "${char_name} ${variant} 角色 视觉特征" \
   --type character \
   --episode "$ep" \
   --n 3)
 
-prev_state=$(python3 scripts/vectordb-manager.py get-state \
+prev_state=$(python3 scripts/vectordb-manager.py --project "$PROJECT" get-state \
   "${char_id}" "$ep" "${ep}-shot-$(printf '%02d' $((shot_index - 1)))" 2>/dev/null || echo '{"found":false}')
 ```
 
@@ -189,7 +189,7 @@ prev_state=$(python3 scripts/vectordb-manager.py get-state \
 先查场景实体，而不是直接按场景名找图：
 
 ```bash
-scene_hits=$(python3 scripts/vectordb-manager.py search-entities \
+scene_hits=$(python3 scripts/vectordb-manager.py --project "$PROJECT" search-entities \
   "${scene_name} ${time_of_day} 场景 功能性 视觉地标" \
   --type scene \
   --episode "$ep" \
@@ -215,7 +215,7 @@ scene_hits=$(python3 scripts/vectordb-manager.py search-entities \
 如果 shot 中有 2 个及以上角色，补查关系，用于决定谁是主参考、谁需要反应镜头支持：
 
 ```bash
-relation_hits=$(python3 scripts/vectordb-manager.py search-relations \
+relation_hits=$(python3 scripts/vectordb-manager.py --project "$PROJECT" search-relations \
   "${char_a} ${char_b} 关系 权力 契约 对抗" \
   --episode "$ep" \
   --n 3)
@@ -228,11 +228,11 @@ memory-agent 不直接改 prompt，但应把关系证据写入 `retrieval_eviden
 用规划段产出的 query 检索资产，而不是直接用角色名：
 
 ```bash
-char_assets=$(python3 scripts/vectordb-manager.py search-assets "$asset_query" \
+char_assets=$(python3 scripts/vectordb-manager.py --project "$PROJECT" search-assets "$asset_query" \
   --type character \
   --n 5)
 
-scene_assets=$(python3 scripts/vectordb-manager.py search-assets "$scene_asset_query" \
+scene_assets=$(python3 scripts/vectordb-manager.py --project "$PROJECT" search-assets "$scene_asset_query" \
   --type scene \
   --n 5)
 ```

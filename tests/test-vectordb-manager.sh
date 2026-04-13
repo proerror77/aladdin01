@@ -14,7 +14,13 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 DB_PATH="$TMP_DIR/lancedb"
 WORLD_MODEL="$TMP_DIR/world-model.json"
+WORLD_MODEL_OTHER="$TMP_DIR/world-model-other.json"
 SHOT_PACKET="$TMP_DIR/shot-packet.json"
+STUB_PY="$TMP_DIR/py-stubs"
+mkdir -p "$STUB_PY"
+cat > "$STUB_PY/sentence_transformers.py" <<'EOF'
+raise ImportError("disabled in test")
+EOF
 
 cat > "$WORLD_MODEL" <<'EOF'
 {
@@ -95,6 +101,33 @@ cat > "$WORLD_MODEL" <<'EOF'
 }
 EOF
 
+cat > "$WORLD_MODEL_OTHER" <<'EOF'
+{
+  "episode": "ep99",
+  "entities": {
+    "characters": [
+      {
+        "id": "otherhero",
+        "name": "另一位主角",
+        "tier": "protagonist",
+        "variants": [
+          {
+            "variant_id": "default",
+            "appearance": "另一种形态"
+          }
+        ],
+        "abilities": []
+      }
+    ],
+    "locations": [],
+    "skills": []
+  },
+  "relationships": {
+    "social": []
+  }
+}
+EOF
+
 cat > "$SHOT_PACKET" <<'EOF'
 {
   "episode": "ep99",
@@ -128,16 +161,22 @@ cat > "$SHOT_PACKET" <<'EOF'
 }
 EOF
 
-VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" init >/dev/null
-VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" upsert-world-model "$WORLD_MODEL" >/dev/null
+if PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" init >/dev/null 2>&1; then
+  echo "FAIL: vectordb-manager should require --project" >&2
+  exit 1
+fi
 
-VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" search-relations "suye 契约 yehongyi" --episode ep99 --n 3 > "$TMP_DIR/relations.json"
-VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" search-entities "吞天口 苏夜 active 濒危反击 妖力 体力消耗 必须近距离 密林" --type skill --episode ep99 --n 3 > "$TMP_DIR/skills.json"
+PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" --project demo init >/dev/null
+PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" --project demo upsert-world-model "$WORLD_MODEL" >/dev/null
+PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" --project other upsert-world-model "$WORLD_MODEL_OTHER" >/dev/null
 
-VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" upsert-state "$SHOT_PACKET" >/dev/null
-VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" upsert-state "$SHOT_PACKET" >/dev/null
-VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" get-state suye ep99 ep99-shot-01 > "$TMP_DIR/state.json"
-VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" stats > "$TMP_DIR/stats.txt"
+PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" --project demo search-relations "suye 契约 yehongyi" --episode ep99 --n 3 > "$TMP_DIR/relations.json"
+PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" --project demo search-entities "吞天口 苏夜 active 濒危反击 妖力 体力消耗 必须近距离 密林" --type skill --episode ep99 --n 3 > "$TMP_DIR/skills.json"
+
+PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" --project demo upsert-state "$SHOT_PACKET" >/dev/null
+PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" --project demo upsert-state "$SHOT_PACKET" >/dev/null
+PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" --project demo get-state suye ep99 ep99-shot-01 > "$TMP_DIR/state.json"
+PYTHONPATH="$STUB_PY${PYTHONPATH:+:$PYTHONPATH}" VECTORDB_PATH="$DB_PATH" "$PYTHON_BIN" "$ROOT_DIR/scripts/vectordb-manager.py" --project demo stats > "$TMP_DIR/stats.txt"
 
 "$PYTHON_BIN" - <<'PY' "$TMP_DIR" "$DB_PATH"
 import json
@@ -170,7 +209,13 @@ assert "states: 2 条" in stats, stats
 
 db = lancedb.connect(db_path)
 assert db.open_table("states").count_rows() == 2
-assert db.open_table("relations").count_rows() == 2
+relations_table = db.open_table("relations").to_arrow().to_pylist()
+entities_table = db.open_table("entities").to_arrow().to_pylist()
+
+demo_relations = [row for row in relations_table if row["project"] == "demo"]
+assert len(demo_relations) == 2, demo_relations
+other_entities = [row for row in entities_table if row["project"] == "other" and row["name"] == "另一位主角"]
+assert len(other_entities) == 1, entities_table
 PY
 
 echo "PASS: vectordb-manager"

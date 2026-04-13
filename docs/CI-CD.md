@@ -2,7 +2,7 @@
 
 ## 流水线概览
 
-```
+```text
 PR 提交 → lint-validate → security-scan → dry-run-check → ✅ 可合并
 main 合并 → 同上 + compliance-config-test → 通知
 ```
@@ -48,11 +48,11 @@ python3 -c "import yaml; yaml.safe_load(open('config/compliance/blocklist.yaml')
 **规则**：
 - 禁止将任何 API Key 硬编码进脚本或配置文件
 - `config/api-endpoints.yaml` 只存 URL 模板，不存 Key
-- PR diff 中出现疑似 Key 格式（`sk-`、`Bearer ` 后跟长字符串）时 CI 自动阻断
+- PR diff 中出现疑似 Key 格式（`sk-`、`Bearer` 后跟长字符串）时 CI 自动阻断
 
 ## 分支策略（GitHub Flow）
 
-```
+```text
 main           # 唯一长期分支，始终可部署
 feature/*      # 新功能（agent、phase、config 改动）
 fix/*          # 修复
@@ -64,7 +64,7 @@ fix/*          # 修复
 - PR 需 CI 全绿才可合并，使用 squash merge 保持 main 历史整洁
 
 **分支命名**：
-```
+```text
 feature/add-comply-agent
 feature/voice-config-yaml
 fix/gen-worker-retry-logic

@@ -84,7 +84,7 @@
    同上三种结果：auto_approve / human_review / auto_reject
    - redo → 重跑有问题的集数（reason 指出问题）
    ```
-8. 格式转换：
+9. 格式转换：
    - 合并分集剧本为完整文件
    - **写入 `raw/{project}-complete.md`**（供 ~preprocess 直接读取）
    - 同时保留 `outputs/scriptwriter/{project}/complete.md`
