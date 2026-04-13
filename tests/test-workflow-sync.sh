@@ -159,9 +159,9 @@ EOF
 python3 "$FIXTURE_ROOT/scripts-workflow-sync.py" \
   --project-root "$FIXTURE_ROOT" \
   --project demo \
-  --episode ep01
+  --episode ep01 > "$FIXTURE_ROOT/workflow-sync-output.json"
 
-python3 - <<'PY' "$FIXTURE_ROOT"
+python3 - <<'PY' "$FIXTURE_ROOT" "$FIXTURE_ROOT/workflow-sync-output.json"
 import json
 import sys
 from pathlib import Path
@@ -169,6 +169,8 @@ from pathlib import Path
 import yaml
 
 root = Path(sys.argv[1])
+output_json = Path(sys.argv[2])
+sync_output = json.loads(output_json.read_text())
 visual = yaml.safe_load((root / "projects/demo/outputs/ep01/visual-direction.yaml").read_text())
 assert all(shot.get("storyboard_image_path") for shot in visual["shots"])
 # 分镜图引用现在是 @图片N（正确的 Seedance 索引格式），不再是 @分镜图
@@ -184,6 +186,11 @@ assert phase35["status"] == "completed", phase35
 assert phase5["status"] == "completed", phase5
 assert phase5["data"]["total_shots"] == 2, phase5
 assert phase5["data"]["completed"] == 2, phase5
+assert phase5["data"]["deliverables_manifest"].endswith("deliverables/manifest.json"), phase5
+assert phase5["data"]["deliverables_final_video"].endswith("deliverables/final.mp4"), phase5
+assert phase5["data"]["deliverables_shots_dir"].endswith("deliverables/shots"), phase5
+assert phase5["data"]["review_dir"].endswith("/review"), phase5
+assert phase23["data"]["review_preview_file"].endswith("review/storyboard-preview.md"), phase23
 
 packet = json.loads((root / "projects/demo/state/shot-packets/ep01-shot-01.json").read_text())
 assert packet["seedance_inputs"]["prompt"], packet
@@ -224,6 +231,11 @@ assert (root / "projects/demo/outputs/ep01/deliverables/shots/shot-01.mp4").exis
 assert (root / "projects/demo/outputs/ep01/deliverables/shots/shot-02.mp4").exists()
 assert (root / "projects/demo/outputs/ep01/build/raw-videos/33e5c7751ecec384.mp4").exists()
 assert not (root / "projects/demo/outputs/ep01/videos/33e5c7751ecec384.mp4").exists()
+assert sync_output["deliverables_manifest"].endswith("deliverables/manifest.json"), sync_output
+assert sync_output["deliverables_final_video"].endswith("deliverables/final.mp4"), sync_output
+assert sync_output["deliverables_shots_dir"].endswith("deliverables/shots"), sync_output
+assert sync_output["review_dir"].endswith("/review"), sync_output
+assert sync_output["build_raw_videos_dir"].endswith("build/raw-videos"), sync_output
 
 # Task 3: shot packet 新增字段
 packet = json.loads((root / "projects/demo/state/shot-packets/ep01-shot-01.json").read_text())

@@ -141,6 +141,7 @@ python3 scripts/vectordb-manager.py stats
 ### workflow-sync.py — 工作流修复与状态同步
 
 修复 Phase 2.3 / 3.5 缺口，生成本地 fallback 分镜图，编译 shot packet，并同步状态文件。
+同时会整理一层人类可读输出：`deliverables/`、`review/`、`build/raw-videos/`。
 
 ```bash
 python3 scripts/workflow-sync.py --project qyccan --episode ep01

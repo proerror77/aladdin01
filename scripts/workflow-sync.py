@@ -795,6 +795,7 @@ def sync_phase_files(
     outputs_dir = project_root / "projects" / project / "outputs" / episode
     state_dir = project_root / "projects" / project / "state"
     shots = visual_data.get("shots") or []
+    ui_paths = human_facing_paths(project_root, project, episode)
 
     phase2_path = state_dir / f"{episode}-phase2.json"
     if phase2_path.exists():
@@ -822,6 +823,7 @@ def sync_phase_files(
         {
             "storyboard_count": len(shots) if storyboard_ready else 0,
             "preview_file": f"projects/{project}/outputs/{episode}/storyboard-preview.md",
+            "review_preview_file": ui_paths["review_preview"],
         },
     )
 
@@ -888,6 +890,10 @@ def sync_phase_files(
             "backend": (read_json(state_dir / f"{episode}-phase5.json").get("data", {}).get("backend", "unknown")
                         if (state_dir / f"{episode}-phase5.json").exists() else "unknown"),
             "total_size_mb": round(total_size_mb, 2),
+            "deliverables_manifest": ui_paths["deliverables_manifest"],
+            "deliverables_final_video": ui_paths["deliverables_final_video"],
+            "deliverables_shots_dir": ui_paths["deliverables_shots_dir"],
+            "review_dir": ui_paths["review_dir"],
         },
     )
 
@@ -916,6 +922,10 @@ def write_generation_report(
 ) -> None:
     state_dir = project_root / "projects" / project / "state"
     outputs_dir = project_root / "projects" / project / "outputs" / episode
+    deliverables_dir = outputs_dir / "deliverables"
+    final_video = deliverables_dir / "final.mp4"
+    manifest_path = deliverables_dir / "manifest.json"
+    review_dir = outputs_dir / "review"
     lines = [f"# 视频生成报告 - {episode}", "", "## 总览", ""]
 
     shots = visual_data.get("shots") or []
@@ -935,6 +945,9 @@ def write_generation_report(
             f"- 总镜次：{len(shots)}",
             f"- 成功：{success}",
             f"- 失败：{failed}",
+            f"- 最终成片：{relpath(project_root, final_video) if final_video.exists() else '（尚未生成）'}",
+            f"- 交付清单：{relpath(project_root, manifest_path) if manifest_path.exists() else '（尚未生成）'}",
+            f"- 审阅入口：{relpath(project_root, review_dir) if review_dir.exists() else '（尚未生成）'}",
             f"- 生成时间：{utc_now()}",
             "",
             "## 明细",
@@ -953,6 +966,20 @@ def write_generation_report(
 
     report_path = outputs_dir / "generation-report.md"
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def human_facing_paths(project_root: Path, project: str, episode: str) -> dict[str, str]:
+    outputs_dir = project_root / "projects" / project / "outputs" / episode
+    deliverables_dir = outputs_dir / "deliverables"
+    return {
+        "deliverables_dir": relpath(project_root, deliverables_dir),
+        "deliverables_manifest": relpath(project_root, deliverables_dir / "manifest.json"),
+        "deliverables_final_video": relpath(project_root, deliverables_dir / "final.mp4"),
+        "deliverables_shots_dir": relpath(project_root, deliverables_dir / "shots"),
+        "review_dir": relpath(project_root, outputs_dir / "review"),
+        "review_preview": relpath(project_root, outputs_dir / "review" / "storyboard-preview.md"),
+        "build_raw_videos_dir": relpath(project_root, outputs_dir / "build" / "raw-videos"),
+    }
 
 
 def mirror_file(source: Path, target: Path) -> None:
@@ -1336,6 +1363,8 @@ def process_episode(project_root: Path, project: str, episode: str, do_vectordb:
     if do_vectordb:
         sync_vectordb(project_root, project, episode)
 
+    ui_paths = human_facing_paths(project_root, project, episode)
+
     print(
         json.dumps(
             {
@@ -1347,6 +1376,7 @@ def process_episode(project_root: Path, project: str, episode: str, do_vectordb:
                 "completed_shots": completed_shots,
                 "total_shots": total_shots,
                 "vectordb_synced": do_vectordb,
+                **ui_paths,
             },
             ensure_ascii=False,
         )
