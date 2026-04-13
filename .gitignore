@@ -36,3 +36,11 @@ state/vectordb/
 
 # Backup files
 *.backup
+
+# Local project workspaces (do not upload to GitHub)
+projects/
+
+# Local auth artifacts
+dreamina-login-qr.png
+
+.omx/
