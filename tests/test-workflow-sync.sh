@@ -134,6 +134,7 @@ touch "$FIXTURE_ROOT/projects/demo/assets/characters/images/苏夜-qingyucan-sid
 touch "$FIXTURE_ROOT/projects/demo/assets/scenes/images/黑雾森林-day.png"
 touch "$FIXTURE_ROOT/projects/demo/outputs/ep01/videos/shot-01.mp4"
 touch "$FIXTURE_ROOT/projects/demo/outputs/ep01/videos/shot-02.mp4"
+touch "$FIXTURE_ROOT/projects/demo/outputs/ep01/videos/33e5c7751ecec384.mp4"
 
 # Task 5: stale recovery fixture — shot-03 has video on disk but state says pending
 mkdir -p "$FIXTURE_ROOT/projects/demo/state/shot-state"
@@ -212,6 +213,17 @@ view_index = json.loads((root / "projects/demo/state/asset-views/ep01-view-index
 assert view_index["characters"]["苏夜"]["qingyucan"]["front"].endswith("苏夜-qingyucan-front.png"), view_index
 assert view_index["characters"]["苏夜"]["qingyucan"]["side"].endswith("苏夜-qingyucan-side.png"), view_index
 assert view_index["scenes"]["黑雾森林"]["day"].endswith("黑雾森林-day.png"), view_index
+
+# Human-facing deliverables layer
+manifest = json.loads((root / "projects/demo/outputs/ep01/deliverables/manifest.json").read_text())
+assert manifest["episode"] == "ep01", manifest
+assert manifest["shot_count"] == 2, manifest
+assert manifest["final_video"] is None, manifest
+assert manifest["shots"][0].endswith("deliverables/shots/shot-01.mp4"), manifest
+assert (root / "projects/demo/outputs/ep01/deliverables/shots/shot-01.mp4").exists()
+assert (root / "projects/demo/outputs/ep01/deliverables/shots/shot-02.mp4").exists()
+assert (root / "projects/demo/outputs/ep01/build/raw-videos/33e5c7751ecec384.mp4").exists()
+assert not (root / "projects/demo/outputs/ep01/videos/33e5c7751ecec384.mp4").exists()
 
 # Task 3: shot packet 新增字段
 packet = json.loads((root / "projects/demo/state/shot-packets/ep01-shot-01.json").read_text())

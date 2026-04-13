@@ -66,11 +66,17 @@
 
 ```bash
 ./scripts/concat-episode.sh ep01
+./scripts/concat-episode.sh --project qyccan ep01
 ```
 
 **依赖**：`ffmpeg`
 
 **注意**：Seedance 有/无音轨混合拼接时，需先补静音轨再 concat，脚本已内置处理。
+
+**项目模式输出**：
+- 最终成片：`projects/{project}/outputs/{ep}/deliverables/final.mp4`
+- 逐镜成片：`projects/{project}/outputs/{ep}/deliverables/shots/`
+- 清单：`projects/{project}/outputs/{ep}/deliverables/manifest.json`
 
 ### trace.sh — Agent Trace Log 写入
 

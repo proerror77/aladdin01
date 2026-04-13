@@ -99,6 +99,7 @@ teardown() {
   rm -rf "$TEST_DIR"
   # Clean up any outputs we created
   rm -rf "outputs/test-ep"
+  rm -rf "projects/demo"
 }
 
 # ── empty directory error ───────────────────────────────────────────────────
@@ -220,4 +221,45 @@ FFSTUB
   [ "$status" -eq 0 ]
   [[ "$output" == *"完成"* ]]
   [[ "$output" == *"保留"* ]]
+}
+
+@test "concat: project mode writes human-facing deliverables layout" {
+  mkdir -p "projects/demo/outputs/ep01/videos"
+  echo "fake-video-1" > "projects/demo/outputs/ep01/videos/shot-01.mp4"
+  echo "fake-video-2" > "projects/demo/outputs/ep01/videos/shot-02.mp4"
+
+  cat > "${STUB_BIN}/ffprobe" << 'PROBSTUB'
+#!/usr/bin/env bash
+for arg in "$@"; do
+  if [[ "$arg" == "-select_streams" ]]; then SELECT=next; continue; fi
+  if [[ "${SELECT:-}" == "next" && "$arg" == "a" ]]; then
+    echo "codec_name=aac"; exit 0
+  fi
+  if [[ "$arg" == "-show_entries" ]]; then SHOW=next; continue; fi
+  if [[ "${SHOW:-}" == "next" && "$arg" == "format=duration" ]]; then
+    echo "16.0"; exit 0
+  fi
+done
+echo "codec_name=aac"
+PROBSTUB
+  chmod +x "${STUB_BIN}/ffprobe"
+
+  cat > "${STUB_BIN}/ffmpeg" << 'FFSTUB'
+#!/usr/bin/env bash
+for arg in "$@"; do
+  if [[ "$arg" == *.mp4 && ! -f "$arg" ]]; then
+    mkdir -p "$(dirname "$arg")"
+    echo "stub" > "$arg"
+  fi
+done
+exit 0
+FFSTUB
+  chmod +x "${STUB_BIN}/ffmpeg"
+
+  run bash "$SCRIPT" --project demo ep01
+  [ "$status" -eq 0 ]
+  [ -f "projects/demo/outputs/ep01/deliverables/final.mp4" ]
+  [ -f "projects/demo/outputs/ep01/deliverables/shots/shot-01.mp4" ]
+  [ -f "projects/demo/outputs/ep01/deliverables/shots/shot-02.mp4" ]
+  [ -f "projects/demo/outputs/ep01/deliverables/manifest.json" ]
 }

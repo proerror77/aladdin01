@@ -955,6 +955,133 @@ def write_generation_report(
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def mirror_file(source: Path, target: Path) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        try:
+            if (
+                target.stat().st_size == source.stat().st_size
+                and int(target.stat().st_mtime) == int(source.stat().st_mtime)
+            ):
+                return
+        except FileNotFoundError:
+            pass
+        target.unlink()
+    try:
+        os.link(source, target)
+    except OSError:
+        shutil.copy2(source, target)
+
+
+def choose_latest_final_video(outputs_dir: Path, episode: str) -> Path | None:
+    candidates = [path for path in outputs_dir.glob(f"{episode}-final*.mp4") if path.is_file()]
+    if not candidates:
+        return None
+    return max(candidates, key=lambda path: (path.stat().st_mtime, path.name))
+
+
+def sync_human_facing_outputs(
+    project_root: Path,
+    project: str,
+    episode: str,
+    visual_data: dict[str, Any],
+) -> None:
+    outputs_dir = project_root / "projects" / project / "outputs" / episode
+    videos_dir = outputs_dir / "videos"
+    deliverables_dir = outputs_dir / "deliverables"
+    deliverables_shots_dir = deliverables_dir / "shots"
+    build_raw_videos_dir = outputs_dir / "build" / "raw-videos"
+    review_dir = outputs_dir / "review"
+    review_dir.mkdir(parents=True, exist_ok=True)
+
+    raw_video_pattern = re.compile(r"[0-9a-f]{16}\.mp4$", re.IGNORECASE)
+    raw_video_paths: list[str] = []
+    if videos_dir.exists():
+        for candidate in sorted(videos_dir.glob("*.mp4")):
+            if raw_video_pattern.fullmatch(candidate.name):
+                target = build_raw_videos_dir / candidate.name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                if target.exists():
+                    target.unlink()
+                shutil.move(str(candidate), str(target))
+
+    if build_raw_videos_dir.exists():
+        raw_video_paths = [
+            relpath(project_root, path)
+            for path in sorted(build_raw_videos_dir.glob("*.mp4"))
+            if path.is_file()
+        ]
+
+    shots = visual_data.get("shots") or []
+    keep_shot_names: set[str] = set()
+    deliverable_shots: list[str] = []
+    for shot in shots:
+        shot_index = int(shot["shot_index"])
+        shot_name = f"shot-{shot_index:02d}.mp4"
+        source = videos_dir / shot_name
+        if not source.exists():
+            continue
+        target = deliverables_shots_dir / shot_name
+        mirror_file(source, target)
+        keep_shot_names.add(shot_name)
+        deliverable_shots.append(relpath(project_root, target))
+
+    if deliverables_shots_dir.exists():
+        for stale in deliverables_shots_dir.glob("shot-*.mp4"):
+            if stale.name not in keep_shot_names:
+                stale.unlink()
+
+    final_video_rel: str | None = None
+    latest_final = choose_latest_final_video(outputs_dir, episode)
+    final_target = deliverables_dir / "final.mp4"
+    if latest_final is not None:
+        mirror_file(latest_final, final_target)
+        final_video_rel = relpath(project_root, final_target)
+    elif final_target.exists():
+        final_video_rel = relpath(project_root, final_target)
+
+    preview_source = outputs_dir / "storyboard-preview.md"
+    review_preview_rel: str | None = None
+    if preview_source.exists():
+        review_preview = review_dir / "storyboard-preview.md"
+        mirror_file(preview_source, review_preview)
+        review_preview_rel = relpath(project_root, review_preview)
+
+    review_readme = review_dir / "README.md"
+    review_lines = [
+        f"# Review Bundle - {episode}",
+        "",
+        f"- Storyboard preview: `{review_preview_rel or '（未生成）'}`",
+        f"- Storyboard images: `projects/{project}/outputs/{episode}/storyboard/`",
+        "",
+        "此目录是给人查看的入口；流水线内部文件仍保留在原始目录。",
+    ]
+    review_readme.write_text("\n".join(review_lines) + "\n", encoding="utf-8")
+
+    manifest = {
+        "project": project,
+        "episode": episode,
+        "shot_count": len(shots),
+        "completed_shots": len(deliverable_shots),
+        "shots": deliverable_shots,
+        "final_video": final_video_rel,
+        "raw_videos": raw_video_paths,
+        "review_preview": review_preview_rel,
+        "updated_at": utc_now(),
+    }
+    write_json(deliverables_dir / "manifest.json", manifest)
+
+    summary_lines = [
+        f"# Deliverables - {episode}",
+        "",
+        f"- Final video: `{final_video_rel or '（尚未拼接）'}`",
+        f"- Shot videos: `{relpath(project_root, deliverables_shots_dir)}`",
+        f"- Review bundle: `projects/{project}/outputs/{episode}/review/`",
+        f"- Raw downloads: `projects/{project}/outputs/{episode}/build/raw-videos/`",
+    ]
+    (deliverables_dir / "README.md").write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+
+
 def sync_vectordb(project_root: Path, project: str, episode: str) -> None:
     python_bin = repo_python(project_root)
     world_model = project_root / "projects" / project / "state" / "ontology" / f"{episode}-world-model.json"
@@ -1202,6 +1329,7 @@ def process_episode(project_root: Path, project: str, episode: str, do_vectordb:
 
     shot_packets_count = compile_shot_packets(project_root, project, episode, visual_data, world_model, view_index)
     completed_shots, total_shots = sync_shot_states(project_root, project, episode, visual_data)
+    sync_human_facing_outputs(project_root, project, episode, visual_data)
     sync_phase_files(project_root, project, episode, visual_data, shot_packets_count, completed_shots, total_shots)
     write_generation_report(project_root, project, episode, visual_data)
 
