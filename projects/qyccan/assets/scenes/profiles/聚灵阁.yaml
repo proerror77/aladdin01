@@ -1,8 +1,0 @@
-name: 聚灵阁
-project: qyccan
-description: 储存灵石、丹药、法宝的阁楼，苏夜的觅食圣地。
-time_variants:
-- day
-- night
-atmosphere: 神秘、灵气充沛
-first_episode: qyccan-ep04

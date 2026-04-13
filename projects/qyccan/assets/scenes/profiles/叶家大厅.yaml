@@ -1,8 +1,0 @@
-name: 叶家大厅
-project: qyccan
-description: 叶家内部大厅，家族议事、比武场所。
-time_variants:
-- day
-- night
-atmosphere: 庄严、权威
-first_episode: qyccan-ep03

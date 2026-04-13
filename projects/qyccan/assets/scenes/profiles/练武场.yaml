@@ -1,7 +1,0 @@
-name: 练武场
-project: qyccan
-description: 叶家或学院的练武场地，日常修炼场所。
-time_variants:
-- day
-atmosphere: 训练、修炼
-first_episode: qyccan-ep04
