@@ -4,8 +4,9 @@ name: seedance-v2
 # default_model 为当前推荐使用的模型，gen-worker 默认使用此值
 # 如需切换模型，修改 default_model 即可，无需改动代码
 models:
-  # Seedance 2.0（最新旗舰，API 尚未开放，敬请期待）
-  seedance_2_0: "doubao-seedance-2.0"
+  # Seedance 2.0（最新旗舰，2026-04-02 正式开放 API）
+  seedance_2_0: "doubao-seedance-2-0-260128"
+  seedance_2_0_fast: "doubao-seedance-2-0-fast-260128"
 
   # Seedance 1.5 pro（当前可用最高质量，支持音画同生）
   seedance_1_5_pro: "doubao-seedance-1-5-pro-251215"
@@ -16,8 +17,8 @@ models:
   seedance_1_0_lite_t2v: "doubao-seedance-1-0-lite-t2v-250428"
   seedance_1_0_lite_i2v: "doubao-seedance-1-0-lite-i2v-250428"
 
-# 当前默认使用的模型（API 开放后改为 seedance_2_0 即可）
-default_model: "doubao-seedance-1-5-pro-251215"
+# 当前默认使用的模型（已切换至 Seedance 2.0）
+default_model: "doubao-seedance-2-0-260128"
 
 max_prompt_length: 2000
 
@@ -34,7 +35,8 @@ prompt_formula:
 
 generation_duration:
   # 各模型时长上限（gen-worker 和 visual-agent 按 default_model 读取对应值）
-  seedance_2_0: {min: 4, max: 15}  # API 尚未开放
+  seedance_2_0: {min: 4, max: 15}
+  seedance_2_0_fast: {min: 4, max: 15}
   seedance_1_5_pro: { min: 4, max: 12 }
   seedance_1_0_pro: { min: 2, max: 12 }
   seedance_1_0_pro_fast: { min: 2, max: 12 }
@@ -42,7 +44,7 @@ generation_duration:
   seedance_1_0_lite_i2v: { min: 2, max: 12 }
   # 当前默认（与 default_model 对应，切换模型时同步更新）
   current_min: 4
-  current_max: 12
+  current_max: 15
 
 # 宽高比选项
 ratio_options:
@@ -54,11 +56,12 @@ ratio_options:
   - "9:16"
   - "adaptive"  # 根据参考图自动决定
 
-# 分辨率选项
+# 分辨率选项（Seedance 2.0 新增 2K）
 resolution_options:
   - "480p"
   - "720p"
   - "1080p"
+  - "2K"
 
 reference_syntax: "@{asset_name}"
 dialogue_format: "lip_sync"

@@ -19,16 +19,18 @@
 #   ./scripts/api-caller.sh env-check  # 检查环境变量
 #   ./scripts/api-caller.sh trace-summary <session_dir>  # 生成 LLM 摘要（DEEPSEEK 或 TUZI）
 #
-# Seedance payload 格式（火山方舟官方规范）：
+# Seedance payload 格式（火山方舟官方规范，Seedance 2.0）：
 # {
-#   "model": "doubao-seedance-1-5-pro-251215",
+#   "model": "doubao-seedance-2-0-260128",   // 或 doubao-seedance-2-0-fast-260128
 #   "content": [
 #     { "type": "text", "text": "提示词" },
-#     { "type": "image_url", "image_url": { "url": "首帧图片URL" } }  // 图生视频时添加
+#     { "type": "image_url", "image_url": { "url": "图片URL" }, "role": "reference_image" },
+#     { "type": "video_url", "video_url": { "url": "视频URL" }, "role": "reference_video" },  // 2.0 新增
+#     { "type": "audio_url", "audio_url": { "url": "音频URL" }, "role": "reference_audio" }   // 2.0 新增
 #   ],
-#   "ratio": "16:9",      // 21:9 / 16:9 / 4:3 / 1:1 / 3:4 / 9:16 / adaptive
-#   "duration": 5,        // 4~12 秒（Seedance 1.5 pro）
-#   "resolution": "1080p", // 480p / 720p / 1080p
+#   "ratio": "16:9",        // 21:9 / 16:9 / 4:3 / 1:1 / 3:4 / 9:16 / adaptive
+#   "duration": 5,          // 4~15 秒（Seedance 2.0）
+#   "resolution": "1080p",  // 480p / 720p / 1080p / 2K（2.0 新增 2K）
 #   "generate_audio": true,
 #   "watermark": false
 # }

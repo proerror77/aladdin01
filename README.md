@@ -15,7 +15,7 @@ Aladdin 是一套运行在 **Claude Code** 里的 AI Agent 系统。你在 Claud
 
 - **剧本创作**：从一句话创意生成完整分集剧本（大纲 → 角色/场景 → 分集 → 质检）
 - **视觉生成**：合规预检 → 视觉指导 → 参考图 → 视频生成，全流程自动化
-- **多模式支持**：text\_to\_video（v1.0 快速原型）和 img2video（v2.0 高质量长剧）
+- **多模式支持**：text\_to\_video（v1.0 快速原型）和 img2video（v2.0 高质量长剧），视频/音频多模态参考（Seedance 2.0）
 - **批量处理**：多集并行生成，断点续传，多人协作任务分配
 - **质量保证**：自动评分过关（Auto-Gate）、飞书异步审核、A/B 提示词测试
 - **可观测性**：Agent Trace Log，支持路径追踪、回溯诊断、LLM 自动摘要
@@ -53,6 +53,8 @@ npm install -g @anthropic-ai/claude-code
 |-----|------|---------|
 | `ARK_API_KEY` | 视频生成（必需） | [火山方舟](https://www.volcengine.com/product/ark) |
 | `TUZI_API_KEY` | 图像生成 + LLM（推荐） | [兔子 API](https://api.tu-zi.com) |
+
+> **Seedance 2.0 说明**：模型已于 2026-04-02 正式开放 API，需账户余额 ≥ 200 元才能开通。默认模型已切换至 `doubao-seedance-2-0-260128`，支持图片/视频/音频多模态输入、时长 4-15 秒、最高 2K 分辨率。
 
 ```bash
 export ARK_API_KEY="your-key-here"
