@@ -12,7 +12,8 @@ import time
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent
-API_CALLER = PROJECT_ROOT / "scripts/api-caller.sh"
+REPO_ROOT = PROJECT_ROOT.parent.parent
+API_CALLER = REPO_ROOT / "scripts/api-caller.sh"
 PACKS_CHARS = PROJECT_ROOT / "assets/packs/characters"
 PACKS_SCENES = PROJECT_ROOT / "assets/packs/scenes"
 PACKS_PROPS  = PROJECT_ROOT / "assets/packs/props"
@@ -141,7 +142,7 @@ def generate_image(prompt: str, output_path: Path) -> bool:
         print(f"  [skip] {output_path.name} 已存在")
         return True
 
-    payload = {"model": "gpt-4o-image", "prompt": prompt, "n": 1, "size": "1024x1024"}
+    payload = {"model": "gpt-image-2", "prompt": prompt, "n": 1, "size": "1:1"}
     PAYLOAD_TMP.write_text(json.dumps(payload, ensure_ascii=False))
 
     print(f"  [gen ] {output_path.name} ...")

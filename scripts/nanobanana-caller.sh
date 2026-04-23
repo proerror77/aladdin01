@@ -35,6 +35,73 @@ map_quality() {
     esac
 }
 
+# 带 429 退避的 API 请求封装
+api_post_with_retry() {
+    local payload="$1"
+    local max_retries="${CURL_MAX_RETRIES:-3}"
+    local attempt=1
+
+    while (( attempt <= max_retries )); do
+        local tmp_file
+        tmp_file=$(mktemp)
+        local http_code
+        if ! http_code=$(curl -sS -w "%{http_code}" -o "$tmp_file" \
+            --connect-timeout 10 \
+            --max-time 120 \
+            -X POST "$API_URL" \
+            -H "Authorization: Bearer ${NANOBANANA_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$payload"); then
+            rm -f "$tmp_file"
+            return 1
+        fi
+        local body
+        body=$(cat "$tmp_file")
+        rm -f "$tmp_file"
+
+        if [[ "$http_code" == "429" ]]; then
+            local wait=$(( 2 ** attempt + RANDOM % 5 ))
+            echo "[WARN] Rate limited (429), waiting ${wait}s" \
+                "(attempt ${attempt}/${max_retries})" >&2
+            sleep "$wait"
+            (( attempt++ ))
+            continue
+        fi
+
+        if [[ "$http_code" -ge 200 && "$http_code" -lt 300 ]]; then
+            echo "$body"
+            return 0
+        fi
+
+        echo "$body" >&2
+        return 1
+    done
+
+    echo "[ERROR] Max retries (${max_retries}) exceeded after rate limiting" >&2
+    return 1
+}
+
+download_image() {
+    local image_url="$1"
+    local output_path="$2"
+    local tmp_output="${output_path}.tmp.$$"
+
+    rm -f "$tmp_output"
+    if ! curl -fL -sS --max-time 60 -o "$tmp_output" "$image_url"; then
+        rm -f "$tmp_output" "$output_path"
+        echo "错误: 图像下载失败" >&2
+        return 1
+    fi
+
+    if [[ ! -s "$tmp_output" ]]; then
+        rm -f "$tmp_output" "$output_path"
+        echo "错误: 图像下载为空" >&2
+        return 1
+    fi
+
+    mv "$tmp_output" "$output_path"
+}
+
 # 生成图像（文生图）
 generate_image() {
     local prompt="$1"
@@ -66,13 +133,7 @@ generate_image() {
         }')
 
     local response
-    response=$(curl -sS --fail-with-body \
-        --connect-timeout 10 \
-        --max-time 120 \
-        -X POST "$API_URL" \
-        -H "Authorization: Bearer ${NANOBANANA_API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d "$payload")
+    response=$(api_post_with_retry "$payload")
 
     # 检查错误
     if echo "$response" | jq -e '.error' > /dev/null 2>&1; then
@@ -89,7 +150,7 @@ generate_image() {
         return 1
     fi
 
-    curl -fL -sS --max-time 60 -o "$output_path" "$image_url"
+    download_image "$image_url" "$output_path"
 
     if [[ -f "$output_path" && -s "$output_path" ]]; then
         local size
@@ -97,7 +158,6 @@ generate_image() {
         echo "✓ 图像已保存: $output_path ($size)" >&2
         return 0
     else
-        echo "错误: 图像下载失败" >&2
         rm -f "$output_path"
         return 1
     fi
@@ -136,13 +196,7 @@ generate_image_from_ref() {
         }')
 
     local response
-    response=$(curl -sS --fail-with-body \
-        --connect-timeout 10 \
-        --max-time 120 \
-        -X POST "$API_URL" \
-        -H "Authorization: Bearer ${NANOBANANA_API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d "$payload")
+    response=$(api_post_with_retry "$payload")
 
     if echo "$response" | jq -e '.error' > /dev/null 2>&1; then
         echo "错误: $(echo "$response" | jq -r '.error.message // .error')" >&2
@@ -156,7 +210,7 @@ generate_image_from_ref() {
         return 1
     fi
 
-    curl -fL -sS --max-time 60 -o "$output_path" "$image_url"
+    download_image "$image_url" "$output_path"
 
     if [[ -f "$output_path" && -s "$output_path" ]]; then
         local size
@@ -164,7 +218,6 @@ generate_image_from_ref() {
         echo "✓ 图像已保存: $output_path ($size)" >&2
         return 0
     else
-        echo "错误: 图像下载失败" >&2
         rm -f "$output_path"
         return 1
     fi

@@ -56,5 +56,15 @@ tuzi:
     image: "gpt-image-2"            # 图像生成（文生图 + 图生图）
   # size 格式（default 分组用 aspect ratio）
   image_sizes:
-    aspect_ratios: ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"]
+    aspect_ratios:
+      - "1:1"
+      - "2:3"
+      - "3:2"
+      - "3:4"
+      - "4:3"
+      - "4:5"
+      - "5:4"
+      - "9:16"
+      - "16:9"
+      - "21:9"
   timeout_seconds: 120

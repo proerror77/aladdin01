@@ -303,7 +303,7 @@ case "$SERVICE" in
           echo "ERROR: Payload file not found: $INPUT" >&2
           exit 1
         fi
-        safe_curl "$IMAGE_GEN_MAX_TIME" -X POST "${BASE_URL}/v1/images/generations" \
+        safe_curl_with_retry "$IMAGE_GEN_MAX_TIME" -X POST "${BASE_URL}/v1/images/generations" \
           -H "Authorization: Bearer ${API_KEY}" \
           -H "Content-Type: application/json" \
           -d @"${INPUT}"
