@@ -89,7 +89,7 @@ generate_image() {
         return 1
     fi
 
-    curl -sS --max-time 60 -o "$output_path" "$image_url"
+    curl -fL -sS --max-time 60 -o "$output_path" "$image_url"
 
     if [[ -f "$output_path" && -s "$output_path" ]]; then
         local size
@@ -156,7 +156,7 @@ generate_image_from_ref() {
         return 1
     fi
 
-    curl -sS --max-time 60 -o "$output_path" "$image_url"
+    curl -fL -sS --max-time 60 -o "$output_path" "$image_url"
 
     if [[ -f "$output_path" && -s "$output_path" ]]; then
         local size
