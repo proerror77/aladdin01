@@ -43,6 +43,8 @@ tts:
 
 tuzi:
   # Tuzi OpenAI-compatible proxy（支持 GPT / Gemini / Claude 等多模型）
+  # default 分组：简化 JSON，size 用 aspect ratio，支持 image 字段做图生图
+  # 官方兼容分组（codex/openai/原价）：标准 OpenAI 格式，size 用像素
   base_url: "https://api.tu-zi.com/v1"
   api_key: "${TUZI_API_KEY}"
   endpoints:
@@ -51,5 +53,18 @@ tuzi:
   # 推荐模型
   models:
     default: "nano-banana-vip"      # 默认轻量模型（路由到 gemini-2.5-flash）
-    image: "nano-banana-vip"        # 图像生成（支持 /v1/images/generations）
+    image: "gpt-image-2"            # 图像生成（文生图 + 图生图）
+  # size 格式（default 分组用 aspect ratio）
+  image_sizes:
+    aspect_ratios:
+      - "1:1"
+      - "2:3"
+      - "3:2"
+      - "3:4"
+      - "4:3"
+      - "4:5"
+      - "5:4"
+      - "9:16"
+      - "16:9"
+      - "21:9"
   timeout_seconds: 120

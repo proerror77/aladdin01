@@ -87,14 +87,14 @@ def generate_scene_prompt(scene_name: str, description: str, time_of_day: Option
 要求：场景概念设计，清晰展示空间布局和氛围，专业场景设计稿"""
 
 
-def call_image_api(prompt: str, output_path: Path, model: str = "gpt-4o-image") -> Optional[str]:
+def call_image_api(prompt: str, output_path: Path, model: str = "gpt-image-2") -> Optional[str]:
     """
     调用图像生成 API
 
     Args:
         prompt: 提示词
         output_path: 输出图片路径
-        model: 模型名称（默认 gpt-4o-image，兔子 API 支持）
+        model: 模型名称（默认 gpt-image-2，兔子 API 支持）
 
     Returns:
         成功返回图片路径，失败返回 None
@@ -104,7 +104,7 @@ def call_image_api(prompt: str, output_path: Path, model: str = "gpt-4o-image") 
         "model": model,
         "prompt": prompt,
         "n": 1,
-        "size": "1024x1024"
+        "size": "1:1"
     }
 
     payload_file = Path("/tmp/image_gen_payload.json")
