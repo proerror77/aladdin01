@@ -15,10 +15,10 @@ echo ""
 echo "生成：苏夜 - 青玉蚕形态（三视图）"
 cat > /tmp/suye-qingyucan-front.json << 'EOF'
 {
-  "model": "gpt-4o-image",
+  "model": "gpt-image-2",
   "prompt": "Character design: Su Ye (Green Jade Silkworm form). A chubby, bright green silkworm with mischievous eyes, thumb-sized, cute but with a slightly smug expression. Front view, white background, professional character concept art, clear features, uniform lighting.",
   "n": 1,
-  "size": "1024x1024"
+  "size": "1:1"
 }
 EOF
 
@@ -33,10 +33,10 @@ fi
 
 cat > /tmp/suye-qingyucan-side.json << 'EOF'
 {
-  "model": "gpt-4o-image",
+  "model": "gpt-image-2",
   "prompt": "Character design: Su Ye (Green Jade Silkworm form). A chubby, bright green silkworm with mischievous eyes, thumb-sized. Side view, white background, professional character concept art, clear features, uniform lighting.",
   "n": 1,
-  "size": "1024x1024"
+  "size": "1:1"
 }
 EOF
 
@@ -51,10 +51,10 @@ fi
 
 cat > /tmp/suye-qingyucan-back.json << 'EOF'
 {
-  "model": "gpt-4o-image",
+  "model": "gpt-image-2",
   "prompt": "Character design: Su Ye (Green Jade Silkworm form). A chubby, bright green silkworm with mischievous eyes, thumb-sized. Back view, white background, professional character concept art, clear features, uniform lighting.",
   "n": 1,
-  "size": "1024x1024"
+  "size": "1:1"
 }
 EOF
 
@@ -73,10 +73,10 @@ echo ""
 echo "生成：苏夜 - 碧鳞蛇形态（三视图）"
 cat > /tmp/suye-bilinse-front.json << 'EOF'
 {
-  "model": "gpt-4o-image",
+  "model": "gpt-image-2",
   "prompt": "Character design: Su Ye (Emerald Scale Snake form). A chopstick-length snake covered in exquisite emerald green scales, golden pupils, forked tongue visible, elegant and slightly menacing. Front view, white background, professional character concept art, clear features, uniform lighting.",
   "n": 1,
-  "size": "1024x1024"
+  "size": "1:1"
 }
 EOF
 

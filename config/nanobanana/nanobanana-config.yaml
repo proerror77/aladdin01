@@ -1,6 +1,6 @@
 api:
-  base_url: "https://generativelanguage.googleapis.com/v1beta"
-  model: "gemini-3-pro-image-preview"
+  base_url: "https://api.tu-zi.com/v1"
+  model: "gpt-image-2"
   api_key_env: "TUZI_API_KEY"
 
 generation:

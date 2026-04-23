@@ -1,6 +1,6 @@
 #!/bin/bash
 # scripts/nanobanana-caller.sh
-# Nanobanana API 调用脚本
+# Nanobanana API 调用脚本（通过 Tuzi gpt-image-2 default 分组）
 
 set -euo pipefail
 
@@ -13,11 +13,11 @@ if [[ -f "$CONFIG_FILE" ]]; then
     MODEL=$(yq eval '.api.model' "$CONFIG_FILE")
     BASE_URL=$(yq eval '.api.base_url' "$CONFIG_FILE")
 else
-    MODEL="gemini-3-pro-image-preview"
-    BASE_URL="https://generativelanguage.googleapis.com/v1beta"
+    MODEL="gpt-image-2"
+    BASE_URL="https://api.tu-zi.com/v1"
 fi
 
-API_URL="${BASE_URL}/models/${MODEL}:generateContent"
+API_URL="${BASE_URL}/images/generations"
 
 # 检查 API Key
 if [[ -z "$NANOBANANA_API_KEY" ]]; then
@@ -25,7 +25,17 @@ if [[ -z "$NANOBANANA_API_KEY" ]]; then
     exit 1
 fi
 
-# 生成图像
+# 映射 image_size 到 quality
+map_quality() {
+    local image_size="$1"
+    case "$image_size" in
+        2K|2k) echo "high" ;;
+        1K|1k) echo "medium" ;;
+        *) echo "auto" ;;
+    esac
+}
+
+# 生成图像（文生图）
 generate_image() {
     local prompt="$1"
     local aspect_ratio="${2:-1:1}"
@@ -37,45 +47,125 @@ generate_image() {
     echo "  宽高比: $aspect_ratio" >&2
     echo "  分辨率: $image_size" >&2
 
+    local quality
+    quality=$(map_quality "$image_size")
+
     local payload
-    payload=$(cat <<EOF
-{
-  "contents": [{
-    "role": "user",
-    "parts": [{"text": "${prompt}"}]
-  }],
-  "generation_config": {
-    "response_modalities": ["IMAGE"],
-    "image_config": {
-      "aspect_ratio": "${aspect_ratio}",
-      "image_size": "${image_size}"
-    }
-  }
-}
-EOF
-)
+    payload=$(jq -cn \
+        --arg model "$MODEL" \
+        --arg prompt "$prompt" \
+        --arg size "$aspect_ratio" \
+        --arg quality "$quality" \
+        '{
+            model: $model,
+            prompt: $prompt,
+            n: 1,
+            size: $size,
+            quality: $quality,
+            response_format: "url"
+        }')
 
     local response
-    response=$(curl -s -X POST "${API_URL}?key=${NANOBANANA_API_KEY}" \
+    response=$(curl -sS --fail-with-body \
+        --connect-timeout 10 \
+        --max-time 120 \
+        -X POST "$API_URL" \
+        -H "Authorization: Bearer ${NANOBANANA_API_KEY}" \
         -H "Content-Type: application/json" \
-        -d "${payload}")
+        -d "$payload")
 
     # 检查错误
     if echo "$response" | jq -e '.error' > /dev/null 2>&1; then
-        echo "错误: $(echo "$response" | jq -r '.error.message')" >&2
+        echo "错误: $(echo "$response" | jq -r '.error.message // .error')" >&2
         return 1
     fi
 
-    # 提取 base64 图像并保存
-    echo "$response" | jq -r '.candidates[0].content.parts[0].inline_data.data' | base64 -d > "$output_path"
+    # 提取 URL 并下载图片
+    local image_url
+    image_url=$(echo "$response" | jq -r '.data[0].url // empty')
+    if [[ -z "$image_url" ]]; then
+        echo "错误: 响应中未找到图片 URL" >&2
+        echo "响应: $response" >&2
+        return 1
+    fi
 
-    if [[ -f "$output_path" ]]; then
+    curl -sS --max-time 60 -o "$output_path" "$image_url"
+
+    if [[ -f "$output_path" && -s "$output_path" ]]; then
         local size
         size=$(du -h "$output_path" | cut -f1)
         echo "✓ 图像已保存: $output_path ($size)" >&2
         return 0
     else
-        echo "错误: 图像保存失败" >&2
+        echo "错误: 图像下载失败" >&2
+        rm -f "$output_path"
+        return 1
+    fi
+}
+
+# 图生图
+generate_image_from_ref() {
+    local prompt="$1"
+    local ref_image="$2"
+    local aspect_ratio="${3:-1:1}"
+    local image_size="${4:-2K}"
+    local output_path="$5"
+
+    echo "图生图: $output_path" >&2
+    echo "  提示词: ${prompt:0:100}..." >&2
+    echo "  参考图: $ref_image" >&2
+
+    local quality
+    quality=$(map_quality "$image_size")
+
+    local payload
+    payload=$(jq -cn \
+        --arg model "$MODEL" \
+        --arg prompt "$prompt" \
+        --arg image "$ref_image" \
+        --arg size "$aspect_ratio" \
+        --arg quality "$quality" \
+        '{
+            model: $model,
+            prompt: $prompt,
+            image: $image,
+            n: 1,
+            size: $size,
+            quality: $quality,
+            response_format: "url"
+        }')
+
+    local response
+    response=$(curl -sS --fail-with-body \
+        --connect-timeout 10 \
+        --max-time 120 \
+        -X POST "$API_URL" \
+        -H "Authorization: Bearer ${NANOBANANA_API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d "$payload")
+
+    if echo "$response" | jq -e '.error' > /dev/null 2>&1; then
+        echo "错误: $(echo "$response" | jq -r '.error.message // .error')" >&2
+        return 1
+    fi
+
+    local image_url
+    image_url=$(echo "$response" | jq -r '.data[0].url // empty')
+    if [[ -z "$image_url" ]]; then
+        echo "错误: 响应中未找到图片 URL" >&2
+        return 1
+    fi
+
+    curl -sS --max-time 60 -o "$output_path" "$image_url"
+
+    if [[ -f "$output_path" && -s "$output_path" ]]; then
+        local size
+        size=$(du -h "$output_path" | cut -f1)
+        echo "✓ 图像已保存: $output_path ($size)" >&2
+        return 0
+    else
+        echo "错误: 图像下载失败" >&2
+        rm -f "$output_path"
         return 1
     fi
 }
@@ -158,6 +248,9 @@ main() {
         generate)
             generate_image "$2" "$3" "$4" "$5"
             ;;
+        image-from-ref)
+            generate_image_from_ref "$2" "$3" "$4" "$5" "$6"
+            ;;
         character-pack)
             generate_character_pack "$2" "$3" "$4"
             ;;
@@ -172,6 +265,7 @@ main() {
             echo ""
             echo "命令:"
             echo "  generate <prompt> <aspect_ratio> <image_size> <output_path>"
+            echo "  image-from-ref <prompt> <ref_image_url> <aspect_ratio> <image_size> <output_path>"
             echo "  character-pack <name> <variant> <appearance>"
             echo "  scene-styleframe <name> <time_of_day> <description> <lighting>"
             echo "  prop-pack <name> <description> <condition>"

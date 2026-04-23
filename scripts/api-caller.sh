@@ -8,7 +8,7 @@
 #   ./scripts/api-caller.sh image_gen download <image_url> <output_file>
 #   ./scripts/api-caller.sh moderation check-file <text_file>
 #   ./scripts/api-caller.sh tuzi chat <payload.json>         # Tuzi LLM（nano-banana-vip 等）
-#   ./scripts/api-caller.sh tuzi image <payload.json>        # Tuzi 图像生成（gpt-4o-image）
+#   ./scripts/api-caller.sh tuzi image <payload.json>        # Tuzi 图像生成（gpt-image-2）
 #   ./scripts/api-caller.sh tuzi models                      # 列出可用模型
 #   ./scripts/api-caller.sh dreamina submit <payload.json>   # 提交 dreamina 生成任务
 #   ./scripts/api-caller.sh dreamina query <submit_id>       # 查询 dreamina 任务结果
@@ -174,7 +174,7 @@ if [[ "$SERVICE" == "env-check" ]]; then
   # image_gen：IMAGE_GEN_API_URL 未设时可 fallback 到 tuzi，给出提示而不报错
   if [[ -z "${IMAGE_GEN_API_URL:-}" ]]; then
     if [[ -n "${TUZI_API_KEY:-}" ]]; then
-      echo "Info: IMAGE_GEN_API_URL not set, will fallback to tuzi (gpt-4o-image)"
+      echo "Info: IMAGE_GEN_API_URL not set, will fallback to tuzi (gpt-image-2)"
     else
       echo "Missing: IMAGE_GEN_API_URL (or set TUZI_API_KEY as fallback)" >&2
       ((missing++))
@@ -288,7 +288,7 @@ case "$SERVICE" in
       fi
       BASE_URL="https://api.tu-zi.com"
       API_KEY="${TUZI_API_KEY}"
-      echo "Info: IMAGE_GEN_API_URL not set, using tuzi fallback (nano-banana-vip)" >&2
+      echo "Info: IMAGE_GEN_API_URL not set, using tuzi fallback (gpt-image-2)" >&2
     elif [[ -z "$API_KEY" ]]; then
       echo "ERROR: IMAGE_GEN_API_KEY must be set" >&2
       exit 1
@@ -395,7 +395,9 @@ print(json.dumps(payload))
     ;;
 
   tuzi)
-    # Tuzi OpenAI-compatible proxy（nano-banana-vip / gpt-4o-image 等）
+    # Tuzi OpenAI-compatible proxy
+    # default 分组：简化 JSON 格式，size 用 aspect ratio（1:1, 9:16 等），支持 image 字段做图生图
+    # 官方兼容分组（codex/openai/原价）：标准 OpenAI 格式，size 用像素（1024x1024 等）
     API_KEY="${TUZI_API_KEY:-}"
     if [[ -z "$API_KEY" ]]; then
       echo "ERROR: TUZI_API_KEY must be set" >&2
@@ -417,13 +419,15 @@ print(json.dumps(payload))
           -d @"${INPUT}"
         ;;
       image)
-        # 图像生成：INPUT 为 payload JSON 文件
-        # payload 格式：{"model": "gpt-4o-image", "prompt": "...", "n": 1, "size": "1024x1024"}
+        # 图像生成（default 分组格式）：INPUT 为 payload JSON 文件
+        # 文生图：{"model": "gpt-image-2", "prompt": "...", "n": 1, "size": "1:1"}
+        # 图生图：{"model": "gpt-image-2", "prompt": "...", "image": "https://..." 或 ["url1","url2"], "n": 1, "size": "9:16"}
+        # size 支持 aspect ratio：1:1, 2:3, 3:2, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9
         if [[ ! -f "$INPUT" ]]; then
           echo "ERROR: Payload file not found: $INPUT" >&2
           exit 1
         fi
-        safe_curl "120" -X POST "${TUZI_BASE}/images/generations" \
+        safe_curl_with_retry "120" -X POST "${TUZI_BASE}/images/generations" \
           -H "Authorization: Bearer ${API_KEY}" \
           -H "Content-Type: application/json" \
           -d @"${INPUT}"
