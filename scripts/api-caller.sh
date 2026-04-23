@@ -137,10 +137,21 @@ safe_curl_with_retry() {
         local tmp_file
         tmp_file=$(mktemp)
         local http_code
-        http_code=$(curl -sS -w "%{http_code}" -o "$tmp_file" \
+        if ! http_code=$(curl -sS -w "%{http_code}" -o "$tmp_file" \
             --connect-timeout "$CONNECT_TIMEOUT" \
             --max-time "$max_time" \
-            "$@")
+            "$@"); then
+            rm -f "$tmp_file"
+            if (( attempt >= max_retries )); then
+                echo "[ERROR] curl failed after ${max_retries} attempt(s)" >&2
+                return 1
+            fi
+            local wait=$(( 2 ** attempt + RANDOM % 5 ))
+            echo "[WARN] curl failed, waiting ${wait}s (attempt ${attempt}/${max_retries})" >&2
+            sleep "$wait"
+            (( attempt++ ))
+            continue
+        fi
         local body
         body=$(cat "$tmp_file")
         rm -f "$tmp_file"
