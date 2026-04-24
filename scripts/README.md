@@ -142,6 +142,28 @@ python3 scripts/workflow-sync.py --project qyccan --episode ep01 --sync-vectordb
 python3 scripts/workflow-sync.py --project qyccan --all-output-episodes
 ```
 
+### ad-workflow.py — 广告片结构与 payload 编译
+
+广告片独立于短剧 episode 流程。先让用户设定总时长，再编译 `hook → product → function → trust → cta` 广告结构、ChatGPT-image-2 storyboard payload 和 Seedance 2.0 分段 payload。
+
+```bash
+python3 scripts/ad-workflow.py init \
+  --project demo \
+  --product "AI广告助手" \
+  --duration 15 \
+  --cta "现在生成第一条广告"
+
+python3 scripts/ad-workflow.py validate \
+  --structure projects/demo/outputs/ads/ai广告助手/ad-structure.yaml
+```
+
+输出：
+
+- `projects/{project}/ads/{ad_id}/brief.yaml`
+- `projects/{project}/outputs/ads/{ad_id}/ad-structure.yaml`
+- `projects/{project}/outputs/ads/{ad_id}/storyboard/tuzi-storyboard-payload.json`
+- `projects/{project}/outputs/ads/{ad_id}/seedance-payloads/*.dreamina.json`
+
 ### design-generate-all.py — 全量参考图生成
 
 `~design` skill 的主脚本，处理角色和场景参考图的批量生成。

@@ -36,3 +36,4 @@ state/vectordb/
 
 # Backup files
 *.backup
+.omx/

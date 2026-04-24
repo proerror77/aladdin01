@@ -12,7 +12,7 @@ fail() { echo "  FAIL: $1"; echo "F" >> "$RESULTS_FILE"; }
 
 assert_contains() {
   local desc="$1" pattern="$2" file="$3"
-  if rg -q "$pattern" "$file"; then
+  if rg -q -- "$pattern" "$file"; then
     pass "$desc"
   else
     fail "$desc"
@@ -109,6 +109,16 @@ echo "=== 11. gen-worker 差异化重试 ==="
 assert_contains "gen-worker 失败分类" 'classify_failure|failure_type' "$ROOT_DIR/.claude/agents/gen-worker.md"
 assert_contains "gen-worker 差异化改写策略" 'simplify_motion|drop_references|truncate' "$ROOT_DIR/.claude/agents/gen-worker.md"
 assert_contains "rewrite-patterns 包含 strategies" 'strategies' "$ROOT_DIR/config/compliance/rewrite-patterns.yaml"
+
+echo ""
+echo "=== 13. 广告片工作流 ==="
+assert_contains "README 暴露 ad-video 命令" '~ad-video' "$ROOT_DIR/README.md"
+assert_contains "ad-video 要求先设定 duration" '--duration|广告总时长' "$ROOT_DIR/.claude/skills/ad-video.md"
+assert_contains "ad-video 使用五段广告结构" 'hook.*product.*function.*trust.*cta' "$ROOT_DIR/.claude/skills/ad-video.md"
+assert_contains "ad-video 说明 Seedance 分段限制" '4-15 秒|4.*15' "$ROOT_DIR/.claude/skills/ad-video.md"
+assert_contains "ad-structure-agent 不走短剧 episode 链路" 'hook.*product.*function.*trust.*cta' "$ROOT_DIR/.claude/agents/ad-structure-agent.md"
+assert_contains "ad-storyboard-agent 要求 5 个镜头格" '5 个镜头格' "$ROOT_DIR/.claude/agents/ad-storyboard-agent.md"
+assert_contains "ad-workflow 编译 Seedance payload" 'seedance-payloads' "$ROOT_DIR/scripts/ad-workflow.py"
 
 PASS_COUNT=$(grep -c '^P$' "$RESULTS_FILE" 2>/dev/null || true)
 FAIL_COUNT=$(grep -c '^F$' "$RESULTS_FILE" 2>/dev/null || true)

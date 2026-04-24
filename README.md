@@ -15,6 +15,7 @@ Aladdin 是一套运行在 **Claude Code** 里的 AI Agent 系统。你在 Claud
 
 - **剧本创作**：从一句话创意生成完整分集剧本（大纲 → 角色/场景 → 分集 → 质检）
 - **视觉生成**：合规预检 → 视觉指导 → 参考图 → 视频生成，全流程自动化
+- **广告片工作流**：先设定广告总时长，编译 `钩子 → 产品 → 功能 → 信任 → CTA`，再生成广告 storyboard 和 Seedance 分段 payload
 - **多模式支持**：text\_to\_video（v1.0 快速原型）和 img2video（v2.0 高质量长剧），视频/音频多模态参考（Seedance 2.0）
 - **批量处理**：多集并行生成，断点续传，多人协作任务分配
 - **质量保证**：自动评分过关（Auto-Gate）、飞书异步审核、A/B 提示词测试
@@ -146,6 +147,7 @@ claude  # 启动 Claude Code
 | 命令 | 用途 |
 |------|------|
 | `~scriptwriter-to-video` | 从创意一键生成视频（E2E） |
+| `~ad-video` | 广告片工作流：结构、storyboard、Seedance payload |
 | `~scriptwriter` | 只做剧本创作 |
 | `~preprocess <file>` | 预处理已有剧本文件 |
 | `~design` | 生成所有参考图 |
