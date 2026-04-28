@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>动态漫 Studio · Mission Control</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffba49'/%3E%3Cpath d='M39 22a15 15 0 1 0 0 20' fill='none' stroke='%23170f06' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='42' cy='42' r='4' fill='%23170f06'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell" data-view="hub">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <strong>动态漫 Studio</strong>
+            <small>LOCAL CTRL · guarded actions</small>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item is-active" type="button" data-view-target="hub">
+            <span class="nav-icon">⌘</span><span>项目中心</span><small>01</small>
+          </button>
+          <button class="nav-item" type="button" data-view-target="workbench">
+            <span class="nav-icon">▤</span><span>项目工作台</span><small>02</small>
+          </button>
+          <button class="nav-item" type="button" data-view-target="assets">
+            <span class="nav-icon">▦</span><span>数字资产</span><small>03</small>
+          </button>
+          <button class="nav-item" type="button" data-view-target="script">
+            <span class="nav-icon">▧</span><span>剧本与流程</span><small>04</small>
+          </button>
+          <button class="nav-item" type="button" data-view-target="storyboard">
+            <span class="nav-icon">▣</span><span>分镜表</span><small>05</small>
+          </button>
+          <button class="nav-item" type="button" data-view-target="export">
+            <span class="nav-icon">⇩</span><span>导出</span><small>06</small>
+          </button>
+          <button class="nav-item" type="button" data-view-target="models">
+            <span class="nav-icon">✳</span><span>模型设置</span><small>07</small>
+          </button>
+        </nav>
+
+        <div class="telemetry">
+          <div class="telemetry-grid">
+            <div><span>PROJECTS</span><strong>0</strong></div>
+            <div><span>STATE</span><strong>0</strong></div>
+          </div>
+          <div class="operator">
+            <span class="avatar">速</span>
+            <div>
+              <strong>本地受控 API</strong>
+              <small>projects/*</small>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="crumb" id="crumb">动态漫 STUDIO / PROJECT HUB / 项目中心</p>
+            <h1 id="pageTitle">从故事到分镜图的漫剧生产工作台</h1>
+          </div>
+          <div class="topbar-actions">
+            <span class="live-pill"><i></i> LOCAL API <time id="clock">--</time></span>
+            <button class="icon-button" type="button" data-action="show-status" aria-label="查看状态">⌁</button>
+            <button class="search-button" type="button" id="commandButton" aria-label="打开命令搜索">
+              <span>⌕</span><kbd>⌘ K</kbd>
+            </button>
+            <button class="back-button" type="button" data-view-target="hub">返回项目中心</button>
+          </div>
+        </header>
+
+        <main class="main-scroll">
+          <section class="view is-current" data-view="hub" aria-labelledby="hubTitle">
+            <div class="hero-strip">
+              <div>
+                <p class="eyebrow">PROJECT HUB · 01</p>
+                <h2 id="hubTitle">从故事到分镜图的<span>漫剧生产工作台</span></h2>
+              </div>
+              <dl class="session-facts">
+                <div><dt>DATA</dt><dd>projects/*</dd></div>
+                <div><dt>ROOT</dt><dd>local repo</dd></div>
+                <div><dt>MODE</dt><dd>Guarded</dd></div>
+              </dl>
+            </div>
+
+            <div class="stats-grid">
+              <article class="stat-card">
+                <p>PROJECTS</p>
+                <strong>0<small>个</small></strong>
+                <span>本地项目</span>
+                <div class="sparkline" style="--accent: var(--amber)"></div>
+              </article>
+              <article class="stat-card">
+                <p>SCRIPTS</p>
+                <strong>0<small>集</small></strong>
+                <span>分集脚本</span>
+                <div class="sparkline" style="--accent: var(--amber)"></div>
+              </article>
+              <article class="stat-card">
+                <p>ASSETS</p>
+                <strong>0<small>项</small></strong>
+                <span>角色 + 场景</span>
+                <div class="sparkline" style="--accent: var(--amber)"></div>
+              </article>
+              <article class="stat-card">
+                <p>STORYBOARDS</p>
+                <strong>0<small>张</small></strong>
+                <span>分镜参考</span>
+                <div class="sparkline" style="--accent: var(--amber)"></div>
+              </article>
+              <article class="stat-card">
+                <p>VIDEOS</p>
+                <strong class="cyan">0<small>条</small></strong>
+                <span>已生成视频</span>
+                <div class="sparkline cyan-line"></div>
+              </article>
+            </div>
+
+            <div class="hub-grid">
+              <section class="panel ops-panel project-index-panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="eyebrow">PROJECTS · 本地项目</p>
+                    <h3>项目目录</h3>
+                    <p>正在读取 projects/* 下的真实项目文件。</p>
+                  </div>
+                  <button class="ghost-button" type="button" id="refreshButton">刷新</button>
+                </div>
+                <div class="project-list" id="projectList"></div>
+              </section>
+
+              <section class="panel data-source-panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="eyebrow">DATA SOURCE · 接入状态</p>
+                    <h3>只读文件系统</h3>
+                    <p>等待本地 API 返回项目和配置摘要。</p>
+                  </div>
+                  <span class="badge">LOADING</span>
+                </div>
+                <div class="source-grid">
+                  <article><strong>0</strong><span>状态 JSON</span></article>
+                  <article><strong>0</strong><span>配置文件</span></article>
+                  <article><strong>0</strong><span>角色档案</span></article>
+                  <article><strong>0</strong><span>场景档案</span></article>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section class="view" data-view="workbench" aria-labelledby="workbenchTitle">
+            <div class="workbench-grid">
+              <section class="panel flow-rail">
+                <p class="eyebrow">WORKFLOW · 工作流</p>
+                <h2 id="workbenchTitle">V1 生产节点</h2>
+                <ol class="timeline">
+                  <li class="done"><span>01</span><strong>需求确认</strong><em>已完成</em></li>
+                  <li class="active"><span>02</span><strong>创作方案</strong><em>进行中</em></li>
+                  <li><span>03</span><strong>角色档案</strong><em>未开始</em></li>
+                  <li><span>04</span><strong>故事地图 / 分集目录</strong><em>未开始</em></li>
+                  <li><span>05</span><strong>分集本</strong><em>未开始</em></li>
+                  <li><span>06</span><strong>视觉指导</strong><em>未开始</em></li>
+                  <li><span>07</span><strong>分镜表</strong><em>未开始</em></li>
+                </ol>
+              </section>
+
+              <section class="panel stage-board">
+                <div class="panel-head">
+                  <div>
+                    <p class="eyebrow">CURRENT STAGE · 真实项目状态</p>
+                    <h2>等待项目接入</h2>
+                    <p>读取 projects/* 下的脚本、资产、状态和产物文件。</p>
+                  </div>
+                  <div class="button-row">
+                    <button type="button" data-view-target="script">查看脚本</button>
+                    <button type="button" id="advanceNode" data-view-target="models">读取配置</button>
+                  </div>
+                </div>
+                <div class="progress-shell">
+                  <span>生产线路进度</span>
+                  <div><i style="width: 0%"></i></div>
+                  <strong>0.0%</strong>
+                  <small>0 / 0</small>
+                </div>
+                <div class="node-grid">
+                  <button class="node-card active" type="button"><small>ND-01</small><strong>故事种子</strong><span>进行中...</span></button>
+                  <button class="node-card" type="button"><small>ND-02</small><strong>创作方案</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-03</small><strong>角色档案</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-04</small><strong>角色参考图与分布</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-05</small><strong>故事地图</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-06</small><strong>分集目录</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-07</small><strong>第 1 集脚本</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-08</small><strong>第 1 集视觉指导</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-09</small><strong>分镜本</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-10</small><strong>分镜词描绘</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-11</small><strong>AI 可行性与规范查</strong><span>待开始</span></button>
+                  <button class="node-card" type="button"><small>ND-12</small><strong>导出与交付包</strong><span>待开始</span></button>
+                </div>
+                <article class="current-node">
+                  <span class="badge">CURRENT NODE</span>
+                  <strong>等待读取</strong>
+                  <p>等待本地 API 返回项目状态。</p>
+                  <dl>
+                    <div><dt>来源</dt><dd>projects/*</dd></div>
+                    <div><dt>更新于</dt><dd>—</dd></div>
+                  </dl>
+                </article>
+                <button class="execute-bar" type="button" id="continueButton">
+                  <span>▶</span><strong>提交继续生成请求</strong><em>准备动作，确认后提交 job</em><b>→</b>
+                </button>
+              </section>
+
+              <aside class="right-stack">
+                <section class="panel precheck-panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="eyebrow">DATA CHECK · 文件完整性</p>
+                      <h3>项目数据检查</h3>
+                    </div>
+                    <span class="ok-pill">READ</span>
+                  </div>
+                  <ul class="check-list">
+                    <li class="warn"><strong>分集脚本</strong><span>等待 API 数据。</span><em>读取中</em></li>
+                    <li class="warn"><strong>角色档案</strong><span>等待 API 数据。</span><em>读取中</em></li>
+                    <li class="warn"><strong>场景档案</strong><span>等待 API 数据。</span><em>读取中</em></li>
+                    <li class="warn"><strong>分镜参考</strong><span>等待 API 数据。</span><em>读取中</em></li>
+                    <li class="warn"><strong>视频产物</strong><span>等待 API 数据。</span><em>读取中</em></li>
+                    <li class="warn"><strong>交付包</strong><span>等待 API 数据。</span><em>读取中</em></li>
+                  </ul>
+                  <button class="ghost-wide" type="button" data-view-target="models">查看真实配置</button>
+                </section>
+                <section class="panel asset-summary">
+                  <div class="panel-head">
+                    <div>
+                      <p class="eyebrow">ASSETS · 资产概览</p>
+                      <h3>数字资产</h3>
+                    </div>
+                    <button class="icon-button" type="button" data-view-target="assets">↗</button>
+                  </div>
+                  <div class="asset-counts">
+                    <div><strong>0</strong><span>角色</span></div>
+                    <div><strong>0</strong><span>场景</span></div>
+                    <div><strong>0</strong><span>道具</span></div>
+                    <div><strong>0</strong><span>参考</span></div>
+                    <div><strong>0</strong><span>提示</span></div>
+                    <div><strong>0</strong><span>分镜</span></div>
+                  </div>
+                </section>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" data-view="assets" aria-labelledby="assetsTitle">
+            <div class="asset-editor">
+              <section class="panel character-panel">
+                <p class="eyebrow">CHARACTER · 角色资产</p>
+                <h2 id="assetsTitle">资产数据 <small>等待项目接入</small></h2>
+                <div class="asset-form-grid">
+                  <div class="plate small">REF / FRONT</div>
+                  <label class="field"><span>名称 / 标识</span><input value="等待读取" /></label>
+                  <label class="field"><span>外观</span><input value="等待读取" /></label>
+                  <label class="field half"><span>性别</span><select><option>等待读取</option><option>女</option><option>男</option></select></label>
+                  <label class="field half"><span>年龄 / 首次出现</span><input value="等待读取" /></label>
+                  <label class="field wide"><span>性格属性</span><textarea rows="3">等待读取</textarea></label>
+                  <label class="field wide"><span>视觉锚点</span><textarea rows="3">等待读取</textarea></label>
+                  <label class="field wide"><span>来源</span><textarea rows="3">等待读取</textarea></label>
+                  <label class="field wide"><span>别名 / 关系</span><input value="等待读取" /></label>
+                </div>
+                <div class="section-rule"><span>SOURCE PROFILE</span></div>
+                <div class="profile-row">
+                  <div class="source-list"><div><span>档案</span><strong>等待读取</strong></div></div>
+                </div>
+              </section>
+
+              <section class="panel scene-panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="eyebrow">SCENE · 场景资产</p>
+                    <h2>场景数据 <small>等待项目接入</small></h2>
+                  </div>
+                  <span class="badge cyan-text">EXTERIOR</span>
+                </div>
+                <div class="plate wide">SCENE PLATE</div>
+                <div class="two-col">
+                  <label class="field"><span>场景名</span><input value="等待读取" /></label>
+                  <label class="field"><span>分类</span><select><option>等待读取</option><option>室内</option><option>室外</option></select></label>
+                </div>
+                <label class="field wide"><span>首次出现</span><input value="等待读取" /></label>
+                <div class="two-col">
+                  <label class="field"><span>氛围</span><input value="等待读取" /></label>
+                  <label class="field"><span>备注</span><input value="等待读取" /></label>
+                </div>
+                <label class="field wide"><span>描述</span><textarea rows="3">等待读取</textarea></label>
+                <label class="field wide"><span>来源</span><textarea rows="3">等待读取</textarea></label>
+                <div class="section-rule"><span>SOURCE PROFILE</span></div>
+                <div class="light-info">
+                  <div class="source-list"><div><span>档案</span><strong>等待读取</strong></div></div>
+                </div>
+              </section>
+
+              <aside class="panel prompt-panel">
+                <p class="eyebrow">ASSET INDEX · 真实资产索引</p>
+                <h2>项目资产</h2>
+                <div class="source-list"><div><span>状态</span><strong>等待读取</strong></div></div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" data-view="script" aria-labelledby="scriptTitle">
+            <section class="panel script-board">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">CURRENT · 真实脚本</p>
+                  <h2 id="scriptTitle">脚本入口</h2>
+                  <p>等待本地 API 返回脚本文件。</p>
+                </div>
+                <span class="badge">READ</span>
+              </div>
+              <div class="phase-tabs">
+                <button class="is-active" type="button">等待读取</button>
+              </div>
+              <div class="phase-gates">
+                <article class="gate warn"><strong>脚本文件</strong><span>等待 API 数据。</span><em>读取中</em></article>
+              </div>
+              <div class="button-row">
+                <button class="primary-action compact" type="button" data-action="preview-script">预览当前脚本</button>
+              </div>
+            </section>
+
+            <div class="script-grid">
+              <section class="panel">
+                <p class="eyebrow">INPUT · 故事输入</p>
+                <h3>从 0 到 1 的素材入口</h3>
+                <label class="field wide"><span>脚本摘录</span><textarea rows="4">等待读取</textarea></label>
+                <label class="field wide"><span>来源文件</span><textarea rows="4">等待读取</textarea></label>
+                <div class="button-row"><span class="file-chip">只读模式</span></div>
+              </section>
+              <section class="panel">
+                <p class="eyebrow">PLAN · 创作方案</p>
+                <h3>定位、冲突、节奏与视觉</h3>
+                <div class="two-col">
+                  <label class="field"><span>脚本数量</span><input value="等待读取" /></label>
+                  <label class="field"><span>标题</span><input value="等待读取" /></label>
+                </div>
+                <div class="two-col">
+                  <label class="field"><span>当前节点</span><input value="等待读取" /></label>
+                  <label class="field"><span>资产规模</span><input value="等待读取" /></label>
+                </div>
+                <label class="field wide"><span>进度</span><input value="等待读取" /></label>
+                <label class="field wide"><span>来源</span><input value="等待读取" /></label>
+              </section>
+              <section class="panel">
+                <p class="eyebrow">MAP · 剧情地图</p>
+                <h3>剧情点</h3>
+                <label class="field wide"><span>剧情编号</span><input value="等待读取" /></label>
+                <label class="field wide"><span>类型</span><select><option>等待读取</option></select></label>
+                <label class="field wide"><span>地点</span><input value="等待读取" /></label>
+                <label class="field wide"><span>时间</span><input value="等待读取" /></label>
+                <label class="field wide"><span>关键事件</span><textarea rows="3">等待读取</textarea></label>
+              </section>
+            </div>
+          </section>
+
+          <section class="view" data-view="storyboard" aria-labelledby="storyboardTitle">
+            <div class="storyboard-layout">
+              <section class="panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="eyebrow">SHOT LIST · 分镜表</p>
+                    <h2 id="storyboardTitle">分镜参考</h2>
+                  </div>
+                  <button class="primary-action compact" type="button" data-action="preview-shot">预览当前分镜</button>
+                </div>
+                <div class="shot-table">
+                  <article class="shot-row selected">
+                    <span>SH-00</span>
+                    <div class="shot-frame">REF</div>
+                    <strong>等待读取<small>本地 API</small></strong>
+                    <p>等待读取 outputs/*/storyboard 下的真实分镜参考图。</p>
+                    <em>读取中</em>
+                  </article>
+                </div>
+              </section>
+
+              <aside class="panel shot-detail">
+                <p class="eyebrow">SHOT DETAIL · 当前镜头</p>
+                <h3>等待读取</h3>
+                <div class="large-frame">PREVIEW</div>
+                <label class="field wide"><span>镜头描述</span><textarea rows="4">等待读取</textarea></label>
+                <label class="field wide"><span>参考说明</span><textarea rows="5">等待读取</textarea></label>
+                <div class="two-col">
+                  <label class="field"><span>集数</span><input value="等待读取" /></label>
+                  <label class="field"><span>状态</span><input value="等待读取" /></label>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" data-view="export" aria-labelledby="exportTitle">
+            <div class="export-grid">
+              <section class="panel">
+                <p class="eyebrow">EXPORT · 交付包</p>
+                <h2 id="exportTitle">生产包检查</h2>
+                <div class="deliverable-list">
+                  <label><input type="checkbox" /> 项目状态文件</label>
+                  <label><input type="checkbox" /> 脚本文件</label>
+                  <label><input type="checkbox" /> 角色与场景档案</label>
+                  <label><input type="checkbox" /> 分镜参考图</label>
+                  <label><input type="checkbox" /> 视频产物</label>
+                </div>
+                <button class="primary-action wide-button" type="button" data-action="inspect-export">检查交付物</button>
+              </section>
+              <section class="panel">
+                <p class="eyebrow">COMMANDS · 本地命令</p>
+                <h2>本地任务</h2>
+                <div class="queue-list">
+                  <article><span>C-000</span><strong>等待读取</strong><em>等待 API 数据</em></article>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section class="view" data-view="models" aria-labelledby="modelsTitle">
+            <section class="panel model-console">
+              <p class="eyebrow">CONFIG · 真实配置文件</p>
+              <h2 id="modelsTitle">生成链路配置</h2>
+              <div class="model-grid">
+                <article><strong>默认视频模型</strong><span>等待读取</span><em class="ok-pill">YAML</em></article>
+                <article><strong>生成后端</strong><span>等待读取</span><em class="ok-pill">YAML</em></article>
+                <article><strong>Dreamina 视频</strong><span>等待读取</span><em class="ok-pill">YAML</em></article>
+                <article><strong>图像模型</strong><span>等待读取</span><em class="ok-pill">YAML</em></article>
+                <article><strong>分辨率</strong><span>等待读取</span><em class="ok-pill">YAML</em></article>
+                <article><strong>并发上限</strong><span>等待读取</span><em class="ok-pill">YAML</em></article>
+              </div>
+              <div class="section-rule"><span>CONFIG FILES</span></div>
+              <div class="source-list"><div><span>状态</span><strong>等待 API 数据</strong></div></div>
+            </section>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div class="command-palette" id="commandPalette" hidden>
+      <div class="palette-card" role="dialog" aria-modal="true" aria-labelledby="paletteTitle">
+        <div class="palette-head">
+          <h2 id="paletteTitle">快速跳转</h2>
+          <button type="button" id="closePalette" aria-label="关闭">×</button>
+        </div>
+        <div class="command-list">
+          <button type="button" data-view-target="hub">项目中心</button>
+          <button type="button" data-view-target="workbench">项目工作台</button>
+          <button type="button" data-view-target="assets">数字资产</button>
+          <button type="button" data-view-target="script">剧本与流程</button>
+          <button type="button" data-view-target="storyboard">分镜表</button>
+          <button type="button" data-view-target="export">导出</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-panel" id="actionPanel" hidden>
+      <section class="action-card" role="dialog" aria-modal="true" aria-labelledby="actionPanelTitle">
+        <div class="palette-head">
+          <h2 id="actionPanelTitle">操作</h2>
+          <button type="button" id="closeActionPanel" aria-label="关闭">×</button>
+        </div>
+        <div class="action-body" id="actionPanelBody"></div>
+      </section>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>

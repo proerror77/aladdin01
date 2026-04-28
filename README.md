@@ -117,6 +117,14 @@ claude  # 启动 Claude Code
 ~trace           # Agent 链路追踪
 ```
 
+**可视化控制台：**
+
+```bash
+python3 studio-ui/server.py --port 4173
+```
+
+打开 `http://127.0.0.1:4173/` 可以查看本地项目、角色/场景资产、脚本、分镜图和交付物摘要。控制台也提供受控动作入口：环境检查、workflow-sync、继续生成请求和 trace 摘要都通过白名单 job 执行，需要确认的动作会先弹出确认面板。
+
 **产出文件位置**：`outputs/{ep}/videos/`
 
 ## 架构
