@@ -123,7 +123,15 @@ claude  # 启动 Claude Code
 python3 studio-ui/server.py --port 4173
 ```
 
-打开 `http://127.0.0.1:4173/` 可以查看本地项目、角色/场景资产、脚本、分镜图和交付物摘要。控制台也提供受控动作入口：环境检查、workflow-sync、继续生成请求和 trace 摘要都通过白名单 job 执行，需要确认的动作会先弹出确认面板。
+打开 `http://127.0.0.1:4173/` 可以进入桌面宽屏 Operator Cockpit。新版控制台按真实 v2 生产流程组织：项目 → 生产流程 → 资产设定 → 剧本 → 镜头 → 交付。主工作台只保留一个“准备下一步”入口，其余信息围绕 `剧本 → 本体论 → 合规预检 → 视觉指导 → 叙事审查 → Storyboard → 资产工厂 → 美术校验 → Shot Packet → 音色配置 → 视频生成 → QA/Repair → 交付` 展示。
+
+控制台也提供受控动作入口：
+- 环境检查：直接提交 job，不调用外部模型。
+- 同步项目状态：执行 `scripts/workflow-sync.py`，需要确认。
+- 继续生成请求：写入 `state/ui-actions/requests/`，如配置远端触发器会尝试提交给远端 Agent，需要确认。
+- Trace 摘要：对最新 trace session 生成摘要，可能调用外部 API，需要确认。
+
+所有动作都由 `studio-ui/server.py` 后端白名单注册，不接受任意命令输入；job 状态和日志写入 `state/ui-actions/jobs/`。详细 API 与安全边界见 [studio-ui/README.md](studio-ui/README.md)。
 
 **产出文件位置**：`outputs/{ep}/videos/`
 

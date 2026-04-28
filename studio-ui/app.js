@@ -10,32 +10,32 @@ const actionPanelBody = document.querySelector("#actionPanelBody");
 
 const pageMeta = {
   hub: {
-    title: "从故事到分镜图的漫剧生产工作台",
-    crumb: "动态漫 STUDIO / PROJECT HUB / 项目中心",
+    title: "故事资产与分镜控制台",
+    crumb: "动态漫 STUDIO / STORY BIBLE / 项目中心",
   },
   workbench: {
-    title: "项目工作台",
-    crumb: "动态漫 STUDIO / WORKBENCH / 项目工作台",
+    title: "生产流程",
+    crumb: "动态漫 STUDIO / PRODUCTION FLOW / 生产流程",
   },
   assets: {
-    title: "数字资产",
-    crumb: "动态漫 STUDIO / ASSETS / 数字资产",
+    title: "人物资产与设定",
+    crumb: "动态漫 STUDIO / STORY BIBLE / 人物资产与设定",
   },
   script: {
     title: "故事 / 剧情地图 / 分集脚本",
     crumb: "动态漫 STUDIO / SCRIPT / 剧本与流程",
   },
   storyboard: {
-    title: "分镜表",
-    crumb: "动态漫 STUDIO / STORYBOARD / 分镜表",
+    title: "Storyboard",
+    crumb: "动态漫 STUDIO / STORYBOARD / 镜头连接",
   },
   export: {
     title: "导出",
     crumb: "动态漫 STUDIO / EXPORT / 导出",
   },
   models: {
-    title: "模型设置",
-    crumb: "动态漫 STUDIO / MODELS / 模型设置",
+    title: "配置",
+    crumb: "动态漫 STUDIO / MODELS / 配置",
   },
 };
 
@@ -320,6 +320,19 @@ function renderHubContent(data = {}) {
   if (!hubGrid) return;
   hubGrid.classList.add("hub-grid-connected");
   hubGrid.innerHTML = `
+    <section class="panel production-overview-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">NOW · 当前项目生产状态</p>
+          <h3>等待项目接入</h3>
+          <p>接入后显示 v2 phase、审核队列、资产包和 storyboard 状态。</p>
+        </div>
+        <span class="badge">LIVE</span>
+      </div>
+      <div class="production-overview-body">
+        <div class="empty-state">正在读取项目详情...</div>
+      </div>
+    </section>
     <section class="panel ops-panel project-index-panel">
       <div class="panel-head">
         <div>
@@ -359,6 +372,41 @@ function renderHubContent(data = {}) {
   renderProjectList(data.projects || []);
 }
 
+function renderHubProjectBrief(detail) {
+  const panel = document.querySelector(".production-overview-panel");
+  if (!panel || !detail) return;
+  const counts = detail.counts || {};
+  const phaseRows = detail.phase_matrix || [];
+  const reviewCount = (detail.review_queue || []).filter((item) => item.severity !== "info").length;
+  panel.querySelector("h3").textContent = detail.headline || detail.name;
+  const intro = panel.querySelector(".panel-head p:not(.eyebrow)");
+  if (intro) {
+    intro.textContent = `${detail.name} · ${counts.episodes ?? 0} 集 · ${counts.characters ?? 0} 角色 · ${counts.storyboards ?? 0} storyboard · ${reviewCount} 个待处理项`;
+  }
+  const body = panel.querySelector(".production-overview-body");
+  if (body) {
+    body.innerHTML = `
+      <div class="overview-score-grid">
+        <article><strong>${counts.storyboards ?? 0}</strong><span>Storyboard</span></article>
+        <article><strong>${counts.characters ?? 0}</strong><span>人物</span></article>
+        <article><strong>${counts.videos ?? 0}</strong><span>视频</span></article>
+        <article><strong>${reviewCount}</strong><span>待审核</span></article>
+      </div>
+      <div class="section-rule"><span>PHASE MATRIX</span></div>
+      ${phaseMatrixHtml(detail, 5)}
+      <div class="section-rule"><span>REVIEW QUEUE</span></div>
+      ${reviewQueueHtml(detail, 4)}
+      <div class="action-buttons">
+        <button type="button" data-view-target="workbench">打开生产流程</button>
+      </div>
+    `;
+  }
+  if (phaseRows.length) {
+    const badge = panel.querySelector(".badge");
+    if (badge) badge.textContent = `${phaseRows.length} EP`;
+  }
+}
+
 function statusText(status) {
   const map = {
     active: "进行中",
@@ -373,6 +421,320 @@ function statusClass(status) {
   if (status === "completed") return "done";
   if (status === "active") return "hot";
   return "";
+}
+
+function shotPacket(shot = {}) {
+  return shot.packet || {};
+}
+
+function storyLogic(shot = {}) {
+  return shotPacket(shot).story_logic || {};
+}
+
+function shotCharacters(shot = {}) {
+  const characters = shotPacket(shot).characters || [];
+  return characters
+    .map((item) => typeof item === "string" ? item : item.id || item.name || "")
+    .map((name) => String(name).trim())
+    .filter(Boolean);
+}
+
+function shotLocation(shot = {}) {
+  return String(shotPacket(shot).background?.location || "").trim();
+}
+
+function characterImage(detail, name) {
+  const character = (detail.characters || []).find((item) => item.name === name || item.code === name);
+  return character?.image_url || "";
+}
+
+function plainObjectValues(value) {
+  if (!value) return [];
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value)) return value.flatMap((item) => plainObjectValues(item));
+  if (typeof value === "object") return Object.values(value).flatMap((item) => plainObjectValues(item));
+  return [String(value)];
+}
+
+function shortText(value = "", limit = 96) {
+  const text = plainObjectValues(value).join(" / ").replace(/\s+/g, " ").trim();
+  if (text.length <= limit) return text;
+  return `${text.slice(0, limit).trim()}...`;
+}
+
+function buildStoryGraph(detail) {
+  const nodeMap = new Map();
+  const edgeMap = new Map();
+  const addNode = (id, type, extra = {}) => {
+    if (!id) return;
+    const current = nodeMap.get(id) || { id, type, weight: 0, ...extra };
+    current.weight += 1;
+    nodeMap.set(id, { ...current, ...extra, weight: current.weight });
+  };
+  const addEdge = (source, target, type, shotId) => {
+    if (!source || !target || source === target) return;
+    const key = [source, target].sort().join("::");
+    const edge = edgeMap.get(key) || { source, target, type, weight: 0, shots: [] };
+    edge.weight += 1;
+    if (shotId && edge.shots.length < 5) edge.shots.push(shotId);
+    edgeMap.set(key, edge);
+  };
+
+  (detail.characters || []).forEach((character) => addNode(String(character.name || "").trim(), "character", {
+    image_url: character.image_url,
+    label: character.name,
+    meta: character.tier || character.raw?.role || character.first_episode || "角色",
+  }));
+
+  (detail.scenes || []).forEach((scene) => addNode(String(scene.name || "").trim(), "scene", {
+    image_url: scene.image_url,
+    label: scene.name,
+    meta: scene.first_episode || "场景",
+  }));
+
+  const ontology = detail.ontology || {};
+  (ontology.entities?.characters || []).forEach((character) => {
+    addNode(character.name || character.id, "character", {
+      label: character.name || character.id,
+      meta: character.tier || character.current_variant || "ontology",
+    });
+  });
+  (ontology.entities?.locations || []).forEach((location) => {
+    addNode(location.name || location.id, "scene", {
+      label: location.name || location.id,
+      meta: location.spatial?.type || "ontology",
+    });
+  });
+  (ontology.entities?.props || []).forEach((prop) => {
+    addNode(prop.name || prop.id, "prop", {
+      label: prop.name || prop.id,
+      meta: prop.condition || "prop",
+    });
+  });
+  (ontology.relationships || []).forEach((relation) => {
+    addEdge(relation.from, relation.to, relation.type || relation.relation || "ontology", relation.episode);
+  });
+
+  (detail.storyboards || []).forEach((shot) => {
+    const names = [...new Set(shotCharacters(shot))];
+    const location = shotLocation(shot);
+    names.forEach((name) => {
+      addNode(name, "character", {
+        image_url: characterImage(detail, name),
+        label: name,
+        meta: "出现在分镜",
+      });
+      if (location) {
+        addNode(location, "scene", { label: location, meta: "场景" });
+        addEdge(name, location, "appears_at", shot.id);
+      }
+    });
+    for (let i = 0; i < names.length; i += 1) {
+      for (let j = i + 1; j < names.length; j += 1) {
+        addEdge(names[i], names[j], "co_shot", shot.id);
+      }
+    }
+  });
+
+  const nodes = [...nodeMap.values()]
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 11);
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  const edges = [...edgeMap.values()]
+    .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target))
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 16);
+  return { nodes, edges };
+}
+
+function phaseStatusClass(status = "") {
+  if (status === "completed" || status === "fixed_pass") return "done";
+  if (status === "running" || status === "in_progress") return "running";
+  if (status === "pending") return "pending";
+  if (status === "failed" || status === "missing") return "missing";
+  return "";
+}
+
+function phaseStatusText(status = "") {
+  const map = {
+    completed: "完成",
+    fixed_pass: "修复通过",
+    pending: "待处理",
+    missing: "缺口",
+    failed: "失败",
+    running: "运行中",
+    in_progress: "进行中",
+  };
+  return map[status] || status || "未知";
+}
+
+function phaseMatrixHtml(detail, limit = 6) {
+  const rows = (detail.phase_matrix || []).slice(0, limit);
+  if (!rows.length) return `<div class="empty-state">暂无 phase 状态。</div>`;
+  return `
+    <div class="phase-matrix">
+      ${rows.map((row) => `
+        <article class="phase-row">
+          <strong>${escapeHtml(row.episode)}</strong>
+          <div>
+            ${(row.ordered || []).map((phase) => `
+              <span class="${phaseStatusClass(phase.status)}" title="${escapeHtml(phase.label)}">${escapeHtml(phase.phase)}</span>
+            `).join("")}
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function reviewQueueHtml(detail, limit = 8) {
+  const queue = (detail.review_queue || []).slice(0, limit);
+  if (!queue.length) return `<div class="empty-state">暂无审核项。</div>`;
+  return `
+    <div class="review-queue">
+      ${queue.map((item) => `
+        <article class="${escapeHtml(item.severity || "info")}">
+          <span>${escapeHtml(item.episode)} · ${escapeHtml(item.label)}</span>
+          <strong>${escapeHtml(item.text)}</strong>
+          <small>${escapeHtml(item.source || `Phase ${item.phase}`)}</small>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function assetMatrixHtml(detail, section = "characters", limit = 8) {
+  const rows = (detail.asset_matrix?.[section] || []).slice(0, limit);
+  if (!rows.length) return `<div class="empty-state">暂无资产包。</div>`;
+  return `
+    <div class="asset-matrix">
+      ${rows.map((row) => `
+        <article>
+          <strong>${escapeHtml(row.entity)}<small>${row.asset_count} assets</small></strong>
+          <div>
+            ${row.variants.map((variant) => `
+              <span>
+                <em>${escapeHtml(variant.variant)}</em>
+                ${["front", "side", "back", "day", "night", "styleframe", "interface"].map((view) => `
+                  <b class="${variant.views[view] ? "ok" : ""}">${escapeHtml(view)}</b>
+                `).join("")}
+              </span>
+            `).join("")}
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function shotPhasePillsHtml(shot = {}) {
+  const phase = shot.phase_status || {};
+  const items = [
+    ["SB", phase.storyboard],
+    ["SP", phase.packet],
+    ["VID", phase.video],
+    ["QA", phase.qa],
+  ];
+  return `<div class="shot-phase-pills">${items.map(([label, status]) => `<span class="${phaseStatusClass(status)}">${label}</span>`).join("")}</div>`;
+}
+
+function relationshipMapHtml(detail, compact = false) {
+  const graph = buildStoryGraph(detail);
+  if (!graph.nodes.length) {
+    return `<div class="empty-state">暂无可绘制关系。需要角色档案或 shot packet。</div>`;
+  }
+  const center = { x: 50, y: 50 };
+  const radius = compact ? 34 : 38;
+  const positions = {};
+  graph.nodes.forEach((node, index) => {
+    if (index === 0) {
+      positions[node.id] = center;
+      return;
+    }
+    const angle = ((index - 1) / Math.max(graph.nodes.length - 1, 1)) * Math.PI * 2 - Math.PI / 2;
+    positions[node.id] = {
+      x: 50 + Math.cos(angle) * radius,
+      y: 50 + Math.sin(angle) * radius,
+    };
+  });
+  return `
+    <div class="relation-map ${compact ? "compact" : ""}">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        ${graph.edges.map((edge) => {
+          const a = positions[edge.source];
+          const b = positions[edge.target];
+          if (!a || !b) return "";
+          return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" style="--weight:${Math.min(edge.weight, 5)}" />`;
+        }).join("")}
+        ${graph.nodes.map((node) => {
+          const p = positions[node.id];
+          const size = node.type === "scene" ? 2.8 : 3.5 + Math.min(node.weight, 6) * 0.34;
+          return `<circle class="${node.type}" cx="${p.x}" cy="${p.y}" r="${size}" />`;
+        }).join("")}
+      </svg>
+      <div class="relation-labels">
+        ${graph.nodes.slice(0, compact ? 7 : 11).map((node) => `
+          <span class="${escapeHtml(node.type)}" style="--x:${positions[node.id].x}%;--y:${positions[node.id].y}%">
+            ${escapeHtml(node.label || node.id)}
+          </span>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function storyboardMiniHtml(detail, limit = 8) {
+  const shots = (detail.storyboards || []).slice(0, limit);
+  if (!shots.length) return `<div class="empty-state">暂无 storyboard 图片。</div>`;
+  return shots.map((shot, index) => {
+    const logic = storyLogic(shot);
+    const characters = shotCharacters(shot).slice(0, 3);
+    return `
+      <button class="story-shot-mini" type="button" data-shot-index="${index}" data-view-target="storyboard">
+        <span class="story-shot-image ${shot.image_url ? "has-image" : ""}" style="${shot.image_url ? `--plate-image:url('${escapeHtml(shot.image_url)}')` : ""}">${escapeHtml(shot.episode)}</span>
+        <strong>${escapeHtml(shot.id)}<small>${escapeHtml(logic.dramatic_role || shot.status)}</small></strong>
+        <em>${escapeHtml(characters.join(" / ") || shotLocation(shot) || "未标注角色")}</em>
+      </button>
+    `;
+  }).join("");
+}
+
+function characterDossierHtml(detail, limit = 8) {
+  const characters = (detail.characters || []).slice(0, limit);
+  if (!characters.length) return `<div class="empty-state">暂无角色档案。</div>`;
+  return characters.map((character) => `
+    <article class="character-dossier">
+      <div class="dossier-portrait ${character.image_url ? "has-image" : ""}" style="${character.image_url ? `--plate-image:url('${escapeHtml(character.image_url)}')` : ""}">${escapeHtml(character.code || "C")}</div>
+      <div>
+        <strong>${escapeHtml(character.name)}</strong>
+        <span>${escapeHtml(character.tier || character.raw?.role || character.first_episode || "角色设定")}</span>
+        <p>${escapeHtml(shortText(character.personality || character.appearance || character.raw?.personality, 88))}</p>
+      </div>
+    </article>
+  `).join("");
+}
+
+function settingsListHtml(detail, limit = 5) {
+  const rows = [
+    ...(detail.scenes || []).slice(0, limit).map((scene) => ({
+      label: scene.name,
+      meta: scene.first_episode || "场景",
+      text: scene.appearance || scene.personality || scene.path,
+    })),
+    ...(detail.scripts || []).slice(0, Math.max(0, limit - (detail.scenes || []).length)).map((script) => ({
+      label: script.episode,
+      meta: script.title,
+      text: script.excerpt,
+    })),
+  ].slice(0, limit);
+  if (!rows.length) return `<div class="empty-state">暂无设定资料。</div>`;
+  return rows.map((row) => `
+    <article class="setting-row">
+      <span>${escapeHtml(row.meta)}</span>
+      <strong>${escapeHtml(row.label)}</strong>
+      <p>${escapeHtml(shortText(row.text, 112))}</p>
+    </article>
+  `).join("");
 }
 
 function actionById(actionId) {
@@ -477,9 +839,7 @@ function renderProjectList(projects = []) {
         <code>${escapeHtml(project.id)}</code>
         <time>${date}</time>
         <div class="row-actions">
-          <button type="button" class="project-open" data-project-id="${escapeHtml(project.id)}" data-view-target="workbench">进入</button>
-          <button type="button" class="project-open" data-project-id="${escapeHtml(project.id)}" data-view-target="assets">资产</button>
-          <button type="button" class="project-open" data-project-id="${escapeHtml(project.id)}" data-view-target="storyboard">分镜</button>
+          <button type="button" class="project-open primary-row-action" data-project-id="${escapeHtml(project.id)}" data-view-target="workbench">打开流程</button>
         </div>
       </article>
     `;
@@ -502,70 +862,261 @@ function renderAssetCounts(counts = {}) {
   });
 }
 
+const productionWorkflow = [
+  { phase: "script", label: "剧本", detail: "分集脚本 / render script", metric: "scripts" },
+  { phase: "0", label: "本体论", detail: "角色、地点、道具、关系", metric: "ontology" },
+  { phase: "1", label: "合规预检", detail: "敏感点与改写风险", metric: "phase" },
+  { phase: "2", label: "视觉指导", detail: "镜次、画面、运镜", metric: "phase" },
+  { phase: "2.2", label: "叙事审查", detail: "戏剧逻辑与连接", metric: "phase" },
+  { phase: "2.3", label: "Storyboard", detail: "分镜参考图", metric: "storyboards" },
+  { phase: "2.5", label: "资产工厂", detail: "角色定妆 / 场景 styleframe", metric: "assets" },
+  { phase: "3", label: "美术校验", detail: "角色、场景、连续性", metric: "phase" },
+  { phase: "3.5", label: "Shot Packet", detail: "镜头指令包 + 资产引用", metric: "packets" },
+  { phase: "4", label: "音色配置", detail: "角色 voice config", metric: "phase" },
+  { phase: "5", label: "视频生成", detail: "Seedance / Dreamina 输出", metric: "videos" },
+  { phase: "6", label: "QA / Repair", detail: "Symbolic / Visual / Semantic QA", metric: "phase" },
+  { phase: "deliver", label: "交付", detail: "manifest / review / final", metric: "deliverables" },
+];
+
+function aggregatePhaseStatus(detail, phaseId) {
+  const rows = detail.phase_matrix || [];
+  const statuses = rows
+    .map((row) => row.phases?.[phaseId]?.status)
+    .filter(Boolean);
+  if (!statuses.length) return "missing";
+  if (statuses.every((status) => ["completed", "fixed_pass"].includes(status))) return "completed";
+  if (statuses.some((status) => ["running", "in_progress"].includes(status))) return "running";
+  if (statuses.some((status) => ["pending"].includes(status))) return "pending";
+  if (statuses.some((status) => ["failed", "missing"].includes(status))) return "missing";
+  return statuses[0] || "unknown";
+}
+
+function workflowStatusForStep(detail, step) {
+  const counts = detail.counts || {};
+  if (step.phase === "script") return counts.scripts > 0 ? "completed" : "missing";
+  if (step.phase === "deliver") return (detail.deliverables || []).length > 0 ? "completed" : "pending";
+  if (step.metric === "storyboards") return counts.storyboards > 0 ? "completed" : aggregatePhaseStatus(detail, step.phase);
+  if (step.metric === "videos") return counts.videos > 0 ? "completed" : aggregatePhaseStatus(detail, step.phase);
+  if (step.metric === "assets") return (counts.characters || 0) + (counts.scenes || 0) > 0 ? aggregatePhaseStatus(detail, step.phase) : "missing";
+  if (step.metric === "packets") {
+    const packets = (detail.storyboards || []).filter((shot) => Object.keys(shot.packet || {}).length).length;
+    return packets > 0 ? "completed" : aggregatePhaseStatus(detail, step.phase);
+  }
+  if (step.metric === "ontology") return (detail.ontology?.episodes || []).length > 0 ? "completed" : aggregatePhaseStatus(detail, step.phase);
+  return aggregatePhaseStatus(detail, step.phase);
+}
+
+function workflowStatusText(status) {
+  const map = {
+    completed: "已完成",
+    fixed_pass: "修复通过",
+    running: "运行中",
+    in_progress: "进行中",
+    pending: "待处理",
+    missing: "缺口",
+    failed: "失败",
+    unknown: "未知",
+  };
+  return map[status] || status || "未知";
+}
+
+function workflowSteps(detail) {
+  return productionWorkflow.map((step) => ({ ...step, status: workflowStatusForStep(detail, step) }));
+}
+
+function currentWorkflowStep(steps) {
+  return steps.find((step) => !["completed", "fixed_pass"].includes(step.status)) || steps[steps.length - 1];
+}
+
+function workflowStepsHtml(detail) {
+  const steps = workflowSteps(detail);
+  return `
+    <ol class="workflow-path">
+      ${steps.map((step, index) => `
+        <li class="${phaseStatusClass(step.status)} ${step === currentWorkflowStep(steps) ? "is-current" : ""}">
+          <span>${String(index + 1).padStart(2, "0")}</span>
+          <div>
+            <strong>${escapeHtml(step.label)}</strong>
+            <p>${escapeHtml(step.detail)}</p>
+          </div>
+          <em>${escapeHtml(workflowStatusText(step.status))}</em>
+        </li>
+      `).join("")}
+    </ol>
+  `;
+}
+
+function workflowSummaryHtml(detail) {
+  const counts = detail.counts || {};
+  const packetCount = (detail.storyboards || []).filter((shot) => Object.keys(shot.packet || {}).length).length;
+  const rows = [
+    ["脚本", `${counts.scripts ?? 0} 集`],
+    ["本体论", `${detail.ontology?.episodes?.length ?? 0} 集`],
+    ["角色 / 场景", `${counts.characters ?? 0} / ${counts.scenes ?? 0}`],
+    ["Storyboard", `${counts.storyboards ?? 0} 张`],
+    ["Shot Packet", `${packetCount} 个`],
+    ["视频", `${counts.videos ?? 0} 条`],
+  ];
+  return `
+    <div class="flow-metrics">
+      ${rows.map(([label, value]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></article>`).join("")}
+    </div>
+  `;
+}
+
+function nextWorkHtml(detail) {
+  const steps = workflowSteps(detail);
+  const current = currentWorkflowStep(steps);
+  const reviewItems = (detail.review_queue || []).filter((item) => item.severity !== "info").slice(0, 5);
+  return `
+    <div class="next-work-card">
+      <p class="eyebrow">NEXT · 当前要处理</p>
+      <h3>${escapeHtml(current?.label || "交付")}</h3>
+      <p>${escapeHtml(current?.detail || "检查交付资料。")}</p>
+      <div class="section-rule"><span>需要关注</span></div>
+      ${reviewItems.length ? reviewQueueHtml({ review_queue: reviewItems }, 5) : `<div class="empty-state">当前没有非信息类审核项。</div>`}
+    </div>
+  `;
+}
+
 function renderWorkbench(detail) {
   if (!detail) return;
   const pipeline = detail.pipeline || [];
   const progress = detail.progress || {};
   const counts = detail.counts || {};
   const stage = document.querySelector(".stage-board");
+  const flowRail = document.querySelector(".flow-rail");
 
-  if (stage) {
-    const eyebrow = stage.querySelector(".panel-head .eyebrow");
-    const title = stage.querySelector(".panel-head h2");
-    const intro = stage.querySelector(".panel-head p:not(.eyebrow)");
-    if (eyebrow) eyebrow.textContent = "CURRENT STAGE · 真实项目状态";
-    if (title) title.textContent = `${detail.name} 项目状态`;
-    if (intro) {
-      intro.textContent = `${detail.headline || detail.name}；读取脚本、资产、状态和产物文件，不触发生成。`;
+  if (flowRail) {
+    const railEyebrow = flowRail.querySelector(".eyebrow");
+    const railTitle = flowRail.querySelector("h2");
+    if (railEyebrow) railEyebrow.textContent = "PRODUCTION LINE · 制作链路";
+    if (railTitle) railTitle.textContent = "真实 v2 流程";
+    const timeline = flowRail.querySelector(".timeline");
+    if (timeline) {
+      const sideSteps = workflowSteps(detail);
+      const sideCurrent = currentWorkflowStep(sideSteps);
+      timeline.innerHTML = sideSteps.map((step, index) => `
+        <li class="${["completed", "fixed_pass"].includes(step.status) ? "done" : step === sideCurrent ? "active" : ""}">
+          <span>${String(index + 1).padStart(2, "0")}</span>
+          <strong>${escapeHtml(step.label)}</strong>
+          <em>${escapeHtml(workflowStatusText(step.status))}</em>
+        </li>
+      `).join("");
     }
   }
 
-  const timeline = document.querySelector(".timeline");
-  if (timeline && pipeline.length) {
-    timeline.innerHTML = pipeline.map((node) => `
-      <li class="${node.status === "completed" ? "done" : node.status === "in_progress" ? "active" : ""}">
-        <span>${String(node.index).padStart(2, "0")}</span>
-        <strong>${escapeHtml(node.name)}</strong>
-        <em>${escapeHtml(node.status === "completed" ? "已完成" : node.status === "in_progress" ? "进行中" : "未开始")}</em>
-      </li>
-    `).join("");
-  }
-
-  const progressBar = document.querySelector(".progress-shell i");
-  const progressValue = document.querySelector(".progress-shell strong");
-  const progressCount = document.querySelector(".progress-shell small");
-  if (progressBar) progressBar.style.width = `${progress.percent ?? 0}%`;
-  if (progressValue) progressValue.textContent = `${Number(progress.percent ?? 0).toFixed(1)}%`;
-  if (progressCount) progressCount.textContent = `${progress.completed_nodes ?? 0} / ${progress.total_nodes ?? 0}`;
-
-  const nodeGrid = document.querySelector(".node-grid");
-  if (nodeGrid && pipeline.length) {
-    const currentNodeIndex = pipeline.findIndex((node) => detail.current_node?.index === node.index);
-    const progressNodeIndex = pipeline.findIndex((node) => node.status === "in_progress");
-    const selectedIndex = currentNodeIndex >= 0 ? currentNodeIndex : progressNodeIndex >= 0 ? progressNodeIndex : 0;
-    nodeGrid.innerHTML = pipeline.map((node, index) => `
-      <button class="node-card ${node.status === "in_progress" ? "active" : ""} ${index === selectedIndex ? "is-selected" : ""}" type="button" data-node-index="${index}">
-        <small>ND-${String(node.index).padStart(2, "0")}</small>
-        <strong>${escapeHtml(node.name)}</strong>
-        <span>${escapeHtml(node.status === "completed" ? "已完成" : node.status === "in_progress" ? "进行中..." : "待开始")}</span>
-      </button>
-    `).join("");
-  }
-
-  const currentNode = detail.current_node || pipeline.find((node) => node.status === "in_progress") || pipeline[pipeline.length - 1];
-  document.querySelector(".current-node strong").textContent = currentNode
-    ? `ND-${String(currentNode.index).padStart(2, "0")} · ${currentNode.name}`
-    : "ND-01 · 故事种子";
-  document.querySelector(".current-node p").textContent = `接入 ${detail.name}：${counts.episodes ?? 0} 集脚本、${counts.characters ?? 0} 个角色、${counts.storyboards ?? 0} 张分镜参考。`;
-  const currentNodeDl = document.querySelector(".current-node dl");
-  if (currentNodeDl) {
-    currentNodeDl.innerHTML = `
-      <div><dt>来源</dt><dd>${escapeHtml(detail.id)}</dd></div>
-      <div><dt>更新于</dt><dd>${escapeHtml(formatDate(detail.updated_at))}</dd></div>
+  if (stage) {
+    const firstShot = detail.storyboards?.[0] || {};
+    const firstLogic = storyLogic(firstShot);
+    const steps = workflowSteps(detail);
+    const current = currentWorkflowStep(steps);
+    stage.innerHTML = `
+      <div class="flow-command">
+        <div class="flow-command-head">
+          <div>
+            <p class="eyebrow">PRODUCTION FLOW · 按实际工作流推进</p>
+            <h2>${escapeHtml(detail.headline || detail.name)}</h2>
+            <p>${escapeHtml(detail.name)} · 当前阶段：${escapeHtml(current?.label || "交付")} · ${escapeHtml(workflowStatusText(current?.status))}</p>
+          </div>
+          <button class="execute-bar compact-flow-action" type="button" id="continueButton">
+            <span>▶</span><strong>准备下一步</strong><em>确认后写入继续生成请求</em><b>→</b>
+          </button>
+        </div>
+        ${workflowSummaryHtml(detail)}
+        <div class="flow-layout">
+          <section class="flow-primary">
+            <div class="story-section-head">
+              <strong>生产流水线</strong>
+              <span>所有状态来自 projects/* 的脚本、phase、资产、shot packet 和产物文件。</span>
+            </div>
+            ${workflowStepsHtml(detail)}
+          </section>
+          <aside class="flow-side">
+            ${nextWorkHtml(detail)}
+            <div class="relation-card">
+              <div class="story-section-head">
+                <strong>人物 / 场景关系网</strong>
+                <span>${buildStoryGraph(detail).nodes.length} 个节点</span>
+              </div>
+              ${relationshipMapHtml(detail, true)}
+            </div>
+          </aside>
+        </div>
+        <div class="story-hero-grid">
+          <article class="story-main-frame">
+            <div class="story-main-image ${firstShot.image_url ? "has-image" : ""}" style="${firstShot.image_url ? `--plate-image:url('${escapeHtml(firstShot.image_url)}')` : ""}">
+              ${escapeHtml(firstShot.episode || "STORYBOARD")}
+            </div>
+            <div class="story-main-copy">
+              <span>${escapeHtml(firstShot.id || "SHOT")}</span>
+              <strong>${escapeHtml(firstLogic.shot_purpose || firstShot.title || "等待分镜")}</strong>
+              <p>${escapeHtml(firstLogic.transition_from_previous || firstShot.path || "读取 storyboard 与 shot packet。")}</p>
+            </div>
+          </article>
+          <article class="story-graph-card storyboard-logic-card">
+            <div class="panel-head tight">
+              <div>
+                <p class="eyebrow">STORY LOGIC</p>
+                <h3>镜头连接逻辑</h3>
+              </div>
+              <span class="badge">${escapeHtml(firstShot.id || "SHOT")}</span>
+            </div>
+            ${keyValueRows([
+              ["镜头目的", firstLogic.shot_purpose || "—"],
+              ["戏剧角色", firstLogic.dramatic_role || "—"],
+              ["转场", firstLogic.transition_from_previous || "—"],
+              ["情绪目标", firstLogic.emotional_target || "—"],
+              ["信息增量", firstLogic.information_delta || "—"],
+              ["下一钩子", firstLogic.next_hook || "—"],
+            ])}
+          </article>
+        </div>
+        <div class="story-section-head">
+          <strong>Storyboard</strong>
+          <span>预览用于检查镜头连接；完整镜头表在左侧“镜头”。</span>
+        </div>
+        <div class="storyboard-preview-strip">
+          ${storyboardMiniHtml(detail, 9)}
+        </div>
+        <div class="story-support-grid">
+          <section>
+            <div class="story-section-head">
+              <strong>Phase 状态</strong>
+              <span>v2 生产链路：本体论、分镜、Shot Packet、视频、QA。</span>
+            </div>
+            ${phaseMatrixHtml(detail, 8)}
+          </section>
+          <section>
+            <div class="story-section-head">
+              <strong>审核队列</strong>
+              <span>需要人工确认、修复或检查的事项。</span>
+            </div>
+            ${reviewQueueHtml(detail, 6)}
+          </section>
+        </div>
+        <div class="story-support-grid">
+          <section>
+            <div class="story-section-head">
+              <strong>人物资产</strong>
+              <span>角色档案、参考图和设定锚点。</span>
+            </div>
+            <div class="character-dossier-list">
+              ${characterDossierHtml(detail, 6)}
+            </div>
+          </section>
+          <section>
+            <div class="story-section-head">
+              <strong>资产包矩阵</strong>
+              <span>front / side / back / styleframe 完整性。</span>
+            </div>
+            ${assetMatrixHtml(detail, "characters", 5)}
+          </section>
+        </div>
+      </div>
     `;
   }
-  document.querySelector(".execute-bar strong").textContent = "提交继续生成请求";
-  document.querySelector(".execute-bar em").textContent = "写入请求文件；如配置远端触发器则自动提交";
+
   renderAssetCounts(counts);
   renderPrecheck(detail);
 }
@@ -691,14 +1242,24 @@ function renderAssets(detail) {
       ["交付物", `${detail.deliverables?.length ?? 0} 个`],
     ];
     promptPanel.innerHTML = `
-      <p class="eyebrow">ASSET INDEX · 真实资产索引</p>
-      <h2>项目资产</h2>
+      <p class="eyebrow">STORY BIBLE · 人物与设定</p>
+      <h2>资产设定总览</h2>
       <div class="config-list asset-index-list">
         ${assetRows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("")}
       </div>
-      <div class="section-rule"><span>RECENT FILES</span></div>
-      <div class="source-list">
-        ${(detail.deliverables || []).slice(0, 4).map((item) => `<div><span>${escapeHtml(item.episode)}</span><strong>${escapeHtml(item.path)}</strong></div>`).join("") || "<div><span>交付物</span><strong>未找到 deliverables</strong></div>"}
+      <div class="section-rule"><span>RELATION MAP</span></div>
+      ${relationshipMapHtml(detail)}
+      <div class="section-rule"><span>CHARACTER DOSSIERS</span></div>
+      <div class="character-dossier-list">
+        ${characterDossierHtml(detail, 10)}
+      </div>
+      <div class="section-rule"><span>ASSET MATRIX · CHARACTERS</span></div>
+      ${assetMatrixHtml(detail, "characters", 10)}
+      <div class="section-rule"><span>ASSET MATRIX · SCENES</span></div>
+      ${assetMatrixHtml(detail, "scenes", 8)}
+      <div class="section-rule"><span>SETTINGS</span></div>
+      <div class="setting-list">
+        ${settingsListHtml(detail, 6)}
       </div>
     `;
   }
@@ -782,17 +1343,25 @@ function renderStoryboard(detail) {
   const table = document.querySelector(".shot-table");
   if (!table || shots.length === 0) return;
   const heading = document.querySelector("#storyboardTitle");
-  if (heading) heading.textContent = `${detail.name} · ${shots.length} 张分镜参考`;
+  if (heading) heading.textContent = `${detail.name} · Storyboard`;
 
-  table.innerHTML = shots.slice(0, 16).map((shot, index) => `
-    <article class="shot-row ${index === 0 ? "selected" : ""}" data-shot-index="${index}">
+  table.innerHTML = shots.slice(0, 24).map((shot, index) => {
+    const logic = storyLogic(shot);
+    const packet = shotPacket(shot);
+    const characters = shotCharacters(shot);
+    return `
+    <article class="shot-row story-shot-card ${index === 0 ? "selected" : ""}" data-shot-index="${index}">
       <span>SH-${String(shot.shot).padStart(2, "0")}</span>
       <div class="shot-frame has-image" style="--plate-image:url('${escapeHtml(shot.image_url)}')">${escapeHtml(shot.episode)}</div>
-      <strong>${escapeHtml(shot.title)}<small>${escapeHtml(shot.status)} · ${escapeHtml(formatDate(shot.updated_at))}</small></strong>
-      <p>${escapeHtml(shot.path)}</p>
-      <em>${escapeHtml(shot.status)}</em>
+      <strong>${escapeHtml(logic.shot_purpose || shot.title)}<small>${escapeHtml(logic.dramatic_role || shot.status)} · ${escapeHtml(packet.duration_sec ? `${packet.duration_sec}s` : formatDate(shot.updated_at))}</small></strong>
+      <p>${escapeHtml(logic.transition_from_previous || packet.camera || shot.path)}</p>
+      <div>
+        <em>${escapeHtml(characters.slice(0, 2).join(" / ") || shotLocation(shot) || shot.status)}</em>
+        ${shotPhasePillsHtml(shot)}
+      </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
   selectShot(0);
 }
 
@@ -808,10 +1377,32 @@ function selectShot(index) {
   detailPanel.querySelector("h3").textContent = `${shot.id} · ${shot.status}`;
   setPlateImage(detailPanel.querySelector(".large-frame"), shot.image_url, "PREVIEW");
   const controls = detailPanel.querySelectorAll("textarea, input");
-  setControlValue(controls[0], `${shot.title}\n${shot.path}`);
-  setControlValue(controls[1], `@${shot.path} 作为构图参考，延续 ${currentProjectLabel()} 的角色与场景约束。`);
+  const logic = storyLogic(shot);
+  const packet = shotPacket(shot);
+  setControlValue(controls[0], [
+    logic.shot_purpose || shot.title,
+    logic.dramatic_role ? `dramatic_role: ${logic.dramatic_role}` : "",
+    logic.emotional_target ? `emotional_target: ${logic.emotional_target}` : "",
+    logic.information_delta ? `information_delta: ${logic.information_delta}` : "",
+  ].filter(Boolean).join("\n"));
+  setControlValue(controls[1], [
+    logic.transition_from_previous ? `转场：${logic.transition_from_previous}` : "",
+    packet.camera ? `镜头：${packet.camera}` : "",
+    logic.next_hook ? `下一钩子：${logic.next_hook}` : "",
+    `参考图：${shot.path}`,
+  ].filter(Boolean).join("\n"));
   setControlValue(controls[2], shot.episode);
-  setControlValue(controls[3], shot.status);
+  setControlValue(controls[3], `${shot.status} · ${shotCharacters(shot).join(" / ") || shotLocation(shot) || "未标注"}`);
+  const phaseBox = detailPanel.querySelector(".shot-phase-detail");
+  if (phaseBox) {
+    const phase = shot.phase_status || {};
+    phaseBox.innerHTML = `
+      <div><span>Storyboard</span><strong class="${phaseStatusClass(phase.storyboard)}">${escapeHtml(phaseStatusText(phase.storyboard))}</strong></div>
+      <div><span>Shot Packet</span><strong class="${phaseStatusClass(phase.packet)}">${escapeHtml(phaseStatusText(phase.packet))}</strong></div>
+      <div><span>Video</span><strong class="${phaseStatusClass(phase.video)}">${escapeHtml(phaseStatusText(phase.video))}</strong></div>
+      <div><span>QA</span><strong class="${phaseStatusClass(phase.qa)}">${escapeHtml(phaseStatusText(phase.qa))}</strong></div>
+    `;
+  }
 }
 
 function renderExport(detail) {
@@ -1150,6 +1741,7 @@ function renderProjectDetail(detail) {
   localStorage.setItem("aladdin-studio-project", detail.id);
   refreshPageChrome();
   renderWorkbench(detail);
+  renderHubProjectBrief(detail);
   renderAssets(detail);
   renderScript(detail);
   renderStoryboard(detail);
@@ -1198,6 +1790,18 @@ document.addEventListener("click", async (event) => {
   const shotRow = event.target.closest(".shot-row");
   if (shotRow) {
     selectShot(Number(shotRow.dataset.shotIndex || 0));
+    return;
+  }
+
+  const storyShot = event.target.closest(".story-shot-mini[data-shot-index]");
+  if (storyShot) {
+    selectShot(Number(storyShot.dataset.shotIndex || 0));
+    switchView("storyboard");
+    return;
+  }
+
+  if (event.target.closest("#continueButton")) {
+    advanceNode();
     return;
   }
 
@@ -1284,8 +1888,6 @@ document.addEventListener("click", async (event) => {
 document.querySelector("#refreshButton")?.addEventListener("click", () => {
   loadStudioData();
 });
-
-document.querySelector("#continueButton")?.addEventListener("click", advanceNode);
 
 document.querySelector("#commandButton")?.addEventListener("click", openPalette);
 document.querySelector("#closePalette")?.addEventListener("click", closePalette);

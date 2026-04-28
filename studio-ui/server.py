@@ -324,6 +324,37 @@ def collect_storyboards(project_dir: Path, shot_states: list[dict]) -> list[dict
             if key:
                 state_by_key[key.lower()] = state
 
+    packet_by_key = {}
+    packets_dir = project_dir / "state" / "shot-packets"
+    if packets_dir.exists():
+        for packet_path in sorted(packets_dir.glob("*.json")):
+            data = read_json(packet_path)
+            if not data:
+                continue
+            shot_id = str(data.get("shot_id") or packet_path.stem)
+            episode = str(data.get("episode") or "")
+            shot_number = data.get("shot_number")
+            candidates = [shot_id, packet_path.stem]
+            if episode and shot_number:
+                candidates.extend([
+                    f"{episode}-shot-{int(shot_number):02d}",
+                    f"{episode}-shot-{int(shot_number)}",
+                ])
+            packet = {
+                "path": rel(packet_path),
+                "shot_id": shot_id,
+                "duration_sec": data.get("duration_sec", ""),
+                "dialogue_mode": data.get("dialogue_mode", ""),
+                "story_logic": data.get("story_logic") or {},
+                "characters": data.get("characters") or [],
+                "background": data.get("background") or {},
+                "camera": data.get("camera") or "",
+                "seedance_mode": (data.get("seedance_inputs") or {}).get("mode", ""),
+            }
+            for key in candidates:
+                if key:
+                    packet_by_key[str(key).lower()] = packet
+
     shots = []
     outputs_dir = project_dir / "outputs"
     if not outputs_dir.exists():
@@ -340,6 +371,7 @@ def collect_storyboards(project_dir: Path, shot_states: list[dict]) -> list[dict
             image.stem,
         ]
         state = next((state_by_key[key.lower()] for key in candidates if key.lower() in state_by_key), {})
+        packet = next((packet_by_key[key.lower()] for key in candidates if key.lower() in packet_by_key), {})
         shots.append({
             "id": f"{episode}-shot-{shot_number:02d}",
             "episode": episode,
@@ -349,8 +381,243 @@ def collect_storyboards(project_dir: Path, shot_states: list[dict]) -> list[dict
             "path": rel(image),
             "status": state.get("status") or "storyboard",
             "updated_at": state.get("updated_at") or iso_from_mtime(image.stat().st_mtime),
+            "packet": packet,
         })
     return shots
+
+
+PHASE_LABELS = {
+    "0": "本体论",
+    "1": "合规预检",
+    "2": "视觉指导",
+    "2.2": "叙事审查",
+    "2.3": "分镜图",
+    "2.5": "资产工厂",
+    "3": "美术校验",
+    "3.5": "Shot Packet",
+    "4": "音色配置",
+    "5": "视频生成",
+    "6": "QA / Repair",
+}
+
+
+def normalize_phase(value: object) -> str:
+    if value is None:
+        return ""
+    text = str(value).strip()
+    if text.endswith(".0"):
+        text = text[:-2]
+    return text
+
+
+def collect_phase_matrix(project_dir: Path) -> list[dict]:
+    state_dir = project_dir / "state"
+    if not state_dir.exists():
+        return []
+    by_episode: dict[str, dict] = {}
+    for path in sorted(state_dir.glob("*-phase*.json")):
+        data = read_json(path)
+        if not data:
+            continue
+        episode = str(data.get("episode") or path.stem.split("-phase")[0])
+        phase = normalize_phase(data.get("phase") or path.stem.split("-phase", 1)[-1])
+        if not episode or not phase:
+            continue
+        row = by_episode.setdefault(episode, {"episode": episode, "phases": {}})
+        row["phases"][phase] = {
+            "phase": phase,
+            "label": PHASE_LABELS.get(phase, f"Phase {phase}"),
+            "status": data.get("status") or data.get("decision") or "unknown",
+            "decision": data.get("decision", ""),
+            "score": data.get("total_score", ""),
+            "path": rel(path),
+            "updated_at": data.get("completed_at") or data.get("reviewed_at") or data.get("started_at") or iso_from_mtime(path.stat().st_mtime),
+            "data": data.get("data") or {},
+            "needs_human_review": data.get("needs_human_review") or [],
+        }
+    rows = []
+    phase_order = ["0", "1", "2", "2.2", "2.3", "2.5", "3", "3.5", "4", "5", "6"]
+    for episode, row in sorted(by_episode.items(), key=lambda item: episode_sort_key(Path(item[0]))):
+        phases = row["phases"]
+        row["ordered"] = [
+            phases.get(phase) or {
+                "phase": phase,
+                "label": PHASE_LABELS.get(phase, f"Phase {phase}"),
+                "status": "missing",
+                "path": "",
+                "updated_at": "",
+                "data": {},
+                "needs_human_review": [],
+            }
+            for phase in phase_order
+        ]
+        rows.append(row)
+    return rows
+
+
+def collect_ontology(project_dir: Path) -> dict:
+    ontology_dir = project_dir / "state" / "ontology"
+    if not ontology_dir.exists():
+        return {"episodes": [], "entities": {"characters": [], "locations": [], "props": []}, "relationships": [], "rules": []}
+
+    episodes = []
+    characters: dict[str, dict] = {}
+    locations: dict[str, dict] = {}
+    props: dict[str, dict] = {}
+    relationships = []
+    rules: list[str] = []
+    for path in sorted(ontology_dir.glob("*-world-model.json"), key=episode_sort_key):
+        data = read_json(path)
+        if not data:
+            continue
+        episode = data.get("episode") or path.stem.split("-")[0]
+        entities = data.get("entities") or {}
+        for item in entities.get("characters") or []:
+            name = str(item.get("name") or item.get("id") or "")
+            if name:
+                current = characters.setdefault(name, {**item, "episodes": []})
+                current["episodes"].append(episode)
+        for item in entities.get("locations") or []:
+            name = str(item.get("name") or item.get("id") or "")
+            if name:
+                current = locations.setdefault(name, {**item, "episodes": []})
+                current["episodes"].append(episode)
+        for item in entities.get("props") or []:
+            name = str(item.get("name") or item.get("id") or "")
+            if name:
+                current = props.setdefault(name, {**item, "episodes": []})
+                current["episodes"].append(episode)
+        for relation in data.get("relationships") or []:
+            relationships.append({**relation, "episode": episode})
+        narrative = data.get("narrative_constraints") or {}
+        rules.extend([str(item) for item in narrative.get("world_rules") or []])
+        physics_notes = (data.get("physics_rules") or {}).get("notes")
+        if physics_notes:
+            rules.append(str(physics_notes))
+        episodes.append({
+            "episode": episode,
+            "path": rel(path),
+            "characters": len(entities.get("characters") or []),
+            "locations": len(entities.get("locations") or []),
+            "props": len(entities.get("props") or []),
+            "relationships": len(data.get("relationships") or []),
+        })
+
+    return {
+        "episodes": episodes,
+        "entities": {
+            "characters": list(characters.values()),
+            "locations": list(locations.values()),
+            "props": list(props.values()),
+        },
+        "relationships": relationships,
+        "rules": list(dict.fromkeys(rules))[:24],
+    }
+
+
+def split_asset_name(path: Path) -> tuple[str, str, str]:
+    stem = path.stem
+    parts = stem.split("-")
+    if len(parts) >= 3 and parts[-1] in {"front", "side", "back"}:
+        return "-".join(parts[:-2]), parts[-2], parts[-1]
+    if len(parts) >= 2 and parts[-1] in {"front", "side", "back", "interface"}:
+        return "-".join(parts[:-1]), "default", parts[-1]
+    if len(parts) >= 2 and parts[-1] in {"day", "night", "dusk", "dawn"}:
+        return "-".join(parts[:-1]), parts[-1], "styleframe"
+    return stem, "default", "asset"
+
+
+def collect_asset_matrix(project_dir: Path) -> dict:
+    matrix: dict[str, dict[str, dict]] = {"characters": {}, "scenes": {}, "props": {}}
+    image_roots = [
+        ("characters", project_dir / "assets" / "characters" / "images"),
+        ("scenes", project_dir / "assets" / "scenes" / "images"),
+        ("props", project_dir / "assets" / "props" / "images"),
+    ]
+    for asset_type, root in image_roots:
+        if not root.exists():
+            continue
+        for path in sorted(root.rglob("*")):
+            if not path.is_file() or path.suffix.lower() not in {".png", ".jpg", ".jpeg", ".webp"}:
+                continue
+            entity, variant, view = split_asset_name(path)
+            entity_row = matrix[asset_type].setdefault(entity, {"entity": entity, "variants": {}})
+            variant_row = entity_row["variants"].setdefault(variant, {"variant": variant, "views": {}})
+            variant_row["views"][view] = {"path": rel(path), "url": media_url(path)}
+
+    def flatten(section: dict) -> list[dict]:
+        rows = []
+        for entity, row in sorted(section.items()):
+            variants = []
+            for variant, variant_row in sorted(row["variants"].items()):
+                variants.append({
+                    "variant": variant,
+                    "views": variant_row["views"],
+                    "view_count": len(variant_row["views"]),
+                })
+            rows.append({"entity": entity, "variants": variants, "asset_count": sum(item["view_count"] for item in variants)})
+        return rows
+
+    return {key: flatten(value) for key, value in matrix.items()}
+
+
+def collect_review_queue(project_dir: Path, phase_matrix: list[dict]) -> list[dict]:
+    queue = []
+    for row in phase_matrix:
+        episode = row["episode"]
+        for phase in row.get("ordered", []):
+            for item in phase.get("needs_human_review") or []:
+                queue.append({
+                    "episode": episode,
+                    "phase": phase["phase"],
+                    "label": phase["label"],
+                    "severity": "review",
+                    "text": str(item),
+                    "source": phase.get("path", ""),
+                })
+            if phase["status"] in {"pending", "failed", "missing"} and phase["phase"] in {"2.2", "2.3", "3.5", "5", "6"}:
+                queue.append({
+                    "episode": episode,
+                    "phase": phase["phase"],
+                    "label": phase["label"],
+                    "severity": "pending" if phase["status"] == "pending" else "gap",
+                    "text": f"{phase['label']} 状态为 {phase['status']}",
+                    "source": phase.get("path", ""),
+                })
+
+    outputs_dir = project_dir / "outputs"
+    for path in sorted(outputs_dir.glob("ep*/review/*.md")) + sorted(outputs_dir.glob("ep*/narrative-review.md")) + sorted(outputs_dir.glob("ep*/art-direction-review.md")):
+        if path.is_file():
+            episode = path.parent.parent.name if path.parent.name == "review" else path.parent.name
+            queue.append({
+                "episode": episode,
+                "phase": "review",
+                "label": "审核资料",
+                "severity": "info",
+                "text": path.name,
+                "source": rel(path),
+            })
+    return queue[:80]
+
+
+def shot_phase_status(shot: dict, project_dir: Path, phase_matrix: list[dict]) -> dict:
+    episode = shot.get("episode", "")
+    shot_number = int(shot.get("shot") or 0)
+    phases = next((row.get("phases", {}) for row in phase_matrix if row.get("episode") == episode), {})
+    video_candidates = [
+        project_dir / "outputs" / episode / "deliverables" / "shots" / f"shot-{shot_number:02d}.mp4",
+        project_dir / "outputs" / episode / "videos" / f"shot-{shot_number:02d}.mp4",
+    ]
+    video = next((path for path in video_candidates if path.exists()), None)
+    return {
+        "ontology": phases.get("0", {}).get("status", "missing"),
+        "storyboard": "completed" if shot.get("image_url") else phases.get("2.3", {}).get("status", "missing"),
+        "packet": "completed" if shot.get("packet") else phases.get("3.5", {}).get("status", "missing"),
+        "video": "completed" if video else phases.get("5", {}).get("status", "missing"),
+        "qa": phases.get("6", {}).get("status", "missing"),
+        "video_path": rel(video) if video else "",
+        "video_url": media_url(video) if video else "",
+    }
 
 
 def pipeline_from_project(project_dir: Path, counts: dict, phases: list[dict]) -> list[dict]:
@@ -418,6 +685,7 @@ def project_detail(project_id: str) -> dict | None:
 
     summary = project_summary(project_dir)
     phases, shot_states = collect_states(project_dir)
+    phase_matrix = collect_phase_matrix(project_dir)
     pipeline = pipeline_from_project(project_dir, summary["counts"], phases)
     character_profiles = sorted((project_dir / "assets" / "characters" / "profiles").glob("*.yaml"))
     scene_profiles = sorted((project_dir / "assets" / "scenes" / "profiles").glob("*.yaml"))
@@ -439,15 +707,27 @@ def project_detail(project_id: str) -> dict | None:
         {"label": "打开审核", "command": "~review"},
         {"label": "查看链路", "command": "~trace"},
     ]
+    storyboards = collect_storyboards(project_dir, shot_states)
+    for shot in storyboards:
+        shot["phase_status"] = shot_phase_status(shot, project_dir, phase_matrix)
+
+    ontology = collect_ontology(project_dir)
+    asset_matrix = collect_asset_matrix(project_dir)
+    review_queue = collect_review_queue(project_dir, phase_matrix)
+
     detail = {
         **summary,
         "pipeline": pipeline,
+        "phase_matrix": phase_matrix,
+        "ontology": ontology,
+        "asset_matrix": asset_matrix,
+        "review_queue": review_queue,
         "scripts": collect_scripts(project_dir),
         "characters": characters,
         "scenes": scenes,
         "phases": phases,
         "shot_states": shot_states,
-        "storyboards": collect_storyboards(project_dir, shot_states),
+        "storyboards": storyboards,
         "deliverables": deliverables,
         "commands": commands,
     }
@@ -838,7 +1118,10 @@ class StudioHandler(SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         with target.open("rb") as file:
-            self.wfile.write(file.read())
+            try:
+                self.wfile.write(file.read())
+            except BrokenPipeError:
+                return
 
 
 def main() -> None:
